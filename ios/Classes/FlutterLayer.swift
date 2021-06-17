@@ -1,0 +1,27 @@
+//
+// Created by Valentin Grigorean on 25.03.2021.
+//
+
+import Foundation
+import ArcGIS
+
+struct FlutterLayer: Hashable {
+
+    init(data: Dictionary<String, Any>) {
+        layerId = data["layerId"] as! String
+        layerType = data["layerType"] as! String
+        url = URL(string: data["url"] as! String)
+
+        if let credential = data["credential"] as? Dictionary<String, Any> {
+            self.credential = AGSCredential(data: credential)
+        } else {
+            credential = nil
+        }
+    }
+
+    let layerId: String
+    let layerType: String
+    let url: URL?
+
+    let credential: AGSCredential?
+}
