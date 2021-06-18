@@ -25,6 +25,10 @@ class TiledLayer extends BaseTileLayer {
 
   @override
   clone() {
-    return TiledLayer._(layerId: layerId, url: url);
+    return TiledLayer._(
+      layerId: layerId,
+      url: url,
+      credential: credential,
+    );
   }
 }

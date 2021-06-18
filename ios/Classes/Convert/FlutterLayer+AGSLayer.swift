@@ -20,6 +20,10 @@ extension FlutterLayer {
             let layer = AGSArcGISTiledLayer(url: url!)
             layer.credential = credential
             return layer
+        case "ArcGISMapImageLayer":
+            let mapImageLayer = AGSArcGISMapImageLayer(url: url!)
+            mapImageLayer.credential = credential
+            return mapImageLayer
         default:
             fatalError("Not implemented.")
         }

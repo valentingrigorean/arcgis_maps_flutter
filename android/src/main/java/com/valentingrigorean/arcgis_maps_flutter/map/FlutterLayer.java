@@ -2,6 +2,7 @@ package com.valentingrigorean.arcgis_maps_flutter.map;
 
 import com.esri.arcgisruntime.data.ServiceFeatureTable;
 import com.esri.arcgisruntime.io.RemoteResource;
+import com.esri.arcgisruntime.layers.ArcGISMapImageLayer;
 import com.esri.arcgisruntime.layers.ArcGISTiledLayer;
 import com.esri.arcgisruntime.layers.ArcGISVectorTiledLayer;
 import com.esri.arcgisruntime.layers.FeatureLayer;
@@ -41,19 +42,24 @@ public class FlutterLayer {
         RemoteResource remoteResource;
         switch (layerType) {
             case "VectorTileLayer":
-                ArcGISVectorTiledLayer vectorTiledLayer = new ArcGISVectorTiledLayer(url);
+                final ArcGISVectorTiledLayer vectorTiledLayer = new ArcGISVectorTiledLayer(url);
                 layer = vectorTiledLayer;
                 remoteResource = vectorTiledLayer;
                 break;
             case "FeatureLayer":
-                ServiceFeatureTable serviceFeatureTable = new ServiceFeatureTable(url);
+                final ServiceFeatureTable serviceFeatureTable = new ServiceFeatureTable(url);
                 remoteResource = serviceFeatureTable;
                 layer = new FeatureLayer(serviceFeatureTable);
                 break;
             case "TiledLayer":
-                ArcGISTiledLayer tiledLayer = new ArcGISTiledLayer(url);
+                final ArcGISTiledLayer tiledLayer = new ArcGISTiledLayer(url);
                 remoteResource = tiledLayer;
                 layer = tiledLayer;
+                break;
+            case "ArcGISMapImageLayer":
+                final ArcGISMapImageLayer mapImageLayer = new ArcGISMapImageLayer(url);
+                remoteResource = mapImageLayer;
+                layer = mapImageLayer;
                 break;
             default:
                 throw new UnsupportedOperationException("not implemented.");

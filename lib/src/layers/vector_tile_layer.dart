@@ -26,6 +26,10 @@ class VectorTileLayer extends BaseTileLayer {
 
   @override
   clone() {
-    return VectorTileLayer._(layerId: layerId, url: url);
+    return VectorTileLayer._(
+      layerId: layerId,
+      url: url,
+      credential: credential,
+    );
   }
 }

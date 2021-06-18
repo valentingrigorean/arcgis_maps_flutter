@@ -1,24 +1,23 @@
 part of arcgis_maps_flutter;
 
-@immutable
-class FeatureLayer extends BaseTileLayer {
-  const FeatureLayer._({
+class ArcGISMapImageLayer extends BaseTileLayer {
+  const ArcGISMapImageLayer._({
     required LayerId layerId,
     required String url,
     Credential? credential,
   }) : super(
           layerId: layerId,
           url: url,
-          type: 'FeatureLayer',
+          type: "ArcGISMapImageLayer",
           credential: credential,
         );
 
-  factory FeatureLayer.fromUrl(
+  factory ArcGISMapImageLayer.fromUrl(
     String url, {
     LayerId? layerId,
     Credential? credential,
   }) =>
-      FeatureLayer._(
+      ArcGISMapImageLayer._(
         layerId: layerId ?? LayerId(url),
         url: url,
         credential: credential,
@@ -26,7 +25,7 @@ class FeatureLayer extends BaseTileLayer {
 
   @override
   clone() {
-    return FeatureLayer._(
+    return ArcGISMapImageLayer._(
       layerId: layerId,
       url: url,
       credential: credential,

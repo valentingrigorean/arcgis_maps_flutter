@@ -49,6 +49,7 @@ part 'src/portal/portal_item.dart';
 
 part 'src/loadable/loadable.dart';
 
+part 'src/layers/arcgis_map_image_layer.dart';
 part 'src/layers/layer.dart';
 part 'src/layers/feature_layer.dart';
 part 'src/layers/tiled_layer.dart';
