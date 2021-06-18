@@ -28,6 +28,7 @@ import 'package:flutter/material.dart';
 part 'src/arcgis_error.dart';
 part 'src/arcgis_runtime_environment.dart';
 
+part 'src/geometry/ags_polyline.dart';
 part 'src/geometry/envelope.dart';
 part 'src/geometry/point.dart';
 part 'src/geometry/spatial_references.dart';

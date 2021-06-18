@@ -13,3 +13,13 @@ Map<dynamic, dynamic>? toSafeMapNullable(dynamic o) {
   }
   return null;
 }
+
+double? toDoubleNullable(dynamic o) {
+  if (o is int) {
+    return o.toDouble();
+  }
+  if (o is double) {
+    return o;
+  }
+  return null;
+}

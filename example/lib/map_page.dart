@@ -43,6 +43,20 @@ class _MapPageState extends State<MapPage> {
               password: dotenv.env['password']!,
             ),
           ),
+          FeatureLayer.fromUrl(
+            'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/19',
+            credential: Credential.creteUserCredential(
+              username: dotenv.env['username']!,
+              password: dotenv.env['password']!,
+            ),
+          ),
+          FeatureLayer.fromUrl(
+            'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/18',
+            credential: Credential.creteUserCredential(
+              username: dotenv.env['username']!,
+              password: dotenv.env['password']!,
+            ),
+          ),
         },
         onIdentifyLayers: (layers) {
           for (var layer in layers) {

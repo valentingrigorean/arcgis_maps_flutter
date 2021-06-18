@@ -14,13 +14,16 @@ abstract class GeoElement {
     attributesData.forEach((key, value) {
       attributes[key] = fromNativeField(value);
     });
-    return _GeoElementImpl(
-        attributes,
-        Geometry.fromJson(
-          toSafeMapNullable(
-            json['geometry'],
-          ),
-        )!);
+
+    Geometry? geometry;
+    try {
+      geometry = Geometry.fromJson(toSafeMapNullable(json['geometry']));
+    } catch (e, stackTrace) {
+      print(e);
+      print(stackTrace);
+    }
+
+    return _GeoElementImpl(attributes, geometry);
   }
 }
 

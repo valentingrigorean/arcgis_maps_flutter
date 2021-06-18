@@ -10,6 +10,9 @@ abstract class Geometry {
     if (json.containsKey('xmax')) {
       return Envelope.fromJson(json);
     }
+    if (json.containsKey('paths')) {
+      return AGSPolyline.fromJson(json);
+    }
     return Point.fromJson(json);
   }
 }

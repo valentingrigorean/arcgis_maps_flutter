@@ -58,6 +58,7 @@ public class Convert {
         if (data.containsKey("z"))
             z = toDouble(data.get("z"));
 
+
         if (data.containsKey("m"))
             m = toDouble(data.get("m"));
 
