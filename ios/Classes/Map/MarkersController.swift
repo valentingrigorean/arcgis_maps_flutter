@@ -77,8 +77,8 @@ class MarkersController: NSObject {
             controller.setBackground(bitmapDescription: BitmapDescriptor(data: backgroundImage))
         }
 
-        if let opacity = data["opacity"] as? Float {
-            controller.setOpacity(opacity: opacity)
+        if let opacity = data["opacity"] as? Double {
+            controller.setOpacity(opacity: Float(opacity))
         }
 
         if let visible = data["visible"] as? Bool {

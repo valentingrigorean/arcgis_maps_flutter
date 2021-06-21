@@ -18,7 +18,9 @@ class _MapPageState extends State<MapPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final Set<Layer> _lakeLayers = {
     FeatureLayer.fromUrl(
-        'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/1'),
+      'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/1',
+      opacity: 0.4,
+    ),
     FeatureLayer.fromUrl(
         'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/2'),
     FeatureLayer.fromUrl(
