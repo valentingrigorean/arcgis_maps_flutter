@@ -2,6 +2,7 @@ package com.valentingrigorean.arcgis_maps_flutter.map;
 
 import com.esri.arcgisruntime.layers.Layer;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
+import com.valentingrigorean.arcgis_maps_flutter.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,7 +11,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import io.flutter.plugin.common.MethodChannel;
 
@@ -50,7 +50,7 @@ class LayersController {
 
     public void updateFromArgs(Object args) {
         final Map<?, ?> mapData = (Map<?, ?>) args;
-        if (mapData == null) {
+        if (mapData == null || mapData.size() == 0) {
             return;
         }
 
@@ -77,7 +77,7 @@ class LayersController {
     private void addLayers(Object args, LayerType layerType) {
 
         final Collection<Map<?, ?>> layersArgs = (Collection<Map<?, ?>>) args;
-        if (layersArgs == null) {
+        if (layersArgs == null || layersArgs.size() == 0) {
             return;
         }
 
@@ -102,7 +102,7 @@ class LayersController {
 
     private void removeLayers(Object args, LayerType layerType) {
         final Collection<Map<?, ?>> layersArgs = (Collection<Map<?, ?>>) args;
-        if (layersArgs == null) {
+        if (layersArgs == null || layersArgs.size() == 0) {
             return;
         }
         final Map<String, Layer> flutterMap = getFlutterMap(layerType);
@@ -121,10 +121,12 @@ class LayersController {
     }
 
     private void removeLayersById(Collection<String> ids, LayerType layerType) {
+        if (ids.size() == 0)
+            return;
         final ArrayList<FlutterLayer> layersToRemove = new ArrayList<>();
-        final Stream<FlutterLayer> layers = getFlutterLayerSet(layerType).stream();
+        final Set<FlutterLayer> layers = getFlutterLayerSet(layerType);
         for (String id : ids) {
-            final Optional<FlutterLayer> flutterLayer = layers.filter(e -> e.getLayerId() == id).findFirst();
+            final Optional<FlutterLayer> flutterLayer = layers.stream().filter(e -> StringUtils.areEqual(e.getLayerId(), id)).findFirst();
             if (flutterLayer.isPresent()) {
                 layersToRemove.add(flutterLayer.get());
             }
@@ -134,6 +136,8 @@ class LayersController {
     }
 
     private void addLayersToMap(Collection<FlutterLayer> layers, LayerType layerType) {
+        if (layers.size() == 0)
+            return;
         if (map == null) {
             return;
         }
@@ -144,7 +148,7 @@ class LayersController {
             final Layer nativeLayer = layer.createLayer();
             flutterMap.put(layer.getLayerId(), nativeLayer);
             nativeLayer.addDoneLoadingListener(() -> {
-                final Map<String, Object> args = new HashMap<>();
+                final Map<String, Object> args = new HashMap<>(1);
                 args.put("layerId", layer.getLayerId());
                 methodChannel.invokeMethod("layer#loaded", args);
             });
@@ -164,13 +168,15 @@ class LayersController {
     }
 
     private void removeLayersFromMap(Collection<FlutterLayer> layers, LayerType layerType) {
+        if (layers.size() == 0)
+            return;
         final ArrayList<Layer> nativeLayersToRemove = new ArrayList<>();
         final Map<String, Layer> flutterMap = getFlutterMap(layerType);
         final Set<FlutterLayer> flutterLayer = getFlutterLayerSet(layerType);
 
         for (FlutterLayer layer : layers) {
             Layer nativeLayer = flutterMap.get(layer.getLayerId());
-            flutterMap.remove(layer);
+            flutterMap.remove(layer.getLayerId());
             flutterLayer.remove(layer);
             nativeLayersToRemove.add(nativeLayer);
         }

@@ -1,7 +1,7 @@
 part of arcgis_maps_flutter;
 
-class AGSPolyline implements Geometry {
-  AGSPolyline({
+class AGSPolygon implements Geometry {
+  AGSPolygon({
     required this.points,
     this.spatialReference,
   });
@@ -10,20 +10,20 @@ class AGSPolyline implements Geometry {
 
   final SpatialReference? spatialReference;
 
-  static AGSPolyline? fromJson(Map<dynamic, dynamic>? json) {
+  static AGSPolygon? fromJson(Map<dynamic, dynamic>? json) {
     if (json == null) {
       return null;
     }
 
     final bool hasZ = json['hasZ'] ?? false;
 
-    final List<dynamic> paths = json['paths'];
+    final List<dynamic> rings = json['rings'];
 
     final SpatialReference? spatialReference =
         SpatialReference.fromJson(json['spatialReference']);
 
-    return AGSPolyline(
-      points: Point.fromJsonList(paths, hasZ),
+    return AGSPolygon(
+      points: Point.fromJsonList(rings, hasZ),
       spatialReference: spatialReference,
     );
   }
@@ -46,7 +46,7 @@ class AGSPolyline implements Geometry {
       return result;
     }
 
-    addIfPresent('paths', _pointsToJson());
+    addIfPresent('rings', _pointsToJson());
     addIfPresent('spatialReference', spatialReference?.toJson());
 
     return Object();

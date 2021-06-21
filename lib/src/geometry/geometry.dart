@@ -7,12 +7,16 @@ abstract class Geometry {
     if (json == null) {
       return null;
     }
-    if (json.containsKey('xmax')) {
-      return Envelope.fromJson(json);
-    }
     if (json.containsKey('paths')) {
       return AGSPolyline.fromJson(json);
     }
+    if (json.containsKey('rings')) {
+      return AGSPolygon.fromJson(json);
+    }
+    if (json.containsKey('xmax')) {
+      return Envelope.fromJson(json);
+    }
+
     return Point.fromJson(json);
   }
 }

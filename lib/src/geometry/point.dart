@@ -34,6 +34,20 @@ class Point implements Geometry {
     );
   }
 
+  static List<Point> fromJsonList(List<dynamic> json, bool hasZ) {
+    final List<Point> points = [];
+
+    for (final path in json) {
+      for (final point in path) {
+        final double x = toDoubleSafe(point[0]);
+        final double y = toDoubleSafe(point[1]);
+        final double? z = hasZ ? toDoubleSafeNullable(point[2]) : null;
+        points.add(Point(x: x, y: y, z: z));
+      }
+    }
+    return points;
+  }
+
   final double x;
   final double y;
   final double? z;

@@ -4,6 +4,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // ignore_for_file: unused_field
 
+final geodataCredentials = Credential.creteUserCredential(
+  username: dotenv.env['username']!,
+  password: dotenv.env['password']!,
+);
+
 class MapPage extends StatefulWidget {
   @override
   _MapPageState createState() => _MapPageState();
@@ -11,6 +16,22 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final Set<Layer> _lakeLayers = {
+    FeatureLayer.fromUrl(
+        'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/1'),
+    FeatureLayer.fromUrl(
+        'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/2'),
+    FeatureLayer.fromUrl(
+        'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/3'),
+    FeatureLayer.fromUrl(
+        'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/4'),
+    FeatureLayer.fromUrl(
+        'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/5'),
+    FeatureLayer.fromUrl(
+        'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/6'),
+  };
+
+  bool _showLayers = true;
 
   bool _trackCamera = false;
 
@@ -25,64 +46,54 @@ class _MapPageState extends State<MapPage> {
         key: _scaffoldKey,
         title: Text("Map"),
       ),
-      body: ArcgisMapView(
-        map: map,
-        onMapCreated: onMapCreated,
-        onMapLoaded: (error) {
-          if (error != null) {
-            print(error);
-          } else {
-            print('map loaded.');
-          }
+      body: _buildMap(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            _showLayers = !_showLayers;
+          });
         },
-        referenceLayers: {
-          FeatureLayer.fromUrl(
-            'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/20',
-            credential: Credential.creteUserCredential(
-              username: dotenv.env['username']!,
-              password: dotenv.env['password']!,
-            ),
-          ),
-          FeatureLayer.fromUrl(
-            'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/19',
-            credential: Credential.creteUserCredential(
-              username: dotenv.env['username']!,
-              password: dotenv.env['password']!,
-            ),
-          ),
-          FeatureLayer.fromUrl(
-            'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/18',
-            credential: Credential.creteUserCredential(
-              username: dotenv.env['username']!,
-              password: dotenv.env['password']!,
-            ),
-          ),
-        },
-        onIdentifyLayers: (layers) {
-          for (var layer in layers) {
-            print('LayerName:' + layer.layerName);
-            for (var element in layer.elements) {
-              print('geometry:' +
-                  (element.geometry?.toJson().toString() ?? 'null'));
-              element.attributes.forEach((key, value) {
-                print(key + ':' + (value?.toString() ?? 'null'));
-              });
-            }
-          }
-        },
-        onLayerLoaded: (layer, error) {
-          if (error != null) {
-            print('Failed to load $layer:$error');
-          } else {
-            print('Loaded layer $layer');
-          }
-        },
-        onCameraMove: _trackCamera
-            ? () {
-                print('onCameraMove');
-              }
-            : null,
+        child: Icon(Icons.add),
       ),
+    );
+  }
+
+  Widget _buildMap() {
+    return ArcgisMapView(
+      map: map,
+      onMapCreated: onMapCreated,
+      onMapLoaded: (error) {
+        if (error != null) {
+          print(error);
+        } else {
+          print('map loaded.');
+        }
+      },
+      referenceLayers: _showLayers ? _lakeLayers : const {},
+      onIdentifyLayers: (layers) {
+        for (var layer in layers) {
+          print('LayerName:' + layer.layerName);
+          for (var element in layer.elements) {
+            print('geometry:' +
+                (element.geometry?.toJson().toString() ?? 'null'));
+            element.attributes.forEach((key, value) {
+              print(key + ':' + (value?.toString() ?? 'null'));
+            });
+          }
+        }
+      },
+      onLayerLoaded: (layer, error) {
+        if (error != null) {
+          print('Failed to load $layer:$error');
+        } else {
+          print('Loaded layer $layer');
+        }
+      },
+      onCameraMove: _trackCamera
+          ? () {
+              print('onCameraMove');
+            }
+          : null,
     );
   }
 

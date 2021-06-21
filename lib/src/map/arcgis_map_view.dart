@@ -74,7 +74,7 @@ class ArcgisMapView extends StatefulWidget {
     this.onCameraMove,
     this.onIdentifyLayer = const {},
     this.onIdentifyLayers,
-  })  :
+  }) :
         // assert(onIdentifyLayer.isNotEmpty || onIdentifyLayers != null,
         //     'You can use only onIdentifyLayer or onIdentifyLayers'),
         super(key: key);
@@ -375,6 +375,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     final ArcgisMapController controller = await _controller.future;
     final layersUpdate = LayerUpdates.from(_operationalLayers.values.toSet(),
         widget.operationalLayers, 'operationalLayer');
+    if (layersUpdate.isEmpty) return;
     controller._updateLayers(layersUpdate);
     _operationalLayers = keyByLayerId(widget.operationalLayers);
   }
@@ -383,6 +384,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     final ArcgisMapController controller = await _controller.future;
     final layersUpdate = LayerUpdates.from(
         _baseLayers.values.toSet(), widget.baseLayers, 'baseLayer');
+    if (layersUpdate.isEmpty) return;
     controller._updateLayers(layersUpdate);
     _baseLayers = keyByLayerId(widget.baseLayers);
   }
@@ -391,6 +393,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     final ArcgisMapController controller = await _controller.future;
     final layersUpdate = LayerUpdates.from(_referenceLayers.values.toSet(),
         widget.referenceLayers, 'referenceLayer');
+    if (layersUpdate.isEmpty) return;
     controller._updateLayers(layersUpdate);
     _referenceLayers = keyByLayerId(widget.referenceLayers);
   }
@@ -399,21 +402,26 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     final ArcgisMapController controller = await _controller.future;
     final markerUpdate =
         MarkerUpdates.from(_markers.values.toSet(), widget.markers);
+    if (markerUpdate.isEmpty) return;
     controller._updateMarkers(markerUpdate);
     _markers = keyByMarkerId(widget.markers);
   }
 
   void _updatePolygons() async {
     final ArcgisMapController controller = await _controller.future;
-    controller._updatePolygons(
-        PolygonUpdates.from(_polygons.values.toSet(), widget.polygons));
+    final polygonUpdates =
+        PolygonUpdates.from(_polygons.values.toSet(), widget.polygons);
+    if (polygonUpdates.isEmpty) return;
+    controller._updatePolygons(polygonUpdates);
     _polygons = keyByPolygonId(widget.polygons);
   }
 
   void _updatePolylines() async {
     final ArcgisMapController controller = await _controller.future;
-    controller._updatePolylines(
-        PolylineUpdates.from(_polylines.values.toSet(), widget.polylines));
+    final polylinesUpdate =
+        PolylineUpdates.from(_polylines.values.toSet(), widget.polylines);
+    if (polylinesUpdate.isEmpty) return;
+    controller._updatePolylines(polylinesUpdate);
     _polylines = keyByPolylineId(widget.polylines);
   }
 

@@ -11,10 +11,11 @@ class MapsObjectUpdates<T extends MapsObject> {
   /// [objectName] is the prefix to use when serializing the updates into a JSON
   /// dictionary. E.g., 'circle' will give 'circlesToAdd', 'circlesToUpdate',
   /// 'circleIdsToRemove'.
-  MapsObjectUpdates.from(Set<T> previous,
-      Set<T> current, {
-        required this.objectName,
-      }) {
+  MapsObjectUpdates.from(
+    Set<T> previous,
+    Set<T> current, {
+    required this.objectName,
+  }) {
     final Map<MapsObjectId<T>, T> previousObjects = keyByMapsObjectId(previous);
     final Map<MapsObjectId<T>, T> currentObjects = keyByMapsObjectId(current);
 
@@ -74,6 +75,12 @@ class MapsObjectUpdates<T extends MapsObject> {
 
   late Set<T> _objectsToChange;
 
+  bool get isEmpty {
+    return objectsToAdd.isEmpty &&
+        objectIdsToRemove.isEmpty &&
+        objectsToChange.isEmpty;
+  }
+
   /// Converts this object to JSON.
   Object toJson() {
     final Map<String, Object> updateMap = <String, Object>{};
@@ -108,14 +115,12 @@ class MapsObjectUpdates<T extends MapsObject> {
   }
 
   @override
-  int get hashCode =>
-      hashValues(hashList(_objectsToAdd),
-          hashList(_objectIdsToRemove), hashList(_objectsToChange));
+  int get hashCode => hashValues(hashList(_objectsToAdd),
+      hashList(_objectIdsToRemove), hashList(_objectsToChange));
 
   @override
   String toString() {
-    return '${objectRuntimeType(
-        this, 'MapsObjectUpdates')}(add: $objectsToAdd, '
+    return '${objectRuntimeType(this, 'MapsObjectUpdates')}(add: $objectsToAdd, '
         'remove: $objectIdsToRemove, '
         'change: $objectsToChange)';
   }

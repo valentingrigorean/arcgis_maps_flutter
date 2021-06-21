@@ -14,7 +14,11 @@ Map<dynamic, dynamic>? toSafeMapNullable(dynamic o) {
   return null;
 }
 
-double? toDoubleNullable(dynamic o) {
+double toDoubleSafe(dynamic o) {
+  return toDoubleSafeNullable(o)!;
+}
+
+double? toDoubleSafeNullable(dynamic o) {
   if (o is int) {
     return o.toDouble();
   }
