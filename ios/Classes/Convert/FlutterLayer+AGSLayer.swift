@@ -11,22 +11,31 @@ extension FlutterLayer {
         case "VectorTileLayer":
             let layer = AGSArcGISVectorTiledLayer(url: url!)
             layer.credential = credential
+            setupDefaultParams(layer: layer)
             return layer
         case "FeatureLayer":
             let featureTable = AGSServiceFeatureTable(url: url!)
             featureTable.credential = credential
-            return AGSFeatureLayer(featureTable: featureTable)
+            let featureLayer = AGSFeatureLayer(featureTable: featureTable)
+            setupDefaultParams(layer: featureLayer)
+            return featureLayer
         case "TiledLayer":
             let layer = AGSArcGISTiledLayer(url: url!)
             layer.credential = credential
+            setupDefaultParams(layer: layer)
             return layer
         case "ArcGISMapImageLayer":
             let mapImageLayer = AGSArcGISMapImageLayer(url: url!)
             mapImageLayer.credential = credential
+            setupDefaultParams(layer: mapImageLayer)
             return mapImageLayer
         default:
             fatalError("Not implemented.")
         }
+    }
 
+    func setupDefaultParams(layer: AGSLayer) {
+        layer.opacity = opacity
+        layer.isVisible = isVisible
     }
 }

@@ -1,12 +1,14 @@
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 
-abstract class BaseTileLayer extends Layer {
+abstract class BaseTileLayer<T> extends Layer {
   const BaseTileLayer({
     required this.layerId,
     required this.url,
     required this.type,
     this.credential,
-  });
+    bool isVisible = true,
+    double opacity = 1,
+  }) : super(isVisible: isVisible, opacity: opacity);
 
   final LayerId layerId;
 
@@ -20,8 +22,8 @@ abstract class BaseTileLayer extends Layer {
   LayerId get mapsId => layerId;
 
   @override
-  Object toJson() {
-    final Map<String, Object> json = <String, Object>{};
+  Map<String, Object> toJson() {
+    final Map<String, Object> json = super.toJson();
     json["layerType"] = type;
     json["url"] = url;
     json["layerId"] = layerId.value;

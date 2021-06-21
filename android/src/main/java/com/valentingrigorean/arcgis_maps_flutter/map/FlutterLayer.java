@@ -19,12 +19,15 @@ public class FlutterLayer {
     private final String layerType;
     private final String url;
     private final Credential credential;
-
-
+    private final boolean isVisible;
+    private final float opacity;
+    
     public FlutterLayer(Map<?, ?> data) {
         layerId = (String) data.get("layerId");
         layerType = (String) data.get("layerType");
         url = (String) data.get("url");
+        isVisible = Convert.toBoolean(data.get("isVisible"));
+        opacity = Convert.toFloat(data.get("opacity"));
         if (data.containsKey("credential")) {
             credential = Convert.toCredentials(data.get("credential"));
         } else {
@@ -35,7 +38,6 @@ public class FlutterLayer {
     public String getLayerId() {
         return layerId;
     }
-
 
     public Layer createLayer() {
         Layer layer;
@@ -68,6 +70,10 @@ public class FlutterLayer {
         if (credential != null && remoteResource != null) {
             remoteResource.setCredential(credential);
         }
+
+        layer.setOpacity(opacity);
+        layer.setVisible(isVisible);
+
         return layer;
     }
 

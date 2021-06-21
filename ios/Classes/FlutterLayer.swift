@@ -12,6 +12,9 @@ struct FlutterLayer: Hashable {
         layerType = data["layerType"] as! String
         url = URL(string: data["url"] as! String)
 
+        isVisible = data["isVisible"] as! Bool
+        opacity = data["opacity"] as! Float
+
         if let credential = data["credential"] as? Dictionary<String, Any> {
             self.credential = AGSCredential(data: credential)
         } else {
@@ -21,6 +24,8 @@ struct FlutterLayer: Hashable {
 
     let layerId: String
     let layerType: String
+    let opacity: Float
+    let isVisible: Bool
     let url: URL?
 
     let credential: AGSCredential?
