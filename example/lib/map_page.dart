@@ -33,7 +33,7 @@ class _MapPageState extends State<MapPage> {
         'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/6'),
   };
 
-  bool _showLayers = true;
+  bool _showLayers = false;
 
   bool _trackCamera = false;
 
@@ -72,6 +72,15 @@ class _MapPageState extends State<MapPage> {
         }
       },
       referenceLayers: _showLayers ? _lakeLayers : const {},
+      operationalLayers: {
+        WmsLayer.fromUrl('https://wms.geonorge.no/skwms1/wms.dybdedata2?service=WMS&request=GetCapabilities', layersName: [
+          'grunne',
+          'flytedokk',
+          'Dybdepunkt',
+          'Dybdelag',
+          'Dybdekontur'
+        ]),
+      },
       onIdentifyLayers: (layers) {
         for (var layer in layers) {
           print('LayerName:' + layer.layerName);

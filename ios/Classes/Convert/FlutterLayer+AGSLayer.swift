@@ -29,6 +29,11 @@ extension FlutterLayer {
             mapImageLayer.credential = credential
             setupDefaultParams(layer: mapImageLayer)
             return mapImageLayer
+        case "WmsLayer":
+            let wmsLayer = AGSWMSLayer(url: url!, layerNames: layersName!)
+            wmsLayer.credential = credential
+            setupDefaultParams(layer: wmsLayer)
+            return wmsLayer
         default:
             fatalError("Not implemented.")
         }

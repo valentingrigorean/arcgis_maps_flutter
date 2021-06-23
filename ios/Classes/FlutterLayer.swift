@@ -7,6 +7,7 @@ import ArcGIS
 
 struct FlutterLayer: Hashable {
 
+
     init(data: Dictionary<String, Any>) {
         layerId = data["layerId"] as! String
         layerType = data["layerType"] as! String
@@ -20,6 +21,8 @@ struct FlutterLayer: Hashable {
         } else {
             credential = nil
         }
+
+        layersName = data["layersName"] as? [String]
     }
 
     let layerId: String
@@ -27,6 +30,7 @@ struct FlutterLayer: Hashable {
     let opacity: Float
     let isVisible: Bool
     let url: URL?
+    let layersName: [String]?
 
     let credential: AGSCredential?
 }

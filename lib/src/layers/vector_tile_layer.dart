@@ -13,7 +13,7 @@ class VectorTileLayer extends BaseTileLayer {
           opacity: opacity,
           layerId: layerId,
           url: url,
-          type: "VectorTileLayer",
+          type: 'VectorTileLayer',
           credential: credential,
         );
 

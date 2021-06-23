@@ -55,6 +55,7 @@ part 'src/layers/layer.dart';
 part 'src/layers/feature_layer.dart';
 part 'src/layers/tiled_layer.dart';
 part 'src/layers/vector_tile_layer.dart';
+part 'src/layers/wms_layer.dart';
 
 part 'src/mapping/arcgis_map.dart';
 part 'src/map/arcgis_map_view.dart';

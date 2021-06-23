@@ -7,22 +7,25 @@ import com.esri.arcgisruntime.layers.ArcGISTiledLayer;
 import com.esri.arcgisruntime.layers.ArcGISVectorTiledLayer;
 import com.esri.arcgisruntime.layers.FeatureLayer;
 import com.esri.arcgisruntime.layers.Layer;
+import com.esri.arcgisruntime.layers.WmsLayer;
 import com.esri.arcgisruntime.security.Credential;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 
 public class FlutterLayer {
-
+    private final Map<?, ?> data;
     private final String layerId;
     private final String layerType;
     private final String url;
     private final Credential credential;
     private final boolean isVisible;
     private final float opacity;
-    
+
     public FlutterLayer(Map<?, ?> data) {
+        this.data = data;
         layerId = (String) data.get("layerId");
         layerType = (String) data.get("layerType");
         url = (String) data.get("url");
@@ -41,7 +44,7 @@ public class FlutterLayer {
 
     public Layer createLayer() {
         Layer layer;
-        RemoteResource remoteResource;
+        RemoteResource remoteResource = null;
         switch (layerType) {
             case "VectorTileLayer":
                 final ArcGISVectorTiledLayer vectorTiledLayer = new ArcGISVectorTiledLayer(url);
@@ -62,6 +65,12 @@ public class FlutterLayer {
                 final ArcGISMapImageLayer mapImageLayer = new ArcGISMapImageLayer(url);
                 remoteResource = mapImageLayer;
                 layer = mapImageLayer;
+                break;
+            case "WmsLayer":
+                final Collection<String> layersNames = (Collection<String>) data.get("layersName");
+                final WmsLayer wmsLayer = new WmsLayer(url, layersNames);
+                remoteResource = wmsLayer;
+                layer = wmsLayer;
                 break;
             default:
                 throw new UnsupportedOperationException("not implemented.");

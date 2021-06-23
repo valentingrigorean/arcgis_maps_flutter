@@ -12,7 +12,7 @@ class TiledLayer extends BaseTileLayer {
           opacity: opacity,
           layerId: layerId,
           url: url,
-          type: "TiledLayer",
+          type: 'TiledLayer',
           credential: credential,
         );
 
