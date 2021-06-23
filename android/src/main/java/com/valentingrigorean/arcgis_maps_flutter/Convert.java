@@ -4,13 +4,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.icu.text.SimpleDateFormat;
 
-import com.esri.arcgisruntime.data.Feature;
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.geometry.PointCollection;
 import com.esri.arcgisruntime.geometry.Polygon;
 import com.esri.arcgisruntime.geometry.Polyline;
 import com.esri.arcgisruntime.geometry.SpatialReference;
-import com.esri.arcgisruntime.layers.FeatureLayer;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.ArcGISScene;
 import com.esri.arcgisruntime.mapping.ArcGISTiledElevationSource;
@@ -404,7 +402,8 @@ public class Convert {
             final Map<String, Object> elementData = new HashMap<>(2);
 
             elementData.put("attributes", attributes);
-            elementData.put("geometry", element.getGeometry().toJson());
+            if (element.getGeometry() != null)
+                elementData.put("geometry", element.getGeometry().toJson());
             elements.add(elementData);
         }
         data.put("elements", elements);
