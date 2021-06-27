@@ -27,6 +27,7 @@ class Polyline implements MapsObject {
     this.zIndex = 0,
     this.antialias = true,
     this.onTap,
+    this.selectedColor,
   });
 
   /// Uniquely identifies a [Polyline].
@@ -71,6 +72,8 @@ class Polyline implements MapsObject {
   /// Callbacks to receive tap events for polyline placed on this map.
   final VoidCallback? onTap;
 
+  final Color? selectedColor;
+
   /// Creates a new [Polyline] object whose values are the same as this instance,
   /// unless overwritten by the specified parameters.
   Polyline copyWith({
@@ -83,6 +86,7 @@ class Polyline implements MapsObject {
     int? zIndexParam,
     bool? antialiasParam,
     VoidCallback? onTapParam,
+    Color? selectedColorParam,
   }) {
     return Polyline(
       polylineId: polylineId,
@@ -95,6 +99,7 @@ class Polyline implements MapsObject {
       zIndex: zIndexParam ?? zIndex,
       antialias: antialiasParam ?? antialias,
       onTap: onTapParam ?? onTap,
+      selectedColor: selectedColorParam ?? selectedColor,
     );
   }
 
@@ -124,16 +129,12 @@ class Polyline implements MapsObject {
     addIfPresent('width', width);
     addIfPresent('zIndex', zIndex);
     addIfPresent('antialias', antialias);
+    addIfPresent('selectedColor', selectedColor?.value);
     return json;
   }
 
-  Object _pointsToJson() {
-    final List<Object> result = <Object>[];
-    for (final Point point in points) {
-      result.add(point.toJson());
-    }
-    return result;
-  }
+  @override
+  int get hashCode => polylineId.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -144,13 +145,18 @@ class Polyline implements MapsObject {
           consumeTapEvents == other.consumeTapEvents &&
           color == other.color &&
           style == other.style &&
-          listEquals(points, other.points) &&
+          points == other.points &&
           visible == other.visible &&
           width == other.width &&
           zIndex == other.zIndex &&
           antialias == other.antialias &&
-          onTap == other.onTap;
+          selectedColor == other.selectedColor;
 
-  @override
-  int get hashCode => polylineId.hashCode;
+  Object _pointsToJson() {
+    final List<Object> result = <Object>[];
+    for (final Point point in points) {
+      result.add(point.toJson());
+    }
+    return result;
+  }
 }

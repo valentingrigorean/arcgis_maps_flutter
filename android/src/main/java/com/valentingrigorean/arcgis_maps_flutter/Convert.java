@@ -2,6 +2,7 @@ package com.valentingrigorean.arcgis_maps_flutter;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
 
 import com.esri.arcgisruntime.geometry.Point;
@@ -434,7 +435,10 @@ public class Convert {
             controller.setZIndex(toInt(zIndex));
         }
 
-
+        final Object selectedColor = data.get("selectedColor");
+        if (selectedColor != null) {
+            controller.setSelectedColor(Color.valueOf(toInt(selectedColor)));
+        }
     }
 
     private static void interpretInteractionOptions(Object o, MapView mapView) {

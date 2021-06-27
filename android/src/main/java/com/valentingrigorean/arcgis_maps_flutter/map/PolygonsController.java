@@ -15,10 +15,13 @@ public class PolygonsController implements MapTouchGraphicDelegate {
 
     private final MethodChannel methodChannel;
     private final GraphicsOverlay graphicsOverlay;
+    private final SelectionPropertiesHandler selectionPropertiesHandler;
 
-    public PolygonsController(MethodChannel methodChannel, GraphicsOverlay graphicsOverlay) {
+
+    public PolygonsController(MethodChannel methodChannel, GraphicsOverlay graphicsOverlay, SelectionPropertiesHandler selectionPropertiesHandler) {
         this.methodChannel = methodChannel;
         this.graphicsOverlay = graphicsOverlay;
+        this.selectionPropertiesHandler = selectionPropertiesHandler;
     }
 
     @Override
@@ -56,7 +59,7 @@ public class PolygonsController implements MapTouchGraphicDelegate {
                 continue;
             }
             final String polygonId = (String) data.get("polygonId");
-            final PolygonController controller = new PolygonController(polygonId);
+            final PolygonController controller = new PolygonController(polygonId, selectionPropertiesHandler);
             polygonIdToController.put(polygonId, controller);
             Convert.interpretPolygonController(data, controller);
             controller.add(graphicsOverlay);

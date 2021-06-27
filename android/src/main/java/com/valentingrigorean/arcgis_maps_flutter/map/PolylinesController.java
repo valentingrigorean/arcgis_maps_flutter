@@ -15,10 +15,13 @@ public class PolylinesController implements MapTouchGraphicDelegate {
 
     private final MethodChannel methodChannel;
     private final GraphicsOverlay graphicsOverlay;
+    private final SelectionPropertiesHandler selectionPropertiesHandler;
 
-    public PolylinesController(MethodChannel methodChannel, GraphicsOverlay graphicsOverlay) {
+
+    public PolylinesController(MethodChannel methodChannel, GraphicsOverlay graphicsOverlay, SelectionPropertiesHandler selectionPropertiesHandler) {
         this.methodChannel = methodChannel;
         this.graphicsOverlay = graphicsOverlay;
+        this.selectionPropertiesHandler = selectionPropertiesHandler;
     }
 
     @Override
@@ -57,7 +60,7 @@ public class PolylinesController implements MapTouchGraphicDelegate {
                 continue;
             }
             final String polylineId = (String) data.get("polylineId");
-            final PolylineController controller = new PolylineController(polylineId);
+            final PolylineController controller = new PolylineController(polylineId, selectionPropertiesHandler);
             polylineIdToController.put(polylineId, controller);
             Convert.interpretPolylineController(data, controller);
             controller.add(graphicsOverlay);

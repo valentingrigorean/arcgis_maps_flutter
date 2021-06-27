@@ -8,11 +8,14 @@ import ArcGIS
 public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private let mapView: AGSMapView
+    private let selectionPropertiesHandler: SelectionPropertiesHandler
+
     private let channel: FlutterMethodChannel
     private let layersController: LayersController
     private let markersController: MarkersController
     private let polygonsController: PolygonsController
     private let polylinesController: PolylinesController
+
 
     private var lastScreenPoint = CGPoint.zero
 
@@ -38,10 +41,13 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)", binaryMessenger: registrar.messenger())
 
         mapView = AGSMapView(frame: frame)
+
+        selectionPropertiesHandler = SelectionPropertiesHandler(selectionProperties: mapView.selectionProperties)
+
         let graphicsOverlay = AGSGraphicsOverlay()
         polygonsController = PolygonsController(methodChannel: channel, graphicsOverlays: graphicsOverlay)
         polylinesController = PolylinesController(methodChannel: channel, graphicsOverlays: graphicsOverlay)
-        markersController = MarkersController(methodChannel: channel, graphicsOverlays: graphicsOverlay)
+        markersController = MarkersController(methodChannel: channel, graphicsOverlays: graphicsOverlay, selectionPropertiesHandler: selectionPropertiesHandler)
 
         mapView.graphicsOverlays.add(graphicsOverlay)
 

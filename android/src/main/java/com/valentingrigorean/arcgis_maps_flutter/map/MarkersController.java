@@ -19,13 +19,16 @@ public class MarkersController implements MapTouchGraphicDelegate {
     private final Context context;
     private final MethodChannel methodChannel;
     private final GraphicsOverlay graphicsOverlay;
+    private final SelectionPropertiesHandler selectionPropertiesHandler;
 
     private MarkerController selectedMarker;
 
-    public MarkersController(Context context, MethodChannel methodChannel, GraphicsOverlay graphicsOverlay) {
+
+    public MarkersController(Context context, MethodChannel methodChannel, GraphicsOverlay graphicsOverlay, SelectionPropertiesHandler selectionPropertiesHandler) {
         this.context = context;
         this.methodChannel = methodChannel;
         this.graphicsOverlay = graphicsOverlay;
+        this.selectionPropertiesHandler = selectionPropertiesHandler;
     }
 
     @Override
@@ -49,9 +52,9 @@ public class MarkersController implements MapTouchGraphicDelegate {
         if (markerController == null || !markerController.canConsumeTapEvents()) {
             return false;
         }
-        markerController.setSelected(true);
         if (selectedMarker != null)
             selectedMarker.setSelected(false);
+        markerController.setSelected(true);
         selectedMarker = markerController;
         methodChannel.invokeMethod("marker#onTap", Convert.markerIdToJson(markerId));
         return true;
@@ -67,7 +70,7 @@ public class MarkersController implements MapTouchGraphicDelegate {
                 continue;
             }
             final String markerId = (String) data.get("markerId");
-            final MarkerController markerController = new MarkerController(context, markerId);
+            final MarkerController markerController = new MarkerController(context, markerId, selectionPropertiesHandler);
             markerIdToController.put(markerId, markerController);
             Convert.interpretMarkerController(data, markerController);
             markerController.add(graphicsOverlay);

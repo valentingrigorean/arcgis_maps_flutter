@@ -40,6 +40,8 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     private final LifecycleProvider lifecycleProvider;
     private final MethodChannel methodChannel;
 
+    private final SelectionPropertiesHandler selectionPropertiesHandler;
+
     private final LayersController layersController;
     private final MarkersController markersController;
     private final PolygonsController polygonsController;
@@ -71,12 +73,13 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         methodChannel.setMethodCallHandler(this);
 
         mapView = new MapView(context);
+        selectionPropertiesHandler = new SelectionPropertiesHandler(mapView.getSelectionProperties());
 
         final GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
         layersController = new LayersController(methodChannel);
-        markersController = new MarkersController(context, methodChannel, graphicsOverlay);
-        polygonsController = new PolygonsController(methodChannel, graphicsOverlay);
-        polylinesController = new PolylinesController(methodChannel, graphicsOverlay);
+        markersController = new MarkersController(context, methodChannel, graphicsOverlay, selectionPropertiesHandler);
+        polygonsController = new PolygonsController(methodChannel, graphicsOverlay, selectionPropertiesHandler);
+        polylinesController = new PolylinesController(methodChannel, graphicsOverlay, selectionPropertiesHandler);
 
         mapViewOnTouchListener = new MapViewOnTouchListener(context, mapView, methodChannel);
         mapViewOnTouchListener.addGraphicDelegate(markersController);
@@ -198,6 +201,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             }
             break;
             case "map#clearMarkerSelection": {
+                selectionPropertiesHandler.reset();
                 markersController.clearSelectedMarker();
                 result.success(null);
             }

@@ -17,6 +17,7 @@ class Marker extends Symbol {
     this.onTap,
     this.visible = true,
     this.zIndex = 0,
+    this.selectedColor,
   })  : assert(opacity >= 0 && opacity <= 1),
         markerId = markerId,
         super(symbolId: markerId);
@@ -51,6 +52,8 @@ class Marker extends Symbol {
   /// True if the marker is visible.
   final bool visible;
 
+  final Color? selectedColor;
+
   @override
   clone() {
     return Marker(
@@ -65,6 +68,7 @@ class Marker extends Symbol {
       onTap: onTap,
       visible: visible,
       zIndex: zIndex,
+      selectedColor: selectedColor,
     );
   }
 
@@ -82,6 +86,10 @@ class Marker extends Symbol {
 
     if (backgroundImage != null) {
       json['backgroundImage'] = backgroundImage!.toJson();
+    }
+
+    if(selectedColor != null){
+      json['selectedColor'] = selectedColor!.value;
     }
 
     json['opacity'] = opacity;
@@ -106,5 +114,6 @@ class Marker extends Symbol {
           opacity == other.opacity &&
           consumeTapEvents == other.consumeTapEvents &&
           zIndex == other.zIndex &&
-          visible == other.visible;
+          visible == other.visible &&
+          selectedColor == other.selectedColor;
 }

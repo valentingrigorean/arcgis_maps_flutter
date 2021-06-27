@@ -23,6 +23,7 @@ class Polygon implements MapsObject {
     this.visible = true,
     this.zIndex = 0,
     this.onTap,
+    this.selectedColor,
   });
 
   /// Uniquely identifies a [Polygon].
@@ -61,6 +62,8 @@ class Polygon implements MapsObject {
   /// Callbacks to receive tap events for polygon placed on this map.
   final VoidCallback? onTap;
 
+  final Color? selectedColor;
+
   @override
   MapsObjectId get mapsId => polygonId;
 
@@ -75,6 +78,7 @@ class Polygon implements MapsObject {
     bool? visibleParam,
     int? zIndexParam,
     VoidCallback? onTapParam,
+    Color? selectedColorParam,
   }) {
     return Polygon(
       polygonId: polygonId,
@@ -86,6 +90,7 @@ class Polygon implements MapsObject {
       visible: visibleParam ?? visible,
       onTap: onTapParam ?? onTap,
       zIndex: zIndexParam ?? zIndex,
+      selectedColor: selectedColor ?? selectedColorParam,
     );
   }
 
@@ -111,29 +116,33 @@ class Polygon implements MapsObject {
     addIfPresent('strokeWidth', strokeWidth);
     addIfPresent('visible', visible);
     addIfPresent('zIndex', zIndex);
+    addIfPresent('selectedColor', selectedColor?.value);
 
     json['points'] = _pointsToJson();
 
     return json;
   }
 
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other.runtimeType != runtimeType) return false;
-    final Polygon typedOther = other as Polygon;
-    return polygonId == typedOther.polygonId &&
-        consumeTapEvents == typedOther.consumeTapEvents &&
-        fillColor == typedOther.fillColor &&
-        listEquals(points, typedOther.points) &&
-        visible == typedOther.visible &&
-        strokeColor == typedOther.strokeColor &&
-        strokeWidth == typedOther.strokeWidth &&
-        zIndex == typedOther.zIndex;
-  }
+
 
   @override
   int get hashCode => polygonId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Polygon &&
+          runtimeType == other.runtimeType &&
+          polygonId == other.polygonId &&
+          consumeTapEvents == other.consumeTapEvents &&
+          fillColor == other.fillColor &&
+          points == other.points &&
+          visible == other.visible &&
+          strokeColor == other.strokeColor &&
+          strokeWidth == other.strokeWidth &&
+          zIndex == other.zIndex &&
+          selectedColor == other.selectedColor;
+
 
   Object _pointsToJson() {
     final List<Object> result = <Object>[];

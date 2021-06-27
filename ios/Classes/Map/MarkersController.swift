@@ -8,24 +8,28 @@ import ArcGIS
 class MarkersController: NSObject {
     private var markerIdToController = Dictionary<String, MarkerController>()
     private let graphicsOverlays: AGSGraphicsOverlay
+    private let selectionPropertiesHandler: SelectionPropertiesHandler
 
     private var selectedMarker: MarkerController?
 
     private let methodChannel: FlutterMethodChannel
 
     init(methodChannel: FlutterMethodChannel,
-         graphicsOverlays: AGSGraphicsOverlay) {
+         graphicsOverlays: AGSGraphicsOverlay,
+         selectionPropertiesHandler: SelectionPropertiesHandler
+    ) {
         self.methodChannel = methodChannel
         self.graphicsOverlays = graphicsOverlays
+        self.selectionPropertiesHandler = selectionPropertiesHandler
     }
 
     func addMarkers(markersToAdd: [Dictionary<String, Any>]) {
         for marker in markersToAdd {
             let markerId = marker["markerId"] as! String
-            let controller = MarkerController(graphicsOverlay: graphicsOverlays, markerId: markerId)
+            let controller = MarkerController(markerId: markerId, selectionPropertiesHandler: selectionPropertiesHandler)
             markerIdToController[markerId] = controller
             updateMarker(data: marker, controller: controller)
-            controller.add()
+            controller.add(graphicsOverlay: graphicsOverlays)
         }
     }
 
@@ -44,7 +48,7 @@ class MarkersController: NSObject {
             guard let controller = markerIdToController[markerId] else {
                 continue
             }
-            controller.remove()
+            controller.remove(graphicsOverlay: graphicsOverlays)
             markerIdToController.removeValue(forKey: markerId)
         }
     }
@@ -60,11 +64,11 @@ class MarkersController: NSObject {
                               controller: MarkerController) {
 
         if let consumeTapEvents = data["consumeTapEvents"] as? Bool {
-            controller.consumeTabEvent = consumeTapEvents
+            controller.consumeTapEvents = consumeTapEvents
         }
 
         if let position = data["position"] as? Dictionary<String, Any> {
-            controller.setPosition(location: AGSPoint(data: position))
+            controller.geometry = AGSPoint(data: position)
         }
 
         if let icon = data["icon"] as? Dictionary<String, Any> {
@@ -82,11 +86,11 @@ class MarkersController: NSObject {
         }
 
         if let visible = data["visible"] as? Bool {
-            controller.setVisible(visible: visible)
+            controller.isVisible = visible
         }
 
         if let zIndex = data["zIndex"] as? Int {
-            controller.setZIndex(zIndex: zIndex)
+            controller.zIndex = zIndex
         }
     }
 }
@@ -95,7 +99,7 @@ extension MarkersController: MapGraphicTouchDelegate {
 
     func canConsumeTaps() -> Bool {
         for (_, controller) in markerIdToController {
-            if controller.consumeTabEvent {
+            if controller.consumeTapEvents {
                 return true
             }
         }
@@ -107,7 +111,7 @@ extension MarkersController: MapGraphicTouchDelegate {
             return false
         }
         if let currentMarker = markerIdToController[markerId] {
-            guard currentMarker.consumeTabEvent else {
+            guard currentMarker.consumeTapEvents else {
                 return false
             }
             let prevMarker = selectedMarker
@@ -120,6 +124,4 @@ extension MarkersController: MapGraphicTouchDelegate {
         methodChannel.invokeMethod("marker#onTap", arguments: ["markerId": markerId])
         return true
     }
-
-
 }

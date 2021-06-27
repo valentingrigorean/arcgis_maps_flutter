@@ -22,7 +22,8 @@ public final class MarkerController extends BaseGraphicController {
     private float iconOffsetY = 0;
     private Context context;
 
-    public MarkerController(Context context, String markerId) {
+    public MarkerController(Context context, String markerId,SelectionPropertiesHandler selectionPropertiesHandler) {
+        super(selectionPropertiesHandler);
         this.context = context;
         graphic = new Graphic();
         graphic.setSymbol(marker);
@@ -126,6 +127,4 @@ public final class MarkerController extends BaseGraphicController {
             ((PictureMarkerSymbol) symbol).setHeight(height);
         }
     }
-
-
 }

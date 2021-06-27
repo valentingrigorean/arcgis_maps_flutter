@@ -9,7 +9,8 @@ public final class PolylineController extends BaseGraphicController {
     private final Graphic graphic;
     private final SimpleLineSymbol polylineSymbol;
 
-    public PolylineController(String polylineId) {
+    public PolylineController(String polylineId,SelectionPropertiesHandler selectionPropertiesHandler) {
+        super(selectionPropertiesHandler);
         polylineSymbol = new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, Color.BLACK, 10);
         graphic = new Graphic();
         graphic.setSymbol(polylineSymbol);

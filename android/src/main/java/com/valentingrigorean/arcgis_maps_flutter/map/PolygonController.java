@@ -12,7 +12,8 @@ public final class PolygonController extends BaseGraphicController {
     private final SimpleFillSymbol polygonSymbol;
     private final SimpleLineSymbol polygonStrokeSymbol;
 
-    public PolygonController(String polygonId) {
+    public PolygonController(String polygonId,SelectionPropertiesHandler selectionPropertiesHandler) {
+        super(selectionPropertiesHandler);
         polygonStrokeSymbol = new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, Color.BLACK, 10);
         polygonSymbol = new SimpleFillSymbol(SimpleFillSymbol.Style.SOLID, Color.BLACK, polygonStrokeSymbol);
 

@@ -1,12 +1,21 @@
 package com.valentingrigorean.arcgis_maps_flutter.map;
 
+import android.graphics.Color;
+
 import com.esri.arcgisruntime.geometry.Geometry;
 import com.esri.arcgisruntime.mapping.view.Graphic;
 import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
 
 public abstract class BaseGraphicController {
 
+    private final SelectionPropertiesHandler selectionPropertiesHandler;
     private boolean consumeTapEvents;
+    private Color selectedColor;
+
+    protected BaseGraphicController(SelectionPropertiesHandler selectionPropertiesHandler) {
+        this.selectionPropertiesHandler = selectionPropertiesHandler;
+    }
+
 
     protected abstract Graphic getGraphic();
 
@@ -30,9 +39,13 @@ public abstract class BaseGraphicController {
         getGraphic().setGeometry(geometry);
     }
 
-
     public void setSelected(boolean selected) {
-        getGraphic().setSelected(selected);
+        final Graphic graphic = getGraphic();
+        if (selected && !graphic.isSelected()) {
+            selectionPropertiesHandler.setSelected(graphic, selectedColor);
+        } else if (graphic.isSelected()) {
+            selectionPropertiesHandler.clearSelection(graphic);
+        }
     }
 
     public void setConsumeTapEvents(boolean consumeTapEvents) {
@@ -41,5 +54,9 @@ public abstract class BaseGraphicController {
 
     public boolean canConsumeTapEvents() {
         return consumeTapEvents;
+    }
+
+    public void setSelectedColor(Color selectedColor) {
+        this.selectedColor = selectedColor;
     }
 }

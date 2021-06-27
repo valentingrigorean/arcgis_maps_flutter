@@ -5,54 +5,22 @@
 import Foundation
 import ArcGIS
 
-class MarkerController {
-    private let graphics: AGSGraphic
+class MarkerController: BaseGraphicController {
     private var marker: AGSCompositeSymbol
     private var icon: BitmapDescriptor?
     private var iconSymbol: AGSSymbol?
     private var backgroundImage: BitmapDescriptor?
     private var backgroundImageSymbol: AGSSymbol?
-    private weak var graphicsOverlay: AGSGraphicsOverlay?
 
     private var iconOffsetX: CGFloat = 0
     private var iconOffsetY: CGFloat = 0
 
     private var opacity: Float = 1
 
-    var isSelected: Bool = false {
-        didSet {
-            if oldValue != isSelected {
-                graphics.isSelected = isSelected
-            }
-        }
-    }
-
-    var consumeTabEvent = false
-
-    init(graphicsOverlay: AGSGraphicsOverlay,
-         markerId: String) {
-        self.graphicsOverlay = graphicsOverlay
+    init(markerId: String,
+         selectionPropertiesHandler: SelectionPropertiesHandler) {
         marker = AGSCompositeSymbol()
-        graphics = AGSGraphic(geometry: nil, symbol: marker, attributes: ["markerId": markerId])
-    }
-
-    func add() {
-        guard let graphicsOverlay = graphicsOverlay else {
-            return
-        }
-        graphicsOverlay.graphics.add(graphics)
-    }
-
-    func remove() {
-        guard let graphicsOverlay = graphicsOverlay else {
-            return
-        }
-
-        graphicsOverlay.graphics.remove(graphics)
-    }
-
-    func setVisible(visible: Bool) {
-        graphics.isVisible = visible
+        super.init(graphics: AGSGraphic(geometry: nil, symbol: marker, attributes: ["markerId": markerId]), selectionPropertiesHandler: selectionPropertiesHandler)
     }
 
     func setIcon(bitmapDescription: BitmapDescriptor) {
@@ -83,9 +51,6 @@ class MarkerController {
         marker.symbols.insert(backgroundImageSymbol!, at: 0)
     }
 
-    func setPosition(location: AGSPoint) {
-        graphics.geometry = location
-    }
 
     func setIconOffset(offsetX: CGFloat,
                        offsetY: CGFloat) {
@@ -108,10 +73,6 @@ class MarkerController {
         setGraphicsOpacity(opacity: opacity)
     }
 
-    func setZIndex(zIndex: Int) {
-        graphics.zIndex = zIndex
-    }
-
     private func offsetSymbol(symbol: AGSSymbol,
                               offsetX: CGFloat,
                               offsetY: CGFloat) {
@@ -131,15 +92,14 @@ class MarkerController {
         }
     }
 
-
-
     private func createSymbol(bitmapDescription: BitmapDescriptor) -> AGSSymbol {
         let newSymbol = bitmapDescription.createSymbol()
         setOpacity(opacity: opacity)
         return newSymbol
     }
 
-    private func setOpacity(symbol: AGSSymbol,opacity:Float){
+    private func setOpacity(symbol: AGSSymbol,
+                            opacity: Float) {
         guard let pictureSymbol = symbol as? AGSPictureMarkerSymbol else {
             return
         }
