@@ -41,6 +41,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)", binaryMessenger: registrar.messenger())
 
         mapView = AGSMapView(frame: frame)
+        mapView.selectionProperties = AGSSelectionProperties(color: UIColor.cyan)
 
         selectionPropertiesHandler = SelectionPropertiesHandler(selectionProperties: mapView.selectionProperties)
 
@@ -147,6 +148,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             result(nil)
             break
         case "map#clearMarkerSelection":
+            selectionPropertiesHandler.reset()
             markersController.clearSelectedMarker()
             result(nil)
             break
