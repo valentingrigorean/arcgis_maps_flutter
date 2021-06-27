@@ -92,6 +92,10 @@ class MarkersController: NSObject {
         if let zIndex = data["zIndex"] as? Int {
             controller.zIndex = zIndex
         }
+
+        if let selectedColor = data["selectedColor"] as? Int{
+            controller.selectedColor = UIColor(data: selectedColor)
+        }
     }
 }
 

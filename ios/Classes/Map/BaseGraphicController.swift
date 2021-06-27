@@ -35,7 +35,6 @@ extension GraphicController {
 
 class BaseGraphicController: GraphicController {
 
-
     init(graphics: AGSGraphic,
          selectionPropertiesHandler: SelectionPropertiesHandler) {
         self.graphics = graphics
