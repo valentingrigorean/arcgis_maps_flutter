@@ -71,28 +71,43 @@ class _MapPageState extends State<MapPage> {
           print('map loaded.');
         }
       },
+      markers: {
+        Marker(
+          markerId: MarkerId("markerId"),
+          position: Point.fromLatLng(latitude: 0, longitude: 0),
+          onTap: () => print('On marker tap'),
+          consumeTapEvents: true,
+          icon: BitmapDescriptor.fromStyleMarker(
+            style: SimpleMarkerSymbolStyle.square,
+            color: Colors.red,
+            size: 30,
+          ),
+        )
+      },
       referenceLayers: _showLayers ? _lakeLayers : const {},
-      operationalLayers: {
-        WmsLayer.fromUrl('https://wms.geonorge.no/skwms1/wms.dybdedata2?service=WMS&request=GetCapabilities', layersName: [
-          'grunne',
-          'flytedokk',
-          'Dybdepunkt',
-          'Dybdelag',
-          'Dybdekontur'
-        ]),
-      },
-      onIdentifyLayers: (layers) {
-        for (var layer in layers) {
-          print('LayerName:' + layer.layerName);
-          for (var element in layer.elements) {
-            print('geometry:' +
-                (element.geometry?.toJson().toString() ?? 'null'));
-            element.attributes.forEach((key, value) {
-              print(key + ':' + (value?.toString() ?? 'null'));
-            });
-          }
-        }
-      },
+      // operationalLayers: {
+      //   WmsLayer.fromUrl(
+      //       'https://wms.geonorge.no/skwms1/wms.dybdedata2?service=WMS&request=GetCapabilities',
+      //       layersName: [
+      //         'grunne',
+      //         'flytedokk',
+      //         'Dybdepunkt',
+      //         'Dybdelag',
+      //         'Dybdekontur'
+      //       ]),
+      // },
+      // onIdentifyLayers: (layers) {
+      //   for (var layer in layers) {
+      //     print('LayerName:' + layer.layerName);
+      //     for (var element in layer.elements) {
+      //       print('geometry:' +
+      //           (element.geometry?.toJson().toString() ?? 'null'));
+      //       element.attributes.forEach((key, value) {
+      //         print(key + ':' + (value?.toString() ?? 'null'));
+      //       });
+      //     }
+      //   }
+      // },
       onLayerLoaded: (layer, error) {
         if (error != null) {
           print('Failed to load $layer:$error');

@@ -320,13 +320,15 @@ extension ArcgisMapController: AGSGeoViewTouchDelegate {
         } else {
             sendOnMapTap(screenPoint: screenPoint)
         }
-
     }
 
 
     private func identifyGraphicsOverlaysCallback(results: [AGSIdentifyGraphicsOverlayResult]?,
                                                   error: Error?) {
         graphicsHandle = nil
+        if let error = error{
+            return
+        }
         if !onTapGraphicsCompleted(results: results, screenPoint: lastScreenPoint) && trackIdentityLayers {
             layerHandle = mapView.identifyLayers(atScreenPoint: lastScreenPoint, tolerance: 12, returnPopupsOnly: false, completion: identifyLayersCallback)
         } else {
@@ -337,6 +339,9 @@ extension ArcgisMapController: AGSGeoViewTouchDelegate {
     private func identifyLayersCallback(results: [AGSIdentifyLayerResult]?,
                                         error: Error?) {
         layerHandle = nil
+        if let error = error{
+            return
+        }
         guard let results = results else {
             sendOnMapTap(screenPoint: lastScreenPoint)
             return
