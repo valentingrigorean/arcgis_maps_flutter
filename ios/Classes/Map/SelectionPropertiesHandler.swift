@@ -30,6 +30,9 @@ class SelectionPropertiesHandler {
     }
 
     func reset() {
+        if selectionProperties.color == defaultSelectedColor {
+            return
+        }
         selectionProperties.color = defaultSelectedColor
     }
 
