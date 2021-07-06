@@ -140,10 +140,7 @@ public class BitmapDescriptorFactory {
                         symbol.setHeight(bitmapDescriptorOptions.getHeight());
                     }
                     loader.onLoaded(symbol);
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                    loader.onFailed();
-                } catch (InterruptedException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     loader.onFailed();
                 }

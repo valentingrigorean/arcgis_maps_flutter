@@ -12,9 +12,9 @@ public final class MarkerController extends BaseGraphicController {
     private final Graphic graphic;
 
     private BitmapDescriptor icon;
-    private Symbol iconSymbol;
+    private ScaleSymbol iconSymbol;
     private BitmapDescriptor background;
-    private Symbol backgroundSymbol;
+    private ScaleSymbol backgroundSymbol;
 
     private float opacity = 1;
 
@@ -22,7 +22,10 @@ public final class MarkerController extends BaseGraphicController {
     private float iconOffsetY = 0;
     private Context context;
 
-    public MarkerController(Context context, String markerId,SelectionPropertiesHandler selectionPropertiesHandler) {
+    private boolean isSelected;
+
+
+    public MarkerController(Context context, String markerId, SelectionPropertiesHandler selectionPropertiesHandler) {
         super(selectionPropertiesHandler);
         this.context = context;
         graphic = new Graphic();
@@ -52,10 +55,10 @@ public final class MarkerController extends BaseGraphicController {
         bitmapDescriptor.createSymbolAsync(new BitmapDescriptor.BitmapDescriptorListener() {
             @Override
             public void onLoaded(Symbol symbol) {
-                iconSymbol = symbol;
+                iconSymbol = new ScaleSymbol(symbol);
                 setOpacity(iconSymbol, opacity);
                 offsetSymbol(symbol, iconOffsetX, iconOffsetY);
-                marker.getSymbols().add(symbol);
+                marker.getSymbols().add(iconSymbol);
             }
 
             @Override
@@ -77,9 +80,10 @@ public final class MarkerController extends BaseGraphicController {
         bitmapDescriptor.createSymbolAsync(new BitmapDescriptor.BitmapDescriptorListener() {
             @Override
             public void onLoaded(Symbol symbol) {
-                backgroundSymbol = symbol;
+                backgroundSymbol = new ScaleSymbol(symbol);
+
                 setOpacity(backgroundSymbol, opacity);
-                marker.getSymbols().add(0, symbol);
+                marker.getSymbols().add(0, backgroundSymbol);
             }
 
             @Override
@@ -107,6 +111,19 @@ public final class MarkerController extends BaseGraphicController {
         }
     }
 
+    @Override
+    public void setSelected(boolean selected) {
+        if (selected == isSelected)
+            return;
+        isSelected = selected;
+        if (selected) {
+            backgroundSymbol.setScale(1.2f);
+            iconSymbol.setScale(1.2f);
+        } else {
+            backgroundSymbol.setScale(1f);
+            iconSymbol.setScale(1f);
+        }
+    }
 
     private static void offsetSymbol(Symbol symbol, float offsetX, float offsetY) {
         if (symbol instanceof PictureMarkerSymbol) {
@@ -118,13 +135,6 @@ public final class MarkerController extends BaseGraphicController {
     private static void setOpacity(Symbol symbol, float opacity) {
         if (symbol instanceof PictureMarkerSymbol) {
             ((PictureMarkerSymbol) symbol).setOpacity(opacity);
-        }
-    }
-
-    private static void setSymbolSize(Symbol symbol, float width, float height) {
-        if (symbol instanceof PictureMarkerSymbol) {
-            ((PictureMarkerSymbol) symbol).setWidth(width);
-            ((PictureMarkerSymbol) symbol).setHeight(height);
         }
     }
 }
