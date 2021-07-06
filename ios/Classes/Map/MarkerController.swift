@@ -34,7 +34,7 @@ class MarkerController: BaseGraphicController {
         set {
             if selected != newValue {
                 selected = newValue
-
+                handleScaleChanged()
             }
         }
     }
