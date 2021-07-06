@@ -16,7 +16,6 @@ import com.valentingrigorean.arcgis_maps_flutter.Convert;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import io.flutter.plugin.common.MethodChannel;
 
@@ -78,7 +77,7 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
                 final List<IdentifyGraphicsOverlayResult> results = graphicHandler.get();
                 graphicHandler = null;
                 Log.d(TAG, "identifyGraphicsOverlays: " + results.size() + " found.");
-                if(onTapCompleted(results,screenPoint)){
+                if (onTapCompleted(results, screenPoint)) {
                     return;
                 }
                 if (trackIdentityLayers) {
@@ -86,10 +85,8 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
                 } else {
                     sendOnMapTap(screenPoint);
                 }
-            } catch (ExecutionException executionException) {
-                executionException.printStackTrace();
-            } catch (InterruptedException interruptedException) {
-                interruptedException.printStackTrace();
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         });
     }
@@ -107,10 +104,8 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
                 }
                 final Object json = Convert.identifyLayerResultsToJson(results);
                 methodChannel.invokeMethod("map#onIdentifyLayers", json);
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         });
     }
