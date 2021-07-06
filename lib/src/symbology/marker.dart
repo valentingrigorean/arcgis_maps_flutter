@@ -72,6 +72,7 @@ class Marker extends Symbol {
       visible: visible,
       zIndex: zIndex,
       selectedColor: selectedColor,
+      selectedScale: selectedScale,
     );
   }
 
@@ -119,5 +120,6 @@ class Marker extends Symbol {
           consumeTapEvents == other.consumeTapEvents &&
           zIndex == other.zIndex &&
           visible == other.visible &&
-          selectedColor == other.selectedColor;
+          selectedColor == other.selectedColor &&
+          selectedScale == other.selectedScale;
 }

@@ -8,19 +8,35 @@ import ArcGIS
 class MarkerController: BaseGraphicController {
     private var marker: AGSCompositeSymbol
     private var icon: BitmapDescriptor?
-    private var iconSymbol: AGSSymbol?
+    private var iconSymbol: ScaleSymbolHelper?
     private var backgroundImage: BitmapDescriptor?
-    private var backgroundImageSymbol: AGSSymbol?
+    private var backgroundImageSymbol: ScaleSymbolHelper?
 
     private var iconOffsetX: CGFloat = 0
     private var iconOffsetY: CGFloat = 0
 
     private var opacity: Float = 1
 
+    private var selected: Bool = false
+
+    private var selectedScale: CGFloat = 1.4
+
     init(markerId: String,
          selectionPropertiesHandler: SelectionPropertiesHandler) {
         marker = AGSCompositeSymbol()
         super.init(graphics: AGSGraphic(geometry: nil, symbol: marker, attributes: ["markerId": markerId]), selectionPropertiesHandler: selectionPropertiesHandler)
+    }
+
+    override var isSelected: Bool {
+        get {
+            selected
+        }
+        set {
+            if selected != newValue {
+                selected = newValue
+
+            }
+        }
     }
 
     func setIcon(bitmapDescription: BitmapDescriptor) {
@@ -31,9 +47,10 @@ class MarkerController: BaseGraphicController {
             marker.symbols.remove(at: backgroundImage == nil ? 0 : 1)
         }
         icon = bitmapDescription
-        iconSymbol = createSymbol(bitmapDescription: bitmapDescription)
-        offsetSymbol(symbol: iconSymbol!, offsetX: iconOffsetX, offsetY: iconOffsetY)
-        marker.symbols.insert(iconSymbol!, at: backgroundImage == nil ? 0 : 1)
+        iconSymbol = ScaleSymbolHelper(symbol: createSymbol(bitmapDescription: bitmapDescription))
+        offsetSymbol(symbol: iconSymbol!.symbol, offsetX: iconOffsetX, offsetY: iconOffsetY)
+        handleScaleChanged()
+        marker.symbols.insert(iconSymbol!.symbol, at: backgroundImage == nil ? 0 : 1)
 
     }
 
@@ -47,8 +64,9 @@ class MarkerController: BaseGraphicController {
 
         backgroundImage = bitmapDescription
 
-        backgroundImageSymbol = createSymbol(bitmapDescription: bitmapDescription)
-        marker.symbols.insert(backgroundImageSymbol!, at: 0)
+        backgroundImageSymbol = ScaleSymbolHelper(symbol: createSymbol(bitmapDescription: bitmapDescription))
+        handleScaleChanged()
+        marker.symbols.insert(backgroundImageSymbol!.symbol, at: 0)
     }
 
 
@@ -71,6 +89,27 @@ class MarkerController: BaseGraphicController {
     func setOpacity(opacity: Float) {
         self.opacity = opacity
         setGraphicsOpacity(opacity: opacity)
+    }
+
+    func setSelectedScale(selectedScale: CGFloat) {
+        if selectedScale == selectedScale {
+            return
+        }
+        self.selectedScale = selectedScale
+        handleScaleChanged()
+    }
+
+    private func handleScaleChanged() {
+
+        let scale = isSelected ? selectedScale : 1.0
+
+        if let iconSymbol = iconSymbol {
+            iconSymbol.setScale(scale: scale)
+        }
+
+        if let backgroundImageSymbol = backgroundImageSymbol {
+            backgroundImageSymbol.setScale(scale: scale)
+        }
     }
 
     private func offsetSymbol(symbol: AGSSymbol,
@@ -104,15 +143,5 @@ class MarkerController: BaseGraphicController {
             return
         }
         pictureSymbol.opacity = opacity
-    }
-
-    private func setSymbolSize(symbol: AGSSymbol,
-                               width: CGFloat,
-                               height: CGFloat) {
-        guard let pictureSymbol = symbol as? AGSPictureMarkerSymbol else {
-            return
-        }
-        pictureSymbol.width = width
-        pictureSymbol.height = height
     }
 }

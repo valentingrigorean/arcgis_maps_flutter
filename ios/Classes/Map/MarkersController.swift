@@ -93,6 +93,10 @@ class MarkersController: NSObject {
             controller.zIndex = zIndex
         }
 
+        if let selectedScale = data["selectedScale"] as? Double {
+            controller.setSelectedScale(selectedScale: CGFloat(selectedScale))
+        }
+
         controller.selectedColor = UIColor(data: data["selectedColor"])
     }
 }
