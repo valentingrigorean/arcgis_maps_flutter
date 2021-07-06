@@ -18,6 +18,7 @@ class Marker extends Symbol {
     this.visible = true,
     this.zIndex = 0,
     this.selectedColor,
+    this.selectedScale = 1.4,
   })  : assert(opacity >= 0 && opacity <= 1),
         markerId = markerId,
         super(symbolId: markerId);
@@ -54,6 +55,8 @@ class Marker extends Symbol {
 
   final Color? selectedColor;
 
+  final double selectedScale;
+
   @override
   clone() {
     return Marker(
@@ -88,11 +91,12 @@ class Marker extends Symbol {
       json['backgroundImage'] = backgroundImage!.toJson();
     }
 
-    if(selectedColor != null){
+    if (selectedColor != null) {
       json['selectedColor'] = selectedColor!.value;
     }
 
     json['opacity'] = opacity;
+    json['selectedScale'] = selectedScale;
     json['zIndex'] = zIndex;
     return json;
   }

@@ -259,6 +259,11 @@ public class Convert {
         if (opacity != null) {
             controller.setOpacity(toFloat(opacity));
         }
+
+        final Object selectedScale = data.get("selectedScale");
+        if (selectedScale != null) {
+            controller.setSelectedScale(toFloat(selectedScale));
+        }
     }
 
     public static void interpretPolygonController(Object o, PolygonController controller) {

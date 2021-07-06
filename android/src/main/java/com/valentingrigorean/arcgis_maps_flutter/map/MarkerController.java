@@ -24,6 +24,8 @@ public final class MarkerController extends BaseGraphicController {
 
     private boolean isSelected;
 
+    private float selectedScale = 1.4f;
+
 
     public MarkerController(Context context, String markerId, SelectionPropertiesHandler selectionPropertiesHandler) {
         super(selectionPropertiesHandler);
@@ -42,6 +44,10 @@ public final class MarkerController extends BaseGraphicController {
         return context;
     }
 
+    public void setSelectedScale(float selectedScale) {
+        this.selectedScale = selectedScale;
+        handleScaleChange();
+    }
 
     public void setIcon(BitmapDescriptor bitmapDescriptor) {
         if (bitmapDescriptor == icon) {
@@ -59,6 +65,7 @@ public final class MarkerController extends BaseGraphicController {
                 setOpacity(iconSymbol, opacity);
                 offsetSymbol(symbol, iconOffsetX, iconOffsetY);
                 marker.getSymbols().add(iconSymbol);
+                handleScaleChange();
             }
 
             @Override
@@ -84,6 +91,7 @@ public final class MarkerController extends BaseGraphicController {
 
                 setOpacity(backgroundSymbol, opacity);
                 marker.getSymbols().add(0, backgroundSymbol);
+                handleScaleChange();
             }
 
             @Override
@@ -116,12 +124,16 @@ public final class MarkerController extends BaseGraphicController {
         if (selected == isSelected)
             return;
         isSelected = selected;
-        if (selected) {
-            backgroundSymbol.setScale(1.2f);
-            iconSymbol.setScale(1.2f);
-        } else {
-            backgroundSymbol.setScale(1f);
-            iconSymbol.setScale(1f);
+        handleScaleChange();
+    }
+
+    private void handleScaleChange() {
+        final float scale = isSelected ? selectedScale : 1f;
+        if (backgroundSymbol != null) {
+            backgroundSymbol.setScale(scale);
+        }
+        if (iconSymbol != null) {
+            iconSymbol.setScale(scale);
         }
     }
 
