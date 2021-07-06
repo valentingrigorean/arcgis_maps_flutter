@@ -78,7 +78,10 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
                 final List<IdentifyGraphicsOverlayResult> results = graphicHandler.get();
                 graphicHandler = null;
                 Log.d(TAG, "identifyGraphicsOverlays: " + results.size() + " found.");
-                if (!onTapCompleted(results, screenPoint) && trackIdentityLayers) {
+                if(onTapCompleted(results,screenPoint)){
+                    return;
+                }
+                if (trackIdentityLayers) {
                     identifyLayers(screenPoint);
                 } else {
                     sendOnMapTap(screenPoint);

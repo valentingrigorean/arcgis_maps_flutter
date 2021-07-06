@@ -29,6 +29,8 @@ public class SelectionPropertiesHandler {
     }
 
     public void reset() {
+        if (selectionProperties.getColor() == defaultSelectedColor)
+            return;
         selectionProperties.setColor(defaultSelectedColor);
     }
 }
