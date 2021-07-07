@@ -161,6 +161,21 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
+  Future<double> getMapRotation(int mapId) async {
+    final result =
+        await channel(mapId).invokeMethod<double>('map#getMapRotation');
+    return result ?? 0;
+  }
+
+  @override
+  Future<void> setViewpointChangedListenerEvents(int mapId, bool value) {
+    return channel(mapId).invokeMethod<void>(
+      "map#setViewpointChangedListenerEvents",
+      value,
+    );
+  }
+
+  @override
   Future<void> clearMarkerSelection(int mapId) {
     return channel(mapId).invokeMethod<void>("map#clearMarkerSelection");
   }
@@ -278,12 +293,25 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
     return _events(mapId).whereType<IdentifyLayersEvent>();
   }
 
+  @override
+  Stream<ViewpointChangedListenerEvent> onViewpointChangedListener(
+      {required int mapId}) {
+    return _events(mapId).whereType<ViewpointChangedListenerEvent>();
+  }
+
   // Returns a filtered view of the events in the _controller, by mapId.
   Stream<MapEvent> _events(int mapId) =>
       _mapEventStreamController.stream.where((event) => event.mapId == mapId);
 
   Future<dynamic> _handleMethodCall(MethodCall call, int mapId) async {
     switch (call.method) {
+      case 'map#viewpointChanged':
+        _mapEventStreamController.add(
+          ViewpointChangedListenerEvent(
+            mapId,
+          ),
+        );
+        break;
       case 'marker#onTap':
         _mapEventStreamController.add(
           MarkerTapEvent(
@@ -364,4 +392,3 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
     }
   }
 }
-

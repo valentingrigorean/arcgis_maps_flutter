@@ -47,12 +47,16 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     private final PolygonsController polygonsController;
     private final PolylinesController polylinesController;
 
+    private final ViewpointChangedListenerController viewpointChangedListenerController;
+
 
     @Nullable
     private MapView mapView;
     private MapViewOnTouchListener mapViewOnTouchListener;
 
     private Viewpoint viewpoint;
+
+    private boolean trackViewpointChangedListenerEvent = false;
 
     private boolean trackCameraPosition = false;
 
@@ -90,6 +94,8 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         mapView.setOnTouchListener(mapViewOnTouchListener);
         mapView.addViewpointChangedListener(this);
 
+        viewpointChangedListenerController = new ViewpointChangedListenerController(methodChannel);
+
         lifecycleProvider.getLifecycle().addObserver(this);
 
         if (params == null) {
@@ -97,7 +103,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         }
         initWithParams(params);
         Log.d(TAG, "setApiKey: " + ArcGISRuntimeEnvironment.getApiKey());
-
     }
 
 
@@ -149,6 +154,22 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 }
                 result.success(null);
             }
+            case "map#setViewpointChangedListenerEvents": {
+                final boolean val = (boolean) call.arguments;
+                if (val == trackViewpointChangedListenerEvent)
+                    return;
+                trackViewpointChangedListenerEvent = val;
+                if (val) {
+                    mapView.addViewpointChangedListener(viewpointChangedListenerController);
+                } else {
+                    mapView.removeViewpointChangedListener(viewpointChangedListenerController);
+                }
+            }
+            break;
+            case "map#getMapRotation": {
+                result.success(mapView.getMapRotation());
+            }
+            break;
             case "map#setViewpoint": {
                 viewpoint = Convert.toViewPoint(call.arguments);
                 mapView.setViewpointAsync(viewpoint).addDoneListener(() -> result.success(null));

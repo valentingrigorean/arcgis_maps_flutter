@@ -44,6 +44,7 @@ part 'src/mapping/arcgis_tiled_elevation_source.dart';
 part 'src/mapping/viewpoint_type.dart';
 
 part 'src/mapping/view/identify_layer_result.dart';
+part 'src/mapping/view/viewpoint_changed_listener.dart';
 
 part 'src/portal/portal.dart';
 part 'src/portal/portal_item.dart';

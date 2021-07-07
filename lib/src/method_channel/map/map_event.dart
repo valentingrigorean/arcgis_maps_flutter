@@ -100,6 +100,10 @@ class CameraMoveEvent extends MapEvent<void> {
   CameraMoveEvent(int mapId) : super(mapId, null);
 }
 
+class ViewpointChangedListenerEvent extends MapEvent<void> {
+  ViewpointChangedListenerEvent(int mapId) : super(mapId, null);
+}
+
 /// A `MapEvent` associated to a `position`.
 class _PositionedMapEvent<T> extends MapEvent<T> {
   /// The position where this event happened.

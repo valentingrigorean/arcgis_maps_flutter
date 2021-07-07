@@ -2,6 +2,10 @@ part of arcgis_maps_flutter;
 
 class ArcgisMapController {
   final _ArcgisMapViewState _arcgisMapState;
+  final List<ViewpointChangedListener> _viewpointChangedListeners = [];
+
+  bool _viewPointChangedWired = false;
+
   final int mapId;
 
   ArcgisMapController._(this._arcgisMapState, this.mapId) {
@@ -12,6 +16,25 @@ class ArcgisMapController {
       int id, _ArcgisMapViewState arcgisMapState) async {
     await ArcgisMapsFlutterPlatform.instance.init(id);
     return ArcgisMapController._(arcgisMapState, id);
+  }
+
+  void addViewpointChangedListener(ViewpointChangedListener listener) {
+    if (!_viewpointChangedListeners.contains(listener)) {
+      _viewpointChangedListeners.add(listener);
+    }
+    if (_viewPointChangedWired) return;
+    _viewPointChangedWired = true;
+    ArcgisMapsFlutterPlatform.instance
+        .setViewpointChangedListenerEvents(mapId, true);
+  }
+
+  void removeViewpointChangedListener(ViewpointChangedListener listener) {
+    _viewpointChangedListeners.remove(listener);
+    if (_viewPointChangedWired && _viewpointChangedListeners.isEmpty) {
+      _viewPointChangedWired = false;
+      ArcgisMapsFlutterPlatform.instance
+          .setViewpointChangedListenerEvents(mapId, false);
+    }
   }
 
   Future<void> clearMarkerSelection() {
@@ -42,6 +65,10 @@ class ArcgisMapController {
   /// The current scale of the map. Will return 0 if it cannot be calculated. To change the scale see
   Future<double> getMapScale() =>
       ArcgisMapsFlutterPlatform.instance.getMapScale(mapId);
+
+  /// The current rotation of the map. Will return 0 if it fails.
+  Future<double> getMapRotation() =>
+      ArcgisMapsFlutterPlatform.instance.getMapRotation(mapId);
 
   Future<void> _setMap(ArcGISMap map) {
     return ArcgisMapsFlutterPlatform.instance.setMap(mapId, map);
@@ -117,8 +144,12 @@ class ArcgisMapController {
         .listen((CameraMoveEvent e) => _arcgisMapState.onCameraMove());
 
     ArcgisMapsFlutterPlatform.instance
-        .onCameraMove(mapId: mapId)
-        .listen((CameraMoveEvent e) => _arcgisMapState.onCameraMove());
+        .onViewpointChangedListener(mapId: mapId)
+        .listen((ViewpointChangedListenerEvent event) {
+      for (final listener in _viewpointChangedListeners) {
+        listener.viewpointChanged();
+      }
+    });
 
     ArcgisMapsFlutterPlatform.instance.onIdentifyLayer(mapId: mapId).listen(
         (IdentifyLayerEvent e) =>

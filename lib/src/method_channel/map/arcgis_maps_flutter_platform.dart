@@ -59,6 +59,15 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('updateMapOptions() has not been implemented.');
   }
 
+  Future<double> getMapRotation(int mapId) {
+    throw UnimplementedError('getMapRotation() has not been implemented.');
+  }
+
+  Future<void> setViewpointChangedListenerEvents(int mapId,bool value) {
+    throw UnimplementedError(
+        'setViewpointChangedListenerEvents() has not been implemented.');
+  }
+
   Future<void> clearMarkerSelection(int mapId) {
     throw UnimplementedError(
         'clearMarkerSelection() has not been implemented.');
@@ -76,11 +85,12 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('locationToScreen() has not been implemented.');
   }
 
-  Future<Point?> screenToLocation(int mapId, Offset screenPoint,SpatialReference spatialReference) {
+  Future<Point?> screenToLocation(
+      int mapId, Offset screenPoint, SpatialReference spatialReference) {
     throw UnimplementedError('screenToLocation() has not been implemented.');
   }
 
-  Future<double> getMapScale(int mapId){
+  Future<double> getMapScale(int mapId) {
     throw UnimplementedError('getMapScale() has not been implemented.');
   }
 
@@ -100,8 +110,9 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('updatePolylines() has not been implemented.');
   }
 
-  Future<void> updateIdentifyLayerListeners(int mapId,Set<LayerId> layers){
-    throw UnimplementedError('updateIdentifyLayerListeners() has not been implemented.');
+  Future<void> updateIdentifyLayerListeners(int mapId, Set<LayerId> layers) {
+    throw UnimplementedError(
+        'updateIdentifyLayerListeners() has not been implemented.');
   }
 
   Stream<MapLoadedEvent> onMapLoad({required int mapId}) {
@@ -137,12 +148,18 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('onCameraMove() has not been implemented.');
   }
 
-  Stream<IdentifyLayerEvent> onIdentifyLayer({required int mapId}){
+  Stream<IdentifyLayerEvent> onIdentifyLayer({required int mapId}) {
     throw UnimplementedError('onIdentifyLayer() has not been implemented.');
   }
 
-  Stream<IdentifyLayersEvent> onIdentifyLayers({required int mapId}){
+  Stream<IdentifyLayersEvent> onIdentifyLayers({required int mapId}) {
     throw UnimplementedError('onIdentifyLayers() has not been implemented.');
+  }
+
+  Stream<ViewpointChangedListenerEvent> onViewpointChangedListener(
+      {required int mapId}) {
+    throw UnimplementedError(
+        'onViewpointChangedListener() has not been implemented.');
   }
 
   void dispose(int mapId) {

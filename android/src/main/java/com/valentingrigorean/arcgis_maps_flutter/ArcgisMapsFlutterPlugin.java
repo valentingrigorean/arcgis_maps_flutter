@@ -25,13 +25,13 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
 
     final static String TAG = "ArcgisMapsFlutterPlugin";
 
+    private static final String VIEW_TYPE_MAP = "plugins.flutter.io/arcgis_maps";
+    private static final String VIEW_TYPE_SCENE = "plugins.flutter.io/arcgis_scene";
+
     private MethodChannel channel;
 
     @Nullable
     private Lifecycle lifecycle;
-
-    private static final String VIEW_TYPE_MAP = "plugins.flutter.io/arcgis_maps";
-    private static final String VIEW_TYPE_SCENE = "plugins.flutter.io/arcgis_scene";
 
 
     @Override

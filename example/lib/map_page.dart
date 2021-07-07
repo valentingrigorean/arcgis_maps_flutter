@@ -14,7 +14,7 @@ class MapPage extends StatefulWidget {
   _MapPageState createState() => _MapPageState();
 }
 
-class _MapPageState extends State<MapPage> {
+class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final Set<Layer> _lakeLayers = {
     FeatureLayer.fromUrl(
@@ -51,9 +51,7 @@ class _MapPageState extends State<MapPage> {
       body: _buildMap(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          setState(() {
-            _showLayers = !_showLayers;
-          });
+          _mapController?.removeViewpointChangedListener(this);
         },
         child: Icon(Icons.add),
       ),
@@ -123,25 +121,6 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  void _fabPressed() {
-    showModalBottomSheet(
-      isDismissible: true,
-      isScrollControlled: true,
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
-      ),
-      backgroundColor: Colors.transparent,
-      builder: (context) => DraggableScrollableSheet(
-        minChildSize: 0.3,
-        initialChildSize: 0.3,
-        maxChildSize: 0.6,
-        builder: (context, scrollController) =>
-            _buildMapsTypes(scrollController),
-      ),
-    );
-  }
-
   Widget _buildMapsTypes(ScrollController scrollController) {
     var items = BasemapType.values;
 
@@ -174,6 +153,13 @@ class _MapPageState extends State<MapPage> {
 
   void onMapCreated(ArcgisMapController mapController) {
     _mapController = mapController;
+    mapController.addViewpointChangedListener(this);
     setState(() {});
+  }
+
+  @override
+  void viewpointChanged() async {
+    final rotation = await _mapController!.getMapRotation();
+    print('viewpointChanged -> map rotation $rotation}');
   }
 }
