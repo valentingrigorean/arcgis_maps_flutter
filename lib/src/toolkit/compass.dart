@@ -89,6 +89,9 @@ class _CompassState extends State<Compass> with SingleTickerProviderStateMixin {
         Image.asset(
           'assets/ic_compass.png',
           package: 'arcgis_maps_flutter',
+          width: widget.width,
+          height: widget.height,
+          fit: BoxFit.contain,
         );
 
     child = SizedBox(
