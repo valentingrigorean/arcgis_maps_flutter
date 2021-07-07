@@ -41,6 +41,8 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
 
   ArcgisMapController? _mapController;
 
+  CompassController? _compasController;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,7 +61,7 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
   }
 
   Widget _buildMap() {
-    return ArcgisMapView(
+    var mapView = ArcgisMapView(
       map: map,
       onMapCreated: onMapCreated,
       onMapLoaded: (error) {
@@ -119,6 +121,20 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
             }
           : null,
     );
+
+    return Stack(
+      children: [
+        mapView,
+        if (_compasController != null)
+          Positioned(
+            right: 16,
+            top: 16,
+            child: Compass(
+              controller: _compasController!,
+            ),
+          )
+      ],
+    );
   }
 
   Widget _buildMapsTypes(ScrollController scrollController) {
@@ -153,7 +169,7 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
 
   void onMapCreated(ArcgisMapController mapController) {
     _mapController = mapController;
-    mapController.addViewpointChangedListener(this);
+    _compasController = CompassController.fromMapController(mapController);
     setState(() {});
   }
 

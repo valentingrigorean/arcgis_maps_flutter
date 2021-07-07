@@ -37,9 +37,11 @@ flutter:
         pluginClass: ArcgisMapsFlutterPlugin
 
   # To add assets to your plugin package, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+     - assets/ic_compass.png
+     - assets/2.0x/ic_compass.png
+     - assets/3.0x/ic_compass.png
+
   #
   # For details regarding assets in packages, see
   # https://flutter.dev/assets-and-images/#from-packages

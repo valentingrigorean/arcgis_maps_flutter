@@ -81,6 +81,11 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('getCurrentViewpoint() has not been implemented.');
   }
 
+  Future<void> setViewpointRotation(int mapId, double angleDegrees) {
+    throw UnimplementedError(
+        'onViewpointChangedListener() has not been implemented.');
+  }
+
   Future<Offset?> locationToScreen(int mapId, Point mapPoint) {
     throw UnimplementedError('locationToScreen() has not been implemented.');
   }
@@ -165,4 +170,6 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
   void dispose(int mapId) {
     throw UnimplementedError('dispose() has not been implemented.');
   }
+
+
 }

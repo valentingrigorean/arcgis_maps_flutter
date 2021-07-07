@@ -102,10 +102,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         case "map#getMapRotation":
             result(mapView.rotation)
             break
-        case "map#setViewpoint":
-            setViewpoint(args: call.arguments, animated: true)
-            result(nil)
-            break
         case "map#getCurrentViewpoint":
             let type = (call.arguments as! Int).toAGSViewpointType()
             let currentViewPoint = mapView.currentViewpoint(with: type)
@@ -114,6 +110,16 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             } else {
                 result(nil)
             }
+            break
+        case "map#setViewpoint":
+            setViewpoint(args: call.arguments, animated: true)
+            result(nil)
+            break
+        case "map#setViewpointRotation":
+            if let angleDegrees = call.arguments as? Double {
+                mapView.setViewpointRotation(angleDegrees)
+            }
+            result(nil)
             break
         case "map#locationToScreen":
             if let mapPointData = call.arguments as? Dictionary<String, Any> {

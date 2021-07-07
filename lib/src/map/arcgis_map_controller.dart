@@ -45,6 +45,10 @@ class ArcgisMapController {
     return ArcgisMapsFlutterPlatform.instance.setViewpoint(mapId, viewpoint);
   }
 
+  Future<void> setViewpointRotation(double angleDegrees){
+    return  ArcgisMapsFlutterPlatform.instance.setViewpointRotation(mapId, angleDegrees);
+  }
+
   Future<Viewpoint?> getCurrentViewpoint(ViewpointType type) {
     return ArcgisMapsFlutterPlatform.instance.getCurrentViewpoint(mapId, type);
   }

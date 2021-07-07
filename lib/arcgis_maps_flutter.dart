@@ -24,6 +24,7 @@ import 'package:arcgis_maps_flutter/src/method_channel/arcgis_flutter_platform.d
 import 'package:arcgis_maps_flutter/src/method_channel/map/arcgis_maps_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/scene/arcgis_scene_flutter_platform.dart';
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 
 part 'src/arcgis_error.dart';
 part 'src/arcgis_runtime_environment.dart';
@@ -75,3 +76,4 @@ part 'src/symbology/polygon.dart';
 part 'src/symbology/polyline.dart';
 part 'src/symbology/symbol.dart';
 
+part 'src/toolkit/compass.dart';
