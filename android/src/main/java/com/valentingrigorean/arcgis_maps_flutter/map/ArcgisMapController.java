@@ -156,14 +156,15 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             }
             case "map#setViewpointChangedListenerEvents": {
                 final boolean val = (boolean) call.arguments;
-                if (val == trackViewpointChangedListenerEvent)
-                    return;
-                trackViewpointChangedListenerEvent = val;
-                if (val) {
-                    mapView.addViewpointChangedListener(viewpointChangedListenerController);
-                } else {
-                    mapView.removeViewpointChangedListener(viewpointChangedListenerController);
+                if (val != trackViewpointChangedListenerEvent) {
+                    trackViewpointChangedListenerEvent = val;
+                    if (val) {
+                        mapView.addViewpointChangedListener(viewpointChangedListenerController);
+                    } else {
+                        mapView.removeViewpointChangedListener(viewpointChangedListenerController);
+                    }
                 }
+                result.success(null);
             }
             break;
             case "map#getMapRotation": {

@@ -31,6 +31,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private var trackIdentityLayers = false
 
+    private var trackViewpointChangedListenerEvent = false
+
 
     public init(
             withRegistrar registrar: FlutterPluginRegistrar,
@@ -90,6 +92,15 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 mapView.setViewpoint(viewPoint!, duration: 0)
             }
             result(nil)
+            break
+        case "map#setViewpointChangedListenerEvents":
+            if let val = call.arguments as? Bool {
+                trackViewpointChangedListenerEvent = val
+            }
+            result(nil)
+            break
+        case "map#getMapRotation":
+            result(mapView.rotation)
             break
         case "map#setViewpoint":
             setViewpoint(args: call.arguments, animated: true)
@@ -187,10 +198,14 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     private func viewpointChangedHandler() {
-        guard trackCameraPosition else {
-            return
+
+        if trackViewpointChangedListenerEvent {
+            channel.invokeMethod("map#viewpointChanged", arguments: nil)
         }
-        channel.invokeMethod("camera#onMove", arguments: nil)
+
+        if trackCameraPosition {
+            channel.invokeMethod("camera#onMove", arguments: nil)
+        }
     }
 
     private func changeMapType(args: Any?) {
