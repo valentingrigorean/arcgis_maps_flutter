@@ -2,13 +2,11 @@ part of arcgis_maps_flutter;
 
 class CompassController extends ChangeNotifier
     implements ViewpointChangedListener {
-  final ArcgisMapController? _mapController;
+  ArcgisMapController? _mapController;
   double _rotation = 0;
 
   CompassController._(this._rotation, this._mapController) {
-    if (_mapController != null) {
-      _mapController!.addViewpointChangedListener(this);
-    }
+    _mapController?.addViewpointChangedListener(this);
   }
 
   CompassController({double rotation = 0})
@@ -26,6 +24,15 @@ class CompassController extends ChangeNotifier
     if (_rotation == newValue) return;
     _rotation = newValue;
     notifyListeners();
+  }
+
+  void setMapController(ArcgisMapController mapController) {
+    if (_mapController != null) {
+      if (_mapController == mapController) return;
+      _mapController?.removeViewpointChangedListener(this);
+    }
+    _mapController = mapController;
+    mapController.addViewpointChangedListener(this);
   }
 
   @override
