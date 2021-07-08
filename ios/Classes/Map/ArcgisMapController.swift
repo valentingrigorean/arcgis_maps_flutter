@@ -238,14 +238,12 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         }
 
         if let myLocationEnabled = mapOptions["myLocationEnabled"] as? Bool {
-            if myLocationEnabled != mapView.locationDisplay.started {
-                if myLocationEnabled {
-                    mapView.locationDisplay.start()
-                } else {
-                    mapView.locationDisplay.stop()
-                }
-            }
             mapView.locationDisplay.showLocation = myLocationEnabled
+            if myLocationEnabled {
+                mapView.locationDisplay.start()
+            } else {
+                mapView.locationDisplay.stop()
+            }
         }
 
         if let trackIdentityLayers = mapOptions["trackIdentifyLayers"] as? Bool {
@@ -254,6 +252,10 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         if let trackCameraPosition = mapOptions["trackCameraPosition"] as? Bool {
             self.trackCameraPosition = trackCameraPosition
+        }
+
+        if let autoPanMode = mapOptions["autoPanMode"] as? Int {
+            mapView.locationDisplay.autoPanMode = AGSLocationDisplayAutoPanMode(rawValue: autoPanMode) ?? .off
         }
     }
 

@@ -20,6 +20,7 @@ import com.esri.arcgisruntime.mapping.Surface;
 import com.esri.arcgisruntime.mapping.Viewpoint;
 import com.esri.arcgisruntime.mapping.view.Camera;
 import com.esri.arcgisruntime.mapping.view.IdentifyLayerResult;
+import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.portal.Portal;
 import com.esri.arcgisruntime.portal.PortalItem;
@@ -210,12 +211,17 @@ public class Convert {
         final Object myLocationEnabled = data.get("myLocationEnabled");
         if (myLocationEnabled != null) {
             final Boolean enabled = toBoolean(myLocationEnabled);
-            if (enabled != mapView.getLocationDisplay().isStarted()) {
+            mapView.getLocationDisplay().setShowLocation(enabled);
+            if (enabled) {
                 mapView.getLocationDisplay().startAsync();
             } else {
                 mapView.getLocationDisplay().stop();
             }
-            mapView.getLocationDisplay().setShowLocation(enabled);
+        }
+
+        final Object autoPanMode = data.get("autoPanMode");
+        if (autoPanMode != null) {
+            mapView.getLocationDisplay().setAutoPanMode(Convert.toAutoPanMode(autoPanMode));
         }
     }
 
@@ -354,6 +360,7 @@ public class Convert {
                 throw new IllegalStateException("Unexpected value: " + rawValue);
         }
     }
+
 
     public static Object markerIdToJson(String markerId) {
         if (markerId == null) {
@@ -507,6 +514,22 @@ public class Convert {
                 return SimpleLineSymbol.Style.SOLID;
             default:
                 throw new IllegalStateException("Unexpected value: " + rawValue);
+        }
+    }
+
+    private static LocationDisplay.AutoPanMode toAutoPanMode(Object rawValue) {
+        final int intValue = toInt(rawValue);
+        switch (intValue) {
+            case 0:
+                return LocationDisplay.AutoPanMode.OFF;
+            case 1:
+                return LocationDisplay.AutoPanMode.RECENTER;
+            case 2:
+                return LocationDisplay.AutoPanMode.NAVIGATION;
+            case 3:
+                return LocationDisplay.AutoPanMode.COMPASS_NAVIGATION;
+            default:
+                throw new IllegalStateException("Unexpected value: " + intValue);
         }
     }
 

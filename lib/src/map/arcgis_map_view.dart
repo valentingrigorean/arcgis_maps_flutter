@@ -70,6 +70,7 @@ class ArcgisMapView extends StatefulWidget {
     this.polygons = const <Polygon>{},
     this.polylines = const <Polyline>{},
     this.myLocationEnabled = false,
+    this.autoPanMode = AutoPanMode.off,
     this.onTap,
     this.onCameraMove,
     this.onIdentifyLayer = const {},
@@ -151,6 +152,10 @@ class ArcgisMapView extends StatefulWidget {
   /// `Info.plist` file. This will automatically prompt the user for permissions
   /// when the map tries to turn on the My Location layer.
   final bool myLocationEnabled;
+
+  /// Defines how to automatically pan the map when new location updates are received.
+  /// Default is [AutoPanMode.off]
+  final AutoPanMode autoPanMode;
 
   /// Called every time a [ArcgisMapView] is tapped.
   final ArgumentCallback<Point>? onTap;
@@ -442,19 +447,22 @@ class _ArcgisMapOptions {
       : interactionOptions = map.interactionOptions,
         myLocationEnabled = map.myLocationEnabled,
         trackCameraPosition = map.onCameraMove != null,
-        trackIdentifyLayers = map.onIdentifyLayers != null;
+        trackIdentifyLayers = map.onIdentifyLayers != null,
+        autoPanMode = map.autoPanMode;
 
   final InteractionOptions interactionOptions;
   final bool myLocationEnabled;
   final bool trackCameraPosition;
   final bool trackIdentifyLayers;
+  final AutoPanMode autoPanMode;
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'interactionOptions': interactionOptions.toJson(),
       'myLocationEnabled': myLocationEnabled,
       'trackCameraPosition': trackCameraPosition,
-      'trackIdentifyLayers': trackIdentifyLayers
+      'trackIdentifyLayers': trackIdentifyLayers,
+      'autoPanMode': autoPanMode.index,
     };
   }
 
