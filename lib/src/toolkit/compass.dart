@@ -64,21 +64,15 @@ class Compass extends StatefulWidget {
 }
 
 class _CompassState extends State<Compass> with SingleTickerProviderStateMixin {
-  late final AnimationController _animationController = AnimationController(
-    duration: const Duration(
-      milliseconds: 250,
-    ),
-    vsync: this,
-  );
-
   late final CompassController _compassController = widget.controller
     ..addListener(_handleRotationChange);
 
   late double _rotation = _degreesToRadians(_compassController.rotation);
 
+  late bool _visible = _compassController.rotation != 0;
+
   @override
   void dispose() {
-    _animationController.dispose();
     _compassController.removeListener(_handleRotationChange);
     super.dispose();
   }
@@ -112,10 +106,19 @@ class _CompassState extends State<Compass> with SingleTickerProviderStateMixin {
       );
     }
 
+    if (widget.autohide) {
+      child = AnimatedOpacity(
+        opacity: _visible ? 1.0 : 0.0,
+        duration: const Duration(milliseconds: 250),
+        child: child,
+      );
+    }
+
     return child;
   }
 
   void _handleRotationChange() {
+    _visible = _compassController.rotation != 0;
     _rotation = _degreesToRadians(_compassController.rotation);
     if (mounted) {
       setState(() {});
