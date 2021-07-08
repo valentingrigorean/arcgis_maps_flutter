@@ -26,18 +26,20 @@ class CompassController extends ChangeNotifier
     notifyListeners();
   }
 
-  void setMapController(ArcgisMapController mapController) {
+  void setMapController(ArcgisMapController? mapController) {
     if (_mapController != null) {
       if (_mapController == mapController) return;
       _mapController?.removeViewpointChangedListener(this);
     }
     _mapController = mapController;
-    mapController.addViewpointChangedListener(this);
+    mapController?.addViewpointChangedListener(this);
   }
 
   @override
   void viewpointChanged() async {
-    rotation = await _mapController!.getMapRotation();
+    final controller = _mapController;
+    if (controller == null) return;
+    rotation = await controller.getMapRotation();
   }
 
   @override
