@@ -64,6 +64,7 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
     var mapView = ArcgisMapView(
       map: map,
       onMapCreated: onMapCreated,
+      autoPanMode: AutoPanMode.navigation,
       onMapLoaded: (error) {
         if (error != null) {
           print(error);

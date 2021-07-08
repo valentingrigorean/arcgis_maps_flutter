@@ -16,6 +16,7 @@ import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.Viewpoint;
 import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
+import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.mapping.view.ViewpointChangedEvent;
 import com.esri.arcgisruntime.mapping.view.ViewpointChangedListener;
@@ -30,7 +31,7 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.platform.PlatformView;
 
-final class ArcgisMapController implements DefaultLifecycleObserver, PlatformView, MethodChannel.MethodCallHandler, ViewpointChangedListener {
+final class ArcgisMapController implements DefaultLifecycleObserver, PlatformView, MethodChannel.MethodCallHandler, ViewpointChangedListener, LocationDisplay.AutoPanModeChangedListener {
 
     private static final String TAG = "ArcgisMapController";
 
@@ -46,9 +47,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     private final MarkersController markersController;
     private final PolygonsController polygonsController;
     private final PolylinesController polylinesController;
-
-    private final ViewpointChangedListenerController viewpointChangedListenerController;
-
 
     @Nullable
     private MapView mapView;
@@ -93,8 +91,8 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         mapView.getGraphicsOverlays().add(graphicsOverlay);
         mapView.setOnTouchListener(mapViewOnTouchListener);
         mapView.addViewpointChangedListener(this);
+        mapView.getLocationDisplay().addAutoPanModeChangedListener(this);
 
-        viewpointChangedListenerController = new ViewpointChangedListenerController(methodChannel);
 
         lifecycleProvider.getLifecycle().addObserver(this);
 
@@ -129,9 +127,18 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
     @Override
     public void viewpointChanged(ViewpointChangedEvent viewpointChangedEvent) {
+        if (trackViewpointChangedListenerEvent) {
+            methodChannel.invokeMethod("map#viewpointChanged", null);
+        }
+
         if (trackCameraPosition) {
             methodChannel.invokeMethod("camera#onMove", null);
         }
+    }
+
+    @Override
+    public void onAutoPanModeChanged(LocationDisplay.AutoPanModeChangedEvent autoPanModeChangedEvent) {
+        methodChannel.invokeMethod("map#autoPanModeChanged", autoPanModeChangedEvent.getAutoPanMode().ordinal());
     }
 
     @Override
@@ -155,15 +162,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 result.success(null);
             }
             case "map#setViewpointChangedListenerEvents": {
-                final boolean val = (boolean) call.arguments;
-                if (val != trackViewpointChangedListenerEvent) {
-                    trackViewpointChangedListenerEvent = val;
-                    if (val) {
-                        mapView.addViewpointChangedListener(viewpointChangedListenerController);
-                    } else {
-                        mapView.removeViewpointChangedListener(viewpointChangedListenerController);
-                    }
-                }
+                trackViewpointChangedListenerEvent = (boolean) call.arguments;
                 result.success(null);
             }
             break;

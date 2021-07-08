@@ -128,6 +128,10 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('onMapLoad() has not been implemented.');
   }
 
+  Stream<AutoPanModeChangedEvent> onAutoPanModeChanged({required int mapId}){
+    throw UnimplementedError('onAutoPanModeChanged() has not been implemented.');
+  }
+
   /// A [Marker] has been tapped.
   Stream<MarkerTapEvent> onMarkerTap({required int mapId}) {
     throw UnimplementedError('onMarkerTap() has not been implemented.');

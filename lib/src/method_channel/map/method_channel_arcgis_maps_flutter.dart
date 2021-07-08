@@ -263,6 +263,10 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
     return _events(mapId).whereType<LayerLoadedEvent>();
   }
 
+  Stream<AutoPanModeChangedEvent> onAutoPanModeChanged({required int mapId}) {
+    return _events(mapId).whereType<AutoPanModeChangedEvent>();
+  }
+
   @override
   Stream<MarkerTapEvent> onMarkerTap({required int mapId}) {
     return _events(mapId).whereType<MarkerTapEvent>();
@@ -314,6 +318,14 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
         _mapEventStreamController.add(
           ViewpointChangedListenerEvent(
             mapId,
+          ),
+        );
+        break;
+      case 'map#autoPanModeChanged':
+        _mapEventStreamController.add(
+          AutoPanModeChangedEvent(
+            mapId,
+            AutoPanMode.values[call.arguments],
           ),
         );
         break;

@@ -71,6 +71,7 @@ class ArcgisMapView extends StatefulWidget {
     this.polylines = const <Polyline>{},
     this.myLocationEnabled = false,
     this.autoPanMode = AutoPanMode.off,
+    this.onAutoPanModeChanged,
     this.onTap,
     this.onCameraMove,
     this.onIdentifyLayer = const {},
@@ -156,6 +157,8 @@ class ArcgisMapView extends StatefulWidget {
   /// Defines how to automatically pan the map when new location updates are received.
   /// Default is [AutoPanMode.off]
   final AutoPanMode autoPanMode;
+
+  final ArgumentCallback<AutoPanMode>? onAutoPanModeChanged;
 
   /// Called every time a [ArcgisMapView] is tapped.
   final ArgumentCallback<Point>? onTap;
@@ -294,6 +297,12 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     if (completion != null) {
       completion(layer, error);
     }
+  }
+
+  void onAutoPanModeChanged(AutoPanMode autoPanMode) {
+    final callback = widget.onAutoPanModeChanged;
+    if (callback == null) return;
+    callback(autoPanMode);
   }
 
   void onMarkerTap(MarkerId markerId) {

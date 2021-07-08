@@ -45,8 +45,9 @@ class ArcgisMapController {
     return ArcgisMapsFlutterPlatform.instance.setViewpoint(mapId, viewpoint);
   }
 
-  Future<void> setViewpointRotation(double angleDegrees){
-    return  ArcgisMapsFlutterPlatform.instance.setViewpointRotation(mapId, angleDegrees);
+  Future<void> setViewpointRotation(double angleDegrees) {
+    return ArcgisMapsFlutterPlatform.instance
+        .setViewpointRotation(mapId, angleDegrees);
   }
 
   Future<Viewpoint?> getCurrentViewpoint(ViewpointType type) {
@@ -154,6 +155,11 @@ class ArcgisMapController {
         listener.viewpointChanged();
       }
     });
+
+    ArcgisMapsFlutterPlatform.instance
+        .onAutoPanModeChanged(mapId: mapId)
+        .listen((AutoPanModeChangedEvent e) =>
+            _arcgisMapState.onAutoPanModeChanged(e.value));
 
     ArcgisMapsFlutterPlatform.instance.onIdentifyLayer(mapId: mapId).listen(
         (IdentifyLayerEvent e) =>

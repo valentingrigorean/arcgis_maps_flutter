@@ -61,9 +61,15 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         super.init()
 
         mapView.touchDelegate = self
+        mapView.locationDisplay.autoPanModeChangedHandler = onAutoPanModeChanged
         mapView.viewpointChangedHandler = viewpointChangedHandler
         channel.setMethodCallHandler(handle)
         initWithArgs(args: args)
+    }
+
+    deinit {
+        mapView.locationDisplay.autoPanModeChangedHandler = nil
+        mapView.viewpointChangedHandler = nil
     }
 
     public func view() -> UIView {
@@ -201,6 +207,10 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             result(FlutterMethodNotImplemented)
             break
         }
+    }
+
+    private func onAutoPanModeChanged(autoPanMode: AGSLocationDisplayAutoPanMode) {
+        channel.invokeMethod("map#autoPanModeChanged", arguments: autoPanMode.rawValue)
     }
 
     private func viewpointChangedHandler() {
