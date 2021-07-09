@@ -62,6 +62,7 @@ class ArcgisMapView extends StatefulWidget {
     this.onMapLoaded,
     this.onLayerLoaded,
     this.viewpoint,
+    this.scalebarConfiguration,
     this.interactionOptions = const InteractionOptions(),
     this.operationalLayers = const <Layer>{},
     this.baseLayers = const <Layer>{},
@@ -89,6 +90,8 @@ class ArcgisMapView extends StatefulWidget {
   final ArcGISMap map;
 
   final Viewpoint? viewpoint;
+
+  final ScalebarConfiguration? scalebarConfiguration;
 
   /// The map's operational layers.
   /// These layers are displayed in a mapview sandwiched between
@@ -457,13 +460,15 @@ class _ArcgisMapOptions {
         myLocationEnabled = map.myLocationEnabled,
         trackCameraPosition = map.onCameraMove != null,
         trackIdentifyLayers = map.onIdentifyLayers != null,
-        autoPanMode = map.autoPanMode;
+        autoPanMode = map.autoPanMode,
+        scalebarConfiguration = map.scalebarConfiguration;
 
   final InteractionOptions interactionOptions;
   final bool myLocationEnabled;
   final bool trackCameraPosition;
   final bool trackIdentifyLayers;
   final AutoPanMode autoPanMode;
+  final ScalebarConfiguration? scalebarConfiguration;
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -472,6 +477,8 @@ class _ArcgisMapOptions {
       'trackCameraPosition': trackCameraPosition,
       'trackIdentifyLayers': trackIdentifyLayers,
       'autoPanMode': autoPanMode.index,
+      if (scalebarConfiguration != null)
+        'scalebarConfiguration': scalebarConfiguration!.toJson(),
     };
   }
 

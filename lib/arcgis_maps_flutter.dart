@@ -43,7 +43,7 @@ part 'src/mapping/geo_element.dart';
 part 'src/mapping/surface.dart';
 part 'src/mapping/arcgis_tiled_elevation_source.dart';
 part 'src/mapping/viewpoint_type.dart';
-
+part 'src/mapping/arcgis_map.dart';
 part 'src/mapping/view/auto_pan_mode.dart';
 part 'src/mapping/view/identify_layer_result.dart';
 part 'src/mapping/view/viewpoint_changed_listener.dart';
@@ -53,17 +53,18 @@ part 'src/portal/portal_item.dart';
 
 part 'src/loadable/loadable.dart';
 
+part 'src/map/arcgis_map_view.dart';
+part 'src/map/arcgis_map_controller.dart';
+part 'src/map/interaction_options.dart';
+part 'src/map/scalebar_configuration.dart';
+
+
 part 'src/layers/arcgis_map_image_layer.dart';
 part 'src/layers/layer.dart';
 part 'src/layers/feature_layer.dart';
 part 'src/layers/tiled_layer.dart';
 part 'src/layers/vector_tile_layer.dart';
 part 'src/layers/wms_layer.dart';
-
-part 'src/mapping/arcgis_map.dart';
-part 'src/map/arcgis_map_view.dart';
-part 'src/map/arcgis_map_controller.dart';
-part 'src/map/interaction_options.dart';
 
 part 'src/mapping/arcgis_scene.dart';
 part 'src/scene/arcgis_scene_controller.dart';
