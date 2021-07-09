@@ -3,6 +3,8 @@ package com.valentingrigorean.arcgis_maps_flutter.map;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,6 +24,7 @@ import com.esri.arcgisruntime.mapping.view.ViewpointChangedEvent;
 import com.esri.arcgisruntime.mapping.view.ViewpointChangedListener;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
 import com.valentingrigorean.arcgis_maps_flutter.LifecycleProvider;
+import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.Scalebar;
 
 import java.util.List;
 import java.util.Map;
@@ -52,7 +55,9 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     private MapView mapView;
     private MapViewOnTouchListener mapViewOnTouchListener;
 
+    private FrameLayout mapContainer;
     private Viewpoint viewpoint;
+    private Scalebar scalebar;
 
     private boolean trackViewpointChangedListenerEvent = false;
 
@@ -74,7 +79,18 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         methodChannel = new MethodChannel(binaryMessenger, "plugins.flutter.io/arcgis_maps_" + id);
         methodChannel.setMethodCallHandler(this);
 
+        mapContainer = new FrameLayout(context);
+
         mapView = new MapView(context);
+
+        scalebar = new Scalebar(context);
+        scalebar.setVisibility(View.GONE);
+
+        mapContainer.addView(mapView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        mapContainer.addView(scalebar, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+
         selectionPropertiesHandler = new SelectionPropertiesHandler(mapView.getSelectionProperties());
 
         final GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
@@ -106,7 +122,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
     @Override
     public View getView() {
-        return mapView;
+        return mapContainer;
     }
 
     @Override
@@ -305,6 +321,9 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     }
 
     private void destroyMapViewIfNecessary() {
+        mapContainer.removeAllViews();
+
+
         if (mapView == null) {
             return;
         }

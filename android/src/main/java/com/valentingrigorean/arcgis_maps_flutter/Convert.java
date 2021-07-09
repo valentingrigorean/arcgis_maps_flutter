@@ -36,6 +36,7 @@ import com.valentingrigorean.arcgis_maps_flutter.map.MarkerController;
 import com.valentingrigorean.arcgis_maps_flutter.map.PolygonController;
 import com.valentingrigorean.arcgis_maps_flutter.map.PolylineController;
 import com.valentingrigorean.arcgis_maps_flutter.map.ScreenLocationData;
+import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.Scalebar;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -202,7 +203,7 @@ public class Convert {
         return new ArcGISMap();
     }
 
-    public static void interpretMapViewOptions(Object o, MapView mapView) {
+    public static void interpretMapViewOptions(Object o, MapView mapView, Scalebar scalebar) {
         final Map<?, ?> data = toMap(o);
         final Object interactionOptions = data.get("interactionOptions");
         if (interactionOptions != null) {
@@ -224,6 +225,7 @@ public class Convert {
             mapView.getLocationDisplay().setAutoPanMode(Convert.toAutoPanMode(autoPanMode));
         }
     }
+
 
 
     public static Viewpoint.Type toViewpointType(Object o) {

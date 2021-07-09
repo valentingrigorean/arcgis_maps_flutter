@@ -24,6 +24,8 @@ rootProject.allprojects {
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
 
 android {
     compileSdkVersion 29
@@ -31,6 +33,7 @@ android {
     defaultConfig {
         minSdkVersion 26
     }
+
     lintOptions {
         disable 'InvalidPackage'
     }

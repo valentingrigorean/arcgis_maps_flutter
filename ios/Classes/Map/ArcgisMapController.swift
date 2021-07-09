@@ -302,7 +302,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         if animated {
             mapView.setViewpoint(newViewpoint, completion: nil)
         } else {
-            mapView.setViewpoint(newViewpoint)
+            mapView.setViewpoint(newViewpoint,duration: 0,)
         }
     }
 

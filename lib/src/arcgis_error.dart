@@ -22,4 +22,9 @@ class ArcgisError implements Exception {
     }
     return null;
   }
+
+  @override
+  String toString() {
+    return 'ArcgisError{code: $code, errorMessage: $errorMessage}';
+  }
 }
