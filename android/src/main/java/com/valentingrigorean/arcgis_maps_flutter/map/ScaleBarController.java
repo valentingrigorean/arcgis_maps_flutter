@@ -23,9 +23,10 @@ public class ScaleBarController implements MapScaleChangedListener {
 
     private FrameLayout.LayoutParams layoutParams;
 
-    private boolean autoHide = false;
+    private boolean isAutoHide = false;
     private int hideAfterMS = 2000;
     private ViewPropertyAnimator viewPropertyAnimator;
+
 
 
     public ScaleBarController(Context context, MapView mapView, FrameLayout container) {
@@ -62,7 +63,7 @@ public class ScaleBarController implements MapScaleChangedListener {
         if (viewPropertyAnimator != null)
             viewPropertyAnimator.cancel();
         scalebar.setAlpha(1f);
-        if (!autoHide)
+        if (!isAutoHide)
             return;
         viewPropertyAnimator = scalebar.animate()
                 .setDuration(hideAfterMS)
@@ -83,7 +84,7 @@ public class ScaleBarController implements MapScaleChangedListener {
 
         validateScaleBarState(showInMap);
 
-        if (showInMap && scaleBarState != ScaleBarState.IN_MAP) {
+        if (showInMap) {
 
             final Object inMapAlignment = data.get("inMapAlignment");
             if (inMapAlignment != null) {
@@ -101,8 +102,14 @@ public class ScaleBarController implements MapScaleChangedListener {
             layoutParams.topMargin = Convert.dpToPixels(context, Convert.toInt(offsetPoints.get(1)));
         }
 
-        this.autoHide = Convert.toBoolean(data.get("autoHide"));
-        this.hideAfterMS = Convert.toInt(data.get("hideAfter"));
+        isAutoHide = Convert.toBoolean(data.get("autoHide"));
+        hideAfterMS = Convert.toInt(data.get("hideAfter"));
+
+        if (isAutoHide) {
+            scalebar.setAlpha(0);
+        }else{
+            scalebar.setAlpha(1f);
+        }
 
         scalebar.setUnitSystem(Convert.toUnitSystem(Convert.toInt(data.get("units"))));
         scalebar.setStyle(Convert.toScaleBarStyle(Convert.toInt(data.get("style"))));
@@ -129,7 +136,6 @@ public class ScaleBarController implements MapScaleChangedListener {
             scaleBarState = ScaleBarState.IN_CONTAINER;
         }
     }
-
 
     private enum ScaleBarState {
         NONE,

@@ -15,6 +15,8 @@ class _MapPageScaleBarState extends State<MapPageScaleBar> {
       ScalebarConfiguration();
   ScalebarConfiguration _customScaleConfiguration = ScalebarConfiguration(
     showInMap: false,
+    autoHide: true,
+    hideAfter: const Duration(milliseconds: 500),
   );
 
   bool _useCustom = true;
