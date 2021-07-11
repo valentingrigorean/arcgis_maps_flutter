@@ -24,7 +24,6 @@ import com.esri.arcgisruntime.mapping.view.ViewpointChangedEvent;
 import com.esri.arcgisruntime.mapping.view.ViewpointChangedListener;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
 import com.valentingrigorean.arcgis_maps_flutter.LifecycleProvider;
-import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.Scalebar;
 
 import java.util.List;
 import java.util.Map;
@@ -57,7 +56,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
     private FrameLayout mapContainer;
     private Viewpoint viewpoint;
-    private Scalebar scalebar;
+    private ScaleBarController scaleBarController;
 
     private boolean trackViewpointChangedListenerEvent = false;
 
@@ -83,13 +82,10 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
         mapView = new MapView(context);
 
-        scalebar = new Scalebar(context);
-        scalebar.setVisibility(View.GONE);
-
         mapContainer.addView(mapView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
-        mapContainer.addView(scalebar, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
+
+        scaleBarController = new ScaleBarController(context, mapView, mapContainer);
 
         selectionPropertiesHandler = new SelectionPropertiesHandler(mapView.getSelectionProperties());
 
@@ -321,8 +317,11 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     }
 
     private void destroyMapViewIfNecessary() {
-        mapContainer.removeAllViews();
 
+        if (scaleBarController != null) {
+            scaleBarController.dispose();
+            scaleBarController = null;
+        }
 
         if (mapView == null) {
             return;
@@ -374,6 +373,13 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         final Object trackIdentifyLayers = data.get("trackIdentifyLayers");
         if (trackIdentifyLayers != null) {
             mapViewOnTouchListener.setTrackIdentityLayers(Convert.toBoolean(trackIdentifyLayers));
+        }
+
+        final Object scaleBarConfiguration = data.get("scalebarConfiguration");
+        if (scaleBarConfiguration == null) {
+            scaleBarController.removeScaleBar();
+        } else {
+            scaleBarController.interpretConfiguration(scaleBarConfiguration);
         }
     }
 

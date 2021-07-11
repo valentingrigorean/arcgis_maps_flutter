@@ -1,10 +1,13 @@
 package com.valentingrigorean.arcgis_maps_flutter;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
+import android.util.DisplayMetrics;
 
+import com.esri.arcgisruntime.UnitSystem;
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.geometry.PointCollection;
 import com.esri.arcgisruntime.geometry.Polygon;
@@ -35,8 +38,10 @@ import com.valentingrigorean.arcgis_maps_flutter.map.FlutterLayer;
 import com.valentingrigorean.arcgis_maps_flutter.map.MarkerController;
 import com.valentingrigorean.arcgis_maps_flutter.map.PolygonController;
 import com.valentingrigorean.arcgis_maps_flutter.map.PolylineController;
+import com.valentingrigorean.arcgis_maps_flutter.map.ScaleBarController;
 import com.valentingrigorean.arcgis_maps_flutter.map.ScreenLocationData;
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.Scalebar;
+import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.Style;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -46,6 +51,47 @@ import java.util.Map;
 
 public class Convert {
     private static final SimpleDateFormat ISO8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+    public static Scalebar.Alignment toScaleBarAlignment(int rawValue) {
+        switch (rawValue) {
+            case 0:
+                return Scalebar.Alignment.LEFT;
+            case 1:
+                return Scalebar.Alignment.RIGHT;
+            case 2:
+                return Scalebar.Alignment.CENTER;
+            default:
+                throw new IllegalStateException("Unexpected value: " + rawValue);
+        }
+    }
+
+    public static Style toScaleBarStyle(int rawValue) {
+        switch (rawValue) {
+            case 0:
+                return Style.LINE;
+            case 1:
+                return Style.BAR;
+            case 2:
+                return Style.GRADUATED_LINE;
+            case 3:
+                return Style.ALTERNATING_BAR;
+            case 4:
+                return Style.DUAL_UNIT_LINE;
+            default:
+                throw new IllegalStateException("Unexpected value: " + rawValue);
+        }
+    }
+
+    public static UnitSystem toUnitSystem(int rawValue) {
+        switch (rawValue) {
+            case 0:
+                return UnitSystem.IMPERIAL;
+            case 1:
+                return UnitSystem.METRIC;
+            default:
+                throw new IllegalStateException("Unexpected value: " + rawValue);
+        }
+    }
 
 
     public static Point toPoint(Object o) {
@@ -203,7 +249,7 @@ public class Convert {
         return new ArcGISMap();
     }
 
-    public static void interpretMapViewOptions(Object o, MapView mapView, Scalebar scalebar) {
+    public static void interpretMapViewOptions(Object o, MapView mapView) {
         final Map<?, ?> data = toMap(o);
         final Object interactionOptions = data.get("interactionOptions");
         if (interactionOptions != null) {
@@ -225,7 +271,6 @@ public class Convert {
             mapView.getLocationDisplay().setAutoPanMode(Convert.toAutoPanMode(autoPanMode));
         }
     }
-
 
 
     public static Viewpoint.Type toViewpointType(Object o) {
@@ -343,6 +388,7 @@ public class Convert {
             return bitmap;
         }
     }
+
 
     public static SimpleMarkerSymbol.Style toSimpleMarkerSymbolStyle(int rawValue) {
         switch (rawValue) {
@@ -706,4 +752,11 @@ public class Convert {
     public static int toInt(Object o) {
         return ((Number) o).intValue();
     }
+
+
+    public static int dpToPixels(Context context, int dp) {
+        return (int) (dp * ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT));
+    }
+
+
 }
