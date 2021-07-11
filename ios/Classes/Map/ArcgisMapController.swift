@@ -16,6 +16,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     private let polygonsController: PolygonsController
     private let polylinesController: PolylinesController
 
+    private let scaleBarController: ScaleBarController
+
 
     private var lastScreenPoint = CGPoint.zero
 
@@ -32,6 +34,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     private var trackIdentityLayers = false
 
     private var trackViewpointChangedListenerEvent = false
+
+    private var haveScaleBar = false
 
 
     public init(
@@ -57,6 +61,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         graphicsTouchDelegates = [markersController, polygonsController, polylinesController]
 
         layersController = LayersController(methodChannel: channel)
+
+        scaleBarController = ScaleBarController(mapView: mapView)
 
         super.init()
 
@@ -267,6 +273,16 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         if let autoPanMode = mapOptions["autoPanMode"] as? Int {
             mapView.locationDisplay.autoPanMode = AGSLocationDisplayAutoPanMode(rawValue: autoPanMode) ?? .off
         }
+
+        if let haveScaleBar = mapOptions["haveScalebar"] as? Bool {
+            if self.haveScaleBar && !haveScaleBar {
+                scaleBarController.removeScaleBar()
+            }
+        }
+
+        if let scalebarConfiguration = mapOptions["scalebarConfiguration"] {
+            scaleBarController.interpretConfiguration(args: scalebarConfiguration)
+        }
     }
 
     private func updateInteractionOptions(interactionOptions: Dictionary<String, Any>) {
@@ -302,7 +318,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         if animated {
             mapView.setViewpoint(newViewpoint, completion: nil)
         } else {
-            mapView.setViewpoint(newViewpoint,duration: 0)
+            mapView.setViewpoint(newViewpoint, duration: 0)
         }
     }
 

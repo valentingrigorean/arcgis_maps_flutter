@@ -12,7 +12,9 @@ class MapPageScaleBar extends StatefulWidget {
 
 class _MapPageScaleBarState extends State<MapPageScaleBar> {
   final ScalebarConfiguration _defaultScaleConfiguration =
-      ScalebarConfiguration();
+      ScalebarConfiguration(
+    inMapAlignment: ScalebarAlignment.center,
+  );
   ScalebarConfiguration _customScaleConfiguration = ScalebarConfiguration(
     showInMap: false,
     autoHide: true,
