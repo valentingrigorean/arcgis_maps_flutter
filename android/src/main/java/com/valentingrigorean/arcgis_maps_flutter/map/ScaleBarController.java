@@ -27,6 +27,9 @@ public class ScaleBarController implements MapScaleChangedListener {
     private int hideAfterMS = 2000;
     private ViewPropertyAnimator viewPropertyAnimator;
 
+    private double mapScale;
+
+    private boolean didGotScale = false;
 
 
     public ScaleBarController(Context context, MapView mapView, FrameLayout container) {
@@ -34,6 +37,7 @@ public class ScaleBarController implements MapScaleChangedListener {
         this.mapView = mapView;
         this.container = container;
         scalebar = new Scalebar(context);
+        scalebar.setAlpha(0f);
         mapView.addMapScaleChangedListener(this);
     }
 
@@ -60,11 +64,27 @@ public class ScaleBarController implements MapScaleChangedListener {
 
     @Override
     public void mapScaleChanged(MapScaleChangedEvent mapScaleChangedEvent) {
-        if (viewPropertyAnimator != null)
+        if (viewPropertyAnimator != null) {
             viewPropertyAnimator.cancel();
-        scalebar.setAlpha(1f);
+            viewPropertyAnimator = null;
+        }
+        if (mapScale == mapView.getMapScale()) {
+            return;
+        }
+
+        mapScale = mapView.getMapScale();
+
+        if (!didGotScale) {
+            didGotScale = true;
+            return;
+        }
+
+        if (scaleBarState == ScaleBarState.NONE) {
+            return;
+        }
         if (!isAutoHide)
             return;
+        scalebar.setAlpha(1f);
         viewPropertyAnimator = scalebar.animate()
                 .setDuration(hideAfterMS)
                 .alpha(0)
@@ -107,7 +127,8 @@ public class ScaleBarController implements MapScaleChangedListener {
 
         if (isAutoHide) {
             scalebar.setAlpha(0);
-        }else{
+            mapScale = mapView.getMapScale();
+        } else {
             scalebar.setAlpha(1f);
         }
 
