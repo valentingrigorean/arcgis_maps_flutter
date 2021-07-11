@@ -61,9 +61,12 @@ class _MapPageScaleBarState extends State<MapPageScaleBar> {
                       onChanged: (val) {
                         setState(
                           () {
-                            _customScaleConfiguration = ScalebarConfiguration(
+                            _customScaleConfiguration =
+                                _customScaleConfiguration.copyWith(
                               offset: Offset(
-                                  val, _customScaleConfiguration.offset.dy),
+                                val,
+                                _customScaleConfiguration.offset.dy,
+                              ),
                             );
                           },
                         );
@@ -76,9 +79,12 @@ class _MapPageScaleBarState extends State<MapPageScaleBar> {
                       onChanged: (val) {
                         setState(
                           () {
-                            _customScaleConfiguration = ScalebarConfiguration(
+                            _customScaleConfiguration =
+                                _customScaleConfiguration.copyWith(
                               offset: Offset(
-                                  _customScaleConfiguration.offset.dx, val),
+                                _customScaleConfiguration.offset.dx,
+                                val,
+                              ),
                             );
                           },
                         );

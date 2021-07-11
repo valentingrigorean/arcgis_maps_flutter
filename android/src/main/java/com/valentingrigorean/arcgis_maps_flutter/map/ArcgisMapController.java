@@ -58,6 +58,8 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     private Viewpoint viewpoint;
     private ScaleBarController scaleBarController;
 
+    private boolean haveScaleBar;
+
     private boolean trackViewpointChangedListenerEvent = false;
 
     private boolean trackCameraPosition = false;
@@ -161,7 +163,9 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             }
             break;
             case "map#update": {
-                updateMapOptions(call.arguments);
+                Map<?, ?> data = call.argument("options");
+                if (data != null)
+                    updateMapOptions(data);
                 result.success(null);
             }
             break;
@@ -375,11 +379,17 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             mapViewOnTouchListener.setTrackIdentityLayers(Convert.toBoolean(trackIdentifyLayers));
         }
 
+        final Object haveScaleBar = data.get("haveScalebar");
+
+        if (haveScaleBar != null) {
+            this.haveScaleBar = Convert.toBoolean(haveScaleBar);
+        }
+
         final Object scaleBarConfiguration = data.get("scalebarConfiguration");
-        if (scaleBarConfiguration == null) {
-            scaleBarController.removeScaleBar();
-        } else {
+        if (scaleBarConfiguration != null) {
             scaleBarController.interpretConfiguration(scaleBarConfiguration);
+        } else if (!this.haveScaleBar) {
+            scaleBarController.removeScaleBar();
         }
     }
 

@@ -29,15 +29,14 @@ import com.esri.arcgisruntime.geometry.GeodeticCurveType
 import com.esri.arcgisruntime.geometry.GeometryEngine
 import com.esri.arcgisruntime.geometry.LinearUnit
 import com.esri.arcgisruntime.geometry.PolylineBuilder
+import com.esri.arcgisruntime.mapping.view.MapScaleChangedListener
 import com.esri.arcgisruntime.mapping.view.MapView
-import com.esri.arcgisruntime.mapping.view.ViewpointChangedListener
 import com.valentingrigorean.arcgis_maps_flutter.R
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.extension.calculateBestLength
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.extension.dpToPixels
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.extension.selectLinearUnit
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.extension.unitSystemFromInt
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.Style
-import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.*
 import kotlin.reflect.KProperty
 
 /**
@@ -112,8 +111,7 @@ class Scalebar : View {
     @Volatile
     private var attributionTextHeight = 0
 
-    private val viewPointChangedListener = ViewpointChangedListener {
-        // Invalidate the Scalebar view when the MapView viewpoint changes
+    private val mapScaleChangedListener = MapScaleChangedListener {
         postInvalidate()
     }
 
@@ -549,7 +547,7 @@ class Scalebar : View {
 
         // Add listeners to new MapView
         this.mapView = mapView
-        mapView.addViewpointChangedListener(viewPointChangedListener)
+        mapView.addMapScaleChangedListener(mapScaleChangedListener)
         mapView.addAttributionViewLayoutChangeListener(attributionViewLayoutChangeListener)
     }
 
@@ -559,7 +557,7 @@ class Scalebar : View {
      * @since 100.5.0
      */
     private fun removeListenersFromMapView() {
-        mapView?.removeViewpointChangedListener(viewPointChangedListener)
+        mapView?.removeMapScaleChangedListener(mapScaleChangedListener)
         mapView?.removeAttributionViewLayoutChangeListener(attributionViewLayoutChangeListener)
     }
 

@@ -145,9 +145,6 @@ fun calculateMagnitude(distance: Double): Double {
  */
 private fun selectMultiplierData(distance: Double, magnitude: Double): Multiplier {
     // Select the largest multiplier that's <= the residual value (distance / magnitude)
-    Log.d("selectMultiplierData", "distance:$distance magnitude:$magnitude")
-//    if(distance == 0.0 || magnitude == 0.0)
-//        return MULTIPLIER_DATA_ARRAY.first()
     return MULTIPLIER_DATA_ARRAY.sortedArrayWith(compareByDescending { it.multiplier }).first {
         it.multiplier <= (distance / magnitude)
     }

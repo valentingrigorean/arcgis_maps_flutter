@@ -92,14 +92,36 @@ class ScalebarConfiguration {
   final Color textShadowColor;
 
   ScalebarConfiguration copyWith({
-    int? widthParam,
-    int? heightParam,
-    Offset? offsetParam,
+    int? width,
+    int? height,
+    Offset? offset,
+    bool? showInMap,
+    ScalebarAlignment? inMapAlignment,
+    bool? autoHide,
+    ScalebarUnits? units,
+    ScalebarStyle? style,
+    Color? fillColor,
+    Color? alternateFillColor,
+    Color? lineColor,
+    Color? shadowColor,
+    Color? textColor,
+    Color? textShadowColor,
   }) {
     return ScalebarConfiguration(
-      width: widthParam ?? width,
-      height: heightParam ?? height,
-      offset: offsetParam ?? offset,
+      width: width ?? this.width,
+      height: height ?? this.height,
+      offset: offset ?? this.offset,
+      showInMap: showInMap ?? this.showInMap,
+      inMapAlignment: inMapAlignment ?? this.inMapAlignment,
+      autoHide: autoHide ?? this.autoHide,
+      units: units ?? this.units,
+      style: style ?? this.style,
+      fillColor: fillColor ?? this.fillColor,
+      alternateFillColor: alternateFillColor ?? this.alternateFillColor,
+      lineColor: lineColor ?? this.lineColor,
+      shadowColor: shadowColor ?? this.shadowColor,
+      textColor: textColor ?? this.textColor,
+      textShadowColor: textShadowColor ?? this.textShadowColor,
     );
   }
 

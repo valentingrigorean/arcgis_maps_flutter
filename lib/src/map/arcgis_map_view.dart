@@ -477,6 +477,7 @@ class _ArcgisMapOptions {
       'trackCameraPosition': trackCameraPosition,
       'trackIdentifyLayers': trackIdentifyLayers,
       'autoPanMode': autoPanMode.index,
+      'haveScalebar': scalebarConfiguration != null,
       if (scalebarConfiguration != null)
         'scalebarConfiguration': scalebarConfiguration!.toJson(),
     };

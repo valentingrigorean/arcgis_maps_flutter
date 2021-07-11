@@ -19,7 +19,7 @@ public class ScaleBarController implements MapScaleChangedListener {
     private final FrameLayout container;
     private final Scalebar scalebar;
 
-    private ScaleBarState scaleBarState;
+    private ScaleBarState scaleBarState = ScaleBarState.NONE;
 
     private FrameLayout.LayoutParams layoutParams;
 
@@ -49,6 +49,7 @@ public class ScaleBarController implements MapScaleChangedListener {
                 scalebar.removeFromMapView();
                 break;
             case IN_CONTAINER:
+                scalebar.bindTo(null);
                 container.removeView(scalebar);
                 break;
         }
@@ -80,9 +81,9 @@ public class ScaleBarController implements MapScaleChangedListener {
 
         final boolean showInMap = Convert.toBoolean(data.get("showInMap"));
 
+        validateScaleBarState(showInMap);
+
         if (showInMap && scaleBarState != ScaleBarState.IN_MAP) {
-            scaleBarState = ScaleBarState.IN_MAP;
-            scalebar.addToMapView(mapView);
 
             final Object inMapAlignment = data.get("inMapAlignment");
             if (inMapAlignment != null) {
@@ -94,18 +95,10 @@ public class ScaleBarController implements MapScaleChangedListener {
             final int height = Convert.dpToPixels(context, Convert.toInt(data.get("height")));
             final List<?> offsetPoints = Convert.toList(data.get("offset"));
 
-
-            if (scaleBarState != ScaleBarState.IN_CONTAINER) {
-                scaleBarState = ScaleBarState.IN_CONTAINER;
-                layoutParams = new FrameLayout.LayoutParams(width, height);
-                container.addView(scalebar, layoutParams);
-            } else {
-                layoutParams.width = width;
-                layoutParams.height = height;
-            }
-
-            layoutParams.topMargin = Convert.dpToPixels(context, Convert.toInt(offsetPoints.get(0)));
-            layoutParams.leftMargin = Convert.dpToPixels(context, Convert.toInt(offsetPoints.get(1)));
+            layoutParams.width = width;
+            layoutParams.height = height;
+            layoutParams.leftMargin = Convert.dpToPixels(context, Convert.toInt(offsetPoints.get(0)));
+            layoutParams.topMargin = Convert.dpToPixels(context, Convert.toInt(offsetPoints.get(1)));
         }
 
         this.autoHide = Convert.toBoolean(data.get("autoHide"));
@@ -120,6 +113,21 @@ public class ScaleBarController implements MapScaleChangedListener {
         scalebar.setShadowColor(Convert.toInt(data.get("shadowColor")));
         scalebar.setTextColor(Convert.toInt(data.get("textColor")));
         scalebar.setTextShadowColor(Convert.toInt(data.get("textShadowColor")));
+    }
+
+
+    private void validateScaleBarState(boolean isInMap) {
+        if (isInMap && scaleBarState != ScaleBarState.IN_MAP) {
+            removeScaleBar();
+            scalebar.addToMapView(mapView);
+            scaleBarState = ScaleBarState.IN_MAP;
+        } else if (scaleBarState != ScaleBarState.IN_CONTAINER) {
+            removeScaleBar();
+            scalebar.bindTo(mapView);
+            layoutParams = new FrameLayout.LayoutParams(-1, -1);
+            container.addView(scalebar, layoutParams);
+            scaleBarState = ScaleBarState.IN_CONTAINER;
+        }
     }
 
 
