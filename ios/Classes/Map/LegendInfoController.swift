@@ -6,7 +6,7 @@ import Foundation
 import ArcGIS
 
 class LegendInfoController{
-    
+
     private let layersController : LayersController
 
     init(layersController: LayersController) {

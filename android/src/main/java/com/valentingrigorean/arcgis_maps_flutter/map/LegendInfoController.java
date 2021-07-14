@@ -23,7 +23,7 @@ public class LegendInfoController {
     private final LayersController layersController;
     private final MethodChannel.Result result;
 
-    private List<LegendInfo> legendInfos = new ArrayList<>();
+    private Map<LayerContent, List<LegendInfo>> layersLegends = new HashMap<>();
 
     private boolean didSetResult;
 
@@ -81,7 +81,7 @@ public class LegendInfoController {
             future.addDoneListener(() -> {
                 try {
                     final List<LegendInfo> items = future.get();
-                    legendInfos.addAll(items);
+                    layersLegends.put(layerContent, items);
                     requests--;
                     if (requests <= 0) {
                         setResult();
@@ -99,36 +99,48 @@ public class LegendInfoController {
             return;
         didSetResult = true;
 
-        final ArrayList<Map<?, ?>> items = new ArrayList<>(legendInfos.size());
+        final ArrayList<Object> items = new ArrayList<>(layersLegends.size());
 
-        if (legendInfos.isEmpty()) {
+        if (layersLegends.isEmpty()) {
             result.success(items);
             return;
         }
 
-        for (final LegendInfo legendInfo : legendInfos) {
-            final Map<String, Object> item = new HashMap<>(2);
-            item.put("name", legendInfo.getName());
+        layersLegends.forEach((k, v) -> {
+            final ArrayList<Map<?, ?>> legendItemsForLayer = new ArrayList<>(layersLegends.size());
 
-            final ListenableFuture<Bitmap> future = legendInfo.getSymbol().createSwatchAsync(context, Color.TRANSPARENT);
-            future.addDoneListener(() -> {
-                try {
-                    final Bitmap bitmap = future.get();
-                    final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                    item.put("symbolImage", stream.toByteArray());
-                } catch (Exception e) {
-                    item.put("symbolImage", new byte[0]);
-                    e.printStackTrace();
-                }
+            for (final LegendInfo legendInfo : v) {
+                final Map<String, Object> item = new HashMap<>(2);
+                item.put("name", legendInfo.getName());
 
-                items.add(item);
+                final ListenableFuture<Bitmap> future = legendInfo.getSymbol().createSwatchAsync(context, Color.TRANSPARENT);
+                final LayerContent layerContent = k;
+                future.addDoneListener(() -> {
+                    try {
+                        final Bitmap bitmap = future.get();
+                        final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                        item.put("symbolImage", stream.toByteArray());
+                    } catch (Exception e) {
+                        item.put("symbolImage", new byte[0]);
+                        e.printStackTrace();
+                    }
 
-                if (items.size() == legendInfos.size()) {
-                    result.success(items);
-                }
-            });
-        }
+                    legendItemsForLayer.add(item);
+
+                    if (legendItemsForLayer.size() == v.size()) {
+                        final Map<String, Object> resultItem = new HashMap<>(2);
+                        resultItem.put("layerName", layerContent.getName());
+                        resultItem.put("results", legendItemsForLayer);
+                        items.add(resultItem);
+                        if (items.size() == layersLegends.size()) {
+                            result.success(items);
+                        }
+                    }
+                });
+            }
+        });
+
 
     }
 }
