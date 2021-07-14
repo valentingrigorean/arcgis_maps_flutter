@@ -59,9 +59,12 @@ public class LegendInfoController {
         if (layerContent instanceof Layer) {
             final Layer layer = (Layer) layerContent;
             layer.addDoneLoadingListener(() -> {
-                loadSublayersOrLegendInfos(layer);
+                if (layer.canShowInLegend())
+                    loadSublayersOrLegendInfos(layer);
             });
             layer.loadAsync();
+        } else {
+            loadSublayersOrLegendInfos(layerContent);
         }
     }
 
@@ -122,7 +125,7 @@ public class LegendInfoController {
                 items.add(item);
 
                 if (items.size() == legendInfos.size()) {
-                    result.success(item);
+                    result.success(items);
                 }
             });
         }
