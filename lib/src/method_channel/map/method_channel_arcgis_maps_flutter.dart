@@ -146,6 +146,19 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
+  Future<List<LegendInfo>> getLegendInfos(int mapId, Layer layer) async {
+    final results = await channel(mapId).invokeListMethod(
+      "map#getLegendInfos",
+      layer.toJson(),
+    );
+
+    if (results == null || results.isEmpty) {
+      return const [];
+    }
+    return results.map((e) => LegendInfo.fromJson(e)!).toList();
+  }
+
+  @override
   Future<void> setMap(int mapId, ArcGISMap map) {
     return channel(mapId).invokeMethod<void>("map#setMap", map.toJson());
   }

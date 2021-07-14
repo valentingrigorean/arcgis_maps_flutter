@@ -48,6 +48,19 @@ class LayersController {
         addLayersToMap(referenceLayers, LayerType.REFERENCE);
     }
 
+    public Layer getLayerByLayerId(String id) {
+        if (flutterOperationalLayersMap.containsKey(id)) {
+            return flutterOperationalLayersMap.get(id);
+        }
+        if (flutterBaseLayersMap.containsKey(id)) {
+            return flutterBaseLayersMap.get(id);
+        }
+        if (flutterReferenceLayersMap.containsKey(id)) {
+            return flutterReferenceLayersMap.get(id);
+        }
+        return null;
+    }
+
     public void updateFromArgs(Object args) {
         final Map<?, ?> mapData = (Map<?, ?>) args;
         if (mapData == null || mapData.size() == 0) {
@@ -152,8 +165,8 @@ class LayersController {
                 args.put("layerId", layer.getLayerId());
                 methodChannel.invokeMethod("layer#loaded", args);
             });
+            nativeLayer.fetchLegendInfosAsync();
             switch (layerType) {
-
                 case OPERATIONAL:
                     map.getOperationalLayers().add(nativeLayer);
                     break;

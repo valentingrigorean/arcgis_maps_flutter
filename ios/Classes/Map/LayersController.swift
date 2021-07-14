@@ -76,6 +76,19 @@ class LayersController {
         addLayersToMap(layers: Array(referenceLayers.set), layerType: .reference)
     }
 
+    public func getLayerByLayerId(layerId: String) -> AGSLayer? {
+        if let layer = flutterOperationalLayersMap[layerId] {
+            return layer
+        }
+        if let layer = flutterBaseLayersMap[layerId] {
+            return layer
+        }
+        if let layer = flutterReferenceLayersMap[layerId] {
+            return layer
+        }
+        return nil
+    }
+
 
     public func updateFromArgs(args: Any) {
         guard let dict = args as? Dictionary<String, Any> else {

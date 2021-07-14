@@ -2,15 +2,17 @@ import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 
 abstract class BaseTileLayer<T> extends Layer {
   const BaseTileLayer({
-    required this.layerId,
+    required LayerId layerId,
     required this.url,
     required this.type,
     this.credential,
     bool isVisible = true,
     double opacity = 1,
-  }) : super(isVisible: isVisible, opacity: opacity);
-
-  final LayerId layerId;
+  }) : super(
+          isVisible: isVisible,
+          opacity: opacity,
+          layerId: layerId,
+        );
 
   final String url;
 

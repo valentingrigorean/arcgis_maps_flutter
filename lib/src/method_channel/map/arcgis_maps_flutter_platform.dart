@@ -51,6 +51,11 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('buildView() has not been implemented.');
   }
 
+  Future<List<LegendInfo>> getLegendInfos(int mapId, Layer layer) {
+    throw UnimplementedError(
+        'setMgetLegendInfosap() has not been implemented.');
+  }
+
   Future<void> setMap(int mapId, ArcGISMap map) {
     throw UnimplementedError('setMap() has not been implemented.');
   }
@@ -63,7 +68,7 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('getMapRotation() has not been implemented.');
   }
 
-  Future<void> setViewpointChangedListenerEvents(int mapId,bool value) {
+  Future<void> setViewpointChangedListenerEvents(int mapId, bool value) {
     throw UnimplementedError(
         'setViewpointChangedListenerEvents() has not been implemented.');
   }
@@ -128,8 +133,9 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('onMapLoad() has not been implemented.');
   }
 
-  Stream<AutoPanModeChangedEvent> onAutoPanModeChanged({required int mapId}){
-    throw UnimplementedError('onAutoPanModeChanged() has not been implemented.');
+  Stream<AutoPanModeChangedEvent> onAutoPanModeChanged({required int mapId}) {
+    throw UnimplementedError(
+        'onAutoPanModeChanged() has not been implemented.');
   }
 
   /// A [Marker] has been tapped.
@@ -174,6 +180,4 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
   void dispose(int mapId) {
     throw UnimplementedError('dispose() has not been implemented.');
   }
-
-
 }

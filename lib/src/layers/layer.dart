@@ -9,15 +9,18 @@ abstract class Layer extends MapsObject<Layer> {
   const Layer({
     required this.isVisible,
     required this.opacity,
+    required this.layerId,
   });
 
   final bool isVisible;
   final double opacity;
+  final LayerId layerId;
 
   Map<String, Object> toJson() {
     return {
       'isVisible': isVisible,
       'opacity': opacity,
+      'layerId': layerId.value,
     };
   }
 }

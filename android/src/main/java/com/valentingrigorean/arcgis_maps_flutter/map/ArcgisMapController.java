@@ -50,6 +50,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     private final PolygonsController polygonsController;
     private final PolylinesController polylinesController;
 
+
     @Nullable
     private MapView mapView;
     private MapViewOnTouchListener mapViewOnTouchListener;
@@ -167,6 +168,11 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 if (data != null)
                     updateMapOptions(data);
                 result.success(null);
+            }
+            break;
+            case "map#getLegendInfos": {
+                final LegendInfoController legendInfoController = new LegendInfoController(context, layersController, result);
+                legendInfoController.loadAsync(call.arguments);
             }
             break;
             case "map#setMap": {

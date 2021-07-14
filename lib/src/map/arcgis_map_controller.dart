@@ -18,6 +18,12 @@ class ArcgisMapController {
     return ArcgisMapController._(arcgisMapState, id);
   }
 
+  Future<LegendInfoResult> getLegendInfos(Layer layer) async {
+    final results =
+        await ArcgisMapsFlutterPlatform.instance.getLegendInfos(mapId, layer);
+    return LegendInfoResult(layer: layer, results: results);
+  }
+
   void addViewpointChangedListener(ViewpointChangedListener listener) {
     if (!_viewpointChangedListeners.contains(listener)) {
       _viewpointChangedListeners.add(listener);

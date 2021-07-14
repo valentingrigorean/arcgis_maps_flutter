@@ -36,6 +36,17 @@ part 'src/geometry/point.dart';
 part 'src/geometry/spatial_references.dart';
 part 'src/geometry/geometry.dart';
 
+
+part 'src/layers/arcgis_map_image_layer.dart';
+part 'src/layers/layer.dart';
+part 'src/layers/feature_layer.dart';
+part 'src/layers/legend_info.dart';
+part 'src/layers/legend_info_result.dart';
+part 'src/layers/tiled_layer.dart';
+part 'src/layers/vector_tile_layer.dart';
+part 'src/layers/wms_layer.dart';
+
+
 part 'src/mapping/viewpoint.dart';
 part 'src/mapping/camera.dart';
 part 'src/mapping/elevation_source.dart';
@@ -57,14 +68,6 @@ part 'src/map/arcgis_map_view.dart';
 part 'src/map/arcgis_map_controller.dart';
 part 'src/map/interaction_options.dart';
 part 'src/map/scalebar_configuration.dart';
-
-
-part 'src/layers/arcgis_map_image_layer.dart';
-part 'src/layers/layer.dart';
-part 'src/layers/feature_layer.dart';
-part 'src/layers/tiled_layer.dart';
-part 'src/layers/vector_tile_layer.dart';
-part 'src/layers/wms_layer.dart';
 
 part 'src/mapping/arcgis_scene.dart';
 part 'src/scene/arcgis_scene_controller.dart';
