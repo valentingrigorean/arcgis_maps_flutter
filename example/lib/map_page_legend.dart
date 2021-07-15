@@ -29,7 +29,7 @@ class _MapPageLegendState extends State<MapPageLegend> {
       ),
       body: ArcgisMapView(
         map: ArcGISMap.openStreetMap(),
-        operationalLayers: {_layer},
+        // operationalLayers: {_layer},
         onMapCreated: (controller) {
           _controller = controller;
           setState(() {});
@@ -61,9 +61,11 @@ class _MapPageLegendState extends State<MapPageLegend> {
                               for (final legend in item.results) ...[
                                 ListTile(
                                   title: Text(legend.name),
-                                  trailing: Image.memory(
-                                    legend.symbolImage,
-                                  ),
+                                  trailing: legend.symbolImage != null
+                                      ? Image.memory(
+                                          legend.symbolImage!,
+                                        )
+                                      : null,
                                 )
                               ]
                             ],

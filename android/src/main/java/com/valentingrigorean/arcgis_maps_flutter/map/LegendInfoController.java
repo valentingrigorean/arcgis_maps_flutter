@@ -8,6 +8,7 @@ import com.esri.arcgisruntime.concurrent.ListenableFuture;
 import com.esri.arcgisruntime.layers.Layer;
 import com.esri.arcgisruntime.layers.LayerContent;
 import com.esri.arcgisruntime.layers.LegendInfo;
+import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
 
 import java.io.ByteArrayOutputStream;
@@ -24,10 +25,11 @@ public class LegendInfoController {
     private final MethodChannel.Result result;
 
     private Map<LayerContent, List<LegendInfo>> layersLegends = new HashMap<>();
+    private List<Object> legendResultsFlutter = new ArrayList<>();
 
     private boolean didSetResult;
 
-    private int requests = 0;
+    private int pendingRequest = 0;
 
 
     public LegendInfoController(Context context, LayersController layersController, MethodChannel.Result result) {
@@ -52,6 +54,16 @@ public class LegendInfoController {
         if (loadedLayer == null) {
             loadedLayer = flutterLayer.createLayer();
         }
+
+        final Layer layer = loadedLayer;
+        layer.addDoneLoadingListener(() -> {
+            if (layer.getLoadStatus() != LoadStatus.LOADED) {
+                setResult();
+            } else if (!layer.canShowInLegend() && layer.getSubLayerContents().isEmpty()) {
+                setResult();
+            }
+        });
+
         loadIndividualLayer(loadedLayer);
     }
 
@@ -69,27 +81,78 @@ public class LegendInfoController {
     }
 
     private void loadSublayersOrLegendInfos(LayerContent layerContent) {
+
         if (!layerContent.getSubLayerContents().isEmpty()) {
+            pendingRequest++;
             for (final LayerContent layer :
                     layerContent.getSubLayerContents()) {
                 loadIndividualLayer(layer);
             }
+            pendingRequest--;
         } else {
-            requests++;
             final ListenableFuture<List<LegendInfo>> future = layerContent.fetchLegendInfosAsync();
 
+            pendingRequest++;
             future.addDoneListener(() -> {
                 try {
                     final List<LegendInfo> items = future.get();
                     layersLegends.put(layerContent, items);
-                    requests--;
-                    if (requests <= 0) {
+
+                    pendingRequest--;
+                    if (pendingRequest == 0) {
                         setResult();
                     }
                 } catch (Exception e) {
+                    layersLegends.put(layerContent, new ArrayList<>(0));
                     e.printStackTrace();
                 }
             });
+        }
+    }
+
+    private void addLegendInfoResultFlutterAndValidate(LayerContent layerContent, List<?> results) {
+        final Map<String, Object> item = new HashMap<>(2);
+        item.put("layerName", layerContent.getName());
+        item.put("results", results);
+
+        legendResultsFlutter.add(item);
+        if (legendResultsFlutter.size() == layersLegends.size()) {
+            result.success(legendResultsFlutter);
+        }
+    }
+
+    private void createLegendFlutter(LayerContent layerContent, List<LegendInfo> legendInfos) {
+        final ArrayList<Map<?, ?>> results = new ArrayList<>(legendInfos.size());
+        for (final LegendInfo legendInfo : legendInfos) {
+            final Map<String, Object> item = new HashMap<>(2);
+            item.put("name", legendInfo.getName());
+
+            if (legendInfo.getSymbol() == null) {
+                results.add(item);
+
+                if (validateLayerResults(legendInfos, results)) {
+                    addLegendInfoResultFlutterAndValidate(layerContent, results);
+                }
+            } else {
+                {
+                    final ListenableFuture<Bitmap> future = legendInfo.getSymbol().createSwatchAsync(context, Color.TRANSPARENT);
+                    future.addDoneListener(() -> {
+                        try {
+                            final Bitmap bitmap = future.get();
+                            final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                            item.put("symbolImage", stream.toByteArray());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        results.add(item);
+
+                        if (validateLayerResults(legendInfos, results)) {
+                            addLegendInfoResultFlutterAndValidate(layerContent, results);
+                        }
+                    });
+                }
+            }
         }
     }
 
@@ -99,48 +162,18 @@ public class LegendInfoController {
             return;
         didSetResult = true;
 
-        final ArrayList<Object> items = new ArrayList<>(layersLegends.size());
-
         if (layersLegends.isEmpty()) {
+            final ArrayList<Object> items = new ArrayList<>(0);
             result.success(items);
             return;
         }
 
         layersLegends.forEach((k, v) -> {
-            final ArrayList<Map<?, ?>> legendItemsForLayer = new ArrayList<>(layersLegends.size());
-
-            for (final LegendInfo legendInfo : v) {
-                final Map<String, Object> item = new HashMap<>(2);
-                item.put("name", legendInfo.getName());
-
-                final ListenableFuture<Bitmap> future = legendInfo.getSymbol().createSwatchAsync(context, Color.TRANSPARENT);
-                final LayerContent layerContent = k;
-                future.addDoneListener(() -> {
-                    try {
-                        final Bitmap bitmap = future.get();
-                        final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                        item.put("symbolImage", stream.toByteArray());
-                    } catch (Exception e) {
-                        item.put("symbolImage", new byte[0]);
-                        e.printStackTrace();
-                    }
-
-                    legendItemsForLayer.add(item);
-
-                    if (legendItemsForLayer.size() == v.size()) {
-                        final Map<String, Object> resultItem = new HashMap<>(2);
-                        resultItem.put("layerName", layerContent.getName());
-                        resultItem.put("results", legendItemsForLayer);
-                        items.add(resultItem);
-                        if (items.size() == layersLegends.size()) {
-                            result.success(items);
-                        }
-                    }
-                });
-            }
+            createLegendFlutter(k, v);
         });
+    }
 
-
+    private static boolean validateLayerResults(List<?> src, List<?> dst) {
+        return src.size() == dst.size();
     }
 }

@@ -8,7 +8,7 @@ class LegendInfo {
   });
 
   final String name;
-  final Uint8List symbolImage;
+  final Uint8List? symbolImage;
 
   static LegendInfo? fromJson(Map<dynamic, dynamic>? json) {
     if (json == null) {
