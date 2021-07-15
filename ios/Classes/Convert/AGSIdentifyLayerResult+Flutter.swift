@@ -23,4 +23,6 @@ extension Array where Element == AGSIdentifyLayerResult {
             $0.toJSONFlutter()
         }
     }
+
+
 }

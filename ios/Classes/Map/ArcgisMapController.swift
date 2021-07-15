@@ -37,6 +37,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private var haveScaleBar = false
 
+    private var legendInfoControllers = Array<LegendInfoController>()
+
 
     public init(
             withRegistrar registrar: FlutterPluginRegistrar,
@@ -96,6 +98,15 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 }
             }
             result(nil)
+            break
+        case "map#getLegendInfos":
+            var index = legendInfoControllers.count;
+            let legendInfoController = LegendInfoController(layersController: layersController) {[weak self] items in
+                result(items)
+                self?.legendInfoControllers.remove(at: index)
+            }
+            legendInfoController.loadAsync(args: call.arguments)
+            legendInfoControllers.append(legendInfoController)
             break
         case "map#setMap":
             let viewPoint = mapView.currentViewpoint(with: AGSViewpointType.centerAndScale)
