@@ -73,6 +73,14 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
         'setViewpointChangedListenerEvents() has not been implemented.');
   }
 
+  Future<bool> isLocationDisplayStarted(int mapId){
+    throw UnimplementedError('isLocationDisplayStarted() has not been implemented.');
+  }
+
+  Future<void> setLocationDisplay(int mapId, bool start) {
+    throw UnimplementedError('isLocationDisplayStarted() has not been implemented.');
+  }
+
   Future<void> clearMarkerSelection(int mapId) {
     throw UnimplementedError(
         'clearMarkerSelection() has not been implemented.');

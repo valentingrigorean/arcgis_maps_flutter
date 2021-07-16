@@ -39,7 +39,7 @@ class _MapPageLegendState extends State<MapPageLegend> {
         onPressed: _controller == null
             ? null
             : () async {
-                final result = await _controller!.getLegendInfos(_layer);
+                final result = await _controller!.getLegendInfosForLayer(_layer);
                 print('LegendInfo:${result.length}');
 
                 showDialog(

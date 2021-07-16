@@ -101,7 +101,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             break
         case "map#getLegendInfos":
             var index = legendInfoControllers.count;
-            let legendInfoController = LegendInfoController(layersController: layersController) {[weak self] items in
+            let legendInfoController = LegendInfoController(layersController: layersController) { [weak self] items in
                 result(items)
                 self?.legendInfoControllers.remove(at: index)
             }
@@ -141,6 +141,21 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         case "map#setViewpointRotation":
             if let angleDegrees = call.arguments as? Double {
                 mapView.setViewpointRotation(angleDegrees)
+            }
+            result(nil)
+            break
+        case "map#isLocationDisplayStarted":
+            result(mapView.locationDisplay.started)
+            break
+        case "map#setLocationDisplay":
+            if let started = call.arguments as? Bool {
+                if mapView.locationDisplay.started != started {
+                    if started {
+                        mapView.locationDisplay.start()
+                    } else {
+                        mapView.locationDisplay.stop()
+                    }
+                }
             }
             result(nil)
             break

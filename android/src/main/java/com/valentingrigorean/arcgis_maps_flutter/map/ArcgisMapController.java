@@ -188,6 +188,22 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 result.success(null);
             }
             break;
+            case "map#isLocationDisplayStarted": {
+                result.success(mapView.getLocationDisplay().isStarted());
+            }
+            break;
+            case "map#setLocationDisplay": {
+                final Boolean started = Convert.toBoolean(call.arguments);
+                if (started != mapView.getLocationDisplay().isStarted()) {
+                    if (started) {
+                        mapView.getLocationDisplay().startAsync();
+                    } else {
+                        mapView.getLocationDisplay().stop();
+                    }
+                }
+                result.success(null);
+            }
+            break;
             case "map#getMapRotation": {
                 result.success(mapView.getMapRotation());
             }

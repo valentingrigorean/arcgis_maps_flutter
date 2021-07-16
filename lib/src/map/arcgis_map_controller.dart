@@ -18,9 +18,19 @@ class ArcgisMapController {
     return ArcgisMapController._(arcgisMapState, id);
   }
 
-  Future<List<LegendInfoResult>> getLegendInfos(Layer layer) async {
+  Future<List<LegendInfoResult>> getLegendInfosForLayer(Layer layer) async {
     return await ArcgisMapsFlutterPlatform.instance
         .getLegendInfos(mapId, layer);
+  }
+
+  Future<List<LegendInfoResult>> getLegendInfosForLayers(
+      Set<Layer> layers) async {
+    var futures = <Future<List<LegendInfoResult>>>[];
+    for (final layer in layers) {
+      futures.add(getLegendInfosForLayer(layer));
+    }
+    final result = await Future.wait(futures);
+    return result.expand((e) => e).toList();
   }
 
   void addViewpointChangedListener(ViewpointChangedListener listener) {
@@ -40,6 +50,23 @@ class ArcgisMapController {
       ArcgisMapsFlutterPlatform.instance
           .setViewpointChangedListenerEvents(mapId, false);
     }
+  }
+
+  /// Indicates whether the location display is active or not.
+  Future<bool> isLocationDisplayStarted() {
+    return ArcgisMapsFlutterPlatform.instance.isLocationDisplayStarted(mapId);
+  }
+
+  /// Start the location display, which will in-turn start receiving location updates.
+  /// As the updates are received they will be displayed on the map.
+  Future<void> startLocationDisplay() {
+    return ArcgisMapsFlutterPlatform.instance.setLocationDisplay(mapId, true);
+  }
+
+  /// Stop the location display. Location updates will no longer
+  /// be received or displayed on the map.
+  Future<void> stopLocationDisplay() {
+    return ArcgisMapsFlutterPlatform.instance.setLocationDisplay(mapId, false);
   }
 
   Future<void> clearMarkerSelection() {

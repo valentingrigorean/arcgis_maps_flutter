@@ -189,6 +189,18 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
+  Future<bool> isLocationDisplayStarted(int mapId) async {
+    return await channel(mapId)
+            .invokeMethod<bool>("map#isLocationDisplayStarted") ??
+        false;
+  }
+
+  @override
+  Future<void> setLocationDisplay(int mapId, bool start) {
+    return channel(mapId).invokeMethod<void>("map#setLocationDisplay", start);
+  }
+
+  @override
   Future<void> clearMarkerSelection(int mapId) {
     return channel(mapId).invokeMethod<void>("map#clearMarkerSelection");
   }
