@@ -4,7 +4,6 @@
 
 import Foundation
 import ArcGIS
-import ArcGISToolkit
 import UIKit
 
 class ScaleBarController: NSObject {

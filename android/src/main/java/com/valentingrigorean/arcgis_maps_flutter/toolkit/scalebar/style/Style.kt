@@ -17,12 +17,7 @@
 package com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style
 
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.Scalebar
-import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.renderer.AlternatingBarRenderer
-import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.renderer.BarRenderer
-import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.renderer.DualUnitLineRenderer
-import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.renderer.GraduatedLineRenderer
-import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.renderer.LineRenderer
-import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.renderer.ScalebarRenderer
+import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.renderer.*
 
 /**
  * Represents the style of [Scalebar] to be displayed.
@@ -87,10 +82,15 @@ enum class Style(
      */
     DUAL_UNIT_LINE(4) {
         override val renderer: ScalebarRenderer = DualUnitLineRenderer()
+    },
+
+    DUAL_UNIT_LINE_NAUTICAL_MILE(5) {
+        override val renderer: ScalebarRenderer = DualUnitLineNauticalMileRenderer()
     };
 
     companion object {
         private val map = values().associateBy(Style::value)
+
         /**
          * @suppress
          */

@@ -28,6 +28,7 @@ internal const val LABEL_X_PAD_DP = 6
 internal const val SCALEBAR_X_PAD_DP = 10
 internal val LINEAR_UNIT_METERS = LinearUnit(LinearUnitId.METERS)
 internal val LINEAR_UNIT_FEET = LinearUnit(LinearUnitId.FEET)
+internal val LINEAR_UNIT_NAUTICAL_MILES = LinearUnit(LinearUnitId.NAUTICAL_MILES)
 private const val ALPHA_50_PC = -0x80000000
 internal val DEFAULT_STYLE = Style.ALTERNATING_BAR
 internal val DEFAULT_ALIGNMENT = Scalebar.Alignment.LEFT

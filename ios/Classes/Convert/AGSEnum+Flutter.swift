@@ -4,7 +4,6 @@
 
 import Foundation
 import ArcGIS
-import ArcGISToolkit
 
 public func toScalebarAlignment(rawValue: Int) -> ScalebarAlignment {
     switch rawValue {
@@ -31,6 +30,8 @@ public func toScalebarStyle(rawValue: Int) -> ScalebarStyle {
         return .alternatingBar
     case 4:
         return .dualUnitLine
+    case 5:
+        return .dualUnitLineNauticalMile
     default:
         fatalError("Invalid ScalebarStyle type \(rawValue)")
     }

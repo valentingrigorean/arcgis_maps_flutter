@@ -14,11 +14,14 @@ class _MapPageScaleBarState extends State<MapPageScaleBar> {
   final ScalebarConfiguration _defaultScaleConfiguration =
       ScalebarConfiguration(
     inMapAlignment: ScalebarAlignment.center,
+    style: ScalebarStyle.dualUnitLine,
   );
   ScalebarConfiguration _customScaleConfiguration = ScalebarConfiguration(
     showInMap: false,
     autoHide: true,
     hideAfter: const Duration(milliseconds: 500),
+    units: ScalebarUnits.imperial,
+    style: ScalebarStyle.dualUnitLineNauticalMile,
   );
 
   bool _useCustom = true;

@@ -16,7 +16,6 @@
 
 package com.valentingrigorean.arcgis_maps_flutter.toolkit.extension
 
-import android.util.Log
 import com.esri.arcgisruntime.UnitSystem
 import com.esri.arcgisruntime.geometry.LinearUnit
 import com.esri.arcgisruntime.geometry.LinearUnitId

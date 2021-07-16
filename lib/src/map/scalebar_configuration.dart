@@ -11,6 +11,7 @@ enum ScalebarStyle {
   graduatedLine,
   alternatingBar,
   dualUnitLine,
+  dualUnitLineNauticalMile,
 }
 
 enum ScalebarAlignment {

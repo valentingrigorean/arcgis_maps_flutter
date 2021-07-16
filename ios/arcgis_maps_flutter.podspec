@@ -22,6 +22,5 @@ A new flutter plugin project.
   s.swift_version = '5.0'
 
   s.dependency 'ArcGIS-Runtime-SDK-iOS', '~> 100.11'
-  s.dependency 'ArcGIS-Runtime-Toolkit-iOS'
 
 end

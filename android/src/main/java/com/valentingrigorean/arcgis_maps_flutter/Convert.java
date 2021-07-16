@@ -38,7 +38,6 @@ import com.valentingrigorean.arcgis_maps_flutter.map.FlutterLayer;
 import com.valentingrigorean.arcgis_maps_flutter.map.MarkerController;
 import com.valentingrigorean.arcgis_maps_flutter.map.PolygonController;
 import com.valentingrigorean.arcgis_maps_flutter.map.PolylineController;
-import com.valentingrigorean.arcgis_maps_flutter.map.ScaleBarController;
 import com.valentingrigorean.arcgis_maps_flutter.map.ScreenLocationData;
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.Scalebar;
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.Style;
@@ -77,6 +76,8 @@ public class Convert {
                 return Style.ALTERNATING_BAR;
             case 4:
                 return Style.DUAL_UNIT_LINE;
+            case 5:
+                return Style.DUAL_UNIT_LINE_NAUTICAL_MILE;
             default:
                 throw new IllegalStateException("Unexpected value: " + rawValue);
         }
