@@ -100,12 +100,12 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             result(nil)
             break
         case "map#getLegendInfos":
-            var index = legendInfoControllers.count;
-            let legendInfoController = LegendInfoController(layersController: layersController) { [weak self] items in
+            let legendInfoController = LegendInfoController(layersController: layersController)
+            legendInfoController.loadAsync(args: call.arguments,result: { [weak self] items in
                 result(items)
-                self?.legendInfoControllers.remove(at: index)
-            }
-            legendInfoController.loadAsync(args: call.arguments)
+                guard let self = self else { return }
+                self.legendInfoControllers = self.legendInfoControllers.filter { $0 !== legendInfoController}
+            })
             legendInfoControllers.append(legendInfoController)
             break
         case "map#setMap":

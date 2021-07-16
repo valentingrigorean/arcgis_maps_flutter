@@ -10,7 +10,7 @@ public typealias LegendInfoControllerResult = ([Any]) -> Void
 class LegendInfoController {
 
     private let layersController: LayersController
-    private let result : LegendInfoControllerResult
+    private var result: LegendInfoControllerResult?
     private var layersLegend = Dictionary<LayerWrapper, [AGSLegendInfo]>()
 
     private var legendResultsFlutter: [Any] = []
@@ -19,13 +19,13 @@ class LegendInfoController {
 
     private var pendingRequest = 0
 
-    init(layersController: LayersController,
-         result: @escaping LegendInfoControllerResult) {
+    init(layersController: LayersController) {
         self.layersController = layersController
-        self.result = result
     }
 
-    func loadAsync(args: Any?) {
+    func loadAsync(args: Any?,
+                   result: @escaping LegendInfoControllerResult) {
+        self.result = result
         if didSetResult {
             return
         }
@@ -102,7 +102,7 @@ class LegendInfoController {
 
         legendResultsFlutter.append(["layerName": layerContent.name, "results": results])
         if legendResultsFlutter.count == layersLegend.count {
-            result(legendResultsFlutter)
+            result?(legendResultsFlutter)
         }
     }
 
@@ -114,7 +114,7 @@ class LegendInfoController {
 
         didSetResult = true
         if layersLegend.isEmpty {
-            result([])
+            result?([])
             return
         }
 
