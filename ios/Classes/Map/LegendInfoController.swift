@@ -120,6 +120,10 @@ class LegendInfoController {
 
         for (k, v) in layersLegend {
             var results = Array<Any>()
+            if v.isEmpty {
+                addLegendInfoResultFlutterAndValidate(layerContent: k.layer, results: results)
+                continue
+            }
             for legendInfo in v {
                 var item = Dictionary<String, Any>()
                 item["name"] = legendInfo.name

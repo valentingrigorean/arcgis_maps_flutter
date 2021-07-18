@@ -19,6 +19,33 @@ class _MapPageLegendState extends State<MapPageLegend> {
         'Dybdekontur'
       ]);
 
+  static Set<Layer> getLakeLayers() => {
+    FeatureLayer.fromUrl(
+      'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/1',
+      opacity: 0.4,
+    ),
+    FeatureLayer.fromUrl(
+      'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/2',
+      opacity: 0.4,
+    ),
+    FeatureLayer.fromUrl(
+      'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/3',
+      opacity: 0.4,
+    ),
+    FeatureLayer.fromUrl(
+      'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/4',
+      opacity: 0.4,
+    ),
+    FeatureLayer.fromUrl(
+      'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/5',
+      opacity: 0.4,
+    ),
+    FeatureLayer.fromUrl(
+      'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/6',
+      opacity: 0.4,
+    ),
+  };
+
   ArcgisMapController? _controller;
 
   @override
@@ -39,7 +66,7 @@ class _MapPageLegendState extends State<MapPageLegend> {
         onPressed: _controller == null
             ? null
             : () async {
-                final result = await _controller!.getLegendInfosForLayer(_layer);
+                final result = await _controller!.getLegendInfosForLayers(getLakeLayers());
                 print('LegendInfo:${result.length}');
 
                 showDialog(

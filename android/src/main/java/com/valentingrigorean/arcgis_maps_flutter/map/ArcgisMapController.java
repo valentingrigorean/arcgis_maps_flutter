@@ -25,6 +25,7 @@ import com.esri.arcgisruntime.mapping.view.ViewpointChangedListener;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
 import com.valentingrigorean.arcgis_maps_flutter.LifecycleProvider;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +50,8 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     private final MarkersController markersController;
     private final PolygonsController polygonsController;
     private final PolylinesController polylinesController;
+
+    private final ArrayList<LegendInfoController> legendInfoControllers = new ArrayList<>();
 
 
     @Nullable
@@ -171,8 +174,12 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             }
             break;
             case "map#getLegendInfos": {
-                final LegendInfoController legendInfoController = new LegendInfoController(context, layersController, result);
-                legendInfoController.loadAsync(call.arguments);
+                final LegendInfoController legendInfoController = new LegendInfoController(context, layersController);
+                legendInfoControllers.add(legendInfoController);
+                legendInfoController.loadAsync(call.arguments, results -> {
+                    result.success(results);
+                    legendInfoControllers.remove(legendInfoController);
+                });
             }
             break;
             case "map#setMap": {

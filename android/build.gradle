@@ -43,7 +43,7 @@ android {
     }
 
     dependencies {
-        implementation 'com.esri.arcgisruntime:arcgis-android:100.11.0'
+        implementation 'com.esri.arcgisruntime:arcgis-android:100.11.2'
     }
 
     compileOptions {

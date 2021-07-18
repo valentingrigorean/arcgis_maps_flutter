@@ -3,13 +3,17 @@ package com.valentingrigorean.arcgis_maps_flutter.map;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.util.Log;
 
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
+import com.esri.arcgisruntime.layers.FeatureLayer;
 import com.esri.arcgisruntime.layers.Layer;
 import com.esri.arcgisruntime.layers.LayerContent;
 import com.esri.arcgisruntime.layers.LegendInfo;
 import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -17,31 +21,39 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.flutter.plugin.common.MethodChannel;
-
 public class LegendInfoController {
+
+    private final String TAG = "LegendInfoController";
+
     private final Context context;
     private final LayersController layersController;
-    private final MethodChannel.Result result;
 
     private Map<LayerContent, List<LegendInfo>> layersLegends = new HashMap<>();
     private List<Object> legendResultsFlutter = new ArrayList<>();
 
     private boolean didSetResult;
 
-    private int pendingRequest = 0;
+    private LegendInfoControllerResult legendInfoControllerResult;
+
+    private ArrayList<LayerContent> pendingLayersRequests = new ArrayList<>();
 
 
-    public LegendInfoController(Context context, LayersController layersController, MethodChannel.Result result) {
-        this.context = context;
-        this.layersController = layersController;
-        this.result = result;
+    public interface LegendInfoControllerResult {
+        void onResult(List<Object> results);
     }
 
-    public void loadAsync(Object args) {
+
+    public LegendInfoController(Context context, LayersController layersController) {
+        this.context = context;
+        this.layersController = layersController;
+    }
+
+    public void loadAsync(Object args, @NotNull LegendInfoControllerResult legendInfoControllerResult) {
         if (didSetResult) {
+            legendInfoControllerResult.onResult(legendResultsFlutter);
             return;
         }
+        this.legendInfoControllerResult = legendInfoControllerResult;
         final Map<?, ?> data = Convert.toMap(args);
         if (data == null || data.isEmpty()) {
             setResult();
@@ -52,28 +64,54 @@ public class LegendInfoController {
 
         Layer loadedLayer = layersController.getLayerByLayerId(flutterLayer.getLayerId());
         if (loadedLayer == null) {
+            Log.d(TAG, "loadAsync: " + flutterLayer.getLayerId() + " not found. Creating a new layer.");
             loadedLayer = flutterLayer.createLayer();
+        } else {
+            Log.d(TAG, "loadAsync: " + flutterLayer.getLayerId() + " found in map layers.");
         }
 
         final Layer layer = loadedLayer;
-        layer.addDoneLoadingListener(() -> {
+
+        final Runnable onDone = () -> {
+            Log.d(TAG, "loadAsync: " + layer.getName() + " status -> " + layer.getLoadStatus());
             if (layer.getLoadStatus() != LoadStatus.LOADED) {
                 setResult();
             } else if (!layer.canShowInLegend() && layer.getSubLayerContents().isEmpty()) {
                 setResult();
+            } else {
+                loadSublayersOrLegendInfos(layer);
             }
-        });
+        };
 
-        loadIndividualLayer(loadedLayer);
+        if (loadedLayer instanceof FeatureLayer) {
+            final FeatureLayer featureLayer = (FeatureLayer) loadedLayer;
+            featureLayer.getFeatureTable().addDoneLoadingListener(() -> {
+                featureLayer.addDoneLoadingListener(onDone);
+                featureLayer.loadAsync();
+            });
+        } else {
+            layer.addDoneLoadingListener(onDone);
+        }
+
+        loadedLayer.loadAsync();
     }
 
     private void loadIndividualLayer(LayerContent layerContent) {
         if (layerContent instanceof Layer) {
             final Layer layer = (Layer) layerContent;
-            layer.addDoneLoadingListener(() -> {
-                if (layer.canShowInLegend())
-                    loadSublayersOrLegendInfos(layer);
-            });
+            final Runnable onDone = () -> {
+                Log.d(TAG, "loadIndividualLayer: " + layer.getName() + " status -> " + layer.getLoadStatus());
+                loadSublayersOrLegendInfos(layer);
+            };
+            if (layer instanceof FeatureLayer) {
+                final FeatureLayer featureLayer = (FeatureLayer) layer;
+                featureLayer.getFeatureTable().addDoneLoadingListener(() -> {
+                    featureLayer.addDoneLoadingListener(onDone);
+                    featureLayer.loadAsync();
+                });
+            } else {
+                layer.addDoneLoadingListener(onDone);
+            }
             layer.loadAsync();
         } else {
             loadSublayersOrLegendInfos(layerContent);
@@ -83,23 +121,28 @@ public class LegendInfoController {
     private void loadSublayersOrLegendInfos(LayerContent layerContent) {
 
         if (!layerContent.getSubLayerContents().isEmpty()) {
-            pendingRequest++;
+            pendingLayersRequests.add(layerContent);
+            Log.d(TAG, "loadSublayersOrLegendInfos: " + layerContent.getName() + " loading sublayers -> " + layerContent.getSubLayerContents().size() + " pendingRequest " + pendingLayersRequests.size());
             for (final LayerContent layer :
                     layerContent.getSubLayerContents()) {
                 loadIndividualLayer(layer);
             }
-            pendingRequest--;
+
+            pendingLayersRequests.remove(layerContent);
         } else {
             final ListenableFuture<List<LegendInfo>> future = layerContent.fetchLegendInfosAsync();
 
-            pendingRequest++;
+            pendingLayersRequests.add(layerContent);
+            Log.d(TAG, "loadSublayersOrLegendInfos: Loading legend for " + layerContent.getName() + " pendingRequest " + pendingLayersRequests.size());
             future.addDoneListener(() -> {
+                pendingLayersRequests.remove(layerContent);
+                Log.d(TAG, "loadSublayersOrLegendInfos: Finish loading legend for " + layerContent.getName() + " pendingRequest " + pendingLayersRequests.size());
+
                 try {
                     final List<LegendInfo> items = future.get();
                     layersLegends.put(layerContent, items);
 
-                    pendingRequest--;
-                    if (pendingRequest == 0) {
+                    if (pendingLayersRequests.size() == 0) {
                         setResult();
                     }
                 } catch (Exception e) {
@@ -117,12 +160,17 @@ public class LegendInfoController {
 
         legendResultsFlutter.add(item);
         if (legendResultsFlutter.size() == layersLegends.size()) {
-            result.success(legendResultsFlutter);
+            Log.d(TAG, "onResult: " + legendResultsFlutter.size());
+            legendInfoControllerResult.onResult(legendResultsFlutter);
         }
     }
 
     private void createLegendFlutter(LayerContent layerContent, List<LegendInfo> legendInfos) {
         final ArrayList<Map<?, ?>> results = new ArrayList<>(legendInfos.size());
+        if (legendInfos.isEmpty()) {
+            addLegendInfoResultFlutterAndValidate(layerContent, results);
+            return;
+        }
         for (final LegendInfo legendInfo : legendInfos) {
             final Map<String, Object> item = new HashMap<>(2);
             item.put("name", legendInfo.getName());
@@ -164,7 +212,7 @@ public class LegendInfoController {
 
         if (layersLegends.isEmpty()) {
             final ArrayList<Object> items = new ArrayList<>(0);
-            result.success(items);
+            legendInfoControllerResult.onResult(items);
             return;
         }
 
