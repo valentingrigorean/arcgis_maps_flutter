@@ -135,8 +135,8 @@ class LegendInfoController {
                         addLegendInfoResultFlutterAndValidate(layerContent: k.layer, results: results)
                     }
                 } else {
-                    legendInfo.symbol?.createSwatch { [weak self] (image,
-                                                                   _) in
+                    legendInfo.symbol?.createSwatch(withBackgroundColor: UIColor.clear, screen: nil) { [weak self] (image,
+                                                                                                                    _) in
                         if image != nil {
                             item["symbolImage"] = image!.jpegData(compressionQuality: 1.0)
                         }
