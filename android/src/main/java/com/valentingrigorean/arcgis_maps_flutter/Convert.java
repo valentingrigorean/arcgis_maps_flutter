@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 
 import com.esri.arcgisruntime.UnitSystem;
 import com.esri.arcgisruntime.geometry.Point;
@@ -759,5 +760,8 @@ public class Convert {
         return (int) (dp * ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT));
     }
 
+    public static int spToPixels(Context context, int sp) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, context.getResources().getDisplayMetrics());
+    }
 
 }

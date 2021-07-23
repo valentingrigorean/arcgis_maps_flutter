@@ -6,12 +6,14 @@ import Foundation
 import ArcGIS
 import UIKit
 
+
+fileprivate let defaultWidth = 175
+
 class ScaleBarController: NSObject {
     private let mapView: AGSMapView
     private let scaleBar: Scalebar
 
     private let constraintWidth: NSLayoutConstraint
-    private let constraintHeight: NSLayoutConstraint
     private let constraintLeft: NSLayoutConstraint
     private let constraintTop: NSLayoutConstraint
 
@@ -41,12 +43,12 @@ class ScaleBarController: NSObject {
         scaleBar.isHidden = true
         mapView.addSubview(scaleBar)
         scaleBar.translatesAutoresizingMaskIntoConstraints = false
-        constraintWidth = scaleBar.widthAnchor.constraint(equalToConstant: 150)
-        constraintHeight = scaleBar.heightAnchor.constraint(equalToConstant: 50)
+
+        constraintWidth = scaleBar.widthAnchor.constraint(equalToConstant: CGFloat(defaultWidth))
         constraintLeft = scaleBar.leadingAnchor.constraint(equalTo: mapView.leadingAnchor)
         constraintTop = scaleBar.topAnchor.constraint(equalTo: mapView.topAnchor)
 
-        customConstraints = [constraintWidth, constraintHeight, constraintLeft, constraintTop]
+        customConstraints = [constraintWidth, constraintLeft, constraintTop]
 
         constrainXCenter = scaleBar.centerXAnchor.constraint(equalTo: mapView.centerXAnchor)
         constraintRight = scaleBar.trailingAnchor.constraint(equalTo: mapView.trailingAnchor)
@@ -56,7 +58,6 @@ class ScaleBarController: NSObject {
 
         allConstraints = [
             constraintWidth,
-            constraintHeight,
             constraintLeft,
             constraintTop,
             constrainXCenter,
@@ -112,8 +113,8 @@ class ScaleBarController: NSObject {
                 }
             }
         } else {
-            constraintWidth.constant = CGFloat(data["width"] as! Int)
-            constraintHeight.constant = CGFloat(data["height"] as! Int)
+
+            constraintWidth.constant = CGFloat(min(data["width"] as! Int, defaultWidth))
 
             if let offsetPoints = data["offset"] as? [Double] {
                 constraintLeft.constant = CGFloat(offsetPoints[0])
@@ -139,6 +140,7 @@ class ScaleBarController: NSObject {
         scaleBar.shadowColor = UIColor(data: data["shadowColor"])
         scaleBar.textColor = UIColor(data: data["textColor"])
         scaleBar.textShadowColor = UIColor(data: data["textShadowColor"])
+        scaleBar.font = scaleBar.font.withSize(CGFloat(data["textSize"] as! Int))
 
         scaleBar.layoutIfNeeded()
     }

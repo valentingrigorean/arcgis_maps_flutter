@@ -357,6 +357,12 @@ class Scalebar : View {
         }
     }
 
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+
+    }
+
+
     /**
      * Adds this [Scalebar] to the provided [mapView]. Used in Workflow 1 (see [Scalebar] above).
      *
@@ -504,7 +510,7 @@ class Scalebar : View {
             }
 
             val top: Float = when (style) {
-                Style.DUAL_UNIT_LINE -> if (drawInMapView) bottom - DEFAULT_BAR_HEIGHT_DP.dpToPixels(
+                Style.DUAL_UNIT_LINE, Style.DUAL_UNIT_LINE_NAUTICAL_MILE -> if (drawInMapView) bottom - DEFAULT_BAR_HEIGHT_DP.dpToPixels(
                     displayDensity
                 ).toFloat() - textSize - maxPixelsBelowBaseline else 0.0f
                 else -> if (drawInMapView) bottom - DEFAULT_BAR_HEIGHT_DP.dpToPixels(displayDensity)
@@ -601,6 +607,8 @@ class Scalebar : View {
                 )) / 2
         }
     }
+
+
 
     /**
      * Represents the alignment of [Scalebar] to be displayed.

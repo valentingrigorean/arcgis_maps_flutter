@@ -1,6 +1,7 @@
 package com.valentingrigorean.arcgis_maps_flutter.map;
 
 import android.content.Context;
+import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
 import android.widget.FrameLayout;
 
@@ -88,9 +89,7 @@ public class ScaleBarController implements MapScaleChangedListener {
         viewPropertyAnimator = scalebar.animate()
                 .setDuration(hideAfterMS)
                 .alpha(0)
-                .withEndAction(() -> {
-                    viewPropertyAnimator = null;
-                });
+                .withEndAction(() -> viewPropertyAnimator = null);
     }
 
     public void interpretConfiguration(Object o) {
@@ -105,19 +104,23 @@ public class ScaleBarController implements MapScaleChangedListener {
         validateScaleBarState(showInMap);
 
         if (showInMap) {
-
             final Object inMapAlignment = data.get("inMapAlignment");
             if (inMapAlignment != null) {
                 scalebar.setAlignment(Convert.toScaleBarAlignment(Convert.toInt(inMapAlignment)));
             }
         } else {
 
-            final int width = Convert.dpToPixels(context, Convert.toInt(data.get("width")));
-            final int height = Convert.dpToPixels(context, Convert.toInt(data.get("height")));
+            final int width = Convert.toInt(data.get("width"));
             final List<?> offsetPoints = Convert.toList(data.get("offset"));
 
-            layoutParams.width = width;
-            layoutParams.height = height;
+
+            if (width < 0) {
+                layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+            } else {
+                layoutParams.width = Convert.dpToPixels(context, width);
+            }
+
+
             layoutParams.leftMargin = Convert.dpToPixels(context, Convert.toInt(offsetPoints.get(0)));
             layoutParams.topMargin = Convert.dpToPixels(context, Convert.toInt(offsetPoints.get(1)));
         }
@@ -141,6 +144,7 @@ public class ScaleBarController implements MapScaleChangedListener {
         scalebar.setShadowColor(Convert.toInt(data.get("shadowColor")));
         scalebar.setTextColor(Convert.toInt(data.get("textColor")));
         scalebar.setTextShadowColor(Convert.toInt(data.get("textShadowColor")));
+        scalebar.setTextSize(Convert.spToPixels(context, Convert.toInt(data.get("textSize"))));
     }
 
 
@@ -152,7 +156,8 @@ public class ScaleBarController implements MapScaleChangedListener {
         } else if (scaleBarState != ScaleBarState.IN_CONTAINER) {
             removeScaleBar();
             scalebar.bindTo(mapView);
-            layoutParams = new FrameLayout.LayoutParams(-1, -1);
+            layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    Convert.dpToPixels(context, 50));
             container.addView(scalebar, layoutParams);
             scaleBarState = ScaleBarState.IN_CONTAINER;
         }

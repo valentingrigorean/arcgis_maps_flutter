@@ -31,13 +31,12 @@ const Color _kDefaultTextShadowColor = Colors.white;
 @immutable
 class ScalebarConfiguration {
   const ScalebarConfiguration({
-    this.width = 150,
-    this.height = 50,
+    this.width = 175,
 
     /// If [showInMap] it's false will use the offset from top-left
     this.offset = const Offset(16, 16),
 
-    /// If [showInMap] it's true will use  [inMapAlignment] to position the
+    /// If [showInMap] it's true will use [inMapAlignment] to position the
     /// scalebar at bottom of the map
     this.showInMap = true,
     this.inMapAlignment = ScalebarAlignment.left,
@@ -51,10 +50,10 @@ class ScalebarConfiguration {
     this.shadowColor = _kDefaultShadowColor,
     this.textColor = _kDefaultTextColor,
     this.textShadowColor = _kDefaultTextShadowColor,
+    this.textSize = 16,
   });
 
   final int width;
-  final int height;
 
   final Offset offset;
 
@@ -92,9 +91,12 @@ class ScalebarConfiguration {
   /// Defaults to [Colors.white]
   final Color textShadowColor;
 
+  /// Defaults to 16
+  final int textSize;
+
   ScalebarConfiguration copyWith({
     int? width,
-    int? height,
+    //int? height,
     Offset? offset,
     bool? showInMap,
     ScalebarAlignment? inMapAlignment,
@@ -107,10 +109,11 @@ class ScalebarConfiguration {
     Color? shadowColor,
     Color? textColor,
     Color? textShadowColor,
+    int? textSize,
   }) {
     return ScalebarConfiguration(
       width: width ?? this.width,
-      height: height ?? this.height,
+      //height: height ?? this.height,
       offset: offset ?? this.offset,
       showInMap: showInMap ?? this.showInMap,
       inMapAlignment: inMapAlignment ?? this.inMapAlignment,
@@ -123,6 +126,7 @@ class ScalebarConfiguration {
       shadowColor: shadowColor ?? this.shadowColor,
       textColor: textColor ?? this.textColor,
       textShadowColor: textShadowColor ?? this.textShadowColor,
+      textSize: textSize ?? this.textSize,
     );
   }
 
@@ -131,7 +135,6 @@ class ScalebarConfiguration {
     json['showInMap'] = showInMap;
     if (!showInMap) {
       json['width'] = width;
-      json['height'] = height;
       json['offset'] = [offset.dx, offset.dy];
     } else {
       json['inMapAlignment'] = inMapAlignment.index;
@@ -149,6 +152,7 @@ class ScalebarConfiguration {
     json['shadowColor'] = shadowColor.value;
     json['textColor'] = textColor.value;
     json['textShadowColor'] = textShadowColor.value;
+    json['textSize'] = textSize;
 
     return json;
   }
@@ -159,8 +163,9 @@ class ScalebarConfiguration {
       other is ScalebarConfiguration &&
           runtimeType == other.runtimeType &&
           width == other.width &&
-          height == other.height &&
           offset == other.offset &&
+          showInMap == other.showInMap &&
+          inMapAlignment == other.inMapAlignment &&
           autoHide == other.autoHide &&
           hideAfter == other.hideAfter &&
           units == other.units &&
@@ -171,14 +176,14 @@ class ScalebarConfiguration {
           shadowColor == other.shadowColor &&
           textColor == other.textColor &&
           textShadowColor == other.textShadowColor &&
-          inMapAlignment == other.inMapAlignment &&
-          showInMap == other.showInMap;
+          textSize == other.textSize;
 
   @override
   int get hashCode =>
       width.hashCode ^
-      height.hashCode ^
       offset.hashCode ^
+      showInMap.hashCode ^
+      inMapAlignment.hashCode ^
       autoHide.hashCode ^
       hideAfter.hashCode ^
       units.hashCode ^
@@ -189,6 +194,5 @@ class ScalebarConfiguration {
       shadowColor.hashCode ^
       textColor.hashCode ^
       textShadowColor.hashCode ^
-      inMapAlignment.hashCode ^
-      showInMap.hashCode;
+      textSize.hashCode;
 }
