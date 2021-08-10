@@ -25,6 +25,11 @@ abstract class GeoElement {
 
     return _GeoElementImpl(attributes, geometry);
   }
+
+  GeoElement copyWith({
+    Map<String, Object?>? attributesParam,
+    Geometry? geometryParam,
+  });
 }
 
 class _GeoElementImpl implements GeoElement {
@@ -38,4 +43,15 @@ class _GeoElementImpl implements GeoElement {
 
   @override
   Geometry? get geometry => _geometry;
+
+  @override
+  GeoElement copyWith({
+    Map<String, Object?>? attributesParam,
+    Geometry? geometryParam,
+  }) {
+    return _GeoElementImpl(
+      attributesParam ?? _attributes,
+      geometryParam ?? _geometry,
+    );
+  }
 }
