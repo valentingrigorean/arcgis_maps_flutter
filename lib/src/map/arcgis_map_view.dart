@@ -78,11 +78,12 @@ class ArcgisMapView extends StatefulWidget {
     this.onCameraMove,
     this.onIdentifyLayer = const {},
     this.onIdentifyLayers,
-  })  :
-        // assert(onIdentifyLayer.isNotEmpty || onIdentifyLayers != null,
-        //     'You can use only onIdentifyLayer or onIdentifyLayers'),
-        assert(wanderExtendFactor < 0 || wanderExtendFactor > 1.0,
-            'wanderExtendFactor can be between >=0  && <= 1'),
+  })  : assert(onIdentifyLayer.isNotEmpty ? onIdentifyLayers == null : true,
+            'You can use only onIdentifyLayer or onIdentifyLayers'),
+        assert(onIdentifyLayers != null ? onIdentifyLayer.isEmpty : true,
+            'You can use only onIdentifyLayer or onIdentifyLayers'),
+        assert(wanderExtendFactor > 0.0 && wanderExtendFactor < 1.0,
+            'wanderExtendFactor can be between >= 0.0  && <= 1.0'),
         super(key: key);
 
   /// Callback method for when the map is ready to be used.
