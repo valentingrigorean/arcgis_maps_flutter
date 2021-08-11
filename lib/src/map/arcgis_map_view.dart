@@ -72,14 +72,17 @@ class ArcgisMapView extends StatefulWidget {
     this.polylines = const <Polyline>{},
     this.myLocationEnabled = false,
     this.autoPanMode = AutoPanMode.off,
+    this.wanderExtendFactor = 0.5,
     this.onAutoPanModeChanged,
     this.onTap,
     this.onCameraMove,
     this.onIdentifyLayer = const {},
     this.onIdentifyLayers,
-  }) :
+  })  :
         // assert(onIdentifyLayer.isNotEmpty || onIdentifyLayers != null,
         //     'You can use only onIdentifyLayer or onIdentifyLayers'),
+        assert(wanderExtendFactor < 0 || wanderExtendFactor > 1.0,
+            'wanderExtendFactor can be between >=0  && <= 1'),
         super(key: key);
 
   /// Callback method for when the map is ready to be used.
@@ -160,6 +163,18 @@ class ArcgisMapView extends StatefulWidget {
   /// Defines how to automatically pan the map when new location updates are received.
   /// Default is [AutoPanMode.off]
   final AutoPanMode autoPanMode;
+
+  ///  The factor of map extent within which the location symbol may move
+  ///  before causing auto-panning to re-center the map on the current location.
+  ///  Applies only to [AutoPanMode.recenter] mode.
+  ///  Permitted values are between 1 (indicating the symbol may move within
+  ///  the current extent of the MapView without causing re-centering),
+  ///  and 0 (indicating that any location movement will re-center the map).
+  ///  Lower values within this range will cause the map to re-center more often,
+  ///  leading to higher CPU and battery consumption.
+  ///  The default value is 0.5, indicating the location may wander up
+  ///  to half of the extent before re-centering occurs.
+  final double wanderExtendFactor;
 
   final ArgumentCallback<AutoPanMode>? onAutoPanModeChanged;
 
@@ -461,6 +476,7 @@ class _ArcgisMapOptions {
         trackCameraPosition = map.onCameraMove != null,
         trackIdentifyLayers = map.onIdentifyLayers != null,
         autoPanMode = map.autoPanMode,
+        wanderExtendFactor = map.wanderExtendFactor,
         scalebarConfiguration = map.scalebarConfiguration;
 
   final InteractionOptions interactionOptions;
@@ -468,6 +484,7 @@ class _ArcgisMapOptions {
   final bool trackCameraPosition;
   final bool trackIdentifyLayers;
   final AutoPanMode autoPanMode;
+  final double wanderExtendFactor;
   final ScalebarConfiguration? scalebarConfiguration;
 
   Map<String, dynamic> toMap() {
@@ -477,6 +494,7 @@ class _ArcgisMapOptions {
       'trackCameraPosition': trackCameraPosition,
       'trackIdentifyLayers': trackIdentifyLayers,
       'autoPanMode': autoPanMode.index,
+      'wanderExtendFactor': wanderExtendFactor,
       'haveScalebar': scalebarConfiguration != null,
       if (scalebarConfiguration != null)
         'scalebarConfiguration': scalebarConfiguration!.toJson(),

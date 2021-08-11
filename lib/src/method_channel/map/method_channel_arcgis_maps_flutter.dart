@@ -181,6 +181,13 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
+  Future<double> getWanderExtentFactor(int mapId) async {
+    final result =
+        await channel(mapId).invokeMethod<double>('map#getWanderExtentFactor');
+    return result ?? 0;
+  }
+
+  @override
   Future<void> setViewpointChangedListenerEvents(int mapId, bool value) {
     return channel(mapId).invokeMethod<void>(
       "map#setViewpointChangedListenerEvents",

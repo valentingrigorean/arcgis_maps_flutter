@@ -107,6 +107,14 @@ class ArcgisMapController {
   Future<double> getMapRotation() =>
       ArcgisMapsFlutterPlatform.instance.getMapRotation(mapId);
 
+  /// Gets the factor of map extent within which the location symbol may move
+  /// before causing auto-panning to re-center the map on the current location.
+  /// Applies only to [AutoPanMode.recenter] mode.
+  /// The default value is 0.5, indicating the location may wander up to
+  /// half of the extent before re-centering occurs.
+  Future<double> getWanderExtentFactor() =>
+      ArcgisMapsFlutterPlatform.instance.getWanderExtentFactor(mapId);
+
   Future<void> _setMap(ArcGISMap map) {
     return ArcgisMapsFlutterPlatform.instance.setMap(mapId, map);
   }

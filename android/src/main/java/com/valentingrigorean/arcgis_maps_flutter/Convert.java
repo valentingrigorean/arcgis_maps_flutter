@@ -272,6 +272,11 @@ public class Convert {
         if (autoPanMode != null) {
             mapView.getLocationDisplay().setAutoPanMode(Convert.toAutoPanMode(autoPanMode));
         }
+
+        final Object wanderExtentFactor = data.get("wanderExtentFactor");
+        if (wanderExtentFactor != null) {
+            mapView.getLocationDisplay().setWanderExtentFactor(toFloat(wanderExtentFactor));
+        }
     }
 
 

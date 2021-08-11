@@ -101,10 +101,14 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             break
         case "map#getLegendInfos":
             let legendInfoController = LegendInfoController(layersController: layersController)
-            legendInfoController.loadAsync(args: call.arguments,result: { [weak self] items in
+            legendInfoController.loadAsync(args: call.arguments, result: { [weak self] items in
                 result(items)
-                guard let self = self else { return }
-                self.legendInfoControllers = self.legendInfoControllers.filter { $0 !== legendInfoController}
+                guard let self = self else {
+                    return
+                }
+                self.legendInfoControllers = self.legendInfoControllers.filter {
+                    $0 !== legendInfoController
+                }
             })
             legendInfoControllers.append(legendInfoController)
             break
@@ -125,6 +129,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         case "map#getMapRotation":
             result(mapView.rotation)
             break
+        case "map#getWanderExtentFactor":
+            result(mapView.locationDisplay.wanderExtentFactor)
+            break;
         case "map#getCurrentViewpoint":
             let type = (call.arguments as! Int).toAGSViewpointType()
             let currentViewPoint = mapView.currentViewpoint(with: type)
@@ -298,6 +305,10 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         if let autoPanMode = mapOptions["autoPanMode"] as? Int {
             mapView.locationDisplay.autoPanMode = AGSLocationDisplayAutoPanMode(rawValue: autoPanMode) ?? .off
+        }
+
+        if let wanderExtentFactor = mapOptions["wanderExtentFactor"] as? Double {
+            mapView.locationDisplay.wanderExtentFactor = Float(wanderExtentFactor)
         }
 
         if let haveScaleBar = mapOptions["haveScalebar"] as? Bool {

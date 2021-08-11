@@ -215,6 +215,10 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 result.success(mapView.getMapRotation());
             }
             break;
+            case "map#getWanderExtentFactor": {
+                result.success(mapView.getLocationDisplay().getWanderExtentFactor());
+            }
+            break;
             case "map#getCurrentViewpoint": {
                 final Viewpoint currentViewPoint = mapView.getCurrentViewpoint(Convert.toViewpointType(call.arguments));
                 final String json = currentViewPoint.toJson();
