@@ -72,7 +72,7 @@ class ArcgisMapView extends StatefulWidget {
     this.polylines = const <Polyline>{},
     this.myLocationEnabled = false,
     this.autoPanMode = AutoPanMode.off,
-    this.wanderExtendFactor = 0.5,
+    this.wanderExtentFactor = 0.5,
     this.onAutoPanModeChanged,
     this.onTap,
     this.onCameraMove,
@@ -82,7 +82,7 @@ class ArcgisMapView extends StatefulWidget {
             'You can use only onIdentifyLayer or onIdentifyLayers'),
         assert(onIdentifyLayers != null ? onIdentifyLayer.isEmpty : true,
             'You can use only onIdentifyLayer or onIdentifyLayers'),
-        assert(wanderExtendFactor >= 0.0 && wanderExtendFactor <= 1.0,
+        assert(wanderExtentFactor >= 0.0 && wanderExtentFactor <= 1.0,
             'wanderExtendFactor can be between >= 0.0  && <= 1.0'),
         super(key: key);
 
@@ -175,7 +175,7 @@ class ArcgisMapView extends StatefulWidget {
   ///  leading to higher CPU and battery consumption.
   ///  The default value is 0.5, indicating the location may wander up
   ///  to half of the extent before re-centering occurs.
-  final double wanderExtendFactor;
+  final double wanderExtentFactor;
 
   final ArgumentCallback<AutoPanMode>? onAutoPanModeChanged;
 
@@ -477,7 +477,7 @@ class _ArcgisMapOptions {
         trackCameraPosition = map.onCameraMove != null,
         trackIdentifyLayers = map.onIdentifyLayers != null,
         autoPanMode = map.autoPanMode,
-        wanderExtendFactor = map.wanderExtendFactor,
+        wanderExtentFactor = map.wanderExtentFactor,
         scalebarConfiguration = map.scalebarConfiguration;
 
   final InteractionOptions interactionOptions;
@@ -485,7 +485,7 @@ class _ArcgisMapOptions {
   final bool trackCameraPosition;
   final bool trackIdentifyLayers;
   final AutoPanMode autoPanMode;
-  final double wanderExtendFactor;
+  final double wanderExtentFactor;
   final ScalebarConfiguration? scalebarConfiguration;
 
   Map<String, dynamic> toMap() {
@@ -495,7 +495,7 @@ class _ArcgisMapOptions {
       'trackCameraPosition': trackCameraPosition,
       'trackIdentifyLayers': trackIdentifyLayers,
       'autoPanMode': autoPanMode.index,
-      'wanderExtendFactor': wanderExtendFactor,
+      'wanderExtentFactor': wanderExtentFactor,
       'haveScalebar': scalebarConfiguration != null,
       if (scalebarConfiguration != null)
         'scalebarConfiguration': scalebarConfiguration!.toJson(),
