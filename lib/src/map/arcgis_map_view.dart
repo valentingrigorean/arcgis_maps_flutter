@@ -82,7 +82,7 @@ class ArcgisMapView extends StatefulWidget {
             'You can use only onIdentifyLayer or onIdentifyLayers'),
         assert(onIdentifyLayers != null ? onIdentifyLayer.isEmpty : true,
             'You can use only onIdentifyLayer or onIdentifyLayers'),
-        assert(wanderExtendFactor > 0.0 && wanderExtendFactor < 1.0,
+        assert(wanderExtendFactor >= 0.0 && wanderExtendFactor <= 1.0,
             'wanderExtendFactor can be between >= 0.0  && <= 1.0'),
         super(key: key);
 
