@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.VectorDrawable;
 import android.util.Log;
 import android.util.LruCache;
 
@@ -123,12 +122,15 @@ public class BitmapDescriptorFactory {
 
         @Override
         public void createSymbolAsync(BitmapDescriptorListener loader) {
-            Bitmap bitmap = _cache.get(bitmapDescriptorOptions);
-            if (bitmap == null) {
-                bitmap = bitmapDescriptorOptions.createBitmap(context);
-                _cache.put(bitmapDescriptorOptions, bitmap);
-               Log.d(TAG, "createSymbolAsync: Insert bitmap to cache for " + bitmapDescriptorOptions.toString() + ".");
+            PictureMarkerSymbol markerSymbol = _cache.get(bitmapDescriptorOptions);
+            if (markerSymbol != null) {
+                loader.onLoaded(markerSymbol);
+                return;
             }
+
+            final Bitmap bitmap = bitmapDescriptorOptions.createBitmap(context);
+
+
             final ListenableFuture<PictureMarkerSymbol> future = PictureMarkerSymbol.createAsync(new BitmapDrawable(context.getResources(), bitmap));
             future.addDoneListener(() -> {
                 try {
@@ -139,6 +141,8 @@ public class BitmapDescriptorFactory {
                     if (bitmapDescriptorOptions.getHeight() != null) {
                         symbol.setHeight(bitmapDescriptorOptions.getHeight());
                     }
+                    _cache.put(bitmapDescriptorOptions, symbol);
+                    Log.d(TAG, "createSymbolAsync: Insert bitmap to cache for " + bitmapDescriptorOptions.toString() + ".");
                     loader.onLoaded(symbol);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -356,7 +360,7 @@ public class BitmapDescriptorFactory {
         }
     }
 
-    private static class LruCacheEx extends LruCache<BitmapDescriptorOptions, Bitmap> {
+    private static class LruCacheEx extends LruCache<BitmapDescriptorOptions, PictureMarkerSymbol> {
 
         /**
          * @param maxSize for caches that do not override {@link #sizeOf}, this is
@@ -368,8 +372,10 @@ public class BitmapDescriptorFactory {
         }
 
         @Override
-        protected int sizeOf(BitmapDescriptorOptions key, Bitmap value) {
-            return value.getByteCount() / 1024;
+        protected int sizeOf(BitmapDescriptorOptions key, PictureMarkerSymbol value) {
+            final BitmapDrawable bitmapDrawable = value.getImage();
+            final Bitmap bitmap = bitmapDrawable.getBitmap();
+            return bitmap != null ? bitmapDrawable.getBitmap().getByteCount() / 1024 : 0;
         }
     }
 }

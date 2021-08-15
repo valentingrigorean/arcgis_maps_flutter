@@ -191,7 +191,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 result.success(null);
             }
             case "map#setViewpointChangedListenerEvents": {
-                trackViewpointChangedListenerEvent = (boolean) call.arguments;
+                trackViewpointChangedListenerEvent = Convert.toBoolean(call.arguments);
                 result.success(null);
             }
             break;
