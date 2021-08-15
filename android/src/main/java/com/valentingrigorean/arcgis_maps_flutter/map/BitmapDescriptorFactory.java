@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LruCache;
 
@@ -21,6 +22,7 @@ import com.valentingrigorean.arcgis_maps_flutter.Convert;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -270,6 +272,9 @@ public class BitmapDescriptorFactory {
     }
 
     private static class BitmapDescriptorOptions {
+
+        private static Map<String, Integer> _resourceIdCache = new HashMap<>();
+
         private final String resourceName;
         private final Integer tintColor;
         private final Float width;
@@ -314,8 +319,14 @@ public class BitmapDescriptorFactory {
         }
 
         private Drawable createDrawable(Context context) {
-            final int drawableResourceId = context.getResources().getIdentifier(resourceName, "drawable", context.getPackageName());
-            final Drawable drawable = ResourcesCompat.getDrawable(context.getResources(), drawableResourceId, context.getTheme());
+            int drawableResourceId = 0;
+            if (_resourceIdCache.containsKey(resourceName)) {
+                drawableResourceId = _resourceIdCache.get(resourceName);
+            } else {
+                drawableResourceId = context.getResources().getIdentifier(resourceName, null, context.getPackageName());
+                _resourceIdCache.put(resourceName, new Integer(drawableResourceId));
+            }
+            final Drawable drawable = ResourcesCompat.getDrawableForDensity(context.getResources(), drawableResourceId, context.getResources().getDisplayMetrics().densityDpi, context.getTheme());
 
             if (tintColor == null) {
                 return drawable;
