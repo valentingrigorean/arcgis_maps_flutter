@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LruCache;
 
@@ -54,7 +53,7 @@ public class BitmapDescriptorFactory {
 
         final Object fromAsset = data.get("fromNativeAsset");
         if (fromAsset != null) {
-            return new AssetBitmapDescriptor(context, new BitmapDescriptorOptions(data));
+            return new AssetBitmapDescriptor(context, new BitmapDescriptorOptions(context, data));
         }
 
         final Object styleMarker = data.get("styleMarker");
@@ -131,8 +130,6 @@ public class BitmapDescriptorFactory {
             }
 
             final Bitmap bitmap = bitmapDescriptorOptions.createBitmap(context);
-
-
             final ListenableFuture<PictureMarkerSymbol> future = PictureMarkerSymbol.createAsync(new BitmapDrawable(context.getResources(), bitmap));
             future.addDoneListener(() -> {
                 try {
@@ -281,7 +278,7 @@ public class BitmapDescriptorFactory {
         private final Float height;
 
 
-        public BitmapDescriptorOptions(Map<?, ?> data) {
+        public BitmapDescriptorOptions(Context context, Map<?, ?> data) {
             resourceName = (String) data.get("fromNativeAsset");
             final Object rawTintColor = data.get("tintColor");
             if (rawTintColor != null) {
@@ -291,13 +288,13 @@ public class BitmapDescriptorFactory {
             }
             final Object rawWidth = data.get("width");
             if (rawWidth != null) {
-                width = Convert.toFloat(rawWidth);
+                width = Convert.dpToPixelsF(context, Convert.toFloat(rawWidth));
             } else {
                 width = null;
             }
             final Object rawHeight = data.get("height");
             if (rawHeight != null) {
-                height = Convert.toFloat(rawHeight);
+                height = Convert.dpToPixelsF(context, Convert.toFloat(rawHeight));
             } else {
                 height = null;
             }
@@ -323,7 +320,7 @@ public class BitmapDescriptorFactory {
             if (_resourceIdCache.containsKey(resourceName)) {
                 drawableResourceId = _resourceIdCache.get(resourceName);
             } else {
-                drawableResourceId = context.getResources().getIdentifier(resourceName, null, context.getPackageName());
+                drawableResourceId = context.getResources().getIdentifier(resourceName, "drawable", context.getPackageName());
                 _resourceIdCache.put(resourceName, new Integer(drawableResourceId));
             }
             final Drawable drawable = ResourcesCompat.getDrawableForDensity(context.getResources(), drawableResourceId, context.getResources().getDisplayMetrics().densityDpi, context.getTheme());

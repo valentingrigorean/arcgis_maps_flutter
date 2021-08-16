@@ -1,5 +1,7 @@
 package com.valentingrigorean.arcgis_maps_flutter.map;
 
+import com.esri.arcgisruntime.internal.jni.CorePictureFillSymbol;
+import com.esri.arcgisruntime.internal.jni.CorePictureMarkerSymbol;
 import com.esri.arcgisruntime.symbology.CompositeSymbol;
 import com.esri.arcgisruntime.symbology.PictureFillSymbol;
 import com.esri.arcgisruntime.symbology.PictureMarkerSymbol;
@@ -46,17 +48,20 @@ public class ScaleSymbol extends Symbol {
         private final float width;
         private final float height;
         private final boolean haveSize;
+        private final Symbol symbol;
 
         private float scale = 1f;
 
         public SymbolScaleHandle(Symbol symbol) {
             if (symbol instanceof PictureMarkerSymbol) {
                 PictureMarkerSymbol pictureMarkerSymbol = (PictureMarkerSymbol) symbol;
+                this.symbol = PictureMarkerSymbol.createFromInternal((CorePictureMarkerSymbol) pictureMarkerSymbol.getInternal());
                 haveSize = true;
                 width = pictureMarkerSymbol.getWidth();
                 height = pictureMarkerSymbol.getHeight();
             } else if (symbol instanceof PictureFillSymbol) {
                 PictureFillSymbol pictureFillSymbol = (PictureFillSymbol) symbol;
+                this.symbol = PictureFillSymbol.createFromInternal((CorePictureFillSymbol) pictureFillSymbol.getInternal());
                 haveSize = true;
                 width = pictureFillSymbol.getWidth();
                 height = pictureFillSymbol.getHeight();
@@ -64,15 +69,21 @@ public class ScaleSymbol extends Symbol {
                 haveSize = false;
                 width = 0;
                 height = 0;
+                this.symbol = null;
             }
         }
 
         public void setScale(float scale) {
-            if (!haveSize)
+            if (!haveSize) {
                 return;
-            if (this.scale == scale)
+            }
+            if (this.scale == scale) {
                 return;
+            }
             this.scale = scale;
+            if (symbol == null) {
+                return;
+            }
             final float newWidth = width * scale;
             final float newHeight = height * scale;
             if (symbol instanceof PictureMarkerSymbol) {

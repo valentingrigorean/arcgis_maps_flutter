@@ -139,8 +139,9 @@ public final class MarkerController extends BaseGraphicController {
 
     private static void offsetSymbol(Symbol symbol, float offsetX, float offsetY) {
         if (symbol instanceof PictureMarkerSymbol) {
-            ((PictureMarkerSymbol) symbol).setOffsetX(offsetX);
-            ((PictureMarkerSymbol) symbol).setOffsetY(offsetY);
+            PictureMarkerSymbol pictureMarkerSymbol = (PictureMarkerSymbol) symbol;
+            pictureMarkerSymbol.setOffsetX(offsetX);
+            pictureMarkerSymbol.setOffsetY(offsetY);
         }
     }
 

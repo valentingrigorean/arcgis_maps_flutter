@@ -761,8 +761,12 @@ public class Convert {
     }
 
 
-    public static int dpToPixels(Context context, int dp) {
+    public static int dpToPixelsI(Context context, int dp) {
         return (int) (dp * ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT));
+    }
+
+    public static float dpToPixelsF(Context context, float dp) {
+        return (dp * ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT));
     }
 
     public static int spToPixels(Context context, int sp) {

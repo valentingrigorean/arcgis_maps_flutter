@@ -117,12 +117,12 @@ public class ScaleBarController implements MapScaleChangedListener {
             if (width < 0) {
                 layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
             } else {
-                layoutParams.width = Convert.dpToPixels(context, width);
+                layoutParams.width = Convert.dpToPixelsI(context, width);
             }
 
 
-            layoutParams.leftMargin = Convert.dpToPixels(context, Convert.toInt(offsetPoints.get(0)));
-            layoutParams.topMargin = Convert.dpToPixels(context, Convert.toInt(offsetPoints.get(1)));
+            layoutParams.leftMargin = Convert.dpToPixelsI(context, Convert.toInt(offsetPoints.get(0)));
+            layoutParams.topMargin = Convert.dpToPixelsI(context, Convert.toInt(offsetPoints.get(1)));
         }
 
         isAutoHide = Convert.toBoolean(data.get("autoHide"));
@@ -157,7 +157,7 @@ public class ScaleBarController implements MapScaleChangedListener {
             removeScaleBar();
             scalebar.bindTo(mapView);
             layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                    Convert.dpToPixels(context, 50));
+                    Convert.dpToPixelsI(context, 50));
             container.addView(scalebar, layoutParams);
             scaleBarState = ScaleBarState.IN_CONTAINER;
         }
