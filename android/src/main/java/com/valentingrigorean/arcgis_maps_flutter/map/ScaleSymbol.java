@@ -56,7 +56,6 @@ public class ScaleSymbol extends Symbol {
             this.symbol = symbol;
             if (symbol instanceof PictureMarkerSymbol) {
                 PictureMarkerSymbol pictureMarkerSymbol = (PictureMarkerSymbol) symbol;
-
                 haveSize = true;
                 width = pictureMarkerSymbol.getWidth();
                 height = pictureMarkerSymbol.getHeight();

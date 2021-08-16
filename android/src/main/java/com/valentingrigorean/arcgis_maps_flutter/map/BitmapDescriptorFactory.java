@@ -127,7 +127,7 @@ public class BitmapDescriptorFactory {
         public void createSymbolAsync(BitmapDescriptorListener loader) {
             CorePictureMarkerSymbolInfo markerSymbolInfo = _cache.get(bitmapDescriptorOptions);
             if (markerSymbolInfo != null) {
-                loader.onLoaded(PictureMarkerSymbol.createFromInternal(new CorePictureMarkerSymbol(markerSymbolInfo.coreImage)));
+                loader.onLoaded(markerSymbolInfo.createSymbol());
                 return;
             }
 
@@ -143,7 +143,7 @@ public class BitmapDescriptorFactory {
                         symbol.setHeight(bitmapDescriptorOptions.getHeight());
                     }
                     final CorePictureMarkerSymbol corePictureMarkerSymbol = (CorePictureMarkerSymbol) symbol.getInternal();
-                    final CorePictureMarkerSymbolInfo info = new CorePictureMarkerSymbolInfo(bitmap.getByteCount(), corePictureMarkerSymbol.w());
+                    final CorePictureMarkerSymbolInfo info = new CorePictureMarkerSymbolInfo(bitmap.getByteCount(), corePictureMarkerSymbol.w(), bitmapDescriptorOptions);
                     _cache.put(bitmapDescriptorOptions, info);
                     Log.d(TAG, "createSymbolAsync: Insert bitmap to cache for " + bitmapDescriptorOptions.toString() + ".");
                     loader.onLoaded(symbol);
@@ -393,18 +393,27 @@ public class BitmapDescriptorFactory {
     private static class CorePictureMarkerSymbolInfo {
         final int size;
         final CoreImage coreImage;
+        final BitmapDescriptorOptions bitmapDescriptorOptions;
 
-        public CorePictureMarkerSymbolInfo(final int size, final CoreImage coreImage) {
+        public CorePictureMarkerSymbolInfo(final int size, final CoreImage coreImage, final BitmapDescriptorOptions bitmapDescriptorOptions) {
             this.size = size;
             this.coreImage = coreImage;
+            this.bitmapDescriptorOptions = bitmapDescriptorOptions;
         }
 
         public int getSize() {
             return size;
         }
 
-        public CoreImage getCoreImage() {
-            return coreImage;
+        public Symbol createSymbol() {
+            final PictureMarkerSymbol symbol = PictureMarkerSymbol.createFromInternal(new CorePictureMarkerSymbol(coreImage));
+            if (bitmapDescriptorOptions.getWidth() != null) {
+                symbol.setWidth(bitmapDescriptorOptions.getWidth());
+            }
+            if (bitmapDescriptorOptions.getHeight() != null) {
+                symbol.setHeight(bitmapDescriptorOptions.getHeight());
+            }
+            return symbol;
         }
     }
 }
