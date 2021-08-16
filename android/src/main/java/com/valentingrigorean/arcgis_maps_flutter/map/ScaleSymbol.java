@@ -53,15 +53,15 @@ public class ScaleSymbol extends Symbol {
         private float scale = 1f;
 
         public SymbolScaleHandle(Symbol symbol) {
+            this.symbol = symbol;
             if (symbol instanceof PictureMarkerSymbol) {
                 PictureMarkerSymbol pictureMarkerSymbol = (PictureMarkerSymbol) symbol;
-                this.symbol = PictureMarkerSymbol.createFromInternal((CorePictureMarkerSymbol) pictureMarkerSymbol.getInternal());
+
                 haveSize = true;
                 width = pictureMarkerSymbol.getWidth();
                 height = pictureMarkerSymbol.getHeight();
             } else if (symbol instanceof PictureFillSymbol) {
                 PictureFillSymbol pictureFillSymbol = (PictureFillSymbol) symbol;
-                this.symbol = PictureFillSymbol.createFromInternal((CorePictureFillSymbol) pictureFillSymbol.getInternal());
                 haveSize = true;
                 width = pictureFillSymbol.getWidth();
                 height = pictureFillSymbol.getHeight();
@@ -69,7 +69,6 @@ public class ScaleSymbol extends Symbol {
                 haveSize = false;
                 width = 0;
                 height = 0;
-                this.symbol = null;
             }
         }
 
@@ -81,9 +80,6 @@ public class ScaleSymbol extends Symbol {
                 return;
             }
             this.scale = scale;
-            if (symbol == null) {
-                return;
-            }
             final float newWidth = width * scale;
             final float newHeight = height * scale;
             if (symbol instanceof PictureMarkerSymbol) {

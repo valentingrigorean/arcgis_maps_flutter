@@ -13,6 +13,8 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
+import com.esri.arcgisruntime.internal.jni.CoreImage;
+import com.esri.arcgisruntime.internal.jni.CorePictureMarkerSymbol;
 import com.esri.arcgisruntime.symbology.CompositeSymbol;
 import com.esri.arcgisruntime.symbology.PictureMarkerSymbol;
 import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
@@ -123,9 +125,9 @@ public class BitmapDescriptorFactory {
 
         @Override
         public void createSymbolAsync(BitmapDescriptorListener loader) {
-            PictureMarkerSymbol markerSymbol = _cache.get(bitmapDescriptorOptions);
-            if (markerSymbol != null) {
-                loader.onLoaded(markerSymbol);
+            CorePictureMarkerSymbolInfo markerSymbolInfo = _cache.get(bitmapDescriptorOptions);
+            if (markerSymbolInfo != null) {
+                loader.onLoaded(PictureMarkerSymbol.createFromInternal(new CorePictureMarkerSymbol(markerSymbolInfo.coreImage)));
                 return;
             }
 
@@ -140,7 +142,9 @@ public class BitmapDescriptorFactory {
                     if (bitmapDescriptorOptions.getHeight() != null) {
                         symbol.setHeight(bitmapDescriptorOptions.getHeight());
                     }
-                    _cache.put(bitmapDescriptorOptions, symbol);
+                    final CorePictureMarkerSymbol corePictureMarkerSymbol = (CorePictureMarkerSymbol) symbol.getInternal();
+                    final CorePictureMarkerSymbolInfo info = new CorePictureMarkerSymbolInfo(bitmap.getByteCount(), corePictureMarkerSymbol.w());
+                    _cache.put(bitmapDescriptorOptions, info);
                     Log.d(TAG, "createSymbolAsync: Insert bitmap to cache for " + bitmapDescriptorOptions.toString() + ".");
                     loader.onLoaded(symbol);
                 } catch (Exception e) {
@@ -288,13 +292,13 @@ public class BitmapDescriptorFactory {
             }
             final Object rawWidth = data.get("width");
             if (rawWidth != null) {
-                width = Convert.dpToPixelsF(context, Convert.toFloat(rawWidth));
+                width = Convert.toFloat(rawWidth);
             } else {
                 width = null;
             }
             final Object rawHeight = data.get("height");
             if (rawHeight != null) {
-                height = Convert.dpToPixelsF(context, Convert.toFloat(rawHeight));
+                height = Convert.toFloat(rawHeight);
             } else {
                 height = null;
             }
@@ -368,7 +372,8 @@ public class BitmapDescriptorFactory {
         }
     }
 
-    private static class LruCacheEx extends LruCache<BitmapDescriptorOptions, PictureMarkerSymbol> {
+
+    private static class LruCacheEx extends LruCache<BitmapDescriptorOptions, CorePictureMarkerSymbolInfo> {
 
         /**
          * @param maxSize for caches that do not override {@link #sizeOf}, this is
@@ -380,10 +385,26 @@ public class BitmapDescriptorFactory {
         }
 
         @Override
-        protected int sizeOf(BitmapDescriptorOptions key, PictureMarkerSymbol value) {
-            final BitmapDrawable bitmapDrawable = value.getImage();
-            final Bitmap bitmap = bitmapDrawable.getBitmap();
-            return bitmap != null ? bitmapDrawable.getBitmap().getByteCount() / 1024 : 0;
+        protected int sizeOf(BitmapDescriptorOptions key, CorePictureMarkerSymbolInfo value) {
+            return value.getSize() / 1024;
+        }
+    }
+
+    private static class CorePictureMarkerSymbolInfo {
+        final int size;
+        final CoreImage coreImage;
+
+        public CorePictureMarkerSymbolInfo(final int size, final CoreImage coreImage) {
+            this.size = size;
+            this.coreImage = coreImage;
+        }
+
+        public int getSize() {
+            return size;
+        }
+
+        public CoreImage getCoreImage() {
+            return coreImage;
         }
     }
 }

@@ -43,6 +43,7 @@ import com.valentingrigorean.arcgis_maps_flutter.map.ScreenLocationData;
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.Scalebar;
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.Style;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -395,6 +396,8 @@ public class Convert {
             return bitmap;
         }
     }
+
+
 
 
     public static SimpleMarkerSymbol.Style toSimpleMarkerSymbolStyle(int rawValue) {
