@@ -1,5 +1,6 @@
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:arcgis_maps_flutter_example/map_page.dart';
+import 'package:arcgis_maps_flutter_example/map_page_auto_pan_mode.dart';
 import 'package:arcgis_maps_flutter_example/map_page_legend.dart';
 import 'package:arcgis_maps_flutter_example/map_page_scalerbar.dart';
 import 'package:arcgis_maps_flutter_example/scene_page.dart';
@@ -60,6 +61,17 @@ class MainPage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => MapPageLegend(),
+                  ),
+                );
+              },
+            ),
+            ElevatedButton(
+              child: Text('Map AutoPanMode'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MapPageAutoPanMode(),
                   ),
                 );
               },
