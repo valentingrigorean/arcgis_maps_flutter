@@ -1,29 +1,30 @@
 part of arcgis_maps_flutter;
 
-class ArcGISMapImageLayer extends BaseTileLayer {
-  const ArcGISMapImageLayer._({
+
+@immutable
+class MapImageLayer extends BaseTileLayer {
+  const MapImageLayer._({
     required LayerId layerId,
     required String url,
     Credential? credential,
     bool isVisible = true,
     double opacity = 1,
   }) : super(
-          isVisible: isVisible,
-          opacity: opacity,
-          layerId: layerId,
-          url: url,
-          type: 'ArcGISMapImageLayer',
-          credential: credential,
-        );
+    isVisible: isVisible,
+    opacity: opacity,
+    layerId: layerId,
+    url: url,
+    type: 'MapImageLayer',
+    credential: credential,
+  );
 
-  factory ArcGISMapImageLayer.fromUrl(
-    String url, {
+  factory MapImageLayer.fromUrl(String url, {
     LayerId? layerId,
     Credential? credential,
     bool isVisible = true,
     double opacity = 1,
   }) =>
-      ArcGISMapImageLayer._(
+      MapImageLayer._(
         layerId: layerId ?? LayerId(url),
         url: url,
         credential: credential,
@@ -36,11 +37,11 @@ class ArcGISMapImageLayer extends BaseTileLayer {
     return copyWith();
   }
 
-  ArcGISMapImageLayer copyWith({
+  MapImageLayer copyWith({
     bool? isVisibleParam,
     double? opacityParam,
   }) {
-    return ArcGISMapImageLayer._(
+    return MapImageLayer._(
       layerId: layerId,
       url: url,
       credential: credential,

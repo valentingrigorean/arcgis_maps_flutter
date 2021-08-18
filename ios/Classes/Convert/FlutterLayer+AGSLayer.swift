@@ -24,7 +24,7 @@ extension FlutterLayer {
             layer.credential = credential
             setupDefaultParams(layer: layer)
             return layer
-        case "ArcGISMapImageLayer":
+        case "MapImageLayer":
             let mapImageLayer = AGSArcGISMapImageLayer(url: url!)
             mapImageLayer.credential = credential
             setupDefaultParams(layer: mapImageLayer)

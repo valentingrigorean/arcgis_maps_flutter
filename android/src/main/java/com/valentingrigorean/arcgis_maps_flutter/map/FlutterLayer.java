@@ -61,16 +61,16 @@ public class FlutterLayer {
                 remoteResource = tiledLayer;
                 layer = tiledLayer;
                 break;
-            case "ArcGISMapImageLayer":
-                final ArcGISMapImageLayer mapImageLayer = new ArcGISMapImageLayer(url);
-                remoteResource = mapImageLayer;
-                layer = mapImageLayer;
-                break;
             case "WmsLayer":
                 final Collection<String> layersNames = (Collection<String>) data.get("layersName");
                 final WmsLayer wmsLayer = new WmsLayer(url, layersNames);
                 remoteResource = wmsLayer;
                 layer = wmsLayer;
+                break;
+            case "MapImageLayer":
+                final ArcGISMapImageLayer mapImageLayer = new ArcGISMapImageLayer(url);
+                remoteResource = mapImageLayer;
+                layer = mapImageLayer;
                 break;
             default:
                 throw new UnsupportedOperationException("not implemented.");

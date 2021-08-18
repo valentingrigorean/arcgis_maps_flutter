@@ -17,7 +17,6 @@ import 'package:arcgis_maps_flutter/src/utils/layers.dart';
 import 'package:arcgis_maps_flutter/src/utils/markers.dart';
 import 'package:arcgis_maps_flutter/src/utils/polygons.dart';
 import 'package:arcgis_maps_flutter/src/utils/polyline.dart';
-import 'package:fluster/fluster.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:meta/meta.dart';
@@ -38,11 +37,11 @@ part 'src/geometry/spatial_references.dart';
 part 'src/geometry/geometry.dart';
 
 
-part 'src/layers/arcgis_map_image_layer.dart';
 part 'src/layers/layer.dart';
 part 'src/layers/feature_layer.dart';
 part 'src/layers/legend_info.dart';
 part 'src/layers/legend_info_result.dart';
+part 'src/layers/map_image_layer.dart';
 part 'src/layers/tiled_layer.dart';
 part 'src/layers/vector_tile_layer.dart';
 part 'src/layers/wms_layer.dart';
