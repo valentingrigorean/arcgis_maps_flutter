@@ -184,7 +184,10 @@ class ScaleBarController: NSObject {
     private func bindToMap(map: AGSMapView) {
         mapScaleObservation = map.observe(\.mapScale, options: .new) { [weak self] _,
                                                                                    _ in
-            self?.handleDidChangeZoom()
+
+            DispatchQueue.main.async {
+                self?.handleDidChangeZoom()
+            }
         }
     }
 }
