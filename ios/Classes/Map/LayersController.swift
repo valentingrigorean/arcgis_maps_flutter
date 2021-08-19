@@ -231,17 +231,21 @@ class LayersController {
         guard let map = map else {
             return
         }
-        switch layerType {
 
-        case .operational:
-            map.operationalLayers.removeObjects(in: nativeLayersToRemove)
-            break
-        case .base:
-            map.basemap.baseLayers.removeObjects(in: nativeLayersToRemove)
-            break
-        case .reference:
-            map.basemap.referenceLayers.removeObjects(in: nativeLayersToRemove)
-            break
+        for layer in nativeLayersToRemove {
+            layer.load { error in
+                switch layerType {
+                case .operational:
+                    map.operationalLayers.remove(layer)
+                    break
+                case .base:
+                    map.basemap.baseLayers.remove(layer)
+                    break
+                case .reference:
+                    map.basemap.referenceLayers.remove(layer)
+                    break
+                }
+            }
         }
     }
 
