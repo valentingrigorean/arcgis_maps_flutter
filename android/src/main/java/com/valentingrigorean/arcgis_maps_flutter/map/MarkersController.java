@@ -9,13 +9,10 @@ import com.valentingrigorean.arcgis_maps_flutter.Convert;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 import io.flutter.plugin.common.MethodChannel;
 
-public class MarkersController implements MapTouchGraphicDelegate {
-    private static Executor executor = Executors.newSingleThreadExecutor();
+public class MarkersController extends BaseWorkerMapController implements MapTouchGraphicDelegate {
 
     private final Map<String, MarkerController> markerIdToController = new HashMap<>();
 
@@ -86,7 +83,7 @@ public class MarkersController implements MapTouchGraphicDelegate {
         if (markersToChange == null) {
             return;
         }
-        executor.execute(()->{
+        executor.execute(() -> {
             for (Object marker : markersToChange) {
                 final Map<?, ?> data = (Map<?, ?>) marker;
                 if (data == null) {
@@ -106,7 +103,7 @@ public class MarkersController implements MapTouchGraphicDelegate {
         if (markerIdsToRemove == null) {
             return;
         }
-        executor.execute(()->{
+        executor.execute(() -> {
             for (Object rawMarkerId : markerIdsToRemove) {
                 if (rawMarkerId == null) {
                     continue;

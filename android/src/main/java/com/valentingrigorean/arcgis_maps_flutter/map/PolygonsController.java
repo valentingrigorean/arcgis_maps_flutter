@@ -10,7 +10,7 @@ import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
 
-public class PolygonsController implements MapTouchGraphicDelegate {
+public class PolygonsController extends BaseWorkerMapController implements MapTouchGraphicDelegate {
     private final Map<String, PolygonController> polygonIdToController = new HashMap<>();
 
     private final MethodChannel methodChannel;
@@ -53,50 +53,57 @@ public class PolygonsController implements MapTouchGraphicDelegate {
         if (polygonsToAdd == null) {
             return;
         }
-        for (Object polygon : polygonsToAdd) {
-            final Map<?, ?> data = (Map<?, ?>) polygon;
-            if (data == null) {
-                continue;
+
+        executor.execute(() -> {
+            for (Object polygon : polygonsToAdd) {
+                final Map<?, ?> data = (Map<?, ?>) polygon;
+                if (data == null) {
+                    continue;
+                }
+                final String polygonId = (String) data.get("polygonId");
+                final PolygonController controller = new PolygonController(polygonId, selectionPropertiesHandler);
+                polygonIdToController.put(polygonId, controller);
+                Convert.interpretPolygonController(data, controller);
+                controller.add(graphicsOverlay);
             }
-            final String polygonId = (String) data.get("polygonId");
-            final PolygonController controller = new PolygonController(polygonId, selectionPropertiesHandler);
-            polygonIdToController.put(polygonId, controller);
-            Convert.interpretPolygonController(data, controller);
-            controller.add(graphicsOverlay);
-        }
+        });
     }
 
     public void changePolygons(List<Object> polygonsToChange) {
         if (polygonsToChange == null) {
             return;
         }
-        for (Object polygon : polygonsToChange) {
-            final Map<?, ?> data = (Map<?, ?>) polygon;
-            if (data == null) {
-                continue;
+        executor.execute(() -> {
+            for (Object polygon : polygonsToChange) {
+                final Map<?, ?> data = (Map<?, ?>) polygon;
+                if (data == null) {
+                    continue;
+                }
+                final String polygonId = (String) data.get("polygonId");
+                final PolygonController controller = polygonIdToController.get(polygonId);
+                if (controller == null) {
+                    continue;
+                }
+                Convert.interpretPolygonController(data, controller);
             }
-            final String polygonId = (String) data.get("polygonId");
-            final PolygonController controller = polygonIdToController.get(polygonId);
-            if (controller == null) {
-                continue;
-            }
-            Convert.interpretPolygonController(data, controller);
-        }
+        });
     }
 
     public void removePolygons(List<Object> polygonIdsToRemove) {
         if (polygonIdsToRemove == null) {
             return;
         }
-        for (Object rawPolygonId : polygonIdsToRemove) {
-            if (rawPolygonId == null) {
-                continue;
+        executor.execute(() -> {
+            for (Object rawPolygonId : polygonIdsToRemove) {
+                if (rawPolygonId == null) {
+                    continue;
+                }
+                final String polygonId = (String) rawPolygonId;
+                final PolygonController controller = polygonIdToController.remove(polygonId);
+                if (controller != null) {
+                    controller.remove(graphicsOverlay);
+                }
             }
-            final String polygonId = (String) rawPolygonId;
-            final PolygonController controller = polygonIdToController.remove(polygonId);
-            if (controller != null) {
-                controller.remove(graphicsOverlay);
-            }
-        }
+        });
     }
 }

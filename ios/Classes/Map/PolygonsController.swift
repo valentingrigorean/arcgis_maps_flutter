@@ -6,6 +6,10 @@ import Foundation
 import ArcGIS
 
 class PolygonsController: NSObject {
+
+    private let workerQueue: DispatchQueue
+
+
     private var polygonIdToController = Dictionary<String, PolygonController>()
 
     private let graphicsOverlays: AGSGraphicsOverlay
@@ -13,38 +17,47 @@ class PolygonsController: NSObject {
     private let methodChannel: FlutterMethodChannel
 
     init(methodChannel: FlutterMethodChannel,
-         graphicsOverlays: AGSGraphicsOverlay) {
+         graphicsOverlays: AGSGraphicsOverlay,
+         workerQueue: DispatchQueue
+    ) {
         self.methodChannel = methodChannel
         self.graphicsOverlays = graphicsOverlays
+        self.workerQueue = workerQueue
     }
 
     func addPolygons(polygonsToAdd: [Dictionary<String, Any>]) {
-        for polygon in polygonsToAdd {
-            let polygonId = polygon["polygonId"] as! String
-            let controller = PolygonController(graphicsOverlay: graphicsOverlays, polygonId: polygonId)
-            polygonIdToController[polygonId] = controller
-            updatePolygon(data: polygon, controller: controller)
-            controller.add()
+        workerQueue.async { [self] in
+            for polygon in polygonsToAdd {
+                let polygonId = polygon["polygonId"] as! String
+                let controller = PolygonController(graphicsOverlay: graphicsOverlays, polygonId: polygonId)
+                polygonIdToController[polygonId] = controller
+                updatePolygon(data: polygon, controller: controller)
+                controller.add()
+            }
         }
     }
 
     func changePolygons(polygonsToChange: [Dictionary<String, Any>]) {
-        for polygon in polygonsToChange {
-            let polygonId = polygon["polygonId"] as! String
-            guard let controller = polygonIdToController[polygonId] else {
-                continue
+        workerQueue.async { [self] in
+            for polygon in polygonsToChange {
+                let polygonId = polygon["polygonId"] as! String
+                guard let controller = polygonIdToController[polygonId] else {
+                    continue
+                }
+                updatePolygon(data: polygon, controller: controller)
             }
-            updatePolygon(data: polygon, controller: controller)
         }
     }
 
     func removePolygons(polygonIdsToRemove: [String]) {
-        for polygonId in polygonIdsToRemove {
-            guard let controller = polygonIdToController[polygonId] else {
-                continue
+        workerQueue.async { [self] in
+            for polygonId in polygonIdsToRemove {
+                guard let controller = polygonIdToController[polygonId] else {
+                    continue
+                }
+                controller.remove()
+                polygonIdToController.removeValue(forKey: polygonId)
             }
-            controller.remove()
-            polygonIdToController.removeValue(forKey: polygonId)
         }
     }
 

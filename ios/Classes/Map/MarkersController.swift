@@ -6,7 +6,7 @@ import Foundation
 import ArcGIS
 
 class MarkersController: NSObject {
-    private let workerQueue = DispatchQueue(label: "markersControllerWorker")
+    private let workerQueue: DispatchQueue
     private var markerIdToController = Dictionary<String, MarkerController>()
     private let graphicsOverlays: AGSGraphicsOverlay
     private let selectionPropertiesHandler: SelectionPropertiesHandler
@@ -17,10 +17,12 @@ class MarkersController: NSObject {
 
     init(methodChannel: FlutterMethodChannel,
          graphicsOverlays: AGSGraphicsOverlay,
+         workerQueue: DispatchQueue,
          selectionPropertiesHandler: SelectionPropertiesHandler
     ) {
         self.methodChannel = methodChannel
         self.graphicsOverlays = graphicsOverlays
+        self.workerQueue = workerQueue
         self.selectionPropertiesHandler = selectionPropertiesHandler
     }
 

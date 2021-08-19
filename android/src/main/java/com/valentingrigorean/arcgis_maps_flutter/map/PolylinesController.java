@@ -10,7 +10,7 @@ import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
 
-public class PolylinesController implements MapTouchGraphicDelegate {
+public class PolylinesController extends BaseWorkerMapController implements MapTouchGraphicDelegate {
     final Map<String, PolylineController> polylineIdToController = new HashMap<>();
 
     private final MethodChannel methodChannel;
@@ -54,17 +54,19 @@ public class PolylinesController implements MapTouchGraphicDelegate {
             return;
         }
 
-        for (Object polyline : polylinesToAdd) {
-            final Map<?, ?> data = (Map<?, ?>) polyline;
-            if (data == null) {
-                continue;
+        executor.execute(() -> {
+            for (Object polyline : polylinesToAdd) {
+                final Map<?, ?> data = (Map<?, ?>) polyline;
+                if (data == null) {
+                    continue;
+                }
+                final String polylineId = (String) data.get("polylineId");
+                final PolylineController controller = new PolylineController(polylineId, selectionPropertiesHandler);
+                polylineIdToController.put(polylineId, controller);
+                Convert.interpretPolylineController(data, controller);
+                controller.add(graphicsOverlay);
             }
-            final String polylineId = (String) data.get("polylineId");
-            final PolylineController controller = new PolylineController(polylineId, selectionPropertiesHandler);
-            polylineIdToController.put(polylineId, controller);
-            Convert.interpretPolylineController(data, controller);
-            controller.add(graphicsOverlay);
-        }
+        });
     }
 
     public void changePolylines(List<Object> polylinesToChange) {
@@ -72,17 +74,19 @@ public class PolylinesController implements MapTouchGraphicDelegate {
             return;
         }
 
-        for (Object polyline : polylinesToChange) {
-            final Map<?, ?> data = (Map<?, ?>) polyline;
-            if (data == null) {
-                continue;
+        executor.execute(() -> {
+            for (Object polyline : polylinesToChange) {
+                final Map<?, ?> data = (Map<?, ?>) polyline;
+                if (data == null) {
+                    continue;
+                }
+                final String polylineId = (String) data.get("polylineId");
+                final PolylineController controller = polylineIdToController.get(polylineId);
+                if (controller != null) {
+                    Convert.interpretPolylineController(data, controller);
+                }
             }
-            final String polylineId = (String) data.get("polylineId");
-            final PolylineController controller = polylineIdToController.get(polylineId);
-            if (controller != null) {
-                Convert.interpretPolylineController(data, controller);
-            }
-        }
+        });
     }
 
     public void removePolylines(List<Object> polylineIdsToRemove) {
@@ -90,15 +94,17 @@ public class PolylinesController implements MapTouchGraphicDelegate {
             return;
         }
 
-        for (Object rawPolylineId : polylineIdsToRemove) {
-            if (rawPolylineId == null) {
-                continue;
+        executor.execute(() -> {
+            for (Object rawPolylineId : polylineIdsToRemove) {
+                if (rawPolylineId == null) {
+                    continue;
+                }
+                final String polylineId = (String) rawPolylineId;
+                final PolylineController controller = polylineIdToController.remove(polylineId);
+                if (controller != null) {
+                    controller.remove(graphicsOverlay);
+                }
             }
-            final String polylineId = (String) rawPolylineId;
-            final PolylineController controller = polylineIdToController.remove(polylineId);
-            if (controller != null) {
-                controller.remove(graphicsOverlay);
-            }
-        }
+        });
     }
 }
