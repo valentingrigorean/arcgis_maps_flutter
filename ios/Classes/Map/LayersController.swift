@@ -188,6 +188,11 @@ class LayersController {
             }
 
             nativeLayer.load { [weak self] error in
+
+                if flutterMap.dict[layer.layerId] == nil {
+                    return
+                }
+
                 guard let channel = self?.methodChannel else {
                     return
                 }

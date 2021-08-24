@@ -161,11 +161,12 @@ class LayersController {
             final Layer nativeLayer = layer.createLayer();
             flutterMap.put(layer.getLayerId(), nativeLayer);
             nativeLayer.addDoneLoadingListener(() -> {
-                final Map<String, Object> args = new HashMap<>(1);
-                args.put("layerId", layer.getLayerId());
-                methodChannel.invokeMethod("layer#loaded", args);
+                if (flutterMap.containsKey(layer.getLayerId())) {
+                    final Map<String, Object> args = new HashMap<>(1);
+                    args.put("layerId", layer.getLayerId());
+                    methodChannel.invokeMethod("layer#loaded", args);
+                }
             });
-            nativeLayer.fetchLegendInfosAsync();
             switch (layerType) {
                 case OPERATIONAL:
                     map.getOperationalLayers().add(nativeLayer);
