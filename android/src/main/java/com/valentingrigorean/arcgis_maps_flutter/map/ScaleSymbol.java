@@ -1,7 +1,5 @@
 package com.valentingrigorean.arcgis_maps_flutter.map;
 
-import com.esri.arcgisruntime.internal.jni.CorePictureFillSymbol;
-import com.esri.arcgisruntime.internal.jni.CorePictureMarkerSymbol;
 import com.esri.arcgisruntime.symbology.CompositeSymbol;
 import com.esri.arcgisruntime.symbology.PictureFillSymbol;
 import com.esri.arcgisruntime.symbology.PictureMarkerSymbol;
@@ -17,6 +15,11 @@ public class ScaleSymbol extends Symbol {
         super(symbol.getInternal());
         this.symbol = symbol;
         populateDefaultSize(symbol);
+    }
+
+
+    public Symbol getSymbol() {
+        return symbol;
     }
 
     public void setScale(float scale) {

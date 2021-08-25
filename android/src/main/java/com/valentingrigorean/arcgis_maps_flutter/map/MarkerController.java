@@ -63,7 +63,7 @@ public final class MarkerController extends BaseGraphicController {
             public void onLoaded(Symbol symbol) {
                 iconSymbol = new ScaleSymbol(symbol);
                 setOpacity(iconSymbol, opacity);
-                offsetSymbol(symbol, iconOffsetX, iconOffsetY);
+                offsetSymbol(iconSymbol.getSymbol(), iconOffsetX, iconOffsetY);
                 marker.getSymbols().add(iconSymbol);
                 handleScaleChange();
             }
@@ -108,7 +108,7 @@ public final class MarkerController extends BaseGraphicController {
         iconOffsetX = offsetX;
         iconOffsetY = offsetY;
         if (iconSymbol != null) {
-            offsetSymbol(iconSymbol, offsetX, offsetY);
+            offsetSymbol(iconSymbol.getSymbol(), offsetX, offsetY);
         }
     }
 
