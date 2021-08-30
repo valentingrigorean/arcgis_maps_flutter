@@ -245,7 +245,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             }
             break;
             case "map#screenToLocation": {
-                final ScreenLocationData screenLocationData = Convert.toScreenLocationData(call.arguments);
+                final ScreenLocationData screenLocationData = Convert.toScreenLocationData(context, call.arguments);
                 Point mapPoint = mapView.screenToLocation(screenLocationData.getPoint());
                 if (mapPoint == null) {
                     result.success(null);

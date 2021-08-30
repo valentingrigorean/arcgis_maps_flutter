@@ -444,11 +444,13 @@ public class Convert {
         return data;
     }
 
-    public static ScreenLocationData toScreenLocationData(Object o) {
+    public static ScreenLocationData toScreenLocationData(Context context, Object o) {
         final Map<?, ?> data = toMap(o);
         final List<?> points = toList(data.get("position"));
         final SpatialReference spatialReferences = toSpatialReference(data.get("spatialReference"));
-        return new ScreenLocationData(new android.graphics.Point(toInt(points.get(0)), toInt(points.get(1))), spatialReferences);
+        final int x = toInt(points.get(0));
+        final int y =  toInt(points.get(1));
+        return new ScreenLocationData(new android.graphics.Point(dpToPixelsI(context,x),dpToPixelsI(context,y)), spatialReferences);
     }
 
     public static Object identifyLayerResultToJson(IdentifyLayerResult layerResult) {
