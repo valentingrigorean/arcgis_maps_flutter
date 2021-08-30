@@ -25,6 +25,8 @@ import 'package:arcgis_maps_flutter/src/method_channel/map/arcgis_maps_flutter_p
 import 'package:arcgis_maps_flutter/src/method_channel/scene/arcgis_scene_flutter_platform.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import 'package:fluster/fluster.dart';
+
 
 part 'src/arcgis_error.dart';
 part 'src/arcgis_runtime_environment.dart';

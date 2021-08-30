@@ -4,6 +4,7 @@ import 'package:arcgis_maps_flutter_example/map_page_assets_marker.dart';
 import 'package:arcgis_maps_flutter_example/map_page_auto_pan_mode.dart';
 import 'package:arcgis_maps_flutter_example/map_page_legend.dart';
 import 'package:arcgis_maps_flutter_example/map_page_scalerbar.dart';
+import 'package:arcgis_maps_flutter_example/map_page_screen_location.dart';
 import 'package:arcgis_maps_flutter_example/scene_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -84,6 +85,17 @@ class MainPage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => MapPageAutoPanMode(),
+                  ),
+                );
+              },
+            ),
+            ElevatedButton(
+              child: Text('Map ScreenLocation'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MapPageScreenLocation(),
                   ),
                 );
               },

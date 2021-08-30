@@ -239,8 +239,8 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 final Point mapPoint = Convert.toPoint(call.arguments);
                 final android.graphics.Point screenPoint = mapView.locationToScreen(mapPoint);
                 double[] screenPoints = new double[2];
-                screenPoints[0] = Convert.dpToPixelsF(context, screenPoint.x);
-                screenPoints[1] = Convert.dpToPixelsF(context, screenPoint.y);
+                screenPoints[0] = Convert.pixelsToDpF(context, screenPoint.x);
+                screenPoints[1] = Convert.pixelsToDpF(context, screenPoint.y);
                 result.success(screenPoints);
             }
             break;

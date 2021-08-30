@@ -43,7 +43,6 @@ import com.valentingrigorean.arcgis_maps_flutter.map.ScreenLocationData;
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.Scalebar;
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.Style;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -396,8 +395,6 @@ public class Convert {
             return bitmap;
         }
     }
-
-
 
 
     public static SimpleMarkerSymbol.Style toSimpleMarkerSymbolStyle(int rawValue) {
@@ -770,6 +767,14 @@ public class Convert {
 
     public static float dpToPixelsF(Context context, float dp) {
         return (dp * ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT));
+    }
+
+    public static int pixelsToDpI(Context context, float pixels) {
+        return (int) (pixels / ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT));
+    }
+
+    public static float pixelsToDpF(Context context, float pixels) {
+        return (pixels / ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT));
     }
 
     public static int spToPixels(Context context, int sp) {

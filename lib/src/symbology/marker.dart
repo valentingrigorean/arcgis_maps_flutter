@@ -4,6 +4,7 @@ class MarkerId extends SymbolId<Marker> {
   MarkerId(String value) : super(value);
 }
 
+
 class Marker extends Symbol {
   Marker({
     required MarkerId markerId,
