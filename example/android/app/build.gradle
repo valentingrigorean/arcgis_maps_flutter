@@ -31,6 +31,10 @@ android {
         disable 'InvalidPackage'
     }
 
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+    }
+
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.valentingrigorean.arcgis_maps_flutter_example"

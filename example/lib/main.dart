@@ -14,23 +14,42 @@ void main() async {
   await ArcGISRuntimeEnvironment.setApiKey('test');
   final result = await ArcGISRuntimeEnvironment.setLicense('licenseKey');
   await dotenv.load(fileName: ".env");
+  final apiVersion = await ArcGISRuntimeEnvironment.getAPIVersion();
 
   print(result);
-  runApp(MyApp());
+  runApp(
+    MyApp(
+      apiVersion: apiVersion,
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key, required this.apiVersion}) : super(key: key);
+
+  final String apiVersion;
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: MainPage());
+    return MaterialApp(
+      home: MainPage(
+        apiVersion: apiVersion,
+      ),
+    );
   }
 }
 
 class MainPage extends StatelessWidget {
+  const MainPage({Key? key, required this.apiVersion}) : super(key: key);
+
+  final String apiVersion;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text('Arcgis $apiVersion'),
+      ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
