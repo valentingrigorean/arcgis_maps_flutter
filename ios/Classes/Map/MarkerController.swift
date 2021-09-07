@@ -21,6 +21,8 @@ class MarkerController: BaseGraphicController {
 
     private var selectedScale: CGFloat = 1.4
 
+    private var angle: Float = 0.0
+
     init(markerId: String,
          selectionPropertiesHandler: SelectionPropertiesHandler) {
         marker = AGSCompositeSymbol()
@@ -49,9 +51,8 @@ class MarkerController: BaseGraphicController {
         icon = bitmapDescription
         iconSymbol = ScaleSymbolHelper(symbol: createSymbol(bitmapDescription: bitmapDescription))
         offsetSymbol(symbol: iconSymbol!.symbol, offsetX: iconOffsetX, offsetY: iconOffsetY)
-        handleScaleChanged()
         marker.symbols.insert(iconSymbol!.symbol, at: backgroundImage == nil ? 0 : 1)
-
+        updateCommonProps()
     }
 
     func setBackground(bitmapDescription: BitmapDescriptor) {
@@ -63,10 +64,9 @@ class MarkerController: BaseGraphicController {
         }
 
         backgroundImage = bitmapDescription
-
         backgroundImageSymbol = ScaleSymbolHelper(symbol: createSymbol(bitmapDescription: bitmapDescription))
-        handleScaleChanged()
         marker.symbols.insert(backgroundImageSymbol!.symbol, at: 0)
+        updateCommonProps()
     }
 
 
@@ -91,12 +91,26 @@ class MarkerController: BaseGraphicController {
         setGraphicsOpacity(opacity: opacity)
     }
 
+    func setAngle(angle: Float) {
+        if self.angle == angle {
+            return
+        }
+        self.angle = angle
+        setGraphicsAngle(angle: angle)
+    }
+
     func setSelectedScale(selectedScale: CGFloat) {
         if selectedScale == selectedScale {
             return
         }
         self.selectedScale = selectedScale
         handleScaleChanged()
+    }
+
+    private func updateCommonProps() {
+        handleScaleChanged()
+        setGraphicsAngle(angle: angle)
+        setGraphicsOpacity(opacity: opacity)
     }
 
     private func handleScaleChanged() {
@@ -127,6 +141,14 @@ class MarkerController: BaseGraphicController {
         for symbol in marker.symbols {
             if let markerSymbol = symbol as? AGSPictureMarkerSymbol {
                 markerSymbol.opacity = opacity
+            }
+        }
+    }
+
+    private func setGraphicsAngle(angle: Float) {
+        for symbol in marker.symbols {
+            if let markerSymbol = symbol as? AGSMarkerSymbol {
+                markerSymbol.angle = angle
             }
         }
     }

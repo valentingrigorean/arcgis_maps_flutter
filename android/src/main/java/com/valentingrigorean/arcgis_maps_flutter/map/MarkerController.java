@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.esri.arcgisruntime.mapping.view.Graphic;
 import com.esri.arcgisruntime.symbology.CompositeSymbol;
+import com.esri.arcgisruntime.symbology.MarkerSymbol;
 import com.esri.arcgisruntime.symbology.PictureMarkerSymbol;
 import com.esri.arcgisruntime.symbology.Symbol;
 
@@ -17,6 +18,8 @@ public final class MarkerController extends BaseGraphicController {
     private ScaleSymbol backgroundSymbol;
 
     private float opacity = 1;
+
+    private float angle = 0.0f;
 
     private float iconOffsetX = 0;
     private float iconOffsetY = 0;
@@ -63,7 +66,8 @@ public final class MarkerController extends BaseGraphicController {
             public void onLoaded(Symbol symbol) {
                 iconSymbol = new ScaleSymbol(symbol);
                 setOpacity(iconSymbol, opacity);
-                offsetSymbol(iconSymbol.getSymbol(), iconOffsetX, iconOffsetY);
+                setAngle(iconSymbol,angle);
+                offsetSymbol(iconSymbol, iconOffsetX, iconOffsetY);
                 marker.getSymbols().add(iconSymbol);
                 handleScaleChange();
             }
@@ -90,6 +94,7 @@ public final class MarkerController extends BaseGraphicController {
                 backgroundSymbol = new ScaleSymbol(symbol);
 
                 setOpacity(backgroundSymbol, opacity);
+                setAngle(backgroundSymbol,angle);
                 marker.getSymbols().add(0, backgroundSymbol);
                 handleScaleChange();
             }
@@ -113,9 +118,22 @@ public final class MarkerController extends BaseGraphicController {
     }
 
     public void setOpacity(float opacity) {
+        if(this.opacity == opacity){
+            return;
+        }
         this.opacity = opacity;
         for (final Symbol symbol : marker.getSymbols()) {
             setOpacity(symbol, opacity);
+        }
+    }
+
+    public void setAngle(float angle) {
+        if(this.angle == angle){
+            return;
+        }
+        this.angle = angle;
+        for (final Symbol symbol : marker.getSymbols()) {
+            setAngle(symbol, angle);
         }
     }
 
@@ -139,15 +157,33 @@ public final class MarkerController extends BaseGraphicController {
 
     private static void offsetSymbol(Symbol symbol, float offsetX, float offsetY) {
         if (symbol instanceof PictureMarkerSymbol) {
-            PictureMarkerSymbol pictureMarkerSymbol = (PictureMarkerSymbol) symbol;
+            final PictureMarkerSymbol pictureMarkerSymbol = (PictureMarkerSymbol) symbol;
             pictureMarkerSymbol.setOffsetX(offsetX);
             pictureMarkerSymbol.setOffsetY(offsetY);
+        }
+        if (symbol instanceof ScaleSymbol) {
+            final ScaleSymbol scaleSymbol = (ScaleSymbol) symbol;
+            offsetSymbol(scaleSymbol.getSymbol(), offsetX, offsetY);
         }
     }
 
     private static void setOpacity(Symbol symbol, float opacity) {
         if (symbol instanceof PictureMarkerSymbol) {
             ((PictureMarkerSymbol) symbol).setOpacity(opacity);
+        }
+        if (symbol instanceof ScaleSymbol) {
+            final ScaleSymbol scaleSymbol = (ScaleSymbol) symbol;
+            setOpacity(scaleSymbol.getSymbol(), opacity);
+        }
+    }
+
+    private static void setAngle(Symbol symbol, float angle) {
+        if (symbol instanceof MarkerSymbol) {
+            ((MarkerSymbol) symbol).setAngle(angle);
+        }
+        if (symbol instanceof ScaleSymbol) {
+            final ScaleSymbol scaleSymbol = (ScaleSymbol) symbol;
+            setAngle(scaleSymbol.getSymbol(), angle);
         }
     }
 }

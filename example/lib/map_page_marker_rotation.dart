@@ -1,21 +1,21 @@
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
-class MapPageASsetsMarker extends StatefulWidget {
-  const MapPageASsetsMarker({Key? key}) : super(key: key);
+class MapPageMarkerRotation extends StatefulWidget {
+  const MapPageMarkerRotation({Key? key}) : super(key: key);
 
   @override
-  _MapPageASsetsMarkerState createState() => _MapPageASsetsMarkerState();
+  _MapPageMarkerRotationState createState() => _MapPageMarkerRotationState();
 }
 
-class _MapPageASsetsMarkerState extends State<MapPageASsetsMarker> {
-  double _offsetY = 3;
+class _MapPageMarkerRotationState extends State<MapPageMarkerRotation> {
+  double _angle = 0.0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Assets Marker"),
+        title: Text("Marker Rotation"),
       ),
       body: Stack(
         children: [
@@ -28,7 +28,8 @@ class _MapPageASsetsMarkerState extends State<MapPageASsetsMarker> {
                   latitude: 0.0,
                   longitude: 0.0,
                 ),
-                iconOffsetY: _offsetY,
+                iconOffsetY: 4,
+                angle: _angle,
                 icon: BitmapDescriptor.fromNativeAsset(
                   'ic_flight_hazard',
                   width: 24,
@@ -50,13 +51,11 @@ class _MapPageASsetsMarkerState extends State<MapPageASsetsMarker> {
             child: SizedBox(
               width: 150,
               child: Slider(
-                value: _offsetY,
-                min: -5,
-                max: 5,
+                value: _angle / 360.0,
                 onChanged: (value) {
-                  print(_offsetY);
+                  print(_angle);
                   setState(() {
-                    _offsetY = value;
+                    _angle = value * 360.0;
                   });
                 },
               ),

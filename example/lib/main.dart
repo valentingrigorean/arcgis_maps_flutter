@@ -3,6 +3,7 @@ import 'package:arcgis_maps_flutter_example/map_page.dart';
 import 'package:arcgis_maps_flutter_example/map_page_assets_marker.dart';
 import 'package:arcgis_maps_flutter_example/map_page_auto_pan_mode.dart';
 import 'package:arcgis_maps_flutter_example/map_page_legend.dart';
+import 'package:arcgis_maps_flutter_example/map_page_marker_rotation.dart';
 import 'package:arcgis_maps_flutter_example/map_page_scalerbar.dart';
 import 'package:arcgis_maps_flutter_example/map_page_screen_location.dart';
 import 'package:arcgis_maps_flutter_example/scene_page.dart';
@@ -93,6 +94,17 @@ class MainPage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => MapPageASsetsMarker(),
+                  ),
+                );
+              },
+            ),
+            ElevatedButton(
+              child: Text('Map Marker rotation'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MapPageMarkerRotation(),
                   ),
                 );
               },

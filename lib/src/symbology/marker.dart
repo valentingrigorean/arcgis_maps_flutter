@@ -4,7 +4,6 @@ class MarkerId extends SymbolId<Marker> {
   MarkerId(String value) : super(value);
 }
 
-
 class Marker extends Symbol {
   Marker({
     required MarkerId markerId,
@@ -15,6 +14,7 @@ class Marker extends Symbol {
     this.iconOffsetY = 0,
     this.backgroundImage,
     this.opacity = 1,
+    this.angle = 0.0,
     this.onTap,
     this.visible = true,
     this.zIndex = 0,
@@ -47,6 +47,9 @@ class Marker extends Symbol {
   /// info window.
   final bool consumeTapEvents;
 
+  /// The angle (in degrees) of the marker symbol.
+  final double angle;
+
   final VoidCallback? onTap;
 
   final int zIndex;
@@ -69,6 +72,7 @@ class Marker extends Symbol {
       backgroundImage: backgroundImage,
       consumeTapEvents: consumeTapEvents,
       opacity: opacity,
+      angle: angle,
       onTap: onTap,
       visible: visible,
       zIndex: zIndex,
@@ -98,6 +102,7 @@ class Marker extends Symbol {
     }
 
     json['opacity'] = opacity;
+    json['angle'] = angle;
     json['selectedScale'] = selectedScale;
     json['zIndex'] = zIndex;
     return json;
@@ -118,6 +123,7 @@ class Marker extends Symbol {
           iconOffsetY == other.iconOffsetY &&
           backgroundImage == other.backgroundImage &&
           opacity == other.opacity &&
+          angle == other.angle &&
           consumeTapEvents == other.consumeTapEvents &&
           zIndex == other.zIndex &&
           visible == other.visible &&

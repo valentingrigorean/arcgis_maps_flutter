@@ -95,6 +95,10 @@ class MarkersController: NSObject {
             controller.setOpacity(opacity: Float(opacity))
         }
 
+        if let angle = data["angle"] as? Double {
+            controller.setAngle(angle: Float(angle))
+        }
+
         if let visible = data["visible"] as? Bool {
             controller.isVisible = visible
         }

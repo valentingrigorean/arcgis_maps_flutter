@@ -320,6 +320,11 @@ public class Convert {
             controller.setOpacity(toFloat(opacity));
         }
 
+        final Object angle = data.get("angle");
+        if(angle != null){
+            controller.setAngle(toFloat(angle));
+        }
+
         final Object selectedScale = data.get("selectedScale");
         if (selectedScale != null) {
             controller.setSelectedScale(toFloat(selectedScale));
