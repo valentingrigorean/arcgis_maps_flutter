@@ -53,6 +53,8 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
     private final ArrayList<LegendInfoController> legendInfoControllers = new ArrayList<>();
 
+    private final SymbolVisibilityFilterController symbolVisibilityFilterController;
+
 
     @Nullable
     private MapView mapView;
@@ -95,9 +97,11 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
         selectionPropertiesHandler = new SelectionPropertiesHandler(mapView.getSelectionProperties());
 
+        symbolVisibilityFilterController = new SymbolVisibilityFilterController(mapView);
+
         final GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
         layersController = new LayersController(methodChannel);
-        markersController = new MarkersController(context, methodChannel, graphicsOverlay, selectionPropertiesHandler);
+        markersController = new MarkersController(context, methodChannel, graphicsOverlay, selectionPropertiesHandler, symbolVisibilityFilterController);
         polygonsController = new PolygonsController(methodChannel, graphicsOverlay, selectionPropertiesHandler);
         polylinesController = new PolylinesController(methodChannel, graphicsOverlay, selectionPropertiesHandler);
 
@@ -134,6 +138,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         }
 
         disposed = true;
+        symbolVisibilityFilterController.clear();
         methodChannel.setMethodCallHandler(null);
         destroyMapViewIfNecessary();
 

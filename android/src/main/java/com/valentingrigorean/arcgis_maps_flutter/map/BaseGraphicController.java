@@ -27,6 +27,10 @@ public abstract class BaseGraphicController {
         graphicsOverlay.getGraphics().remove(getGraphic());
     }
 
+    public boolean getVisible() {
+        return getGraphic().isVisible();
+    }
+
     public void setVisible(boolean visible) {
         getGraphic().setVisible(visible);
     }
@@ -37,6 +41,10 @@ public abstract class BaseGraphicController {
 
     public void setGeometry(Geometry geometry) {
         getGraphic().setGeometry(geometry);
+    }
+
+    public boolean isSelected() {
+        return getGraphic().isSelected();
     }
 
     public void setSelected(boolean selected) {

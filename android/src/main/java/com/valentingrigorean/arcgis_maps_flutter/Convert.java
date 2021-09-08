@@ -8,6 +8,8 @@ import android.icu.text.SimpleDateFormat;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
+import androidx.annotation.Nullable;
+
 import com.esri.arcgisruntime.UnitSystem;
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.geometry.PointCollection;
@@ -40,6 +42,7 @@ import com.valentingrigorean.arcgis_maps_flutter.map.MarkerController;
 import com.valentingrigorean.arcgis_maps_flutter.map.PolygonController;
 import com.valentingrigorean.arcgis_maps_flutter.map.PolylineController;
 import com.valentingrigorean.arcgis_maps_flutter.map.ScreenLocationData;
+import com.valentingrigorean.arcgis_maps_flutter.map.SymbolVisibilityFilter;
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.Scalebar;
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.Style;
 
@@ -291,6 +294,20 @@ public class Convert {
         }
     }
 
+    @Nullable
+    public static SymbolVisibilityFilter toSymbolVisibilityFilter(@Nullable Object o) {
+        if (o == null) {
+            return null;
+        }
+        final Map<?, ?> data = toMap(o);
+        if (data == null) {
+            return null;
+        }
+        final double minZoom = toDouble(data.get("minZoom"));
+        final double maxZoom = toDouble(data.get("maxZoom"));
+        return new SymbolVisibilityFilter(minZoom, maxZoom);
+    }
+
     public static void interpretMarkerController(Object o, MarkerController controller) {
         final Map<?, ?> data = toMap(o);
         if (data == null) {
@@ -321,7 +338,7 @@ public class Convert {
         }
 
         final Object angle = data.get("angle");
-        if(angle != null){
+        if (angle != null) {
             controller.setAngle(toFloat(angle));
         }
 
@@ -454,8 +471,8 @@ public class Convert {
         final List<?> points = toList(data.get("position"));
         final SpatialReference spatialReferences = toSpatialReference(data.get("spatialReference"));
         final int x = toInt(points.get(0));
-        final int y =  toInt(points.get(1));
-        return new ScreenLocationData(new android.graphics.Point(dpToPixelsI(context,x),dpToPixelsI(context,y)), spatialReferences);
+        final int y = toInt(points.get(1));
+        return new ScreenLocationData(new android.graphics.Point(dpToPixelsI(context, x), dpToPixelsI(context, y)), spatialReferences);
     }
 
     public static Object identifyLayerResultToJson(IdentifyLayerResult layerResult) {

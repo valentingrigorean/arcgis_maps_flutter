@@ -20,6 +20,7 @@ class Marker extends Symbol {
     this.zIndex = 0,
     this.selectedColor,
     this.selectedScale = 1.4,
+    this.visibilityFilter,
   })  : assert(opacity >= 0 && opacity <= 1),
         markerId = markerId,
         super(symbolId: markerId);
@@ -42,9 +43,7 @@ class Marker extends Symbol {
   /// 0.0 means fully transparent, 1.0 means fully opaque.
   final double opacity;
 
-  /// True if the marker icon consumes tap events. If not, the map will perform
-  /// default tap handling by centering the map on the marker and displaying its
-  /// info window.
+  /// True if the marker icon consumes tap events.
   final bool consumeTapEvents;
 
   /// The angle (in degrees) of the marker symbol.
@@ -60,6 +59,8 @@ class Marker extends Symbol {
   final Color? selectedColor;
 
   final double selectedScale;
+
+  final SymbolVisibilityFilter? visibilityFilter;
 
   @override
   clone() {
@@ -78,6 +79,7 @@ class Marker extends Symbol {
       zIndex: zIndex,
       selectedColor: selectedColor,
       selectedScale: selectedScale,
+      visibilityFilter: visibilityFilter,
     );
   }
 
@@ -105,6 +107,11 @@ class Marker extends Symbol {
     json['angle'] = angle;
     json['selectedScale'] = selectedScale;
     json['zIndex'] = zIndex;
+
+    if (visibilityFilter != null) {
+      json['visibilityFilter'] = visibilityFilter!.toJson();
+    }
+
     return json;
   }
 
@@ -128,5 +135,6 @@ class Marker extends Symbol {
           zIndex == other.zIndex &&
           visible == other.visible &&
           selectedColor == other.selectedColor &&
-          selectedScale == other.selectedScale;
+          selectedScale == other.selectedScale &&
+          visibilityFilter == other.visibilityFilter;
 }

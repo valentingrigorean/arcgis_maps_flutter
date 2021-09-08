@@ -17,6 +17,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     private let polygonsController: PolygonsController
     private let polylinesController: PolylinesController
 
+    private let symbolVisibilityFilterController: SymbolVisibilityFilterController
+
     private let scaleBarController: ScaleBarController
 
 
@@ -54,10 +56,13 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         selectionPropertiesHandler = SelectionPropertiesHandler(selectionProperties: mapView.selectionProperties)
 
+        symbolVisibilityFilterController = SymbolVisibilityFilterController(workerQueue: mapWorkerQueue, mapView: mapView)
+
         let graphicsOverlay = AGSGraphicsOverlay()
         polygonsController = PolygonsController(methodChannel: channel, graphicsOverlays: graphicsOverlay, workerQueue: mapWorkerQueue)
         polylinesController = PolylinesController(methodChannel: channel, graphicsOverlays: graphicsOverlay, workerQueue: mapWorkerQueue)
-        markersController = MarkersController(methodChannel: channel, graphicsOverlays: graphicsOverlay, workerQueue: mapWorkerQueue, selectionPropertiesHandler: selectionPropertiesHandler)
+        markersController = MarkersController(methodChannel: channel, graphicsOverlays: graphicsOverlay, workerQueue: mapWorkerQueue,
+                selectionPropertiesHandler: selectionPropertiesHandler, symbolVisibilityFilterController: symbolVisibilityFilterController)
 
         mapView.graphicsOverlays.add(graphicsOverlay)
 
@@ -77,6 +82,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     deinit {
+        symbolVisibilityFilterController.clear()
         mapView.locationDisplay.autoPanModeChangedHandler = nil
         mapView.viewpointChangedHandler = nil
     }
@@ -132,7 +138,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             break
         case "map#getWanderExtentFactor":
             result(mapView.locationDisplay.wanderExtentFactor)
-            break;
+            break
         case "map#getCurrentViewpoint":
             let type = (call.arguments as! Int).toAGSViewpointType()
             let currentViewPoint = mapView.currentViewpoint(with: type)

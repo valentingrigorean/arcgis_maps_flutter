@@ -12,9 +12,11 @@ import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
 
-public class MarkersController extends BaseWorkerMapController implements MapTouchGraphicDelegate {
+public class MarkersController extends BaseSymbolController implements MapTouchGraphicDelegate {
 
     private final Map<String, MarkerController> markerIdToController = new HashMap<>();
+
+    private final SymbolVisibilityFilterController symbolVisibilityFilterController;
 
     private final Context context;
     private final MethodChannel methodChannel;
@@ -24,11 +26,12 @@ public class MarkersController extends BaseWorkerMapController implements MapTou
     private MarkerController selectedMarker;
 
 
-    public MarkersController(Context context, MethodChannel methodChannel, GraphicsOverlay graphicsOverlay, SelectionPropertiesHandler selectionPropertiesHandler) {
+    public MarkersController(Context context, MethodChannel methodChannel, GraphicsOverlay graphicsOverlay, SelectionPropertiesHandler selectionPropertiesHandler, SymbolVisibilityFilterController symbolVisibilityFilterController) {
         this.context = context;
         this.methodChannel = methodChannel;
         this.graphicsOverlay = graphicsOverlay;
         this.selectionPropertiesHandler = selectionPropertiesHandler;
+        this.symbolVisibilityFilterController = symbolVisibilityFilterController;
     }
 
     @Override
@@ -74,6 +77,9 @@ public class MarkersController extends BaseWorkerMapController implements MapTou
                 final MarkerController markerController = new MarkerController(context, markerId, selectionPropertiesHandler);
                 markerIdToController.put(markerId, markerController);
                 Convert.interpretMarkerController(data, markerController);
+
+                addOrRemoveVisibilityFilter(symbolVisibilityFilterController, markerController, data);
+
                 markerController.add(graphicsOverlay);
             }
         });
@@ -93,6 +99,7 @@ public class MarkersController extends BaseWorkerMapController implements MapTou
                 final MarkerController markerController = markerIdToController.get(markerId);
                 if (markerController != null) {
                     Convert.interpretMarkerController(data, markerController);
+                    addOrRemoveVisibilityFilter(symbolVisibilityFilterController, markerController, data);
                 }
             }
         });
@@ -111,6 +118,7 @@ public class MarkersController extends BaseWorkerMapController implements MapTou
                 final String markerId = (String) rawMarkerId;
                 final MarkerController markerController = markerIdToController.remove(markerId);
                 if (markerController != null) {
+                    symbolVisibilityFilterController.removeGraphicsController(markerController);
                     markerController.remove(graphicsOverlay);
                 }
             }

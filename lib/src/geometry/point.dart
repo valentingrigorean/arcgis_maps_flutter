@@ -53,6 +53,10 @@ class Point implements Geometry {
   final double? z;
   final double? m;
 
+  double get latitude => y;
+
+  double get longitude => x;
+
   final SpatialReference? spatialReference;
 
   Object toJson() {

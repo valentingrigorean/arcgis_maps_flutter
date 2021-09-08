@@ -10,7 +10,7 @@ import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
 
-public class PolylinesController extends BaseWorkerMapController implements MapTouchGraphicDelegate {
+public class PolylinesController extends BaseSymbolController implements MapTouchGraphicDelegate {
     final Map<String, PolylineController> polylineIdToController = new HashMap<>();
 
     private final MethodChannel methodChannel;

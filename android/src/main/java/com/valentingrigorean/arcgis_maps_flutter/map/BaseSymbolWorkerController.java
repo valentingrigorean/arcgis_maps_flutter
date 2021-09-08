@@ -3,7 +3,7 @@ package com.valentingrigorean.arcgis_maps_flutter.map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-public  abstract class BaseWorkerMapController {
-
+public abstract class BaseSymbolWorkerController {
     protected static Executor executor = Executors.newSingleThreadExecutor();
+
 }

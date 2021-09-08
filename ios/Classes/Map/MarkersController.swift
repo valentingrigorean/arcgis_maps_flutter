@@ -5,11 +5,12 @@
 import Foundation
 import ArcGIS
 
-class MarkersController: NSObject {
+class MarkersController: NSObject, BaseSymbolController {
     private let workerQueue: DispatchQueue
     private var markerIdToController = Dictionary<String, MarkerController>()
     private let graphicsOverlays: AGSGraphicsOverlay
     private let selectionPropertiesHandler: SelectionPropertiesHandler
+    private let symbolVisibilityFilterController: SymbolVisibilityFilterController
 
     private var selectedMarker: MarkerController?
 
@@ -18,12 +19,14 @@ class MarkersController: NSObject {
     init(methodChannel: FlutterMethodChannel,
          graphicsOverlays: AGSGraphicsOverlay,
          workerQueue: DispatchQueue,
-         selectionPropertiesHandler: SelectionPropertiesHandler
+         selectionPropertiesHandler: SelectionPropertiesHandler,
+         symbolVisibilityFilterController: SymbolVisibilityFilterController
     ) {
         self.methodChannel = methodChannel
         self.graphicsOverlays = graphicsOverlays
         self.workerQueue = workerQueue
         self.selectionPropertiesHandler = selectionPropertiesHandler
+        self.symbolVisibilityFilterController = symbolVisibilityFilterController
     }
 
 
@@ -34,6 +37,9 @@ class MarkersController: NSObject {
                 let controller = MarkerController(markerId: markerId, selectionPropertiesHandler: selectionPropertiesHandler)
                 markerIdToController[markerId] = controller
                 updateMarker(data: marker, controller: controller)
+
+                addOrRemoveVisibilityFilter(symbolVisibilityFilterController: symbolVisibilityFilterController, graphicController: controller, data: marker)
+
                 controller.add(graphicsOverlay: graphicsOverlays)
             }
         }
@@ -47,6 +53,7 @@ class MarkersController: NSObject {
                     continue
                 }
                 updateMarker(data: marker, controller: controller)
+                addOrRemoveVisibilityFilter(symbolVisibilityFilterController: symbolVisibilityFilterController, graphicController: controller, data: marker)
             }
         }
     }
@@ -57,6 +64,7 @@ class MarkersController: NSObject {
                 guard let controller = markerIdToController[markerId] else {
                     continue
                 }
+                symbolVisibilityFilterController.removeGraphicsController(graphicController: controller)
                 controller.remove(graphicsOverlay: graphicsOverlays)
                 markerIdToController.removeValue(forKey: markerId)
             }

@@ -83,5 +83,6 @@ part 'src/symbology/marker.dart';
 part 'src/symbology/polygon.dart';
 part 'src/symbology/polyline.dart';
 part 'src/symbology/symbol.dart';
+part 'src/symbology/symbol_visibility_filter.dart';
 
 part 'src/toolkit/compass.dart';

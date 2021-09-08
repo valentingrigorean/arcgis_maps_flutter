@@ -36,7 +36,7 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
             break
         case "arcgis#getApiVersion":
             result("--")
-            break;
+            break
         default:
             result(FlutterMethodNotImplemented)
             break

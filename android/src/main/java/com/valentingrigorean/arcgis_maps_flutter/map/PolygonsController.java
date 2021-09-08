@@ -10,7 +10,7 @@ import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
 
-public class PolygonsController extends BaseWorkerMapController implements MapTouchGraphicDelegate {
+public class PolygonsController extends BaseSymbolController implements MapTouchGraphicDelegate {
     private final Map<String, PolygonController> polygonIdToController = new HashMap<>();
 
     private final MethodChannel methodChannel;
