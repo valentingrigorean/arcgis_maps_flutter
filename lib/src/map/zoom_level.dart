@@ -64,6 +64,10 @@ class ZoomLevel {
 
   static const double level23 = 70.5310735;
 
+  static const double minZoom = level23;
+  
+  static const double maxZoom = level0;
+
   static const double global = level0;
 
   static const double subcontinent = level2;

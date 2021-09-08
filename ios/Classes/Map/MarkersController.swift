@@ -76,6 +76,7 @@ class MarkersController: NSObject, BaseSymbolController {
             return
         }
         selectedMarker.isSelected = false
+        symbolVisibilityFilterController.invalidate(graphicController: selectedMarker)
     }
 
     private func updateMarker(data: Dictionary<String, Any>,
@@ -108,7 +109,11 @@ class MarkersController: NSObject, BaseSymbolController {
         }
 
         if let visible = data["visible"] as? Bool {
-            controller.isVisible = visible
+            if symbolVisibilityFilterController.containsGraphicController(graphicController: controller) {
+                symbolVisibilityFilterController.updateInitialVisibility(graphicController: controller, initValue: visible)
+            } else {
+                controller.isVisible = visible
+            }
         }
 
         if let zIndex = data["zIndex"] as? Int {
@@ -148,6 +153,7 @@ extension MarkersController: MapGraphicTouchDelegate {
             }
             selectedMarker = currentMarker
             currentMarker.isSelected = true
+            symbolVisibilityFilterController.invalidate(graphicController: currentMarker)
         }
         methodChannel.invokeMethod("marker#onTap", arguments: ["markerId": markerId])
         return true

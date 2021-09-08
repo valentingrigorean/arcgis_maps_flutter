@@ -31,6 +31,23 @@ public class SymbolVisibilityFilterController extends BaseSymbolWorkerController
         });
     }
 
+
+    public boolean containsGraphicsController(BaseGraphicController graphicController) {
+        return graphicControllers.containsKey(graphicController);
+    }
+
+    public void updateInitialVisibility(BaseGraphicController graphicController, Boolean initValue) {
+        if (initialValues.containsKey(graphicController)) {
+            initialValues.replace(graphicController, initValue);
+        }
+    }
+
+    public void invalidate(BaseGraphicController graphicController) {
+        if (containsGraphicsController(graphicController)) {
+            handleGraphicsFilterZoom(graphicController, graphicControllers.get(graphicController), mapView.getMapScale());
+        }
+    }
+
     public void addGraphicsController(BaseGraphicController graphicController, SymbolVisibilityFilter symbolVisibilityFilter, boolean initValue) {
         executor.execute(() -> {
             if (initialValues.containsKey(graphicController)) {
@@ -75,10 +92,6 @@ public class SymbolVisibilityFilterController extends BaseSymbolWorkerController
         });
     }
 
-
-    private boolean containsGraphicsController(BaseGraphicController graphicController) {
-        return graphicControllers.containsKey(graphicController);
-    }
 
     private void handleGraphicsFilterZoom(BaseGraphicController graphicController, SymbolVisibilityFilter visibilityFilter, double currentZoom) {
         if (Double.isNaN(currentZoom)) {

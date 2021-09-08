@@ -51,6 +51,30 @@ class SymbolVisibilityFilterController {
         }
     }
 
+
+    func containsGraphicController(graphicController: BaseGraphicController) -> Bool {
+        let id = objectIdentifierFor(graphicController)
+        return graphicControllers[id] != nil
+    }
+
+    func updateInitialVisibility(graphicController: BaseGraphicController,
+                                 initValue: Bool) {
+        if !containsGraphicController(graphicController: graphicController) {
+            return
+        }
+        let id = objectIdentifierFor(graphicController)
+        initialValues[id] = initValue
+    }
+
+    func invalidate(graphicController: BaseGraphicController) {
+        let id = objectIdentifierFor(graphicController)
+
+        guard let graphicControllerInfo = graphicControllers[id] else {
+            return
+        }
+        handleGraphicsFilterZoom(graphicControllerInfo: graphicControllerInfo, currentZoom: mapScale)
+    }
+
     func addGraphicsController(graphicController: BaseGraphicController,
                                visibilityFilter: SymbolVisibilityFilter,
                                initValue: Bool) {

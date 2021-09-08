@@ -63,7 +63,7 @@ public class PolylinesController extends BaseSymbolController implements MapTouc
                 final String polylineId = (String) data.get("polylineId");
                 final PolylineController controller = new PolylineController(polylineId, selectionPropertiesHandler);
                 polylineIdToController.put(polylineId, controller);
-                Convert.interpretPolylineController(data, controller);
+                Convert.interpretPolylineController(data, controller, null);
                 controller.add(graphicsOverlay);
             }
         });
@@ -83,7 +83,7 @@ public class PolylinesController extends BaseSymbolController implements MapTouc
                 final String polylineId = (String) data.get("polylineId");
                 final PolylineController controller = polylineIdToController.get(polylineId);
                 if (controller != null) {
-                    Convert.interpretPolylineController(data, controller);
+                    Convert.interpretPolylineController(data, controller, null);
                 }
             }
         });

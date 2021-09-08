@@ -63,7 +63,7 @@ public class PolygonsController extends BaseSymbolController implements MapTouch
                 final String polygonId = (String) data.get("polygonId");
                 final PolygonController controller = new PolygonController(polygonId, selectionPropertiesHandler);
                 polygonIdToController.put(polygonId, controller);
-                Convert.interpretPolygonController(data, controller);
+                Convert.interpretPolygonController(data, controller,null);
                 controller.add(graphicsOverlay);
             }
         });
@@ -84,7 +84,7 @@ public class PolygonsController extends BaseSymbolController implements MapTouch
                 if (controller == null) {
                     continue;
                 }
-                Convert.interpretPolygonController(data, controller);
+                Convert.interpretPolygonController(data, controller,null);
             }
         });
     }

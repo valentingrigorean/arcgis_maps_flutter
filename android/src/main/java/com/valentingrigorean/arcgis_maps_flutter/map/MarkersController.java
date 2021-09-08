@@ -59,6 +59,7 @@ public class MarkersController extends BaseSymbolController implements MapTouchG
             selectedMarker.setSelected(false);
         markerController.setSelected(true);
         selectedMarker = markerController;
+        symbolVisibilityFilterController.invalidate(selectedMarker);
         methodChannel.invokeMethod("marker#onTap", Convert.markerIdToJson(markerId));
         return true;
     }
@@ -76,7 +77,7 @@ public class MarkersController extends BaseSymbolController implements MapTouchG
                 final String markerId = (String) data.get("markerId");
                 final MarkerController markerController = new MarkerController(context, markerId, selectionPropertiesHandler);
                 markerIdToController.put(markerId, markerController);
-                Convert.interpretMarkerController(data, markerController);
+                Convert.interpretMarkerController(data, markerController, symbolVisibilityFilterController);
 
                 addOrRemoveVisibilityFilter(symbolVisibilityFilterController, markerController, data);
 
@@ -98,7 +99,7 @@ public class MarkersController extends BaseSymbolController implements MapTouchG
                 final String markerId = (String) data.get("markerId");
                 final MarkerController markerController = markerIdToController.get(markerId);
                 if (markerController != null) {
-                    Convert.interpretMarkerController(data, markerController);
+                    Convert.interpretMarkerController(data, markerController, symbolVisibilityFilterController);
                     addOrRemoveVisibilityFilter(symbolVisibilityFilterController, markerController, data);
                 }
             }
@@ -130,6 +131,7 @@ public class MarkersController extends BaseSymbolController implements MapTouchG
             return;
         }
         selectedMarker.setSelected(false);
+        symbolVisibilityFilterController.invalidate(selectedMarker);
         selectedMarker = null;
     }
 }

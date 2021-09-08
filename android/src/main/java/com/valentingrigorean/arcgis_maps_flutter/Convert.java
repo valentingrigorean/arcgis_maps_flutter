@@ -43,6 +43,7 @@ import com.valentingrigorean.arcgis_maps_flutter.map.PolygonController;
 import com.valentingrigorean.arcgis_maps_flutter.map.PolylineController;
 import com.valentingrigorean.arcgis_maps_flutter.map.ScreenLocationData;
 import com.valentingrigorean.arcgis_maps_flutter.map.SymbolVisibilityFilter;
+import com.valentingrigorean.arcgis_maps_flutter.map.SymbolVisibilityFilterController;
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.Scalebar;
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.Style;
 
@@ -308,12 +309,12 @@ public class Convert {
         return new SymbolVisibilityFilter(minZoom, maxZoom);
     }
 
-    public static void interpretMarkerController(Object o, MarkerController controller) {
+    public static void interpretMarkerController(Object o, MarkerController controller, SymbolVisibilityFilterController symbolVisibilityFilterController) {
         final Map<?, ?> data = toMap(o);
         if (data == null) {
             return;
         }
-        interpretBaseGraphicController(data, controller);
+        interpretBaseGraphicController(data, controller, symbolVisibilityFilterController);
 
         final Object position = data.get("position");
         if (position != null) {
@@ -348,12 +349,12 @@ public class Convert {
         }
     }
 
-    public static void interpretPolygonController(Object o, PolygonController controller) {
+    public static void interpretPolygonController(Object o, PolygonController controller, SymbolVisibilityFilterController symbolVisibilityFilterController) {
         final Map<?, ?> data = toMap(o);
         if (data == null) {
             return;
         }
-        interpretBaseGraphicController(data, controller);
+        interpretBaseGraphicController(data, controller, symbolVisibilityFilterController);
         final Object fillColor = data.get("fillColor");
         if (fillColor != null) {
             controller.setFillColor(toInt(fillColor));
@@ -376,12 +377,12 @@ public class Convert {
         }
     }
 
-    public static void interpretPolylineController(Object o, PolylineController controller) {
+    public static void interpretPolylineController(Object o, PolylineController controller, SymbolVisibilityFilterController symbolVisibilityFilterController) {
         final Map<?, ?> data = toMap(o);
         if (data == null) {
             return;
         }
-        interpretBaseGraphicController(data, controller);
+        interpretBaseGraphicController(data, controller, symbolVisibilityFilterController);
         final Object color = data.get("color");
         if (color != null) {
             controller.setColor(toInt(color));
@@ -511,7 +512,7 @@ public class Convert {
     }
 
 
-    private static void interpretBaseGraphicController(Map<?, ?> data, BaseGraphicController controller) {
+    private static void interpretBaseGraphicController(Map<?, ?> data, BaseGraphicController controller, SymbolVisibilityFilterController symbolVisibilityFilterController) {
 
         final Object consumeTapEvents = data.get("consumeTapEvents");
         if (consumeTapEvents != null) {
@@ -519,7 +520,11 @@ public class Convert {
         }
         final Object visible = data.get("visible");
         if (visible != null) {
-            controller.setVisible(toBoolean(visible));
+            if (symbolVisibilityFilterController != null && symbolVisibilityFilterController.containsGraphicsController(controller)) {
+                symbolVisibilityFilterController.updateInitialVisibility(controller, toBoolean(visible));
+            } else {
+                controller.setVisible(toBoolean(visible));
+            }
         }
         final Object zIndex = data.get("zIndex");
         if (zIndex != null) {
