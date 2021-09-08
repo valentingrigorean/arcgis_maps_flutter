@@ -70,6 +70,7 @@ part 'src/map/arcgis_map_view.dart';
 part 'src/map/arcgis_map_controller.dart';
 part 'src/map/interaction_options.dart';
 part 'src/map/scalebar_configuration.dart';
+part 'src/map/zoom_level.dart';
 
 part 'src/mapping/arcgis_scene.dart';
 part 'src/scene/arcgis_scene_controller.dart';
