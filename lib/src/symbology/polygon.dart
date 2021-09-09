@@ -24,6 +24,7 @@ class Polygon implements MapsObject {
     this.zIndex = 0,
     this.onTap,
     this.selectedColor,
+    this.visibilityFilter,
   });
 
   /// Uniquely identifies a [Polygon].
@@ -64,22 +65,24 @@ class Polygon implements MapsObject {
 
   final Color? selectedColor;
 
+  final SymbolVisibilityFilter? visibilityFilter;
+
   @override
   MapsObjectId get mapsId => polygonId;
 
   /// Creates a new [Polygon] object whose values are the same as this instance,
   /// unless overwritten by the specified parameters.
-  Polygon copyWith({
-    bool? consumeTapEventsParam,
-    Color? fillColorParam,
-    List<Point>? pointsParam,
-    Color? strokeColorParam,
-    int? strokeWidthParam,
-    bool? visibleParam,
-    int? zIndexParam,
-    VoidCallback? onTapParam,
-    Color? selectedColorParam,
-  }) {
+  Polygon copyWith(
+      {bool? consumeTapEventsParam,
+      Color? fillColorParam,
+      List<Point>? pointsParam,
+      Color? strokeColorParam,
+      int? strokeWidthParam,
+      bool? visibleParam,
+      int? zIndexParam,
+      VoidCallback? onTapParam,
+      Color? selectedColorParam,
+      SymbolVisibilityFilter? visibilityFilterParam}) {
     return Polygon(
       polygonId: polygonId,
       consumeTapEvents: consumeTapEventsParam ?? consumeTapEvents,
@@ -90,7 +93,8 @@ class Polygon implements MapsObject {
       visible: visibleParam ?? visible,
       onTap: onTapParam ?? onTap,
       zIndex: zIndexParam ?? zIndex,
-      selectedColor: selectedColor ?? selectedColorParam,
+      selectedColor: selectedColorParam ?? selectedColor,
+      visibilityFilter: visibilityFilterParam ?? visibilityFilter,
     );
   }
 
@@ -117,13 +121,12 @@ class Polygon implements MapsObject {
     addIfPresent('visible', visible);
     addIfPresent('zIndex', zIndex);
     addIfPresent('selectedColor', selectedColor?.value);
+    addIfPresent('visibilityFilter', visibilityFilter?.toJson());
 
     json['points'] = _pointsToJson();
 
     return json;
   }
-
-
 
   @override
   int get hashCode => polygonId.hashCode;
@@ -141,8 +144,8 @@ class Polygon implements MapsObject {
           strokeColor == other.strokeColor &&
           strokeWidth == other.strokeWidth &&
           zIndex == other.zIndex &&
-          selectedColor == other.selectedColor;
-
+          selectedColor == other.selectedColor &&
+          visibilityFilter == other.visibilityFilter;
 
   Object _pointsToJson() {
     final List<Object> result = <Object>[];

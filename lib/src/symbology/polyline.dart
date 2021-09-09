@@ -28,6 +28,7 @@ class Polyline implements MapsObject {
     this.antialias = true,
     this.onTap,
     this.selectedColor,
+    this.visibilityFilter,
   });
 
   /// Uniquely identifies a [Polyline].
@@ -74,6 +75,8 @@ class Polyline implements MapsObject {
 
   final Color? selectedColor;
 
+  final SymbolVisibilityFilter? visibilityFilter;
+
   /// Creates a new [Polyline] object whose values are the same as this instance,
   /// unless overwritten by the specified parameters.
   Polyline copyWith({
@@ -87,6 +90,7 @@ class Polyline implements MapsObject {
     bool? antialiasParam,
     VoidCallback? onTapParam,
     Color? selectedColorParam,
+    SymbolVisibilityFilter? visibilityFilterParam,
   }) {
     return Polyline(
       polylineId: polylineId,
@@ -100,6 +104,7 @@ class Polyline implements MapsObject {
       antialias: antialiasParam ?? antialias,
       onTap: onTapParam ?? onTap,
       selectedColor: selectedColorParam ?? selectedColor,
+      visibilityFilter: visibilityFilterParam ?? visibilityFilter,
     );
   }
 
@@ -130,6 +135,7 @@ class Polyline implements MapsObject {
     addIfPresent('zIndex', zIndex);
     addIfPresent('antialias', antialias);
     addIfPresent('selectedColor', selectedColor?.value);
+    addIfPresent('visibilityFilter', visibilityFilter?.toJson());
     return json;
   }
 
@@ -150,7 +156,8 @@ class Polyline implements MapsObject {
           width == other.width &&
           zIndex == other.zIndex &&
           antialias == other.antialias &&
-          selectedColor == other.selectedColor;
+          selectedColor == other.selectedColor &&
+          visibilityFilter == other.visibilityFilter;
 
   Object _pointsToJson() {
     final List<Object> result = <Object>[];
