@@ -8,7 +8,8 @@ import ArcGIS
 protocol GraphicController {
     var graphics: AGSGraphic { get }
 
-    var selectionPropertiesHandler: SelectionPropertiesHandler { get }
+    var selectionPropertiesHandler: SelectionPropertiesHandler? { get set }
+
     var consumeTapEvents: Bool { get set }
 
     var geometry: AGSGeometry? { get set }
@@ -35,16 +36,14 @@ extension GraphicController {
 
 class BaseGraphicController: GraphicController {
 
-    init(graphics: AGSGraphic,
-         selectionPropertiesHandler: SelectionPropertiesHandler) {
+    init(graphics: AGSGraphic) {
         self.graphics = graphics
-        self.selectionPropertiesHandler = selectionPropertiesHandler
         consumeTapEvents = false
     }
 
     let graphics: AGSGraphic
 
-    let selectionPropertiesHandler: SelectionPropertiesHandler
+    var selectionPropertiesHandler: SelectionPropertiesHandler?
 
     var consumeTapEvents: Bool
 
@@ -61,9 +60,9 @@ class BaseGraphicController: GraphicController {
         didSet {
             if oldValue != isSelected {
                 if isSelected {
-                    selectionPropertiesHandler.setGraphicSelected(graphic: graphics, selectedColor: selectedColor)
+                    selectionPropertiesHandler?.setGraphicSelected(graphic: graphics, selectedColor: selectedColor)
                 } else {
-                    selectionPropertiesHandler.clearGraphicsSelection(graphic: graphics)
+                    selectionPropertiesHandler?.clearGraphicsSelection(graphic: graphics)
                 }
             }
         }

@@ -5,8 +5,7 @@
 import Foundation
 import ArcGIS
 
-class PolygonController {
-    private let graphics: AGSGraphic
+class PolygonController : BaseGraphicController {
     private let polygonSymbol: AGSSimpleFillSymbol
     private let polygonStrokeSymbol: AGSSimpleLineSymbol
 
@@ -20,7 +19,7 @@ class PolygonController {
         polygonStrokeSymbol = AGSSimpleLineSymbol(style: .solid, color: UIColor.black, width: 10)
         polygonSymbol = AGSSimpleFillSymbol(style: .solid, color: UIColor.black, outline: polygonStrokeSymbol)
 
-        graphics = AGSGraphic(geometry: nil, symbol: polygonSymbol, attributes: ["polygonId": polygonId])
+        super.init(graphics: AGSGraphic(geometry: nil, symbol: polygonSymbol, attributes: ["polygonId": polygonId]))
     }
 
     func add() {

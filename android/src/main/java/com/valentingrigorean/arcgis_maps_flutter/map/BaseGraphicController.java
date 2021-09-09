@@ -6,18 +6,18 @@ import com.esri.arcgisruntime.geometry.Geometry;
 import com.esri.arcgisruntime.mapping.view.Graphic;
 import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
 
-public abstract class BaseGraphicController {
+public abstract class BaseGraphicController implements GraphicControllerSink {
 
-    private final SelectionPropertiesHandler selectionPropertiesHandler;
+    private SelectionPropertiesHandler selectionPropertiesHandler;
     private boolean consumeTapEvents;
     private Color selectedColor;
 
-    protected BaseGraphicController(SelectionPropertiesHandler selectionPropertiesHandler) {
-        this.selectionPropertiesHandler = selectionPropertiesHandler;
-    }
-
 
     protected abstract Graphic getGraphic();
+
+    public void setSelectionPropertiesHandler(SelectionPropertiesHandler selectionPropertiesHandler) {
+        this.selectionPropertiesHandler = selectionPropertiesHandler;
+    }
 
     public void add(GraphicsOverlay graphicsOverlay) {
         graphicsOverlay.getGraphics().add(getGraphic());
@@ -62,6 +62,11 @@ public abstract class BaseGraphicController {
 
     public boolean canConsumeTapEvents() {
         return consumeTapEvents;
+    }
+
+
+    public void setConsumeTapEvent(boolean consumeTapEvent) {
+        this.consumeTapEvents = consumeTapEvent;
     }
 
     public void setSelectedColor(Color selectedColor) {

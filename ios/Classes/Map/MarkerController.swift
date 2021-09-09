@@ -23,10 +23,9 @@ class MarkerController: BaseGraphicController {
 
     private var angle: Float = 0.0
 
-    init(markerId: String,
-         selectionPropertiesHandler: SelectionPropertiesHandler) {
+    init(markerId: String) {
         marker = AGSCompositeSymbol()
-        super.init(graphics: AGSGraphic(geometry: nil, symbol: marker, attributes: ["markerId": markerId]), selectionPropertiesHandler: selectionPropertiesHandler)
+        super.init(graphics: AGSGraphic(geometry: nil, symbol: marker, attributes: ["markerId": markerId]))
     }
 
     override var isSelected: Bool {

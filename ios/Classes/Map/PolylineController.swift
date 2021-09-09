@@ -5,8 +5,7 @@
 import Foundation
 import ArcGIS
 
-class PolylineController {
-    private let graphics: AGSGraphic
+class PolylineController: BaseGraphicController {
     private let polylineSymbol: AGSSimpleLineSymbol
 
     private weak var graphicsOverlay: AGSGraphicsOverlay?
@@ -17,7 +16,7 @@ class PolylineController {
          polylineId: String) {
         self.graphicsOverlay = graphicsOverlay
         polylineSymbol = AGSSimpleLineSymbol(style: .solid, color: UIColor.black, width: 10)
-        graphics = AGSGraphic(geometry: nil, symbol: polylineSymbol, attributes: ["polylineId": polylineId])
+        super.init(graphics: AGSGraphic(geometry: nil, symbol: polylineSymbol, attributes: ["polylineId": polylineId]))
     }
 
     func add() {

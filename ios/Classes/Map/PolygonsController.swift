@@ -5,16 +5,19 @@
 import Foundation
 import ArcGIS
 
-class PolygonsController: NSObject {
+class PolygonsController: NSObject, SymbolsController {
 
     private let workerQueue: DispatchQueue
-
 
     private var polygonIdToController = Dictionary<String, PolygonController>()
 
     private let graphicsOverlays: AGSGraphicsOverlay
 
     private let methodChannel: FlutterMethodChannel
+
+    var selectionPropertiesHandler: SelectionPropertiesHandler?
+
+    var symbolVisibilityFilterController: SymbolVisibilityFilterController?
 
     init(methodChannel: FlutterMethodChannel,
          graphicsOverlays: AGSGraphicsOverlay,
@@ -55,6 +58,7 @@ class PolygonsController: NSObject {
                 guard let controller = polygonIdToController[polygonId] else {
                     continue
                 }
+                symbolVisibilityFilterController?.removeGraphicsController(graphicController: controller)
                 controller.remove()
                 polygonIdToController.removeValue(forKey: polygonId)
             }
@@ -63,13 +67,8 @@ class PolygonsController: NSObject {
 
     private func updatePolygon(data: Dictionary<String, Any>,
                                controller: PolygonController) {
-        if let consumeTapEvents = data["consumeTapEvents"] as? Bool {
-            controller.consumeTabEvent = consumeTapEvents
-        }
 
-        if let visible = data["visible"] as? Bool {
-            controller.setVisible(visible: visible)
-        }
+        updateController(controller: controller, data: data)
 
         if let fillColor = UIColor(data: data["fillColor"]) {
             controller.setFillColor(fillColor: fillColor)
@@ -81,10 +80,6 @@ class PolygonsController: NSObject {
 
         if let strokeWidth = data["strokeWidth"] as? Double {
             controller.setStrokeWidth(width: CGFloat(strokeWidth))
-        }
-
-        if let zIndex = data["zIndex"] as? Int {
-            controller.setZIndex(zIndex: zIndex)
         }
 
         if let pointsData = data["points"] as? [Dictionary<String, Any>] {

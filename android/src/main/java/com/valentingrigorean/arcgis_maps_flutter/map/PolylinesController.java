@@ -15,13 +15,11 @@ public class PolylinesController extends BaseSymbolController implements MapTouc
 
     private final MethodChannel methodChannel;
     private final GraphicsOverlay graphicsOverlay;
-    private final SelectionPropertiesHandler selectionPropertiesHandler;
 
 
-    public PolylinesController(MethodChannel methodChannel, GraphicsOverlay graphicsOverlay, SelectionPropertiesHandler selectionPropertiesHandler) {
+    public PolylinesController(MethodChannel methodChannel, GraphicsOverlay graphicsOverlay) {
         this.methodChannel = methodChannel;
         this.graphicsOverlay = graphicsOverlay;
-        this.selectionPropertiesHandler = selectionPropertiesHandler;
     }
 
     @Override
@@ -61,9 +59,10 @@ public class PolylinesController extends BaseSymbolController implements MapTouc
                     continue;
                 }
                 final String polylineId = (String) data.get("polylineId");
-                final PolylineController controller = new PolylineController(polylineId, selectionPropertiesHandler);
+                final PolylineController controller = new PolylineController(polylineId);
+                controller.setSelectionPropertiesHandler(getSelectionPropertiesHandler());
                 polylineIdToController.put(polylineId, controller);
-                Convert.interpretPolylineController(data, controller, null);
+                Convert.interpretPolylineController(data, controller, getSymbolVisibilityFilterController());
                 controller.add(graphicsOverlay);
             }
         });
@@ -83,7 +82,7 @@ public class PolylinesController extends BaseSymbolController implements MapTouc
                 final String polylineId = (String) data.get("polylineId");
                 final PolylineController controller = polylineIdToController.get(polylineId);
                 if (controller != null) {
-                    Convert.interpretPolylineController(data, controller, null);
+                    Convert.interpretPolylineController(data, controller, getSymbolVisibilityFilterController());
                 }
             }
         });
@@ -102,6 +101,7 @@ public class PolylinesController extends BaseSymbolController implements MapTouc
                 final String polylineId = (String) rawPolylineId;
                 final PolylineController controller = polylineIdToController.remove(polylineId);
                 if (controller != null) {
+                    onSymbolRemoval(controller);
                     controller.remove(graphicsOverlay);
                 }
             }

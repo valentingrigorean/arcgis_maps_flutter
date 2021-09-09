@@ -16,22 +16,18 @@ public class MarkersController extends BaseSymbolController implements MapTouchG
 
     private final Map<String, MarkerController> markerIdToController = new HashMap<>();
 
-    private final SymbolVisibilityFilterController symbolVisibilityFilterController;
 
     private final Context context;
     private final MethodChannel methodChannel;
     private final GraphicsOverlay graphicsOverlay;
-    private final SelectionPropertiesHandler selectionPropertiesHandler;
 
     private MarkerController selectedMarker;
 
 
-    public MarkersController(Context context, MethodChannel methodChannel, GraphicsOverlay graphicsOverlay, SelectionPropertiesHandler selectionPropertiesHandler, SymbolVisibilityFilterController symbolVisibilityFilterController) {
+    public MarkersController(Context context, MethodChannel methodChannel, GraphicsOverlay graphicsOverlay) {
         this.context = context;
         this.methodChannel = methodChannel;
         this.graphicsOverlay = graphicsOverlay;
-        this.selectionPropertiesHandler = selectionPropertiesHandler;
-        this.symbolVisibilityFilterController = symbolVisibilityFilterController;
     }
 
     @Override
@@ -59,7 +55,7 @@ public class MarkersController extends BaseSymbolController implements MapTouchG
             selectedMarker.setSelected(false);
         markerController.setSelected(true);
         selectedMarker = markerController;
-        symbolVisibilityFilterController.invalidate(selectedMarker);
+        invalidateVisibilityFilterController(selectedMarker);
         methodChannel.invokeMethod("marker#onTap", Convert.markerIdToJson(markerId));
         return true;
     }
@@ -75,12 +71,10 @@ public class MarkersController extends BaseSymbolController implements MapTouchG
                     continue;
                 }
                 final String markerId = (String) data.get("markerId");
-                final MarkerController markerController = new MarkerController(context, markerId, selectionPropertiesHandler);
+                final MarkerController markerController = new MarkerController(context, markerId);
+                markerController.setSelectionPropertiesHandler(getSelectionPropertiesHandler());
                 markerIdToController.put(markerId, markerController);
-                Convert.interpretMarkerController(data, markerController, symbolVisibilityFilterController);
-
-                addOrRemoveVisibilityFilter(symbolVisibilityFilterController, markerController, data);
-
+                Convert.interpretMarkerController(data, markerController, getSymbolVisibilityFilterController());
                 markerController.add(graphicsOverlay);
             }
         });
@@ -99,8 +93,7 @@ public class MarkersController extends BaseSymbolController implements MapTouchG
                 final String markerId = (String) data.get("markerId");
                 final MarkerController markerController = markerIdToController.get(markerId);
                 if (markerController != null) {
-                    Convert.interpretMarkerController(data, markerController, symbolVisibilityFilterController);
-                    addOrRemoveVisibilityFilter(symbolVisibilityFilterController, markerController, data);
+                    Convert.interpretMarkerController(data, markerController, getSymbolVisibilityFilterController());
                 }
             }
         });
@@ -119,7 +112,7 @@ public class MarkersController extends BaseSymbolController implements MapTouchG
                 final String markerId = (String) rawMarkerId;
                 final MarkerController markerController = markerIdToController.remove(markerId);
                 if (markerController != null) {
-                    symbolVisibilityFilterController.removeGraphicsController(markerController);
+                    onSymbolRemoval(markerController);
                     markerController.remove(graphicsOverlay);
                 }
             }
@@ -131,7 +124,7 @@ public class MarkersController extends BaseSymbolController implements MapTouchG
             return;
         }
         selectedMarker.setSelected(false);
-        symbolVisibilityFilterController.invalidate(selectedMarker);
+        invalidateVisibilityFilterController(selectedMarker);
         selectedMarker = null;
     }
 }

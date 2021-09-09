@@ -1,17 +1,37 @@
 package com.valentingrigorean.arcgis_maps_flutter.map;
 
-import com.valentingrigorean.arcgis_maps_flutter.Convert;
+public abstract class BaseSymbolController extends BaseSymbolWorkerController  implements SymbolsController{
 
-import java.util.Map;
+    private SymbolVisibilityFilterController symbolVisibilityFilterController;
+    private SelectionPropertiesHandler selectionPropertiesHandler;
 
-public abstract class BaseSymbolController extends BaseSymbolWorkerController {
+    public SymbolVisibilityFilterController getSymbolVisibilityFilterController() {
+        return symbolVisibilityFilterController;
+    }
 
-    protected void addOrRemoveVisibilityFilter(SymbolVisibilityFilterController symbolVisibilityFilterController, BaseGraphicController graphicController, Map<?, ?> data) {
-        final Object visibilityFilter = data.get("visibilityFilter");
-        if (visibilityFilter != null) {
-            symbolVisibilityFilterController.addGraphicsController(graphicController, Convert.toSymbolVisibilityFilter(visibilityFilter), graphicController.getVisible());
-        } else {
-            symbolVisibilityFilterController.removeGraphicsController(graphicController);
+    public void setSymbolVisibilityFilterController(SymbolVisibilityFilterController symbolVisibilityFilterController) {
+        this.symbolVisibilityFilterController = symbolVisibilityFilterController;
+    }
+
+    public SelectionPropertiesHandler getSelectionPropertiesHandler() {
+        return selectionPropertiesHandler;
+    }
+
+    public void setSelectionPropertiesHandler(SelectionPropertiesHandler selectionPropertiesHandler) {
+        this.selectionPropertiesHandler = selectionPropertiesHandler;
+    }
+
+    protected void onSymbolRemoval(GraphicControllerSink controller) {
+        final SymbolVisibilityFilterController visibilityFilterController = getSymbolVisibilityFilterController();
+        if (visibilityFilterController != null) {
+            visibilityFilterController.removeGraphicsController(controller);
+        }
+    }
+
+    protected void invalidateVisibilityFilterController(GraphicControllerSink controller) {
+        final SymbolVisibilityFilterController filterController = getSymbolVisibilityFilterController();
+        if (filterController != null) {
+            filterController.invalidate(controller);
         }
     }
 }

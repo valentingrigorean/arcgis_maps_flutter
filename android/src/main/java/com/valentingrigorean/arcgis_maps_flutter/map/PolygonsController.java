@@ -15,13 +15,11 @@ public class PolygonsController extends BaseSymbolController implements MapTouch
 
     private final MethodChannel methodChannel;
     private final GraphicsOverlay graphicsOverlay;
-    private final SelectionPropertiesHandler selectionPropertiesHandler;
 
 
-    public PolygonsController(MethodChannel methodChannel, GraphicsOverlay graphicsOverlay, SelectionPropertiesHandler selectionPropertiesHandler) {
+    public PolygonsController(MethodChannel methodChannel, GraphicsOverlay graphicsOverlay) {
         this.methodChannel = methodChannel;
         this.graphicsOverlay = graphicsOverlay;
-        this.selectionPropertiesHandler = selectionPropertiesHandler;
     }
 
     @Override
@@ -61,9 +59,10 @@ public class PolygonsController extends BaseSymbolController implements MapTouch
                     continue;
                 }
                 final String polygonId = (String) data.get("polygonId");
-                final PolygonController controller = new PolygonController(polygonId, selectionPropertiesHandler);
+                final PolygonController controller = new PolygonController(polygonId);
+                controller.setSelectionPropertiesHandler(getSelectionPropertiesHandler());
                 polygonIdToController.put(polygonId, controller);
-                Convert.interpretPolygonController(data, controller,null);
+                Convert.interpretPolygonController(data, controller,getSymbolVisibilityFilterController());
                 controller.add(graphicsOverlay);
             }
         });
@@ -84,7 +83,7 @@ public class PolygonsController extends BaseSymbolController implements MapTouch
                 if (controller == null) {
                     continue;
                 }
-                Convert.interpretPolygonController(data, controller,null);
+                Convert.interpretPolygonController(data, controller,getSymbolVisibilityFilterController());
             }
         });
     }
@@ -101,6 +100,7 @@ public class PolygonsController extends BaseSymbolController implements MapTouch
                 final String polygonId = (String) rawPolygonId;
                 final PolygonController controller = polygonIdToController.remove(polygonId);
                 if (controller != null) {
+                    onSymbolRemoval(controller);
                     controller.remove(graphicsOverlay);
                 }
             }

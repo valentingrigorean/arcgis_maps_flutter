@@ -5,16 +5,19 @@
 import Foundation
 import ArcGIS
 
-class PolylinesController: NSObject {
+class PolylinesController: NSObject, SymbolsController {
 
     private let workerQueue: DispatchQueue
-
 
     private var polylineIdToController = Dictionary<String, PolylineController>()
 
     private let graphicsOverlays: AGSGraphicsOverlay
 
     private let methodChannel: FlutterMethodChannel
+
+    var selectionPropertiesHandler: SelectionPropertiesHandler?
+
+    var symbolVisibilityFilterController: SymbolVisibilityFilterController?
 
     init(methodChannel: FlutterMethodChannel,
          graphicsOverlays: AGSGraphicsOverlay,
@@ -63,9 +66,7 @@ class PolylinesController: NSObject {
 
     private func updatePolyline(data: Dictionary<String, Any>,
                                 controller: PolylineController) {
-        if let consumeTapEvents = data["consumeTapEvents"] as? Bool {
-            controller.consumeTabEvent = consumeTapEvents
-        }
+        updateController(controller: controller, data: data)
 
         if let color = UIColor(data: data["color"]) {
             controller.setColor(color: color)
@@ -85,16 +86,8 @@ class PolylinesController: NSObject {
             controller.setPoints(points: points)
         }
 
-        if let visible = data["visible"] as? Bool {
-            controller.setVisible(visible: visible)
-        }
-
         if let width = data["width"] as? Double {
             controller.setWidth(width: CGFloat(width))
-        }
-
-        if let zIndex = data["zIndex"] as? Int {
-            controller.setZIndex(zIndex: zIndex)
         }
 
         if let antialias = data["antialias"] as? Bool {

@@ -17,6 +17,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     private let polygonsController: PolygonsController
     private let polylinesController: PolylinesController
 
+
     private let symbolVisibilityFilterController: SymbolVisibilityFilterController
 
     private let scaleBarController: ScaleBarController
@@ -25,6 +26,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     private var lastScreenPoint = CGPoint.zero
 
     private var graphicsTouchDelegates: [MapGraphicTouchDelegate]
+
+    private let symbolsControllers: [SymbolsController]
 
     private var viewpoint: AGSViewpoint?
 
@@ -61,8 +64,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         let graphicsOverlay = AGSGraphicsOverlay()
         polygonsController = PolygonsController(methodChannel: channel, graphicsOverlays: graphicsOverlay, workerQueue: mapWorkerQueue)
         polylinesController = PolylinesController(methodChannel: channel, graphicsOverlays: graphicsOverlay, workerQueue: mapWorkerQueue)
-        markersController = MarkersController(methodChannel: channel, graphicsOverlays: graphicsOverlay, workerQueue: mapWorkerQueue,
-                selectionPropertiesHandler: selectionPropertiesHandler, symbolVisibilityFilterController: symbolVisibilityFilterController)
+        markersController = MarkersController(methodChannel: channel, graphicsOverlays: graphicsOverlay, workerQueue: mapWorkerQueue)
+
+        symbolsControllers = [polygonsController, polylinesController, markersController]
 
         mapView.graphicsOverlays.add(graphicsOverlay)
 
@@ -74,6 +78,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         super.init()
 
+        initSymbolsControllers()
+
         mapView.touchDelegate = self
         mapView.locationDisplay.autoPanModeChangedHandler = onAutoPanModeChanged
         mapView.viewpointChangedHandler = viewpointChangedHandler
@@ -82,6 +88,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     deinit {
+        clearSymbolsControllers()
         symbolVisibilityFilterController.clear()
         mapView.locationDisplay.autoPanModeChangedHandler = nil
         mapView.viewpointChangedHandler = nil
@@ -255,6 +262,20 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         }
     }
 
+    private func initSymbolsControllers() {
+        for var controller in symbolsControllers {
+            controller.selectionPropertiesHandler = selectionPropertiesHandler
+            controller.symbolVisibilityFilterController = symbolVisibilityFilterController
+        }
+    }
+
+    private func clearSymbolsControllers() {
+        for var controller in symbolsControllers {
+            controller.selectionPropertiesHandler = nil
+            controller.symbolVisibilityFilterController = nil
+        }
+    }
+
     private func onAutoPanModeChanged(autoPanMode: AGSLocationDisplayAutoPanMode) {
         channel.invokeMethod("map#autoPanModeChanged", arguments: autoPanMode.rawValue)
     }
@@ -394,6 +415,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             updateMapOptions(mapOptions: options)
         }
     }
+
 }
 
 extension ArcgisMapController: AGSGeoViewTouchDelegate {

@@ -5,12 +5,11 @@ import android.graphics.Color;
 import com.esri.arcgisruntime.mapping.view.Graphic;
 import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
 
-public final class PolylineController extends BaseGraphicController {
+public final class PolylineController extends BaseGraphicController implements PolylineControllerSink {
     private final Graphic graphic;
     private final SimpleLineSymbol polylineSymbol;
 
-    public PolylineController(String polylineId,SelectionPropertiesHandler selectionPropertiesHandler) {
-        super(selectionPropertiesHandler);
+    public PolylineController(String polylineId) {
         polylineSymbol = new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, Color.BLACK, 10);
         graphic = new Graphic();
         graphic.setSymbol(polylineSymbol);
@@ -37,5 +36,4 @@ public final class PolylineController extends BaseGraphicController {
     public void setAntialias(boolean antialias) {
         polylineSymbol.setAntiAlias(antialias);
     }
-
 }

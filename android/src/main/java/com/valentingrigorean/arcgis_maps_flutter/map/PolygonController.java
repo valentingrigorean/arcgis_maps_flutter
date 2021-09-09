@@ -6,14 +6,13 @@ import com.esri.arcgisruntime.mapping.view.Graphic;
 import com.esri.arcgisruntime.symbology.SimpleFillSymbol;
 import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
 
-public final class PolygonController extends BaseGraphicController {
+public final class PolygonController extends BaseGraphicController implements PolygonControllerSink {
 
     private final Graphic graphic;
     private final SimpleFillSymbol polygonSymbol;
     private final SimpleLineSymbol polygonStrokeSymbol;
 
-    public PolygonController(String polygonId,SelectionPropertiesHandler selectionPropertiesHandler) {
-        super(selectionPropertiesHandler);
+    public PolygonController(String polygonId) {
         polygonStrokeSymbol = new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, Color.BLACK, 10);
         polygonSymbol = new SimpleFillSymbol(SimpleFillSymbol.Style.SOLID, Color.BLACK, polygonStrokeSymbol);
 

@@ -35,9 +35,9 @@ import com.esri.arcgisruntime.security.UserCredential;
 import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
 import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
 import com.valentingrigorean.arcgis_maps_flutter.data.FieldTypeFlutter;
-import com.valentingrigorean.arcgis_maps_flutter.map.BaseGraphicController;
 import com.valentingrigorean.arcgis_maps_flutter.map.BitmapDescriptorFactory;
 import com.valentingrigorean.arcgis_maps_flutter.map.FlutterLayer;
+import com.valentingrigorean.arcgis_maps_flutter.map.GraphicControllerSink;
 import com.valentingrigorean.arcgis_maps_flutter.map.MarkerController;
 import com.valentingrigorean.arcgis_maps_flutter.map.PolygonController;
 import com.valentingrigorean.arcgis_maps_flutter.map.PolylineController;
@@ -512,7 +512,7 @@ public class Convert {
     }
 
 
-    private static void interpretBaseGraphicController(Map<?, ?> data, BaseGraphicController controller, SymbolVisibilityFilterController symbolVisibilityFilterController) {
+    private static void interpretBaseGraphicController(Map<?, ?> data, GraphicControllerSink controller, SymbolVisibilityFilterController symbolVisibilityFilterController) {
 
         final Object consumeTapEvents = data.get("consumeTapEvents");
         if (consumeTapEvents != null) {
@@ -520,8 +520,9 @@ public class Convert {
         }
         final Object visible = data.get("visible");
         if (visible != null) {
-            if (symbolVisibilityFilterController != null && symbolVisibilityFilterController.containsGraphicsController(controller)) {
-                symbolVisibilityFilterController.updateInitialVisibility(controller, toBoolean(visible));
+            final Object visibilityFilter = data.get("visibilityFilter");
+            if (symbolVisibilityFilterController != null && visibilityFilter != null) {
+                    symbolVisibilityFilterController.addGraphicsController(controller, toSymbolVisibilityFilter(visibilityFilter), toBoolean(visible));
             } else {
                 controller.setVisible(toBoolean(visible));
             }

@@ -8,8 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SymbolVisibilityFilterController extends BaseSymbolWorkerController implements MapScaleChangedListener {
-    private final Map<BaseGraphicController, SymbolVisibilityFilter> graphicControllers = new HashMap<>();
-    private final Map<BaseGraphicController, Boolean> initialValues = new HashMap<>();
+    private final Map<GraphicControllerSink, SymbolVisibilityFilter> graphicControllers = new HashMap<>();
+    private final Map<GraphicControllerSink, Boolean> initialValues = new HashMap<>();
     private final MapView mapView;
 
     private boolean isRegister;
@@ -23,7 +23,7 @@ public class SymbolVisibilityFilterController extends BaseSymbolWorkerController
         isRegister = false;
 
         executor.execute(() -> {
-            for (Map.Entry<BaseGraphicController, SymbolVisibilityFilter> entry :
+            for (Map.Entry<GraphicControllerSink, SymbolVisibilityFilter> entry :
                     graphicControllers.entrySet()) {
                 entry.getKey().setVisible(initialValues.remove(entry.getKey()));
             }
@@ -32,45 +32,43 @@ public class SymbolVisibilityFilterController extends BaseSymbolWorkerController
     }
 
 
-    public boolean containsGraphicsController(BaseGraphicController graphicController) {
+    public boolean containsGraphicsController(GraphicControllerSink graphicController) {
         return graphicControllers.containsKey(graphicController);
     }
 
-    public void updateInitialVisibility(BaseGraphicController graphicController, Boolean initValue) {
+    public void updateInitialVisibility(GraphicControllerSink graphicController, Boolean initValue) {
         if (initialValues.containsKey(graphicController)) {
             initialValues.replace(graphicController, initValue);
         }
     }
 
-    public void invalidate(BaseGraphicController graphicController) {
+    public void invalidate(GraphicControllerSink graphicController) {
         if (containsGraphicsController(graphicController)) {
             handleGraphicsFilterZoom(graphicController, graphicControllers.get(graphicController), mapView.getMapScale());
         }
     }
 
-    public void addGraphicsController(BaseGraphicController graphicController, SymbolVisibilityFilter symbolVisibilityFilter, boolean initValue) {
-        executor.execute(() -> {
-            if (initialValues.containsKey(graphicController)) {
-                initialValues.remove(graphicController);
+    public void addGraphicsController(GraphicControllerSink graphicController, SymbolVisibilityFilter symbolVisibilityFilter, boolean initValue) {
+        if (initialValues.containsKey(graphicController)) {
+            initialValues.remove(graphicController);
+        }
+
+        initialValues.put(graphicController, initValue);
+
+        handleGraphicsFilterZoom(graphicController, symbolVisibilityFilter, mapView.getMapScale());
+
+        if (graphicControllers.containsKey(graphicController)) {
+            if (graphicControllers.get(graphicController) == symbolVisibilityFilter) {
+                return;
             }
+            graphicControllers.remove(graphicController);
+        }
 
-            initialValues.put(graphicController, initValue);
-
-            handleGraphicsFilterZoom(graphicController, symbolVisibilityFilter, mapView.getMapScale());
-
-            if (graphicControllers.containsKey(graphicController)) {
-                if (graphicControllers.get(graphicController) == symbolVisibilityFilter) {
-                    return;
-                }
-                graphicControllers.remove(graphicController);
-            }
-
-            graphicControllers.put(graphicController, symbolVisibilityFilter);
-            handleRegistrationToScaleChanged();
-        });
+        graphicControllers.put(graphicController, symbolVisibilityFilter);
+        handleRegistrationToScaleChanged();
     }
 
-    public void removeGraphicsController(BaseGraphicController graphicController) {
+    public void removeGraphicsController(GraphicControllerSink graphicController) {
         executor.execute(() -> {
             if (!containsGraphicsController(graphicController)) {
                 return;
@@ -85,7 +83,7 @@ public class SymbolVisibilityFilterController extends BaseSymbolWorkerController
     public void mapScaleChanged(MapScaleChangedEvent mapScaleChangedEvent) {
         executor.execute(() -> {
             final double currentZoom = mapScaleChangedEvent.getSource().getMapScale();
-            for (Map.Entry<BaseGraphicController, SymbolVisibilityFilter> entry :
+            for (Map.Entry<GraphicControllerSink, SymbolVisibilityFilter> entry :
                     graphicControllers.entrySet()) {
                 handleGraphicsFilterZoom(entry.getKey(), entry.getValue(), currentZoom);
             }
@@ -93,7 +91,7 @@ public class SymbolVisibilityFilterController extends BaseSymbolWorkerController
     }
 
 
-    private void handleGraphicsFilterZoom(BaseGraphicController graphicController, SymbolVisibilityFilter visibilityFilter, double currentZoom) {
+    private void handleGraphicsFilterZoom(GraphicControllerSink graphicController, SymbolVisibilityFilter visibilityFilter, double currentZoom) {
         if (Double.isNaN(currentZoom)) {
             return;
         }

@@ -51,6 +51,8 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     private final PolygonsController polygonsController;
     private final PolylinesController polylinesController;
 
+    private final ArrayList<SymbolsController> symbolControllers = new ArrayList<>();
+
     private final ArrayList<LegendInfoController> legendInfoControllers = new ArrayList<>();
 
     private final SymbolVisibilityFilterController symbolVisibilityFilterController;
@@ -101,9 +103,17 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
         final GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
         layersController = new LayersController(methodChannel);
-        markersController = new MarkersController(context, methodChannel, graphicsOverlay, selectionPropertiesHandler, symbolVisibilityFilterController);
-        polygonsController = new PolygonsController(methodChannel, graphicsOverlay, selectionPropertiesHandler);
-        polylinesController = new PolylinesController(methodChannel, graphicsOverlay, selectionPropertiesHandler);
+
+        markersController = new MarkersController(context, methodChannel, graphicsOverlay);
+        symbolControllers.add(markersController);
+
+        polygonsController = new PolygonsController(methodChannel, graphicsOverlay);
+        symbolControllers.add(polygonsController);
+
+        polylinesController = new PolylinesController(methodChannel, graphicsOverlay);
+        symbolControllers.add(polylinesController);
+
+        initSymbolsControllers();
 
         mapViewOnTouchListener = new MapViewOnTouchListener(context, mapView, methodChannel);
         mapViewOnTouchListener.addGraphicDelegate(markersController);
@@ -365,6 +375,8 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             scaleBarController = null;
         }
 
+        clearSymbolsControllers();
+
         if (mapView == null) {
             return;
         }
@@ -373,6 +385,22 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         mapView.removeViewpointChangedListener(this);
         mapView.dispose();
         mapView = null;
+    }
+
+    private void initSymbolsControllers(){
+        for (final SymbolsController controller :
+                symbolControllers) {
+            controller.setSymbolVisibilityFilterController(symbolVisibilityFilterController);
+            controller.setSelectionPropertiesHandler(selectionPropertiesHandler);
+        }
+    }
+
+    private void clearSymbolsControllers(){
+        for (final SymbolsController controller :
+                symbolControllers) {
+            controller.setSymbolVisibilityFilterController(null);
+            controller.setSelectionPropertiesHandler(null);
+        }
     }
 
     private void setViewpoint(Object args, boolean animated) {

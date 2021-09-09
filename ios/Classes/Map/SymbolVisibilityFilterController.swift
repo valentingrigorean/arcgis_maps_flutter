@@ -79,26 +79,23 @@ class SymbolVisibilityFilterController {
                                visibilityFilter: SymbolVisibilityFilter,
                                initValue: Bool) {
 
-        workerQueue.async { [self] in
+        let id = objectIdentifierFor(graphicController)
 
-            let id = objectIdentifierFor(graphicController)
+        initialValues[id] = initValue
 
-            initialValues[id] = initValue
+        let graphicControllerInfo = graphicControllers[id] ?? GraphicControllerInfo(graphicController: graphicController, visibilityFilter: visibilityFilter)
 
-            let graphicControllerInfo = graphicControllers[id] ?? GraphicControllerInfo(graphicController: graphicController, visibilityFilter: visibilityFilter)
+        handleGraphicsFilterZoom(graphicControllerInfo: graphicControllerInfo, currentZoom: mapScale)
 
-            handleGraphicsFilterZoom(graphicControllerInfo: graphicControllerInfo, currentZoom: mapScale)
-
-            if let temp = graphicControllers[id] {
-                if temp.visibilityFilter == visibilityFilter {
-                    return
-                }
+        if let temp = graphicControllers[id] {
+            if temp.visibilityFilter == visibilityFilter {
+                return
             }
-
-            graphicControllers[id] = graphicControllerInfo
-
-            handleRegistrationToScaleChanged()
         }
+
+        graphicControllers[id] = graphicControllerInfo
+
+        handleRegistrationToScaleChanged()
     }
 
     func removeGraphicsController(graphicController: BaseGraphicController) {

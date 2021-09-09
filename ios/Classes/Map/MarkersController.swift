@@ -5,28 +5,27 @@
 import Foundation
 import ArcGIS
 
-class MarkersController: NSObject, BaseSymbolController {
+class MarkersController: NSObject, SymbolsController {
+
     private let workerQueue: DispatchQueue
     private var markerIdToController = Dictionary<String, MarkerController>()
     private let graphicsOverlays: AGSGraphicsOverlay
-    private let selectionPropertiesHandler: SelectionPropertiesHandler
-    private let symbolVisibilityFilterController: SymbolVisibilityFilterController
 
     private var selectedMarker: MarkerController?
 
     private let methodChannel: FlutterMethodChannel
 
+    var selectionPropertiesHandler: SelectionPropertiesHandler?
+
+    var symbolVisibilityFilterController: SymbolVisibilityFilterController?
+
     init(methodChannel: FlutterMethodChannel,
          graphicsOverlays: AGSGraphicsOverlay,
-         workerQueue: DispatchQueue,
-         selectionPropertiesHandler: SelectionPropertiesHandler,
-         symbolVisibilityFilterController: SymbolVisibilityFilterController
+         workerQueue: DispatchQueue
     ) {
         self.methodChannel = methodChannel
         self.graphicsOverlays = graphicsOverlays
         self.workerQueue = workerQueue
-        self.selectionPropertiesHandler = selectionPropertiesHandler
-        self.symbolVisibilityFilterController = symbolVisibilityFilterController
     }
 
 
@@ -34,12 +33,10 @@ class MarkersController: NSObject, BaseSymbolController {
         workerQueue.async { [self] in
             for marker in markersToAdd {
                 let markerId = marker["markerId"] as! String
-                let controller = MarkerController(markerId: markerId, selectionPropertiesHandler: selectionPropertiesHandler)
+                let controller = MarkerController(markerId: markerId)
+                controller.selectionPropertiesHandler = selectionPropertiesHandler
                 markerIdToController[markerId] = controller
                 updateMarker(data: marker, controller: controller)
-
-                addOrRemoveVisibilityFilter(symbolVisibilityFilterController: symbolVisibilityFilterController, graphicController: controller, data: marker)
-
                 controller.add(graphicsOverlay: graphicsOverlays)
             }
         }
@@ -53,7 +50,6 @@ class MarkersController: NSObject, BaseSymbolController {
                     continue
                 }
                 updateMarker(data: marker, controller: controller)
-                addOrRemoveVisibilityFilter(symbolVisibilityFilterController: symbolVisibilityFilterController, graphicController: controller, data: marker)
             }
         }
     }
@@ -64,7 +60,7 @@ class MarkersController: NSObject, BaseSymbolController {
                 guard let controller = markerIdToController[markerId] else {
                     continue
                 }
-                symbolVisibilityFilterController.removeGraphicsController(graphicController: controller)
+                symbolVisibilityFilterController?.removeGraphicsController(graphicController: controller)
                 controller.remove(graphicsOverlay: graphicsOverlays)
                 markerIdToController.removeValue(forKey: markerId)
             }
@@ -76,15 +72,13 @@ class MarkersController: NSObject, BaseSymbolController {
             return
         }
         selectedMarker.isSelected = false
-        symbolVisibilityFilterController.invalidate(graphicController: selectedMarker)
+        symbolVisibilityFilterController?.invalidate(graphicController: selectedMarker)
     }
 
     private func updateMarker(data: Dictionary<String, Any>,
                               controller: MarkerController) {
 
-        if let consumeTapEvents = data["consumeTapEvents"] as? Bool {
-            controller.consumeTapEvents = consumeTapEvents
-        }
+        updateController(controller: controller, data: data)
 
         if let position = data["position"] as? Dictionary<String, Any> {
             controller.geometry = AGSPoint(data: position)
@@ -108,23 +102,9 @@ class MarkersController: NSObject, BaseSymbolController {
             controller.setAngle(angle: Float(angle))
         }
 
-        if let visible = data["visible"] as? Bool {
-            if symbolVisibilityFilterController.containsGraphicController(graphicController: controller) {
-                symbolVisibilityFilterController.updateInitialVisibility(graphicController: controller, initValue: visible)
-            } else {
-                controller.isVisible = visible
-            }
-        }
-
-        if let zIndex = data["zIndex"] as? Int {
-            controller.zIndex = zIndex
-        }
-
         if let selectedScale = data["selectedScale"] as? Double {
             controller.setSelectedScale(selectedScale: CGFloat(selectedScale))
         }
-
-        controller.selectedColor = UIColor(data: data["selectedColor"])
     }
 }
 
@@ -153,7 +133,7 @@ extension MarkersController: MapGraphicTouchDelegate {
             }
             selectedMarker = currentMarker
             currentMarker.isSelected = true
-            symbolVisibilityFilterController.invalidate(graphicController: currentMarker)
+            symbolVisibilityFilterController?.invalidate(graphicController: currentMarker)
         }
         methodChannel.invokeMethod("marker#onTap", arguments: ["markerId": markerId])
         return true

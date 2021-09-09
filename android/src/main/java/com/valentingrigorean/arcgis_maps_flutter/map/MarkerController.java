@@ -8,7 +8,7 @@ import com.esri.arcgisruntime.symbology.MarkerSymbol;
 import com.esri.arcgisruntime.symbology.PictureMarkerSymbol;
 import com.esri.arcgisruntime.symbology.Symbol;
 
-public final class MarkerController extends BaseGraphicController {
+public final class MarkerController extends BaseGraphicController implements MarkerControllerSink {
     private final CompositeSymbol marker = new CompositeSymbol();
     private final Graphic graphic;
 
@@ -30,8 +30,7 @@ public final class MarkerController extends BaseGraphicController {
     private float selectedScale = 1.4f;
 
 
-    public MarkerController(Context context, String markerId, SelectionPropertiesHandler selectionPropertiesHandler) {
-        super(selectionPropertiesHandler);
+    public MarkerController(Context context, String markerId) {
         this.context = context;
         graphic = new Graphic();
         graphic.setSymbol(marker);
