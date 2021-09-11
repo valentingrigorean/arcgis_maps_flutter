@@ -5,15 +5,15 @@
 import Foundation
 import ArcGIS
 
+enum LayerType: Int, CaseIterable {
+    case operational = 0
+
+    case base = 1
+
+    case reference = 2
+}
+
 class LayersController {
-
-    enum LayerType: Int, CaseIterable {
-        case operational = 0
-
-        case base = 1
-
-        case reference = 2
-    }
 
     class SharedDictionary<K: Hashable, V> {
         var dict: Dictionary<K, V> = Dictionary()
@@ -86,6 +86,23 @@ class LayersController {
         if let layer = flutterReferenceLayersMap[layerId] {
             return layer
         }
+        return nil
+    }
+
+    public func getLayerIdByLayer(layer: AGSLayer) -> String? {
+
+        if let layerId = LayersController.findLayerIdByLayer(layer: layer, data: flutterOperationalLayersMap) {
+            return layerId
+        }
+
+        if let layerId = LayersController.findLayerIdByLayer(layer: layer, data: flutterBaseLayersMap) {
+            return layerId
+        }
+
+        if let layerId = LayersController.findLayerIdByLayer(layer: layer, data: flutterReferenceLayersMap) {
+            return layerId
+        }
+
         return nil
     }
 
@@ -323,6 +340,16 @@ class LayersController {
         case .reference:
             return flutterReferenceLayersMap
         }
+    }
+
+    private static func findLayerIdByLayer(layer: AGSLayer,
+                                           data: SharedDictionary<String, AGSLayer>) -> String? {
+        for (key, layer) in data.dict {
+            if layer == layer {
+                return key
+            }
+        }
+        return nil
     }
 
 }

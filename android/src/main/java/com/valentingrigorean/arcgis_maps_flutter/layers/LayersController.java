@@ -1,4 +1,6 @@
-package com.valentingrigorean.arcgis_maps_flutter.map;
+package com.valentingrigorean.arcgis_maps_flutter.layers;
+
+import androidx.annotation.Nullable;
 
 import com.esri.arcgisruntime.layers.Layer;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
@@ -15,9 +17,9 @@ import java.util.Set;
 import io.flutter.plugin.common.MethodChannel;
 
 
-class LayersController {
+public class LayersController implements MapChangeAware {
 
-    private enum LayerType {
+    public enum LayerType {
         OPERATIONAL,
         BASE,
         REFERENCE
@@ -39,7 +41,8 @@ class LayersController {
         this.methodChannel = methodChannel;
     }
 
-    public void setMap(ArcGISMap map) {
+    @Override
+    public void onMapChange(ArcGISMap map) {
         clearMap();
         this.map = map;
 
@@ -48,6 +51,7 @@ class LayersController {
         addLayersToMap(referenceLayers, LayerType.REFERENCE);
     }
 
+    @Nullable
     public Layer getLayerByLayerId(String id) {
         if (flutterOperationalLayersMap.containsKey(id)) {
             return flutterOperationalLayersMap.get(id);
@@ -58,6 +62,27 @@ class LayersController {
         if (flutterReferenceLayersMap.containsKey(id)) {
             return flutterReferenceLayersMap.get(id);
         }
+        return null;
+    }
+
+    @Nullable
+    public String getLayerIdByLayer(Layer layer) {
+
+        String layerId = findLayerIdByLayer(layer, flutterOperationalLayersMap);
+        if (layerId != null) {
+            return layerId;
+        }
+
+        layerId = findLayerIdByLayer(layer, flutterBaseLayersMap);
+        if (layerId != null) {
+            return layerId;
+        }
+
+        layerId = findLayerIdByLayer(layer, flutterReferenceLayersMap);
+        if (layerId != null) {
+            return layerId;
+        }
+
         return null;
     }
 
@@ -267,5 +292,16 @@ class LayersController {
         map.getOperationalLayers().removeAll(operationalLayersNative);
         map.getBasemap().getBaseLayers().removeAll(baseLayersNative);
         map.getBasemap().getReferenceLayers().removeAll(referenceLayersNative);
+    }
+
+    @Nullable
+    private static String findLayerIdByLayer(Layer layer, Map<String, Layer> data) {
+        for (final Map.Entry<String, Layer> entry : data.entrySet()) {
+            if (entry.getValue() == layer) {
+                return entry.getKey();
+            }
+        }
+
+        return null;
     }
 }

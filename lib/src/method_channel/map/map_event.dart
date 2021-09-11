@@ -100,12 +100,26 @@ class CameraMoveEvent extends MapEvent<void> {
   const CameraMoveEvent(int mapId) : super(mapId, null);
 }
 
-class ViewpointChangedListenerEvent extends MapEvent<void> {
-  const ViewpointChangedListenerEvent(int mapId) : super(mapId, null);
+class ViewpointChangedEvent extends MapEvent<void> {
+  const ViewpointChangedEvent(int mapId) : super(mapId, null);
+}
+
+class LayersChangedEvent extends MapEvent<LayerType> {
+  const LayersChangedEvent(
+    int mapId,
+    LayerType layerType,
+    this.layerChangeType,
+  ) : super(
+          mapId,
+          layerType,
+        );
+
+  final LayerChangeType layerChangeType;
 }
 
 class AutoPanModeChangedEvent extends MapEvent<AutoPanMode> {
-  const AutoPanModeChangedEvent(int mapId, AutoPanMode value) : super(mapId, value);
+  const AutoPanModeChangedEvent(int mapId, AutoPanMode value)
+      : super(mapId, value);
 }
 
 /// A `MapEvent` associated to a `position`.

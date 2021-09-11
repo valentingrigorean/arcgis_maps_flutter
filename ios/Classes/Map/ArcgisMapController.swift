@@ -22,6 +22,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private let scaleBarController: ScaleBarController
 
+    private let layersChangedController: LayersChangedController
 
     private var lastScreenPoint = CGPoint.zero
 
@@ -75,6 +76,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         layersController = LayersController(methodChannel: channel)
 
         scaleBarController = ScaleBarController(mapView: mapView)
+
+        layersChangedController = LayersChangedController(geoView: mapView, channel: channel, layersController: layersController)
 
         super.init()
 
@@ -137,6 +140,12 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         case "map#setViewpointChangedListenerEvents":
             if let val = call.arguments as? Bool {
                 trackViewpointChangedListenerEvent = val
+            }
+            result(nil)
+            break
+        case "map#setLayersChangedListener":
+            if let val = call.arguments as? Bool {
+                layersChangedController.trackLayersChange = val
             }
             result(nil)
             break

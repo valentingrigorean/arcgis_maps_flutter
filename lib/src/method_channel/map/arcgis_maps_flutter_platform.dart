@@ -78,6 +78,11 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
         'setViewpointChangedListenerEvents() has not been implemented.');
   }
 
+  Future<void> setLayersChangedListener(int mapId, bool value) {
+    throw UnimplementedError(
+        'setOperationLayersChangedListener() has not been implemented.');
+  }
+
   Future<bool> isLocationDisplayStarted(int mapId) {
     throw UnimplementedError(
         'isLocationDisplayStarted() has not been implemented.');
@@ -186,10 +191,16 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('onIdentifyLayers() has not been implemented.');
   }
 
-  Stream<ViewpointChangedListenerEvent> onViewpointChangedListener(
+  Stream<ViewpointChangedEvent> onViewpointChangedListener(
       {required int mapId}) {
     throw UnimplementedError(
         'onViewpointChangedListener() has not been implemented.');
+  }
+
+  Stream<LayersChangedEvent> onLayersChanged(
+      {required int mapId}) {
+    throw UnimplementedError(
+        'onLayersChanged() has not been implemented.');
   }
 
   void dispose(int mapId) {

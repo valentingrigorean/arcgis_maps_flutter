@@ -24,6 +24,10 @@ import com.esri.arcgisruntime.mapping.view.ViewpointChangedEvent;
 import com.esri.arcgisruntime.mapping.view.ViewpointChangedListener;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
 import com.valentingrigorean.arcgis_maps_flutter.LifecycleProvider;
+import com.valentingrigorean.arcgis_maps_flutter.layers.LayersChangedController;
+import com.valentingrigorean.arcgis_maps_flutter.layers.LayersController;
+import com.valentingrigorean.arcgis_maps_flutter.layers.LegendInfoController;
+import com.valentingrigorean.arcgis_maps_flutter.layers.MapChangeAware;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,8 +59,11 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
     private final ArrayList<LegendInfoController> legendInfoControllers = new ArrayList<>();
 
+    private final ArrayList<MapChangeAware> mapChangeAwares = new ArrayList<>();
+
     private final SymbolVisibilityFilterController symbolVisibilityFilterController;
 
+    private final LayersChangedController layersChangedController;
 
     @Nullable
     private MapView mapView;
@@ -101,9 +108,13 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
         symbolVisibilityFilterController = new SymbolVisibilityFilterController(mapView);
 
-        final GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
         layersController = new LayersController(methodChannel);
+        mapChangeAwares.add(layersController);
 
+        layersChangedController = new LayersChangedController(methodChannel, layersController);
+        mapChangeAwares.add(layersChangedController);
+
+        final GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
         markersController = new MarkersController(context, methodChannel, graphicsOverlay);
         symbolControllers.add(markersController);
 
@@ -114,6 +125,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         symbolControllers.add(polylinesController);
 
         initSymbolsControllers();
+
 
         mapViewOnTouchListener = new MapViewOnTouchListener(context, mapView, methodChannel);
         mapViewOnTouchListener.addGraphicDelegate(markersController);
@@ -149,6 +161,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
         disposed = true;
         symbolVisibilityFilterController.clear();
+
         methodChannel.setMethodCallHandler(null);
         destroyMapViewIfNecessary();
 
@@ -206,7 +219,12 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 result.success(null);
             }
             case "map#setViewpointChangedListenerEvents": {
-                trackViewpointChangedListenerEvent = Convert.toBoolean(call.arguments);
+                trackViewpointChangedListenerEvent = call.arguments();
+                result.success(null);
+            }
+            break;
+            case "map#setLayersChangedListener": {
+                layersChangedController.setTrackLayersChange(call.arguments());
                 result.success(null);
             }
             break;
@@ -376,6 +394,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         }
 
         clearSymbolsControllers();
+        clearMapAwareControllers();
 
         if (mapView == null) {
             return;
@@ -387,7 +406,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         mapView = null;
     }
 
-    private void initSymbolsControllers(){
+    private void initSymbolsControllers() {
         for (final SymbolsController controller :
                 symbolControllers) {
             controller.setSymbolVisibilityFilterController(symbolVisibilityFilterController);
@@ -395,11 +414,18 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         }
     }
 
-    private void clearSymbolsControllers(){
+    private void clearSymbolsControllers() {
         for (final SymbolsController controller :
                 symbolControllers) {
             controller.setSymbolVisibilityFilterController(null);
             controller.setSelectionPropertiesHandler(null);
+        }
+    }
+
+    private void clearMapAwareControllers() {
+        for (final MapChangeAware mapChangeAware :
+                mapChangeAwares) {
+            mapChangeAware.onMapChange(null);
         }
     }
 
@@ -425,7 +451,10 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             methodChannel.invokeMethod("map#loaded", null);
         });
         mapView.setMap(map);
-        layersController.setMap(map);
+        for (final MapChangeAware mapChangeAware :
+                mapChangeAwares) {
+            mapChangeAware.onMapChange(map);
+        }
     }
 
     private void updateMapOptions(Object args) {

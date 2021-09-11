@@ -1,4 +1,4 @@
-package com.valentingrigorean.arcgis_maps_flutter.map;
+package com.valentingrigorean.arcgis_maps_flutter.layers;
 
 import android.content.Context;
 import android.graphics.Bitmap;

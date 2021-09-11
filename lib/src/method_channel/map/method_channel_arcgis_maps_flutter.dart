@@ -190,7 +190,15 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   @override
   Future<void> setViewpointChangedListenerEvents(int mapId, bool value) {
     return channel(mapId).invokeMethod<void>(
-      "map#setViewpointChangedListenerEvents",
+      'map#setViewpointChangedListenerEvents',
+      value,
+    );
+  }
+
+  @override
+  Future<void> setLayersChangedListener(int mapId, bool value) {
+    return channel(mapId).invokeMethod<void>(
+      'map#setLayersChangedListener',
       value,
     );
   }
@@ -335,9 +343,14 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Stream<ViewpointChangedListenerEvent> onViewpointChangedListener(
+  Stream<ViewpointChangedEvent> onViewpointChangedListener(
       {required int mapId}) {
-    return _events(mapId).whereType<ViewpointChangedListenerEvent>();
+    return _events(mapId).whereType<ViewpointChangedEvent>();
+  }
+
+  @override
+  Stream<LayersChangedEvent> onLayersChanged({required int mapId}) {
+    return _events(mapId).whereType<LayersChangedEvent>();
   }
 
   // Returns a filtered view of the events in the _controller, by mapId.
@@ -348,10 +361,18 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
     switch (call.method) {
       case 'map#viewpointChanged':
         _mapEventStreamController.add(
-          ViewpointChangedListenerEvent(
+          ViewpointChangedEvent(
             mapId,
           ),
         );
+        break;
+      case 'map#onLayersChanged':
+        final LayersChangedEvent event = LayersChangedEvent(
+          mapId,
+          LayerType.values[call.arguments['layerType']!],
+          LayerChangeType.values[call.arguments['layerChangeType']!],
+        );
+        _mapEventStreamController.add(event);
         break;
       case 'map#autoPanModeChanged':
         _mapEventStreamController.add(
@@ -435,6 +456,8 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
           ));
         }
         _mapEventStreamController.add(IdentifyLayersEvent(mapId, results));
+        break;
+      case '':
         break;
       default:
         throw MissingPluginException();

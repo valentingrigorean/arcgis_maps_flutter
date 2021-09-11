@@ -3,8 +3,10 @@ part of arcgis_maps_flutter;
 class ArcgisMapController {
   final _ArcgisMapViewState _arcgisMapState;
   final List<ViewpointChangedListener> _viewpointChangedListeners = [];
+  final List<LayersChangedListener> _layersChangedListeners = [];
 
   bool _viewPointChangedWired = false;
+  bool _layersChangedWired = false;
 
   final int mapId;
 
@@ -49,6 +51,24 @@ class ArcgisMapController {
       _viewPointChangedWired = false;
       ArcgisMapsFlutterPlatform.instance
           .setViewpointChangedListenerEvents(mapId, false);
+    }
+  }
+
+  void addLayersChangedListener(LayersChangedListener listener) {
+    if (!_layersChangedListeners.contains(listener)) {
+      _layersChangedListeners.add(listener);
+    }
+    if (_layersChangedWired) return;
+    _layersChangedWired = true;
+    ArcgisMapsFlutterPlatform.instance.setLayersChangedListener(mapId, true);
+  }
+
+  void removeLayersChangedListener(LayersChangedListener listener) {
+    _layersChangedListeners.remove(listener);
+
+    if (_layersChangedWired && _layersChangedListeners.isEmpty) {
+      _layersChangedWired = false;
+      ArcgisMapsFlutterPlatform.instance.setLayersChangedListener(mapId, false);
     }
   }
 
@@ -190,9 +210,20 @@ class ArcgisMapController {
 
     ArcgisMapsFlutterPlatform.instance
         .onViewpointChangedListener(mapId: mapId)
-        .listen((ViewpointChangedListenerEvent event) {
+        .listen((ViewpointChangedEvent event) {
       for (final listener in _viewpointChangedListeners) {
         listener.viewpointChanged();
+      }
+    });
+
+    ArcgisMapsFlutterPlatform.instance
+        .onLayersChanged(mapId: mapId)
+        .listen((LayersChangedEvent event) {
+      for (final listener in _layersChangedListeners) {
+        listener.onLayersChanged(
+          event.value,
+          event.layerChangeType,
+        );
       }
     });
 

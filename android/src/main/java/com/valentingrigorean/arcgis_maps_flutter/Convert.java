@@ -36,7 +36,7 @@ import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
 import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
 import com.valentingrigorean.arcgis_maps_flutter.data.FieldTypeFlutter;
 import com.valentingrigorean.arcgis_maps_flutter.map.BitmapDescriptorFactory;
-import com.valentingrigorean.arcgis_maps_flutter.map.FlutterLayer;
+import com.valentingrigorean.arcgis_maps_flutter.layers.FlutterLayer;
 import com.valentingrigorean.arcgis_maps_flutter.map.GraphicControllerSink;
 import com.valentingrigorean.arcgis_maps_flutter.map.MarkerController;
 import com.valentingrigorean.arcgis_maps_flutter.map.PolygonController;
