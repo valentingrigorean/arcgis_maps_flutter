@@ -135,6 +135,10 @@ class ArcgisMapController {
   Future<double> getWanderExtentFactor() =>
       ArcgisMapsFlutterPlatform.instance.getWanderExtentFactor(mapId);
 
+  /// Return all time aware layers from Operational layers.
+  Future<List<TimeAwareLayerInfo>> getTimeAwareLayerInfos() =>
+      ArcgisMapsFlutterPlatform.instance.getTimeAwareLayerInfos(mapId);
+
   Future<void> _setMap(ArcGISMap map) {
     return ArcgisMapsFlutterPlatform.instance.setMap(mapId, map);
   }

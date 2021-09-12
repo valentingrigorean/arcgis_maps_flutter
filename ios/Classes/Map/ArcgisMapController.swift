@@ -155,6 +155,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         case "map#getWanderExtentFactor":
             result(mapView.locationDisplay.wanderExtentFactor)
             break
+        case "map#getTimeAwareLayerInfos":
+            handleTimeAwareLayerInfos(result: result)
+            break
         case "map#getCurrentViewpoint":
             let type = (call.arguments as! Int).toAGSViewpointType()
             let currentViewPoint = mapView.currentViewpoint(with: type)
@@ -268,6 +271,43 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         default:
             result(FlutterMethodNotImplemented)
             break
+        }
+    }
+
+    private func handleTimeAwareLayerInfos(result: @escaping FlutterResult) {
+        guard  let layers = mapView.map?.operationalLayers as AnyObject as? [AGSLayer], layers.count > 0 else {
+            result([])
+            return
+        }
+
+        AGSLoadObjects(layers) { [weak self] (loaded) in
+
+            guard loaded else {
+                result([])
+                return
+            }
+
+            guard let self = self else {
+                result([])
+                return
+            }
+
+            var timeAwareLayers = [AGSTimeAware]()
+
+            layers.forEach { (layer) in
+                guard let timeAwareLayer = layer as? AGSTimeAware else {
+                    return
+                }
+                timeAwareLayers.append(timeAwareLayer)
+            }
+
+            result(timeAwareLayers.map { (layer) -> Any in
+                var layerId: String?
+                if layer is AGSLayer {
+                    layerId = self.layersController.getLayerIdByLayer(layer: layer as! AGSLayer)
+                }
+                return layer.toJSONFlutter(layerId: layerId)
+            })
         }
     }
 

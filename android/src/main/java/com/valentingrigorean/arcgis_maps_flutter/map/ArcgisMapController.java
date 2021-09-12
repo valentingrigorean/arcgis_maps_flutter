@@ -13,9 +13,12 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
+import com.esri.arcgisruntime.arcgisservices.TimeAware;
 import com.esri.arcgisruntime.geometry.GeometryEngine;
 import com.esri.arcgisruntime.geometry.Point;
+import com.esri.arcgisruntime.layers.Layer;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
+import com.esri.arcgisruntime.mapping.LayerList;
 import com.esri.arcgisruntime.mapping.Viewpoint;
 import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
 import com.esri.arcgisruntime.mapping.view.LocationDisplay;
@@ -28,6 +31,7 @@ import com.valentingrigorean.arcgis_maps_flutter.layers.LayersChangedController;
 import com.valentingrigorean.arcgis_maps_flutter.layers.LayersController;
 import com.valentingrigorean.arcgis_maps_flutter.layers.LegendInfoController;
 import com.valentingrigorean.arcgis_maps_flutter.layers.MapChangeAware;
+import com.valentingrigorean.arcgis_maps_flutter.utils.AGSLoadObjects;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -252,6 +256,9 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 result.success(mapView.getLocationDisplay().getWanderExtentFactor());
             }
             break;
+            case "map#getTimeAwareLayerInfos":
+                handleTimeAwareLayerInfos(result);
+                break;
             case "map#getCurrentViewpoint": {
                 final Viewpoint currentViewPoint = mapView.getCurrentViewpoint(Convert.toViewpointType(call.arguments));
                 final String json = currentViewPoint.toJson();
@@ -404,6 +411,32 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         mapView.removeViewpointChangedListener(this);
         mapView.dispose();
         mapView = null;
+    }
+
+    private void handleTimeAwareLayerInfos(MethodChannel.Result result) {
+        final ArcGISMap map = mapView.getMap();
+        if (map == null || map.getOperationalLayers().size() == 0) {
+            result.success(new ArrayList<>());
+            return;
+        }
+
+        final LayerList layers = map.getOperationalLayers();
+
+        AGSLoadObjects.load(layers, (loaded -> {
+            if (!loaded) {
+                result.success(new ArrayList<>());
+                return;
+            }
+
+            final ArrayList<Object> results = new ArrayList<>();
+
+            for (final Layer layer : layers) {
+                if (layer instanceof TimeAware) {
+                    results.add(Convert.timeAwareToJson((TimeAware) layer, layersController.getLayerIdByLayer(layer)));
+                }
+            }
+            result.success(results);
+        }));
     }
 
     private void initSymbolsControllers() {

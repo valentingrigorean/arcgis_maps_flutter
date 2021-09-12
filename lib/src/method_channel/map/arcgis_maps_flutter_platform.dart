@@ -73,6 +73,11 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
         'getWanderExtentFactor() has not been implemented.');
   }
 
+  Future<List<TimeAwareLayerInfo>> getTimeAwareLayerInfos(int mapId) {
+    throw UnimplementedError(
+        'getTimeAwareLayerInfos() has not been implemented.');
+  }
+
   Future<void> setViewpointChangedListenerEvents(int mapId, bool value) {
     throw UnimplementedError(
         'setViewpointChangedListenerEvents() has not been implemented.');
@@ -197,10 +202,8 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
         'onViewpointChangedListener() has not been implemented.');
   }
 
-  Stream<LayersChangedEvent> onLayersChanged(
-      {required int mapId}) {
-    throw UnimplementedError(
-        'onLayersChanged() has not been implemented.');
+  Stream<LayersChangedEvent> onLayersChanged({required int mapId}) {
+    throw UnimplementedError('onLayersChanged() has not been implemented.');
   }
 
   void dispose(int mapId) {

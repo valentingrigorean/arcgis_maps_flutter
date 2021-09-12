@@ -15,11 +15,10 @@ extension AGSGeoElement {
             var value: Any? = nil
             switch flutterType {
             case .date:
-                let format = ISO8601DateFormatter()
                 if let date = attr.value as? Date {
-                    value = format.string(from: date)
+                    value = date.toIso8601String()
                 } else if let nsDate = attr.value as? NSDate {
-                    value = format.string(from: nsDate as Date)
+                    value = nsDate.toIso8601String()
                 } else {
                     value = nil
                 }

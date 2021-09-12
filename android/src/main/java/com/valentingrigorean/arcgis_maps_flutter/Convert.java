@@ -8,9 +8,11 @@ import android.icu.text.SimpleDateFormat;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.esri.arcgisruntime.UnitSystem;
+import com.esri.arcgisruntime.arcgisservices.TimeAware;
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.geometry.PointCollection;
 import com.esri.arcgisruntime.geometry.Polygon;
@@ -23,6 +25,8 @@ import com.esri.arcgisruntime.mapping.Basemap;
 import com.esri.arcgisruntime.mapping.ElevationSource;
 import com.esri.arcgisruntime.mapping.GeoElement;
 import com.esri.arcgisruntime.mapping.Surface;
+import com.esri.arcgisruntime.mapping.TimeExtent;
+import com.esri.arcgisruntime.mapping.TimeValue;
 import com.esri.arcgisruntime.mapping.Viewpoint;
 import com.esri.arcgisruntime.mapping.view.Camera;
 import com.esri.arcgisruntime.mapping.view.IdentifyLayerResult;
@@ -35,8 +39,8 @@ import com.esri.arcgisruntime.security.UserCredential;
 import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
 import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
 import com.valentingrigorean.arcgis_maps_flutter.data.FieldTypeFlutter;
-import com.valentingrigorean.arcgis_maps_flutter.map.BitmapDescriptorFactory;
 import com.valentingrigorean.arcgis_maps_flutter.layers.FlutterLayer;
+import com.valentingrigorean.arcgis_maps_flutter.map.BitmapDescriptorFactory;
 import com.valentingrigorean.arcgis_maps_flutter.map.GraphicControllerSink;
 import com.valentingrigorean.arcgis_maps_flutter.map.MarkerController;
 import com.valentingrigorean.arcgis_maps_flutter.map.PolygonController;
@@ -440,6 +444,58 @@ public class Convert {
     }
 
 
+    public static Object timeAwareToJson(TimeAware timeAware, String layerId) {
+        final Map<String, Object> json = new HashMap<>(6);
+        if (layerId != null) {
+            json.put("layerId", layerId);
+        }
+        if (timeAware.getFullTimeExtent() != null) {
+            final Object fullTimeExtentData = timeExtentToJson(timeAware.getFullTimeExtent());
+            if (fullTimeExtentData != null) {
+                json.put("fullTimeExtent", fullTimeExtentData);
+            }
+        }
+
+        json.put("supportsTimeFiltering", timeAware.isTimeFilteringSupported());
+        json.put("isTimeFilteringEnabled", timeAware.isTimeFilteringEnabled());
+
+        if (timeAware.getTimeOffset() != null) {
+            json.put("timeOffset", timeValueToJson(timeAware.getTimeOffset()));
+        }
+
+        if (timeAware.getTimeInterval() != null) {
+            json.put("timeInterval", timeValueToJson(timeAware.getTimeInterval()));
+        }
+
+        return json;
+    }
+
+
+    @Nullable
+    public static Object timeExtentToJson(TimeExtent timeExtent) {
+        if (timeExtent.getStartTime() == null && timeExtent.getEndTime() == null) {
+            return null;
+        }
+        final Map<Object, Object> json = new HashMap<>(2);
+        if (timeExtent.getStartTime() != null) {
+            json.put("startTime", ISO8601Format.format(timeExtent.getStartTime().getTime()));
+        }
+        if (timeExtent.getEndTime() != null) {
+            json.put("endTime", ISO8601Format.format(timeExtent.getEndTime().getTime()));
+        }
+        return json;
+    }
+
+    @NonNull
+    public static Object timeValueToJson(TimeValue timeValue) {
+        final Map<Object, Object> json = new HashMap<>(2);
+        json.put("duration", timeValue.getDuration());
+        json.put("unit", timeValue.getTimeUnit().ordinal());
+        return json;
+    }
+
+
+    @Nullable
     public static Object markerIdToJson(String markerId) {
         if (markerId == null) {
             return null;
@@ -449,6 +505,7 @@ public class Convert {
         return data;
     }
 
+    @Nullable
     public static Object polygonIdToJson(String polygonId) {
         if (polygonId == null) {
             return null;
@@ -458,6 +515,7 @@ public class Convert {
         return data;
     }
 
+    @Nullable
     public static Object polylineIdToJson(String polylineId) {
         if (polylineId == null) {
             return null;
@@ -467,6 +525,7 @@ public class Convert {
         return data;
     }
 
+    @NonNull
     public static ScreenLocationData toScreenLocationData(Context context, Object o) {
         final Map<?, ?> data = toMap(o);
         final List<?> points = toList(data.get("position"));
@@ -476,6 +535,7 @@ public class Convert {
         return new ScreenLocationData(new android.graphics.Point(dpToPixelsI(context, x), dpToPixelsI(context, y)), spatialReferences);
     }
 
+    @Nullable
     public static Object identifyLayerResultToJson(IdentifyLayerResult layerResult) {
         if (layerResult == null) {
             return null;
@@ -522,7 +582,7 @@ public class Convert {
         if (visible != null) {
             final Object visibilityFilter = data.get("visibilityFilter");
             if (symbolVisibilityFilterController != null && visibilityFilter != null) {
-                    symbolVisibilityFilterController.addGraphicsController(controller, toSymbolVisibilityFilter(visibilityFilter), toBoolean(visible));
+                symbolVisibilityFilterController.addGraphicsController(controller, toSymbolVisibilityFilter(visibilityFilter), toBoolean(visible));
             } else {
                 controller.setVisible(toBoolean(visible));
             }

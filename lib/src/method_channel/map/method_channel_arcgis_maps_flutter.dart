@@ -188,6 +188,16 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
+  Future<List<TimeAwareLayerInfo>> getTimeAwareLayerInfos(int mapId) async {
+    final result =
+        await channel(mapId).invokeListMethod('map#getTimeAwareLayerInfos');
+    return result
+            ?.map<TimeAwareLayerInfo>((e) => TimeAwareLayerInfo.fromJson(e))
+            .toList() ??
+        const [];
+  }
+
+  @override
   Future<void> setViewpointChangedListenerEvents(int mapId, bool value) {
     return channel(mapId).invokeMethod<void>(
       'map#setViewpointChangedListenerEvents',

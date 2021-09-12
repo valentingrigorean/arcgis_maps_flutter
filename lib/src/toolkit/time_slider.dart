@@ -1,5 +1,16 @@
 part of arcgis_maps_flutter;
 
+class TimeSliderController extends ChangeNotifier {
+  TimeExtent? _currentExtent;
+
+  TimeExtent? get currentExtent => _currentExtent;
+
+  set currentExtent(TimeExtent? value) {
+    _currentExtent = value;
+    notifyListeners();
+  }
+}
+
 class TimeSlider extends StatefulWidget {
   const TimeSlider({
     Key? key,
