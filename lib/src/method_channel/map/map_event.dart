@@ -117,6 +117,11 @@ class LayersChangedEvent extends MapEvent<LayerType> {
   final LayerChangeType layerChangeType;
 }
 
+class TimeExtentChangedEvent extends MapEvent<TimeExtent?> {
+  const TimeExtentChangedEvent(int mapId, TimeExtent? value)
+      : super(mapId, value);
+}
+
 class AutoPanModeChangedEvent extends MapEvent<AutoPanMode> {
   const AutoPanModeChangedEvent(int mapId, AutoPanMode value)
       : super(mapId, value);

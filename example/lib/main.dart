@@ -6,6 +6,7 @@ import 'package:arcgis_maps_flutter_example/map_page_layers_change.dart';
 import 'package:arcgis_maps_flutter_example/map_page_legend.dart';
 import 'package:arcgis_maps_flutter_example/map_page_marker_rotation.dart';
 import 'package:arcgis_maps_flutter_example/map_page_markers_visibility_filter.dart';
+import 'package:arcgis_maps_flutter_example/map_page_polygon.dart';
 import 'package:arcgis_maps_flutter_example/map_page_scalerbar.dart';
 import 'package:arcgis_maps_flutter_example/map_page_screen_location.dart';
 import 'package:arcgis_maps_flutter_example/map_page_time_slider.dart';
@@ -88,6 +89,17 @@ class MainPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => MapPageLegend(),
+                    ),
+                  );
+                },
+              ),
+              ElevatedButton(
+                child: Text('Map Page Polygon'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MapPagePolygon(),
                     ),
                   );
                 },

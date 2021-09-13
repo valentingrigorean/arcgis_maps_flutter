@@ -9,32 +9,11 @@ class PolygonController : BaseGraphicController {
     private let polygonSymbol: AGSSimpleFillSymbol
     private let polygonStrokeSymbol: AGSSimpleLineSymbol
 
-    private weak var graphicsOverlay: AGSGraphicsOverlay?
 
-    var consumeTabEvent = false
-
-    init(graphicsOverlay: AGSGraphicsOverlay,
-         polygonId: String) {
-        self.graphicsOverlay = graphicsOverlay
+    init(polygonId: String) {
         polygonStrokeSymbol = AGSSimpleLineSymbol(style: .solid, color: UIColor.black, width: 10)
         polygonSymbol = AGSSimpleFillSymbol(style: .solid, color: UIColor.black, outline: polygonStrokeSymbol)
-
         super.init(graphics: AGSGraphic(geometry: nil, symbol: polygonSymbol, attributes: ["polygonId": polygonId]))
-    }
-
-    func add() {
-        guard let graphicsOverlay = graphicsOverlay else {
-            return
-        }
-        graphicsOverlay.graphics.add(graphics)
-    }
-
-    func remove() {
-        guard let graphicsOverlay = graphicsOverlay else {
-            return
-        }
-
-        graphicsOverlay.graphics.remove(graphics)
     }
 
     func setVisible(visible: Bool) {

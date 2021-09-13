@@ -32,10 +32,10 @@ class PolygonsController: NSObject, SymbolsController {
         workerQueue.async { [self] in
             for polygon in polygonsToAdd {
                 let polygonId = polygon["polygonId"] as! String
-                let controller = PolygonController(graphicsOverlay: graphicsOverlays, polygonId: polygonId)
+                let controller = PolygonController(polygonId: polygonId)
                 polygonIdToController[polygonId] = controller
                 updatePolygon(data: polygon, controller: controller)
-                controller.add()
+                controller.add(graphicsOverlay: graphicsOverlays)
             }
         }
     }
@@ -59,7 +59,7 @@ class PolygonsController: NSObject, SymbolsController {
                     continue
                 }
                 symbolVisibilityFilterController?.removeGraphicsController(graphicController: controller)
-                controller.remove()
+                controller.remove(graphicsOverlay: graphicsOverlays)
                 polygonIdToController.removeValue(forKey: polygonId)
             }
         }
@@ -96,7 +96,7 @@ extension PolygonsController: MapGraphicTouchDelegate {
 
     func canConsumeTaps() -> Bool {
         for (_, controller) in polygonIdToController {
-            if controller.consumeTabEvent {
+            if controller.consumeTapEvents {
                 return true
             }
         }
@@ -108,7 +108,7 @@ extension PolygonsController: MapGraphicTouchDelegate {
             return false
         }
         if let currentPolygon = polygonIdToController[polygonId] {
-            guard currentPolygon.consumeTabEvent else {
+            guard currentPolygon.consumeTapEvents else {
                 return false
             }
             methodChannel.invokeMethod("polygon#onTap", arguments: ["polygonId": polygonId])

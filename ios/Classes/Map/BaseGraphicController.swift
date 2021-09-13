@@ -87,6 +87,4 @@ class BaseGraphicController: GraphicController {
             graphics.zIndex = newValue
         }
     }
-
-
 }

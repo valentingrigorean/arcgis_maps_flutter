@@ -8,30 +8,9 @@ import ArcGIS
 class PolylineController: BaseGraphicController {
     private let polylineSymbol: AGSSimpleLineSymbol
 
-    private weak var graphicsOverlay: AGSGraphicsOverlay?
-
-    var consumeTabEvent = false
-
-    init(graphicsOverlay: AGSGraphicsOverlay,
-         polylineId: String) {
-        self.graphicsOverlay = graphicsOverlay
+    init(polylineId: String) {
         polylineSymbol = AGSSimpleLineSymbol(style: .solid, color: UIColor.black, width: 10)
         super.init(graphics: AGSGraphic(geometry: nil, symbol: polylineSymbol, attributes: ["polylineId": polylineId]))
-    }
-
-    func add() {
-        guard let graphicsOverlay = graphicsOverlay else {
-            return
-        }
-        graphicsOverlay.graphics.add(graphics)
-    }
-
-    func remove() {
-        guard let graphicsOverlay = graphicsOverlay else {
-            return
-        }
-
-        graphicsOverlay.graphics.remove(graphics)
     }
 
     func setVisible(visible: Bool) {

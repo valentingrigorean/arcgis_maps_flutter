@@ -88,6 +88,12 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
         'setOperationLayersChangedListener() has not been implemented.');
   }
 
+
+  Future<void> setTimeExtentChanged(int mapId, bool register) {
+    throw UnimplementedError(
+        'setOperationLayersChangedListener() has not been implemented.');
+  }
+
   Future<bool> isLocationDisplayStarted(int mapId) {
     throw UnimplementedError(
         'isLocationDisplayStarted() has not been implemented.');
@@ -206,7 +212,12 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('onLayersChanged() has not been implemented.');
   }
 
+  Stream<TimeExtentChangedEvent> onTimeExtentChanged(int mapId) {
+    throw UnimplementedError('onTimeExtentChanged() has not been implemented.');
+  }
+
   void dispose(int mapId) {
     throw UnimplementedError('dispose() has not been implemented.');
   }
+
 }

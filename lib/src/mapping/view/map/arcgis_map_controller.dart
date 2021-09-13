@@ -2,12 +2,21 @@ part of arcgis_maps_flutter;
 
 class ArcgisMapController {
   final _ArcgisMapViewState _arcgisMapState;
-  final List<ViewpointChangedListener> _viewpointChangedListeners = [];
-  final List<LayersChangedListener> _layersChangedListeners = [];
-
-  bool _viewPointChangedWired = false;
-  bool _layersChangedWired = false;
-
+  late final _EventBaseHandler<ViewpointChangedListener>
+      _viewpointChangedHandlers = _EventBaseHandler((register) {
+    ArcgisMapsFlutterPlatform.instance
+        .setViewpointChangedListenerEvents(mapId, register);
+  });
+  late final _EventBaseHandler<LayersChangedListener> _layersChangedHandlers =
+      _EventBaseHandler((register) {
+    ArcgisMapsFlutterPlatform.instance
+        .setLayersChangedListener(mapId, register);
+  });
+  late final _EventBaseHandler<TimeExtentChangedListener>
+      _timeExtentChangedHandlers = _EventBaseHandler((register) {
+    ArcgisMapsFlutterPlatform.instance
+        .setTimeExtentChanged(mapId, register);
+  });
   final int mapId;
 
   ArcgisMapController._(this._arcgisMapState, this.mapId) {
@@ -36,40 +45,27 @@ class ArcgisMapController {
   }
 
   void addViewpointChangedListener(ViewpointChangedListener listener) {
-    if (!_viewpointChangedListeners.contains(listener)) {
-      _viewpointChangedListeners.add(listener);
-    }
-    if (_viewPointChangedWired) return;
-    _viewPointChangedWired = true;
-    ArcgisMapsFlutterPlatform.instance
-        .setViewpointChangedListenerEvents(mapId, true);
+    _viewpointChangedHandlers.addHandler(listener);
   }
 
   void removeViewpointChangedListener(ViewpointChangedListener listener) {
-    _viewpointChangedListeners.remove(listener);
-    if (_viewPointChangedWired && _viewpointChangedListeners.isEmpty) {
-      _viewPointChangedWired = false;
-      ArcgisMapsFlutterPlatform.instance
-          .setViewpointChangedListenerEvents(mapId, false);
-    }
+    _viewpointChangedHandlers.removeHandler(listener);
   }
 
   void addLayersChangedListener(LayersChangedListener listener) {
-    if (!_layersChangedListeners.contains(listener)) {
-      _layersChangedListeners.add(listener);
-    }
-    if (_layersChangedWired) return;
-    _layersChangedWired = true;
-    ArcgisMapsFlutterPlatform.instance.setLayersChangedListener(mapId, true);
+    _layersChangedHandlers.addHandler(listener);
   }
 
   void removeLayersChangedListener(LayersChangedListener listener) {
-    _layersChangedListeners.remove(listener);
+    _layersChangedHandlers.removeHandler(listener);
+  }
 
-    if (_layersChangedWired && _layersChangedListeners.isEmpty) {
-      _layersChangedWired = false;
-      ArcgisMapsFlutterPlatform.instance.setLayersChangedListener(mapId, false);
-    }
+  void addTimeExtentChangedListener(TimeExtentChangedListener listener) {
+    _timeExtentChangedHandlers.addHandler(listener);
+  }
+
+  void removeTimeExtentChangedListener(TimeExtentChangedListener listener) {
+    _timeExtentChangedHandlers.removeHandler(listener);
   }
 
   /// Indicates whether the location display is active or not.
@@ -138,6 +134,11 @@ class ArcgisMapController {
   /// Return all time aware layers from Operational layers.
   Future<List<TimeAwareLayerInfo>> getTimeAwareLayerInfos() =>
       ArcgisMapsFlutterPlatform.instance.getTimeAwareLayerInfos(mapId);
+
+  Stream<TimeExtent?> onTimeExtentChanged() =>
+      ArcgisMapsFlutterPlatform.instance
+          .onTimeExtentChanged(mapId)
+          .map((e) => e.value);
 
   Future<void> _setMap(ArcGISMap map) {
     return ArcgisMapsFlutterPlatform.instance.setMap(mapId, map);
@@ -215,7 +216,7 @@ class ArcgisMapController {
     ArcgisMapsFlutterPlatform.instance
         .onViewpointChangedListener(mapId: mapId)
         .listen((ViewpointChangedEvent event) {
-      for (final listener in _viewpointChangedListeners) {
+      for (final listener in _viewpointChangedHandlers.handlers) {
         listener.viewpointChanged();
       }
     });
@@ -223,7 +224,7 @@ class ArcgisMapController {
     ArcgisMapsFlutterPlatform.instance
         .onLayersChanged(mapId: mapId)
         .listen((LayersChangedEvent event) {
-      for (final listener in _layersChangedListeners) {
+      for (final listener in _layersChangedHandlers.handlers) {
         listener.onLayersChanged(
           event.value,
           event.layerChangeType,
@@ -242,5 +243,38 @@ class ArcgisMapController {
 
     ArcgisMapsFlutterPlatform.instance.onIdentifyLayers(mapId: mapId).listen(
         (IdentifyLayersEvent e) => _arcgisMapState.onIdentifyLayers(e.results));
+  }
+}
+
+typedef void _RegisterHandlerCallback(bool register);
+
+class _EventBaseHandler<T> {
+  final List<T> _handlers = [];
+
+  bool _isWired = false;
+
+  _EventBaseHandler(this.registerHandlerCallback);
+
+  final _RegisterHandlerCallback registerHandlerCallback;
+
+  List<T> get handlers => List.unmodifiable(_handlers);
+
+  void addHandler(T handler) {
+    if (!_handlers.contains(handler)) {
+      _handlers.add(handler);
+    }
+    if (_isWired) {
+      return;
+    }
+    _isWired = true;
+    registerHandlerCallback(true);
+  }
+
+  void removeHandler(T handler) {
+    _handlers.remove(handler);
+    if (_isWired && _handlers.isEmpty) {
+      _isWired = false;
+      registerHandlerCallback(false);
+    }
   }
 }

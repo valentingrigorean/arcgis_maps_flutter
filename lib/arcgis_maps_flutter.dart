@@ -63,6 +63,7 @@ part 'src/mapping/arcgis_map.dart';
 part 'src/mapping/view/auto_pan_mode.dart';
 part 'src/mapping/view/identify_layer_result.dart';
 part 'src/mapping/view/layers_changed_listener.dart';
+part 'src/mapping/view/time_extent_changed_listener.dart';
 part 'src/mapping/view/viewpoint_changed_listener.dart';
 
 part 'src/portal/portal.dart';

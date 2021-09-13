@@ -31,10 +31,10 @@ class PolylinesController: NSObject, SymbolsController {
         workerQueue.async { [self] in
             for polyline in polylinesToAdd {
                 let polylineId = polyline["polylineId"] as! String
-                let controller = PolylineController(graphicsOverlay: graphicsOverlays, polylineId: polylineId)
+                let controller = PolylineController(polylineId: polylineId)
                 polylineIdToController[polylineId] = controller
                 updatePolyline(data: polyline, controller: controller)
-                controller.add()
+                controller.add(graphicsOverlay: graphicsOverlays)
             }
         }
 
@@ -58,7 +58,7 @@ class PolylinesController: NSObject, SymbolsController {
                 guard let controller = polylineIdToController[polylineId] else {
                     continue
                 }
-                controller.remove()
+                controller.remove(graphicsOverlay: graphicsOverlays)
                 polylineIdToController.removeValue(forKey: polylineId)
             }
         }
@@ -100,7 +100,7 @@ extension PolylinesController: MapGraphicTouchDelegate {
 
     func canConsumeTaps() -> Bool {
         for (_, controller) in polylineIdToController {
-            if controller.consumeTabEvent {
+            if controller.consumeTapEvents {
                 return true
             }
         }
@@ -112,7 +112,7 @@ extension PolylinesController: MapGraphicTouchDelegate {
             return false
         }
         if let currentPolyline = polylineIdToController[polylineId] {
-            guard currentPolyline.consumeTabEvent else {
+            guard currentPolyline.consumeTapEvents else {
                 return false
             }
             methodChannel.invokeMethod("polyline#onTap", arguments: ["polylineId": polylineId])
