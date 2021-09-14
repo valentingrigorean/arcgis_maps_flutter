@@ -5,8 +5,17 @@
 import Foundation
 import ArcGIS
 
-struct FlutterLayer: Hashable {
+struct ServiceImageTiledLayerOptions: Hashable {
+    let tileInfo: AGSTileInfo
+    let fullExtent: AGSEnvelope
 
+    let urlTemplate: String
+    let subdomains: [String]
+
+    let additionalOptions: Dictionary<String, String>
+}
+
+struct FlutterLayer: Hashable {
 
     init(data: Dictionary<String, Any>) {
         layerId = data["layerId"] as! String
@@ -23,6 +32,18 @@ struct FlutterLayer: Hashable {
         }
 
         layersName = data["layersName"] as? [String]
+
+        if layerType == "ServiceImageTiledLayer" {
+            serviceImageTiledLayerOptions = ServiceImageTiledLayerOptions(
+                    tileInfo: AGSTileInfo(data: data["tileInfo"] as! Dictionary<String, Any>),
+                    fullExtent: AGSEnvelope(data: data["fullExtent"] as! Dictionary<String, Any>),
+                    urlTemplate: data["url"] as! String,
+                    subdomains: data["subdomains"] as! [String],
+                    additionalOptions: data["additionalOptions"] as! Dictionary<String, String>
+            )
+        } else {
+            serviceImageTiledLayerOptions = nil
+        }
     }
 
     let layerId: String
@@ -33,4 +54,6 @@ struct FlutterLayer: Hashable {
     let layersName: [String]?
 
     let credential: AGSCredential?
+
+    let serviceImageTiledLayerOptions: ServiceImageTiledLayerOptions?
 }

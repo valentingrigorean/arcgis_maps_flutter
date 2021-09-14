@@ -2,6 +2,7 @@ import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:arcgis_maps_flutter_example/map_page.dart';
 import 'package:arcgis_maps_flutter_example/map_page_assets_marker.dart';
 import 'package:arcgis_maps_flutter_example/map_page_auto_pan_mode.dart';
+import 'package:arcgis_maps_flutter_example/map_page_dynamic_layer.dart';
 import 'package:arcgis_maps_flutter_example/map_page_layers_change.dart';
 import 'package:arcgis_maps_flutter_example/map_page_legend.dart';
 import 'package:arcgis_maps_flutter_example/map_page_marker_rotation.dart';
@@ -89,6 +90,17 @@ class MainPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => MapPageLegend(),
+                    ),
+                  );
+                },
+              ),
+              ElevatedButton(
+                child: Text('Map Dynamic Layer'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MapPageDynamicLayer(),
                     ),
                   );
                 },

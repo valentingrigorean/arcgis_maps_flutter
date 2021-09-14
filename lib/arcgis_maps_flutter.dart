@@ -26,9 +26,13 @@ import 'package:arcgis_maps_flutter/src/method_channel/scene/arcgis_scene_flutte
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
-
 part 'src/arcgis_error.dart';
 part 'src/arcgis_runtime_environment.dart';
+
+part 'src/arcgisservices/level_of_detail.dart';
+part 'src/arcgisservices/tile_info.dart';
+
+part 'src/data/tile_key.dart';
 
 part 'src/geometry/ags_polygon.dart';
 part 'src/geometry/ags_polyline.dart';
@@ -39,6 +43,7 @@ part 'src/geometry/geometry.dart';
 
 
 part 'src/layers/layer.dart';
+part 'src/layers/service_image_tiled_layer.dart';
 part 'src/layers/feature_layer.dart';
 part 'src/layers/legend_info.dart';
 part 'src/layers/legend_info_result.dart';

@@ -20,8 +20,6 @@ abstract class BaseTileLayer<T> extends Layer {
 
   final Credential? credential;
 
-  @override
-  LayerId get mapsId => layerId;
 
   @override
   Map<String, Object> toJson() {

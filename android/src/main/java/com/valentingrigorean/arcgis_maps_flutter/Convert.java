@@ -12,7 +12,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.esri.arcgisruntime.UnitSystem;
+import com.esri.arcgisruntime.arcgisservices.LevelOfDetail;
+import com.esri.arcgisruntime.arcgisservices.TileInfo;
 import com.esri.arcgisruntime.arcgisservices.TimeAware;
+import com.esri.arcgisruntime.geometry.Envelope;
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.geometry.PointCollection;
 import com.esri.arcgisruntime.geometry.Polygon;
@@ -56,6 +59,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Convert {
     private static final SimpleDateFormat ISO8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
@@ -257,6 +261,48 @@ public class Convert {
 
 
         return new ArcGISMap();
+    }
+
+    public static FlutterLayer.ServiceImageTiledLayerOptions toServiceImageTiledLayerOptions(Object o) {
+        final Map<?, ?> data = toMap(o);
+
+        return new FlutterLayer.ServiceImageTiledLayerOptions(
+                toTileInfo(data.get("tileInfo")),
+                toEnvelop(data.get("fullExtent")),
+                data.get("url").toString(),
+                (List<String>) data.get("subdomains"),
+                (Map<String, String>) data.get("additionalOptions")
+        );
+    }
+
+    public static TileInfo toTileInfo(Object o) {
+        final Map<?, ?> data = toMap(o);
+        final int dpi = toInt(data.get("dpi"));
+        final int imageFormat = toInt(data.get("imageFormat"));
+        final List<LevelOfDetail> levelOfDetails = toList(data.get("levelOfDetails")).stream().map(e -> toLevelOfDetail(e)).collect(Collectors.toList());
+        final Point origin = toPoint(data.get("origin"));
+        final SpatialReference spatialReference = toSpatialReference(data.get("spatialReference"));
+        final int tileHeight = toInt(data.get("tileHeight"));
+        final int tileWidth = toInt(data.get("tileWidth"));
+        return new TileInfo(dpi, TileInfo.ImageFormat.values()[imageFormat], levelOfDetails, origin, spatialReference, tileHeight, tileWidth);
+    }
+
+    public static LevelOfDetail toLevelOfDetail(Object o) {
+        final List<?> data = toList(o);
+        return new LevelOfDetail(toInt(data.get(0)), toDouble(data.get(1)), toDouble(data.get(2)));
+    }
+
+    public static Envelope toEnvelop(Object o) {
+        final Map<?, ?> data = toMap(o);
+
+        final List<?> bbox = toList(data.get("bbox"));
+
+        final SpatialReference spatialReference = toSpatialReference(data.get("spatialReference"));
+
+        if (bbox.size() == 4) {
+            return new Envelope(toDouble(bbox.get(0)), toDouble(bbox.get(1)), toDouble(bbox.get(2)), toDouble(bbox.get(3)), spatialReference);
+        }
+        throw new UnsupportedOperationException("Not implemented!");
     }
 
     public static void interpretMapViewOptions(Object o, MapView mapView) {

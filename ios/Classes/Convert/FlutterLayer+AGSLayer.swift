@@ -34,6 +34,15 @@ extension FlutterLayer {
             wmsLayer.credential = credential
             setupDefaultParams(layer: wmsLayer)
             return wmsLayer
+        case "ServiceImageTiledLayer":
+            let layer = FlutterServiceImageTiledLayer(
+                    tileInfo: serviceImageTiledLayerOptions!.tileInfo,
+                    fullExtent: serviceImageTiledLayerOptions!.fullExtent,
+                    urlTemplate: serviceImageTiledLayerOptions!.urlTemplate,
+                    subdomains: serviceImageTiledLayerOptions!.subdomains,
+                    additionalOptions: serviceImageTiledLayerOptions!.additionalOptions)
+            setupDefaultParams(layer: layer)
+            return layer
         default:
             fatalError("Not implemented.")
         }

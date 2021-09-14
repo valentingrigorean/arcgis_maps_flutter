@@ -12,6 +12,9 @@ abstract class Layer extends MapsObject<Layer> {
     required this.layerId,
   });
 
+  @override
+  LayerId get mapsId => layerId;
+
   final bool isVisible;
   final double opacity;
   final LayerId layerId;
