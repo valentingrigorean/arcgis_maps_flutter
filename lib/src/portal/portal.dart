@@ -2,7 +2,7 @@ part of arcgis_maps_flutter;
 
 @immutable
 class Portal {
-  Portal({
+  const Portal({
     required this.postalUrl,
     required this.loginRequired,
     this.credential,

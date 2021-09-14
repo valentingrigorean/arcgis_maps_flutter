@@ -246,7 +246,7 @@ class ArcgisMapController {
   }
 }
 
-typedef void _RegisterHandlerCallback(bool register);
+typedef _RegisterHandlerCallback = void Function(bool register);
 
 class _EventBaseHandler<T> {
   final List<T> _handlers = [];

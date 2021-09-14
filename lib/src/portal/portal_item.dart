@@ -2,7 +2,7 @@ part of arcgis_maps_flutter;
 
 @immutable
 class PortalItem {
-  PortalItem({
+  const PortalItem({
     required this.portal,
     required this.itemId,
   });

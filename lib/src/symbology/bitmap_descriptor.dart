@@ -69,13 +69,13 @@ abstract class _BitmapDescriptorBase {
 
 @immutable
 class _BitmapDescriptorRaw implements _BitmapDescriptorBase {
-  _BitmapDescriptorRaw({required this.byteData});
+  const _BitmapDescriptorRaw({required this.byteData});
 
   final Uint8List byteData;
 
   @override
   Object toJson() {
-    final json = Map<String, Object>();
+    final json = <String, Object>{};
     json['fromBytes'] = byteData;
     return json;
   }
@@ -108,7 +108,7 @@ class _BitmapDescriptorNative implements _BitmapDescriptorBase {
 
   @override
   Object toJson() {
-    final json = Map<String, Object>();
+    final json = <String, Object>{};
     json['fromNativeAsset'] = fileName;
     json['width'] = width;
     json['height'] = height;
@@ -135,13 +135,13 @@ class _BitmapDescriptorNative implements _BitmapDescriptorBase {
 
 @immutable
 class _ListBitmapDescriptor implements _BitmapDescriptorBase {
-  _ListBitmapDescriptor(this.descriptors);
+  const _ListBitmapDescriptor(this.descriptors);
 
   final List<BitmapDescriptor> descriptors;
 
   @override
   Object toJson() {
-    final json = Map<String, Object>();
+    final json = <String, Object>{};
     json['descriptors'] = descriptors.map((e) => e.toJson()).toList();
     return json;
   }
@@ -159,7 +159,7 @@ class _ListBitmapDescriptor implements _BitmapDescriptorBase {
 
 @immutable
 class _SimpleStyleMarkerBitmapDescriptor implements _BitmapDescriptorBase {
-  _SimpleStyleMarkerBitmapDescriptor(this.style, this.color, this.size);
+  const _SimpleStyleMarkerBitmapDescriptor(this.style, this.color, this.size);
 
   final SimpleMarkerSymbolStyle style;
   final Color color;
@@ -167,7 +167,7 @@ class _SimpleStyleMarkerBitmapDescriptor implements _BitmapDescriptorBase {
 
   @override
   Object toJson() {
-    final json = Map<String, Object>();
+    final json = <String, Object>{};
     json['styleMarker'] = style.index;
     json['color'] = color.value;
     json['size'] = size;

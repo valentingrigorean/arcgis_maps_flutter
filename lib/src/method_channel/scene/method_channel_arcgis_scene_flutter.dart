@@ -16,6 +16,7 @@ class UnknownSceneIDError extends Error {
   /// Message describing the assertion error.
   final Object? message;
 
+  @override
   String toString() {
     if (message != null) {
       return "Unknown map ID $sceneId: ${Error.safeToString(message)}";
@@ -70,17 +71,20 @@ class MethodChannelArcgisSceneFlutter extends ArcgisSceneFlutterPlatform {
         creationParamsCodec: const StandardMessageCodec(),
       );
     }
-    return Text("Unsupported");
+    return const Text("Unsupported");
   }
 
+  @override
   Future<void> setScene(int sceneId, ArcGISScene scene) {
     return channel(sceneId).invokeMethod("sceneView#setScene", scene.toJson());
   }
 
+  @override
   Future<void> setSurface(int sceneId, Surface surface) {
     return channel(sceneId).invokeMethod("sceneView#setSurface", surface.toJson());
   }
 
+  @override
   Future<void> setViewpointCamera(int sceneId, Camera camera) {
     return channel(sceneId).invokeMethod("sceneView#setViewpointCamera", camera.toJson());
   }

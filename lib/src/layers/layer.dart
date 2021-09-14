@@ -16,6 +16,7 @@ abstract class Layer extends MapsObject<Layer> {
   final double opacity;
   final LayerId layerId;
 
+  @override
   Map<String, Object> toJson() {
     return {
       'isVisible': isVisible,

@@ -2,7 +2,7 @@ part of arcgis_maps_flutter;
 
 @immutable
 class Viewpoint {
-  Viewpoint._({
+  const Viewpoint._({
     this.scale,
     required this.targetGeometry,
     required this.viewpointType,

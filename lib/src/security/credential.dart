@@ -56,7 +56,7 @@ class _UserCredential extends _BaseCredentials {
 
   @override
   Object toJson() {
-    final json = Map<String, Object>();
+    final json = <String, Object>{};
 
     void addIfPresent(String fieldName, Object? value) {
       if (value != null) {

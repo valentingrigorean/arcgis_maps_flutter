@@ -26,5 +26,5 @@ enum AutoPanMode {
   /// of the device changes, the map view is automatically panned and rotated
   /// to maintain this position, thus if the device is spun in a circle,
   /// the map view stays aligned with the real world.
-  compass_navigation,
+  compassNavigation,
 }

@@ -1,12 +1,12 @@
 part of arcgis_maps_flutter;
 
 class MarkerId extends SymbolId<Marker> {
-  MarkerId(String value) : super(value);
+  const MarkerId(String value) : super(value);
 }
 
 class Marker extends Symbol {
-  Marker({
-    required MarkerId markerId,
+  const Marker({
+    required this.markerId,
     required this.position,
     required this.icon,
     this.consumeTapEvents = false,
@@ -22,7 +22,6 @@ class Marker extends Symbol {
     this.selectedScale = 1.4,
     this.visibilityFilter,
   })  : assert(opacity >= 0 && opacity <= 1),
-        markerId = markerId,
         super(symbolId: markerId);
 
   /// Uniquely identifies a [Marker].

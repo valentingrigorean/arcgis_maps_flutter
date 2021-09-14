@@ -2,7 +2,7 @@ part of arcgis_maps_flutter;
 
 @immutable
 class SurfaceId extends MapsObjectId<Surface> {
-  SurfaceId(String value) : super(value);
+  const SurfaceId(String value) : super(value);
 }
 
 @immutable

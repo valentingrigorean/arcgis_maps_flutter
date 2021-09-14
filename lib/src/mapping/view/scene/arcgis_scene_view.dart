@@ -4,7 +4,7 @@ part of arcgis_maps_flutter;
 ///
 /// Pass to [ArcgisSceneView.onSceneCreated] to receive a [ArcgisSceneController] when the
 /// map is created.
-typedef void SceneCreatedCallback(ArcgisSceneController controller);
+typedef SceneCreatedCallback = void Function(ArcgisSceneController controller);
 
 // This counter is used to provide a stable "constant" initialization id
 // to the buildView function, so the web implementation can use it as a

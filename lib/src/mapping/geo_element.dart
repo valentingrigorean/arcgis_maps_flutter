@@ -16,12 +16,8 @@ abstract class GeoElement {
     });
 
     Geometry? geometry;
-    try {
-      geometry = Geometry.fromJson(toSafeMapNullable(json['geometry']));
-    } catch (e, stackTrace) {
-      print(e);
-      print(stackTrace);
-    }
+
+    geometry = Geometry.fromJson(toSafeMapNullable(json['geometry']));
 
     return _GeoElementImpl(attributes, geometry);
   }

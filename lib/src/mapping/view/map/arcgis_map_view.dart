@@ -4,18 +4,18 @@ part of arcgis_maps_flutter;
 ///
 /// Pass to [ArcgisMapView.onMapCreated] to receive a [ArcgisMapController] when the
 /// map is created.
-typedef void MapCreatedCallback(ArcgisMapController controller);
+typedef MapCreatedCallback = void Function(ArcgisMapController controller);
 
-typedef void MapLoadedCallback(ArcgisError? error);
+typedef MapLoadedCallback = void Function(ArcgisError? error);
 
-typedef void LayerLoadedCallback(Layer layer, ArcgisError? error);
+typedef LayerLoadedCallback = void Function(Layer layer, ArcgisError? error);
 
-typedef void IdentifyLayerCallback(IdentifyLayerResult result);
+typedef IdentifyLayerCallback = void Function(IdentifyLayerResult result);
 
-typedef void IdentifyLayersCallback(List<IdentifyLayerResult> results);
+typedef IdentifyLayersCallback = void Function(List<IdentifyLayerResult> results);
 
 /// Callback function taking a single argument.
-typedef void ArgumentCallback<T>(T argument);
+typedef ArgumentCallback<T> = void Function(T argument);
 
 /// Callback that receives updates to the camera position.
 ///
@@ -23,7 +23,7 @@ typedef void ArgumentCallback<T>(T argument);
 /// registers a camera movement.
 ///
 /// This is used in [ArcgisMapView.onCameraMove].
-typedef void CameraPositionCallback();
+typedef CameraPositionCallback = void Function();
 
 // This counter is used to provide a stable "constant" initialization id
 // to the buildView function, so the web implementation can use it as a
@@ -45,6 +45,7 @@ class UnknownMapObjectIdError extends Error {
   /// The context where the error occurred.
   final String? context;
 
+  @override
   String toString() {
     if (context != null) {
       return 'Unknown $objectType ID "${objectId.value}" in $context';

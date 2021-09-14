@@ -59,6 +59,7 @@ class Point implements Geometry {
 
   final SpatialReference? spatialReference;
 
+  @override
   Object toJson() {
     final Map<String, Object> json = <String, Object>{};
 

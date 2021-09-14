@@ -31,6 +31,7 @@ class UnknownMapIDError extends Error {
   /// Message describing the assertion error.
   final Object? message;
 
+  @override
   String toString() {
     if (message != null) {
       return "Unknown map ID $mapId: ${Error.safeToString(message)}";
@@ -123,7 +124,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
             viewType: viewType,
             layoutDirection: TextDirection.ltr,
             creationParams: creationParams,
-            creationParamsCodec: StandardMessageCodec(),
+            creationParamsCodec: const StandardMessageCodec(),
           )
             ..addOnPlatformViewCreatedListener((id) {
               params.onPlatformViewCreated(id);
@@ -142,7 +143,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
         creationParamsCodec: const StandardMessageCodec(),
       );
     }
-    return Text('Unsupported');
+    return const Text('Unsupported');
   }
 
   @override
@@ -243,6 +244,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
         .invokeMethod<void>("map#setViewpoint", viewpoint.toJson());
   }
 
+  @override
   Future<void> setViewpointRotation(int mapId, double angleDegrees) {
     return channel(mapId)
         .invokeMethod<void>("map#setViewpointRotation", angleDegrees);
@@ -313,6 +315,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
     return _events(mapId).whereType<LayerLoadedEvent>();
   }
 
+  @override
   Stream<AutoPanModeChangedEvent> onAutoPanModeChanged({required int mapId}) {
     return _events(mapId).whereType<AutoPanModeChangedEvent>();
   }

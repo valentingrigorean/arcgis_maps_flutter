@@ -5,7 +5,7 @@ class ArcGISScene {
   final Basemap? _basemap;
   final String? _json;
 
-  ArcGISScene._(this._basemap, this._json);
+  const ArcGISScene._(this._basemap, this._json);
 
   factory ArcGISScene.fromBasemap(Basemap basemap) =>
       ArcGISScene._(basemap, null);
@@ -37,54 +37,54 @@ class ArcGISScene {
 
 @immutable
 class Basemap {
-  Basemap._(this.basemap);
+  const Basemap._(this.basemap);
 
   final String basemap;
 
-  factory Basemap.createImagery() => Basemap._("createImagery");
+  factory Basemap.createImagery() => const Basemap._("createImagery");
 
   factory Basemap.createImageryWithLabels() =>
-      Basemap._("createImageryWithLabels");
+      const Basemap._("createImageryWithLabels");
 
   factory Basemap.createImageryWithLabelsVector() =>
-      Basemap._("createImageryWithLabelsVector");
+      const Basemap._("createImageryWithLabelsVector");
 
-  factory Basemap.createLightGrayCanvas() => Basemap._("createLightGrayCanvas");
+  factory Basemap.createLightGrayCanvas() => const Basemap._("createLightGrayCanvas");
 
   factory Basemap.createLightGrayCanvasVector() =>
-      Basemap._("createLightGrayCanvasVector");
+      const Basemap._("createLightGrayCanvasVector");
 
   factory Basemap.createDarkGrayCanvasVector() =>
-      Basemap._("createDarkGrayCanvasVector");
+      const Basemap._("createDarkGrayCanvasVector");
 
   factory Basemap.createNationalGeographic() =>
-      Basemap._("createNationalGeographic");
+      const Basemap._("createNationalGeographic");
 
   factory Basemap.createNavigationVector() =>
-      Basemap._("createNavigationVector");
+      const Basemap._("createNavigationVector");
 
-  factory Basemap.createOceans() => Basemap._("createOceans");
+  factory Basemap.createOceans() => const Basemap._("createOceans");
 
-  factory Basemap.createOpenStreetMap() => Basemap._("createOpenStreetMap");
+  factory Basemap.createOpenStreetMap() => const Basemap._("createOpenStreetMap");
 
-  factory Basemap.createStreets() => Basemap._("createStreets");
+  factory Basemap.createStreets() => const Basemap._("createStreets");
 
   factory Basemap.createStreetsNightVector() =>
-      Basemap._("createStreetsNightVector");
+      const Basemap._("createStreetsNightVector");
 
   factory Basemap.createStreetsWithReliefVector() =>
-      Basemap._("createStreetsWithReliefVector");
+      const Basemap._("createStreetsWithReliefVector");
 
   factory Basemap.createTerrainWithLabels() =>
-      Basemap._("createTerrainWithLabels");
+      const Basemap._("createTerrainWithLabels");
 
   factory Basemap.createTerrainWithLabelsVector() =>
-      Basemap._("createTerrainWithLabelsVector");
+      const Basemap._("createTerrainWithLabelsVector");
 
-  factory Basemap.createTopographic() => Basemap._("createTopographic");
+  factory Basemap.createTopographic() => const Basemap._("createTopographic");
 
   factory Basemap.createTopographicVector() =>
-      Basemap._("createTopographicVector");
+      const Basemap._("createTopographicVector");
 
   Object toJson() {
     return basemap;

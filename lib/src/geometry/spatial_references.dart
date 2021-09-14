@@ -2,8 +2,8 @@ part of arcgis_maps_flutter;
 
 @immutable
 class SpatialReference {
-  static SpatialReference _wgs84 = SpatialReference._(wkId: 4326);
-  static SpatialReference _webMercator = SpatialReference._(wkId: 102100);
+  static const SpatialReference _wgs84 = SpatialReference._(wkId: 4326);
+  static const SpatialReference _webMercator = SpatialReference._(wkId: 102100);
 
   const SpatialReference._({this.wkId, this.wkText});
 

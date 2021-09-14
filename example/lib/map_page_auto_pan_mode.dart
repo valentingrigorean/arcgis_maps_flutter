@@ -65,10 +65,10 @@ class _MapPageAutoPanModeState extends State<MapPageAutoPanMode> {
                     break;
                   case AutoPanMode.recenter:
                     setState(() {
-                      _autoPanMode = AutoPanMode.compass_navigation;
+                      _autoPanMode = AutoPanMode.compassNavigation;
                     });
                     break;
-                  case AutoPanMode.compass_navigation:
+                  case AutoPanMode.compassNavigation:
                     setState(() {
                       _autoPanMode = AutoPanMode.off;
                     });
@@ -94,7 +94,7 @@ class _MapPageAutoPanModeState extends State<MapPageAutoPanMode> {
         break;
       case AutoPanMode.navigation:
         return const SizedBox();
-      case AutoPanMode.compass_navigation:
+      case AutoPanMode.compassNavigation:
         iconData = Icons.near_me;
         rotation = 317;
         break;
