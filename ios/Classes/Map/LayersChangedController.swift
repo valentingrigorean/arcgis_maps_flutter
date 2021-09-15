@@ -76,7 +76,7 @@ class LayersChangedController {
             changeType = 1
             break
         @unknown default:
-            changeType = 3
+            changeType = 2
             break
         }
 

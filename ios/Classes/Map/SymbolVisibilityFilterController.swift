@@ -126,7 +126,7 @@ class SymbolVisibilityFilterController {
 
     private func handleGraphicsFilterZoom(graphicControllerInfo: GraphicControllerInfo,
                                           currentZoom: Double) {
-        if currentZoom == Double.nan {
+        if currentZoom.isNaN {
             return
         }
 
