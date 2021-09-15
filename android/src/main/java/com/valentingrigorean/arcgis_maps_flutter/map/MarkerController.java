@@ -65,7 +65,7 @@ public final class MarkerController extends BaseGraphicController implements Mar
             public void onLoaded(Symbol symbol) {
                 iconSymbol = new ScaleSymbol(symbol);
                 setOpacity(iconSymbol, opacity);
-                setAngle(iconSymbol,angle);
+                setAngle(iconSymbol, angle);
                 offsetSymbol(iconSymbol, iconOffsetX, iconOffsetY);
                 marker.getSymbols().add(iconSymbol);
                 handleScaleChange();
@@ -93,7 +93,7 @@ public final class MarkerController extends BaseGraphicController implements Mar
                 backgroundSymbol = new ScaleSymbol(symbol);
 
                 setOpacity(backgroundSymbol, opacity);
-                setAngle(backgroundSymbol,angle);
+                setAngle(backgroundSymbol, angle);
                 marker.getSymbols().add(0, backgroundSymbol);
                 handleScaleChange();
             }
@@ -117,7 +117,7 @@ public final class MarkerController extends BaseGraphicController implements Mar
     }
 
     public void setOpacity(float opacity) {
-        if(this.opacity == opacity){
+        if (this.opacity == opacity) {
             return;
         }
         this.opacity = opacity;
@@ -127,7 +127,7 @@ public final class MarkerController extends BaseGraphicController implements Mar
     }
 
     public void setAngle(float angle) {
-        if(this.angle == angle){
+        if (this.angle == angle) {
             return;
         }
         this.angle = angle;
@@ -179,6 +179,7 @@ public final class MarkerController extends BaseGraphicController implements Mar
     private static void setAngle(Symbol symbol, float angle) {
         if (symbol instanceof MarkerSymbol) {
             ((MarkerSymbol) symbol).setAngle(angle);
+            ((MarkerSymbol) symbol).setAngleAlignment(Float.compare(angle, 0) == 0 ? MarkerSymbol.AngleAlignment.SCREEN : MarkerSymbol.AngleAlignment.MAP);
         }
         if (symbol instanceof ScaleSymbol) {
             final ScaleSymbol scaleSymbol = (ScaleSymbol) symbol;

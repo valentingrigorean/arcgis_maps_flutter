@@ -148,6 +148,7 @@ class MarkerController: BaseGraphicController {
         for symbol in marker.symbols {
             if let markerSymbol = symbol as? AGSMarkerSymbol {
                 markerSymbol.angle = angle
+                markerSymbol.angleAlignment = angle == 0 ? .screen : .map
             }
         }
     }
