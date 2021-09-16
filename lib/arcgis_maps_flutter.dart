@@ -1,6 +1,7 @@
 library arcgis_maps_flutter;
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:arcgis_maps_flutter/src/data/field_type.dart';
 import 'package:arcgis_maps_flutter/src/layers/base_tile_layer.dart';
@@ -17,6 +18,7 @@ import 'package:arcgis_maps_flutter/src/utils/layers.dart';
 import 'package:arcgis_maps_flutter/src/utils/markers.dart';
 import 'package:arcgis_maps_flutter/src/utils/polygons.dart';
 import 'package:arcgis_maps_flutter/src/utils/polyline.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:meta/meta.dart';
@@ -25,6 +27,9 @@ import 'package:arcgis_maps_flutter/src/method_channel/map/arcgis_maps_flutter_p
 import 'package:arcgis_maps_flutter/src/method_channel/scene/arcgis_scene_flutter_platform.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import 'package:http/http.dart' as http;
+import 'package:xml2json/xml2json.dart';
+
 
 part 'src/arcgis_error.dart';
 part 'src/arcgis_runtime_environment.dart';
@@ -69,6 +74,12 @@ part 'src/mapping/view/identify_layer_result.dart';
 part 'src/mapping/view/layers_changed_listener.dart';
 part 'src/mapping/view/time_extent_changed_listener.dart';
 part 'src/mapping/view/viewpoint_changed_listener.dart';
+
+part 'src/ogc/wms/wms_layer_dimension.dart';
+part 'src/ogc/wms/wms_layer_info.dart';
+part 'src/ogc/wms/wms_service_info.dart';
+part 'src/ogc/wms/wms_service.dart';
+part 'src/ogc/wms/wms_version.dart';
 
 part 'src/portal/portal.dart';
 part 'src/portal/portal_item.dart';

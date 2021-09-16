@@ -1,13 +1,16 @@
 part of arcgis_maps_flutter;
 
 enum ImageFormat {
+  defaultFormat,
   png,
   png8,
   png24,
   png32,
   jpg,
-  mixed,
-  lerc,
+  jpgPng,
+  bmp,
+  gif,
+  tiff,
   unknown,
 }
 
@@ -23,11 +26,11 @@ class TileInfo {
     required this.tileWidth,
   });
 
-
   /// The Dots-Per-Inch (DPI) resolution of tiled images.
   final int dpi;
   final ImageFormat imageFormat;
   final List<LevelOfDetail> levelOfDetails;
+
   /// The tiling scheme origin which specifies the starting location of Row 0 and Column 0.
   final Point origin;
 
@@ -35,6 +38,7 @@ class TileInfo {
 
   /// Height (in points) of an individual tile image
   final int tileHeight;
+
   /// Width (in points) of an individual tile image
   final int tileWidth;
 
