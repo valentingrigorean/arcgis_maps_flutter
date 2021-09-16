@@ -44,6 +44,7 @@ class WmsLayerDimension extends Equatable {
   /// instead of an ending value (see C.4.1). Default = [false].
   final bool current;
 
+  /// Text content indicating available value(s) for dimension.
   final String extent;
 
   @override

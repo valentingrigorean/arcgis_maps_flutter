@@ -43,10 +43,9 @@ class WmsService {
     if (serviceJson == null || capabilityJson == null) {
       return null;
     }
-    final name = _getValue<String>(serviceJson['Name']);
-    final title = _getValue<String>(serviceJson['Title']);
-    final serviceDescription =
-        _getValue<String?>(serviceJson['Abstract']) ?? '';
+    final name = _getValue(serviceJson['Name']);
+    final title = _getValue(serviceJson['Title']);
+    final serviceDescription = _getValueOrNull(serviceJson['Abstract']) ?? '';
     final version = _getVersion(capabilitiesJson);
 
     final layersInfo = _getLayersInfo(capabilityJson);
@@ -65,8 +64,38 @@ class WmsService {
     );
   }
 
-  static T _getValue<T>(dynamic json, {String key = '\$t'}) {
-    return json[key] as T;
+  static String _getValue(dynamic json, {String key = '\$t'}) {
+    return _getValueOrNull(json, key: key)!;
+  }
+
+  static String? _getValueOrNull(dynamic json, {String key = '\$t'}) {
+    if (json == null) {
+      return null;
+    }
+
+    if (json is String) {
+      return json;
+    }
+
+    return json[key] as String?;
+  }
+
+  static int _getIntValue(dynamic json, {String key = '\$t'}) {
+    final str = _getValue(json, key: key);
+    return int.parse(str);
+  }
+
+  static bool _getBoolValue(
+    dynamic json, {
+    String key = '\$t',
+    bool defaultValue = false,
+  }) {
+    final value = _getValueOrNull(json, key: key);
+    if (value == null) {
+      return defaultValue;
+    }
+    var result = int.tryParse(value);
+    return result == null ? defaultValue : result != 0;
   }
 
   static WmsVersion _getVersion(dynamic json) {
@@ -86,8 +115,8 @@ class WmsService {
 
   static List<String> _getServiceKeywords(dynamic json) {
     final keywords = json['KeywordList'];
-    if (keywords != null) {
-      return keywords as List<String>;
+    if (keywords is List<dynamic>) {
+      return keywords.cast<String>();
     }
     return const [];
   }
@@ -136,21 +165,146 @@ class WmsService {
 
   static List<WmsLayerInfo> _getLayersInfo(dynamic json) {
     final jsonLayers = json['Layer'];
-    if (jsonLayers != null) {}
+    if (jsonLayers != null) {
+      if (jsonLayers is List<dynamic>) {
+        var arr = <WmsLayerInfo>[];
+        for (final layer in jsonLayers) {
+          arr.add(_getLayerInfo(layer));
+        }
+        return arr;
+      }
+      return [
+        _getLayerInfo(jsonLayers),
+      ];
+    }
     return const [];
   }
 
-// static WmsLayerInfo _getLayerInfo(dynamic json){
-//
-// }
+  static WmsLayerInfo _getLayerInfo(dynamic json) {
+    final title = _getValue(json['Title']);
+    final description = _getValueOrNull(json['Abstract']) ?? '';
+    final spatialReferences = _getSpatialReferences(json['CRS']);
+    final extent = _getBoundingBox(json['BoundingBox']);
+    final fixedImageHeight = _getValueOrNull(json['fixedHeight']);
+    final fixedImageWidth = _getValueOrNull(json['fixedWidth']);
+    final keywords = _getServiceKeywords(json);
+    final name = _getValueOrNull(json['Name']) ?? '';
+    final isOpaque = _getBoolValue(json['opaque']);
+    final isQueryable = _getBoolValue(json['queryable']);
+    final subLayerInfos = _getLayersInfo(json);
+    final styles = _getStyles(json);
+    final dimensions = _getDimensions(json);
 
-  // static List<SpatialReference> _getSpatialReferences(dynamic json) {
-  //
-  // }
-  //
-  // static SpatialReference _getSpatialReference(dynamic json){
-  //   final strValue =
-  // }
+    return WmsLayerInfo(
+      title: title,
+      layerDescription: description,
+      extent: extent,
+      fixedImageHeight:
+          fixedImageHeight == null ? 0 : int.parse(fixedImageHeight),
+      fixedImageWidth: fixedImageWidth == null ? 0 : int.parse(fixedImageWidth),
+      keywords: keywords,
+      name: name,
+      isOpaque: isOpaque,
+      isQueryable: isQueryable,
+      spatialReferences: spatialReferences,
+      sublayerInfos: subLayerInfos,
+      styles: styles,
+      dimensions: dimensions,
+    );
+  }
+
+  static Envelope? _getBoundingBox(dynamic json) {
+    if (json == null) {
+      return null;
+    }
+
+    if (json is List<dynamic>) {
+      if (json.isEmpty) {
+        return null;
+      }
+      json = json.first;
+    }
+
+    final spatialReference = _getSpatialReferenceFromString(json['CRS']);
+    final minx = _getValue(json['minx']);
+    final miny = _getValue(json['miny']);
+    final maxx = _getValue(json['maxx']);
+    final maxy = _getValue(json['maxy']);
+    return Envelope(
+      xMin: double.parse(minx),
+      yMin: double.parse(miny),
+      xMax: double.parse(maxx),
+      yMax: double.parse(maxy),
+      spatialReference: spatialReference,
+    );
+  }
+
+  static List<String> _getStyles(dynamic json) {
+    //todo(vali): impl styles
+    return const [];
+  }
+
+  static List<WmsLayerDimension> _getDimensions(dynamic json) {
+    final dimensions = json['Dimension'];
+    if (dimensions is List<dynamic>) {
+      var arr = <WmsLayerDimension>[];
+      for (final dimension in json) {
+        arr.add(_getDimension(dimension));
+      }
+      return arr;
+    } else if (dimensions != null) {
+      return [
+        _getDimension(dimensions),
+      ];
+    }
+    return const [];
+  }
+
+  static WmsLayerDimension _getDimension(dynamic json) {
+    final name = _getValue(json['name']);
+    final units = _getValue(json['units']);
+    final unitSymbol = _getValueOrNull(json['unitSymbol']);
+    final defaultValue = _getValueOrNull(json['default']);
+    final multipleValues = _getBoolValue(json['multipleValues']);
+    final nearestValue = _getBoolValue(json['nearestValue']);
+    final current = _getBoolValue(json['nearestValue']);
+    final extent = _getValueOrNull(json) ?? '';
+
+    return WmsLayerDimension(
+      name: name,
+      units: units,
+      unitSymbol: unitSymbol,
+      defaultValue: defaultValue,
+      multipleValues: multipleValues,
+      nearestValue: nearestValue,
+      current: current,
+      extent: extent,
+    );
+  }
+
+  static List<SpatialReference> _getSpatialReferences(dynamic json) {
+    if (json is List<dynamic>) {
+      var spatialReferences = <SpatialReference>[];
+      for (final spatialReference in json) {
+        spatialReferences.add(_getSpatialReference(spatialReference));
+      }
+      return spatialReferences;
+    }
+    return const [];
+  }
+
+  static SpatialReference _getSpatialReference(dynamic json) {
+    final strValue = _getValue(json).replaceFirst('EPSG:', '');
+    return _getSpatialReferenceFromString(strValue);
+  }
+
+  static SpatialReference _getSpatialReferenceFromString(String value) {
+    value = value.replaceFirst('EPSG:', '');
+    if (value == 'CRS:84') {
+      return SpatialReference.wgs84();
+    }
+    return SpatialReference.fromWkId(int.parse(value));
+  }
 }
 
 Object _parseAndDecode(String response) {

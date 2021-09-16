@@ -17,6 +17,14 @@ void main() {
             .getServiceInfo('https://nvgis.naturvardsverket.se/geoserver/lavinprognoser/wms');
         assert(serviceInfo != null);
       });
+
+      test('halo', () async {
+        var wmsService = const WmsService();
+        var serviceInfo = await wmsService
+            .getServiceInfo('https://halo-wms.met.no/halo/default.map?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities');
+        assert(serviceInfo != null);
+      });
+
     });
   });
 }
