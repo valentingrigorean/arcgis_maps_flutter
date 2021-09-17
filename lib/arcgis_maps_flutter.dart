@@ -77,6 +77,7 @@ part 'src/mapping/view/viewpoint_changed_listener.dart';
 
 part 'src/ogc/wms/wms_layer_dimension.dart';
 part 'src/ogc/wms/wms_layer_info.dart';
+part 'src/ogc/wms/wms_layer_style.dart';
 part 'src/ogc/wms/wms_service_info.dart';
 part 'src/ogc/wms/wms_service.dart';
 part 'src/ogc/wms/wms_version.dart';

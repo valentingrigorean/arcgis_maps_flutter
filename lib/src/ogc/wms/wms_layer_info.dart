@@ -70,7 +70,7 @@ class WmsLayerInfo extends Equatable {
   /// Available styles for the layer. Styles are server-defined options for
   /// how the layer and its information are displayed. Note that the order
   /// of styles returned does not indicate which style is the default.
-  final List<String> styles;
+  final List<WmsLayerStyle> styles;
 
   /// Sublayers of this layer.
   final List<WmsLayerInfo> sublayerInfos;

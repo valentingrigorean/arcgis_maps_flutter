@@ -80,9 +80,16 @@ class WmsService {
     return json[key] as String?;
   }
 
-  static int _getIntValue(dynamic json, {String key = '\$t'}) {
-    final str = _getValue(json, key: key);
-    return int.parse(str);
+  static int _getIntValue(
+    dynamic json, {
+    String key = '\$t',
+    int defaultValue = 0,
+  }) {
+    final str = _getValueOrNull(json, key: key);
+    if (str == null) {
+      return defaultValue;
+    }
+    return int.tryParse(str) ?? defaultValue;
   }
 
   static bool _getBoolValue(
@@ -125,42 +132,37 @@ class WmsService {
     var formatsJson = json['Request']?['GetMap']?['Format'];
 
     if (formatsJson is List<dynamic>) {
-      final formats = <ImageFormat>[];
+      final formats = <ImageFormat>{};
       for (final format in formatsJson) {
-        switch (format) {
-          case 'image/png':
-            formats.add(ImageFormat.png);
-            break;
-          case 'image/png; mode=8bit':
-            formats.add(ImageFormat.png8);
-            break;
-          case 'image/png; mode=24bit':
-            formats.add(ImageFormat.png24);
-            break;
-          case 'image/png; mode=32bit':
-            formats.add(ImageFormat.png32);
-            break;
-          case 'image/jpeg':
-            formats.add(ImageFormat.jpg);
-            break;
-          case 'image/bmp':
-            formats.add(ImageFormat.bmp);
-            break;
-          case 'image/gif':
-            formats.add(ImageFormat.gif);
-            break;
-          case 'image/tiff':
-            formats.add(ImageFormat.tiff);
-            break;
-          default:
-            formats.add(ImageFormat.unknown);
-            break;
-        }
+        formats.add(_getImageFormat(_getValue(format)));
       }
-      return formats;
+      return formats.toList();
     }
 
     return const [];
+  }
+
+  static ImageFormat _getImageFormat(String mineType) {
+    switch (mineType) {
+      case 'image/png':
+        return ImageFormat.png;
+      case 'image/png; mode=8bit':
+        return ImageFormat.png8;
+      case 'image/png; mode=24bit':
+        return ImageFormat.png24;
+      case 'image/png; mode=32bit':
+        return ImageFormat.png32;
+      case 'image/jpeg':
+        return ImageFormat.jpg;
+      case 'image/bmp':
+        return ImageFormat.bmp;
+      case 'image/gif':
+        return ImageFormat.gif;
+      case 'image/tiff':
+        return ImageFormat.tiff;
+      default:
+        return ImageFormat.unknown;
+    }
   }
 
   static List<WmsLayerInfo> _getLayersInfo(dynamic json) {
@@ -239,9 +241,53 @@ class WmsService {
     );
   }
 
-  static List<String> _getStyles(dynamic json) {
-    //todo(vali): impl styles
+  static List<WmsLayerStyle> _getStyles(dynamic json) {
+    final styles = json['Style'];
+    if (styles is List<dynamic>) {
+      var arr = <WmsLayerStyle>[];
+      for (final style in styles) {
+        arr.add(_getStyle(style));
+      }
+      return arr;
+    } else if (styles != null) {
+      return [
+        _getStyle(styles),
+      ];
+    }
+
     return const [];
+  }
+
+  static WmsLayerStyle _getStyle(dynamic json) {
+    final name = _getValue(json['Name']);
+    final title = _getValue(json['Title']);
+    final description = _getValueOrNull(json['Abstract']);
+    final legendUrl = _getLegendUrl(json['LegendURL']);
+    return WmsLayerStyle(
+      name: name,
+      title: title,
+      description: description ?? '',
+      legendUrl: legendUrl,
+    );
+  }
+
+  static WmsLegendUrl? _getLegendUrl(dynamic json) {
+    if (json == null) {
+      return null;
+    }
+    final url = json['OnlineResource']?['xlink:href']?.toString();
+    if(url == null){
+      return null;
+    }
+    final imageFormat = _getImageFormat(_getValue(json['Format']));
+    final width = _getIntValue(json['width']);
+    final height = _getIntValue(json['height']);
+    return WmsLegendUrl(
+      url: url,
+      imageFormat: imageFormat,
+      width: width,
+      height: height,
+    );
   }
 
   static List<WmsLayerDimension> _getDimensions(dynamic json) {

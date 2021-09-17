@@ -78,7 +78,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         scaleBarController = ScaleBarController(mapView: mapView)
 
         layersChangedController = LayersChangedController(geoView: mapView, channel: channel, layersController: layersController)
-        let s = AGSMapServiceImageFormat
 
         super.init()
 
