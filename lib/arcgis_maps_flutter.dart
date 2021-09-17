@@ -29,6 +29,7 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:http/http.dart' as http;
 import 'package:xml2json/xml2json.dart';
+import 'package:jiffy/jiffy.dart';
 
 
 part 'src/arcgis_error.dart';
@@ -78,6 +79,7 @@ part 'src/mapping/view/viewpoint_changed_listener.dart';
 part 'src/ogc/wms/wms_layer_dimension.dart';
 part 'src/ogc/wms/wms_layer_info.dart';
 part 'src/ogc/wms/wms_layer_style.dart';
+part 'src/ogc/wms/wms_layer_time_dimension.dart';
 part 'src/ogc/wms/wms_service_info.dart';
 part 'src/ogc/wms/wms_service.dart';
 part 'src/ogc/wms/wms_version.dart';

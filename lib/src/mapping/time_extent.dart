@@ -1,7 +1,7 @@
 part of arcgis_maps_flutter;
 
 @immutable
-class TimeExtent {
+class TimeExtent extends Equatable {
   const TimeExtent({
     this.startTime,
     this.endTime,
@@ -10,6 +10,12 @@ class TimeExtent {
   final DateTime? startTime;
 
   final DateTime? endTime;
+
+  @override
+  bool? get stringify => true;
+
+  @override
+  List<Object?> get props => [startTime, endTime];
 
   TimeExtent union(TimeExtent otherTimeExtent) {
     if (startTime == null ||
@@ -41,21 +47,5 @@ class TimeExtent {
     if (startTime != null) json['startTime'] = startTime!.toIso8601String();
     if (endTime != null) json['endTime'] = endTime!.toIso8601String();
     return json;
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is TimeExtent &&
-          runtimeType == other.runtimeType &&
-          startTime == other.startTime &&
-          endTime == other.endTime;
-
-  @override
-  int get hashCode => startTime.hashCode ^ endTime.hashCode;
-
-  @override
-  String toString() {
-    return 'TimeExtent{startTime: $startTime, endTime: $endTime}';
   }
 }

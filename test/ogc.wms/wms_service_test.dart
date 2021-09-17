@@ -4,27 +4,65 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group("WmsService", () {
     group('getServiceInfo', () {
-      test('eumetsat', () async {
+
+      test('Met.no data nowcast', () async {
+        var wmsService = const WmsService();
+        var serviceInfo = await wmsService
+            .getServiceInfo('https://public-wms.met.no/verportal/radar_nowcast.map?');
+        assert(serviceInfo != null);
+      });
+
+      test('Met.no data', () async {
+        var wmsService = const WmsService();
+        var serviceInfo = await wmsService
+            .getServiceInfo('https://public-wms.met.no/verportal/verportal.map?');
+        assert(serviceInfo != null);
+      });
+
+      test('SMHI data', () async {
+        var wmsService = const WmsService();
+        var serviceInfo = await wmsService
+            .getServiceInfo('https://wts2.smhi.se/tile/baltrad?');
+        assert(serviceInfo != null);
+      });
+
+
+      test('EUMETSAT data', () async {
         var wmsService = const WmsService();
         var serviceInfo = await wmsService
             .getServiceInfo('https://view.eumetsat.int/geoserver/wms');
         assert(serviceInfo != null);
       });
 
-      test('naturvardsverket', () async {
+      test('Met.no data (HALO)', () async {
+        var wmsService = const WmsService();
+        var serviceInfo = await wmsService
+            .getServiceInfo('https://halo-wms.met.no/halo/default.map');
+        assert(serviceInfo != null);
+      });
+
+
+      test('NVE Skred data', () async {
+        var wmsService = const WmsService();
+        var serviceInfo = await wmsService
+            .getServiceInfo('https://gis3.nve.no/map/services/Bratthet/MapServer/WMSServer');
+        assert(serviceInfo != null);
+      });
+
+      test('Sluttning', () async {
         var wmsService = const WmsService();
         var serviceInfo = await wmsService
             .getServiceInfo('https://nvgis.naturvardsverket.se/geoserver/lavinprognoser/wms');
         assert(serviceInfo != null);
       });
 
-      test('halo', () async {
+
+      test('BarentsWatch', () async {
         var wmsService = const WmsService();
         var serviceInfo = await wmsService
-            .getServiceInfo('https://halo-wms.met.no/halo/default.map?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities');
+            .getServiceInfo('https://geo.barentswatch.no/geoserver/ows/bw?service=WMS&request=GetCapabilities');
         assert(serviceInfo != null);
       });
-
     });
   });
 }

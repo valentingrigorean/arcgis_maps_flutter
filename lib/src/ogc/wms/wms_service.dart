@@ -33,7 +33,8 @@ class WmsService {
   }
 
   WmsServiceInfo? _parseServiceInfo(dynamic json) {
-    var capabilitiesJson = json['WMS_Capabilities'];
+    var capabilitiesJson =
+        json['WMS_Capabilities'] ?? json['WMT_MS_Capabilities'];
     if (capabilitiesJson == null) {
       return null;
     }
@@ -43,8 +44,8 @@ class WmsService {
     if (serviceJson == null || capabilityJson == null) {
       return null;
     }
-    final name = _getValue(serviceJson['Name']);
-    final title = _getValue(serviceJson['Title']);
+    final name = _getValueOrNull(serviceJson['Name']) ?? '';
+    final title = _getValueOrNull(serviceJson['Title']) ?? '';
     final serviceDescription = _getValueOrNull(serviceJson['Abstract']) ?? '';
     final version = _getVersion(capabilitiesJson);
 
@@ -64,11 +65,11 @@ class WmsService {
     );
   }
 
-  static String _getValue(dynamic json, {String key = '\$t'}) {
-    return _getValueOrNull(json, key: key)!;
+  static String _getValue(dynamic json) {
+    return _getValueOrNull(json)!;
   }
 
-  static String? _getValueOrNull(dynamic json, {String key = '\$t'}) {
+  static String? _getValueOrNull(dynamic json) {
     if (json == null) {
       return null;
     }
@@ -77,15 +78,16 @@ class WmsService {
       return json;
     }
 
-    return json[key] as String?;
+    var val =  json['\$t'] as String?;
+    val ??= json['__cdata'];
+    return val;
   }
 
   static int _getIntValue(
     dynamic json, {
-    String key = '\$t',
     int defaultValue = 0,
   }) {
-    final str = _getValueOrNull(json, key: key);
+    final str = _getValueOrNull(json);
     if (str == null) {
       return defaultValue;
     }
@@ -94,10 +96,9 @@ class WmsService {
 
   static bool _getBoolValue(
     dynamic json, {
-    String key = '\$t',
     bool defaultValue = false,
   }) {
-    final value = _getValueOrNull(json, key: key);
+    final value = _getValueOrNull(json);
     if (value == null) {
       return defaultValue;
     }
@@ -227,7 +228,8 @@ class WmsService {
       json = json.first;
     }
 
-    final spatialReference = _getSpatialReferenceFromString(json['CRS']);
+    final spatialReference =
+        _getSpatialReferenceFromString(json['CRS'] ?? json['SRS']);
     final minx = _getValue(json['minx']);
     final miny = _getValue(json['miny']);
     final maxx = _getValue(json['maxx']);
@@ -249,7 +251,8 @@ class WmsService {
         arr.add(_getStyle(style));
       }
       return arr;
-    } else if (styles != null) {
+    }
+    if (styles != null) {
       return [
         _getStyle(styles),
       ];
@@ -259,8 +262,8 @@ class WmsService {
   }
 
   static WmsLayerStyle _getStyle(dynamic json) {
-    final name = _getValue(json['Name']);
-    final title = _getValue(json['Title']);
+    final name = _getValueOrNull(json['Name']) ?? '';
+    final title = _getValueOrNull(json['Title']) ?? '';
     final description = _getValueOrNull(json['Abstract']);
     final legendUrl = _getLegendUrl(json['LegendURL']);
     return WmsLayerStyle(
@@ -276,7 +279,7 @@ class WmsService {
       return null;
     }
     final url = json['OnlineResource']?['xlink:href']?.toString();
-    if(url == null){
+    if (url == null) {
       return null;
     }
     final imageFormat = _getImageFormat(_getValue(json['Format']));
@@ -294,27 +297,44 @@ class WmsService {
     final dimensions = json['Dimension'];
     if (dimensions is List<dynamic>) {
       var arr = <WmsLayerDimension>[];
-      for (final dimension in json) {
-        arr.add(_getDimension(dimension));
+      for (final dimension in dimensions) {
+        arr.add(_getDimension(dimension, json));
       }
       return arr;
-    } else if (dimensions != null) {
+    }
+    if (dimensions != null) {
       return [
-        _getDimension(dimensions),
+        _getDimension(dimensions, json),
       ];
     }
     return const [];
   }
 
-  static WmsLayerDimension _getDimension(dynamic json) {
-    final name = _getValue(json['name']);
-    final units = _getValue(json['units']);
-    final unitSymbol = _getValueOrNull(json['unitSymbol']);
-    final defaultValue = _getValueOrNull(json['default']);
-    final multipleValues = _getBoolValue(json['multipleValues']);
-    final nearestValue = _getBoolValue(json['nearestValue']);
-    final current = _getBoolValue(json['nearestValue']);
-    final extent = _getValueOrNull(json) ?? '';
+  static WmsLayerDimension _getDimension(dynamic dimension, dynamic parent) {
+    final name = _getValue(dimension['name']);
+    final units = _getValue(dimension['units']);
+    final unitSymbol = _getValueOrNull(dimension['unitSymbol']);
+
+    final parentExtent = parent?['Extent'];
+    if (parentExtent != null) {
+      if (parentExtent is List<dynamic>) {
+        for (final el in parentExtent) {
+          if (el['name'] == name) {
+            dimension = el;
+            break;
+          }
+        }
+      } else {
+        if (parentExtent['name'] == name) {
+          dimension = parentExtent;
+        }
+      }
+    }
+    final defaultValue = _getValueOrNull(dimension['default']);
+    final multipleValues = _getBoolValue(dimension['multipleValues']);
+    final nearestValue = _getBoolValue(dimension['nearestValue']);
+    final current = _getBoolValue(dimension['nearestValue']);
+    final extent = _getValueOrNull(dimension) ?? '';
 
     return WmsLayerDimension(
       name: name,
@@ -345,7 +365,7 @@ class WmsService {
   }
 
   static SpatialReference _getSpatialReferenceFromString(String value) {
-    value = value.replaceFirst('EPSG:', '');
+    value = value.replaceFirst('EPSG:', '').replaceFirst('AUTO:', '');
     if (value == 'CRS:84') {
       return SpatialReference.wgs84();
     }

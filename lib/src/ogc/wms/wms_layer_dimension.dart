@@ -48,8 +48,7 @@ class WmsLayerDimension extends Equatable {
   final String extent;
 
   @override
-  List<Object?> get props =>
-      [
+  List<Object?> get props => [
         name,
         units,
         unitSymbol,
@@ -60,3 +59,5 @@ class WmsLayerDimension extends Equatable {
         extent
       ];
 }
+
+
