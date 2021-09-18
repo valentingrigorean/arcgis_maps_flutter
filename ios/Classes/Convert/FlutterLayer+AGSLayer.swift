@@ -43,6 +43,14 @@ extension FlutterLayer {
                     additionalOptions: serviceImageTiledLayerOptions!.additionalOptions)
             setupDefaultParams(layer: layer)
             return layer
+        case "GroupLayer":
+            let groupLayer = AGSGroupLayer(childLayers: groupLayerOptions!.layers.map {
+                $0.createNativeLayer()
+            })
+            groupLayer.showChildrenInLegend = groupLayerOptions!.showChildrenInLegend
+            groupLayer.visibilityMode = groupLayerOptions!.visibilityMode
+            setupDefaultParams(layer: groupLayer)
+            return groupLayer
         default:
             fatalError("Not implemented.")
         }

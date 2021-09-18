@@ -51,6 +51,8 @@ part 'src/geometry/geometry.dart';
 part 'src/layers/layer.dart';
 part 'src/layers/service_image_tiled_layer.dart';
 part 'src/layers/feature_layer.dart';
+part 'src/layers/group_layer.dart';
+
 part 'src/layers/legend_info.dart';
 part 'src/layers/legend_info_result.dart';
 part 'src/layers/map_image_layer.dart';

@@ -8,6 +8,8 @@ import com.esri.arcgisruntime.layers.ArcGISMapImageLayer;
 import com.esri.arcgisruntime.layers.ArcGISTiledLayer;
 import com.esri.arcgisruntime.layers.ArcGISVectorTiledLayer;
 import com.esri.arcgisruntime.layers.FeatureLayer;
+import com.esri.arcgisruntime.layers.GroupLayer;
+import com.esri.arcgisruntime.layers.GroupVisibilityMode;
 import com.esri.arcgisruntime.layers.Layer;
 import com.esri.arcgisruntime.layers.WmsLayer;
 import com.esri.arcgisruntime.security.Credential;
@@ -17,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class FlutterLayer {
     private final Map<?, ?> data;
@@ -27,6 +30,7 @@ public class FlutterLayer {
     private final boolean isVisible;
     private final float opacity;
     private final ServiceImageTiledLayerOptions serviceImageTiledLayerOptions;
+    private final GroupLayerOptions groupLayerOptions;
 
     public FlutterLayer(Map<?, ?> data) {
         this.data = data;
@@ -45,6 +49,12 @@ public class FlutterLayer {
             serviceImageTiledLayerOptions = Convert.toServiceImageTiledLayerOptions(data);
         } else {
             serviceImageTiledLayerOptions = null;
+        }
+
+        if (layerType.equals("GroupLayer")) {
+            groupLayerOptions = new GroupLayerOptions(data);
+        } else {
+            groupLayerOptions = null;
         }
     }
 
@@ -87,6 +97,12 @@ public class FlutterLayer {
                         serviceImageTiledLayerOptions.urlTemplate, serviceImageTiledLayerOptions.subdomains,
                         serviceImageTiledLayerOptions.additionalOptions);
                 break;
+            case "GroupLayer":
+                final GroupLayer groupLayer = new GroupLayer(groupLayerOptions.layers.stream().map((e) -> e.createLayer()).collect(Collectors.toList()));
+                groupLayer.setVisibilityMode(groupLayerOptions.visibilityMode);
+                groupLayer.setShowChildrenInLegend(groupLayerOptions.showChildrenInLegend);
+                layer = groupLayer;
+                break;
             default:
                 throw new UnsupportedOperationException("not implemented.");
         }
@@ -106,12 +122,12 @@ public class FlutterLayer {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FlutterLayer that = (FlutterLayer) o;
-        return isVisible == that.isVisible && Float.compare(that.opacity, opacity) == 0 && Objects.equals(layerId, that.layerId) && Objects.equals(layerType, that.layerType) && Objects.equals(url, that.url) && Objects.equals(credential, that.credential) && Objects.equals(serviceImageTiledLayerOptions, that.serviceImageTiledLayerOptions);
+        return isVisible == that.isVisible && Float.compare(that.opacity, opacity) == 0 && layerId.equals(that.layerId) && layerType.equals(that.layerType) && url.equals(that.url) && credential.equals(that.credential) && serviceImageTiledLayerOptions.equals(that.serviceImageTiledLayerOptions) && groupLayerOptions.equals(that.groupLayerOptions);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(layerId, layerType, url, credential, isVisible, opacity, serviceImageTiledLayerOptions);
+        return Objects.hash(layerId);
     }
 
 
@@ -145,5 +161,28 @@ public class FlutterLayer {
         }
     }
 
+    public static final class GroupLayerOptions {
+        private final List<FlutterLayer> layers;
+        private final GroupVisibilityMode visibilityMode;
+        private final boolean showChildrenInLegend;
 
+        public GroupLayerOptions(Map<?, ?> data) {
+            showChildrenInLegend = Convert.toBoolean(data.get("showChildrenInLegend"));
+            visibilityMode = GroupVisibilityMode.values()[Convert.toInt(data.get("visibilityMode"))];
+            layers = Convert.toList(data.get("layers")).stream().map((e) -> new FlutterLayer(Convert.toMap(e))).collect(Collectors.toList());
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            GroupLayerOptions that = (GroupLayerOptions) o;
+            return showChildrenInLegend == that.showChildrenInLegend && Objects.equals(layers, that.layers) && visibilityMode == that.visibilityMode;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(layers, visibilityMode, showChildrenInLegend);
+        }
+    }
 }

@@ -92,6 +92,8 @@ class LayersChangedController {
             removeObservers()
         }
 
+        AGSPortalItem.
+
         mapOperationalLayersObservation = map?.observe(\.operationalLayers, options: [.new]) { [weak self] (_,
                                                                                                             change) in
             self?.handleLayerChanged(layerType: .operational, change: change)

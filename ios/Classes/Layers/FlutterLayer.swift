@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-struct ServiceImageTiledLayerOptions: Hashable {
+struct ServiceImageTiledLayerOptions: Hashable, Equatable {
     let tileInfo: AGSTileInfo
     let fullExtent: AGSEnvelope
 
@@ -15,12 +15,23 @@ struct ServiceImageTiledLayerOptions: Hashable {
     let additionalOptions: Dictionary<String, String>
 }
 
-struct FlutterLayer: Hashable {
+struct GroupLayerOptions: Hashable, Equatable {
+    let showChildrenInLegend: Bool
+    let visibilityMode: AGSGroupVisibilityMode
+    let layers: [FlutterLayer]
+}
+
+
+struct FlutterLayer: Hashable, Equatable {
 
     init(data: Dictionary<String, Any>) {
         layerId = data["layerId"] as! String
         layerType = data["layerType"] as! String
-        url = URL(string: data["url"] as! String)
+        if let url = data["url"] as? String {
+            self.url = URL(string: data["url"] as! String)
+        } else {
+            url = nil
+        }
 
         isVisible = data["isVisible"] as! Bool
         opacity = Float(data["opacity"] as! Double)
@@ -44,6 +55,17 @@ struct FlutterLayer: Hashable {
         } else {
             serviceImageTiledLayerOptions = nil
         }
+
+        if layerType == "GroupLayer" {
+            groupLayerOptions = GroupLayerOptions(
+                    showChildrenInLegend: data["showChildrenInLegend"] as! Bool,
+                    visibilityMode: AGSGroupVisibilityMode(rawValue: data["visibilityMode"] as! Int) ?? .independent,
+                    layers: (data["layers"] as! [Any]).map {
+                        FlutterLayer(data: $0 as! Dictionary<String, Any>)
+                    })
+        } else {
+            groupLayerOptions = nil
+        }
     }
 
     let layerId: String
@@ -56,4 +78,9 @@ struct FlutterLayer: Hashable {
     let credential: AGSCredential?
 
     let serviceImageTiledLayerOptions: ServiceImageTiledLayerOptions?
+    let groupLayerOptions: GroupLayerOptions?
+
+    var hashValue: Int {
+        layerId.hashValue
+    }
 }
