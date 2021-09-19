@@ -1,7 +1,7 @@
 part of arcgis_maps_flutter;
 
 @immutable
-class Credential {
+class Credential{
   final _BaseCredentials _baseCredentials;
 
   const Credential._(this._baseCredentials);

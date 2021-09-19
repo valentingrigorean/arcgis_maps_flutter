@@ -1,40 +1,23 @@
 part of arcgis_maps_flutter;
 
 class WmsLayer extends BaseTileLayer {
-  const WmsLayer._({
-    required LayerId layerId,
-    required String url,
+  WmsLayer.fromUrl(
+    String url, {
+    LayerId? layerId,
     required this.layersName,
     Credential? credential,
     bool isVisible = true,
     double opacity = 1,
-  }) : super(
+  }) : super.fromUrl(
           isVisible: isVisible,
           opacity: opacity,
-          layerId: layerId,
+          layerId: layerId ?? LayerId(url),
           url: url,
           type: 'WmsLayer',
           credential: credential,
         );
 
   final List<String> layersName;
-
-  factory WmsLayer.fromUrl(
-    String url, {
-    required List<String> layersName,
-    LayerId? layerId,
-    Credential? credential,
-    bool isVisible = true,
-    double opacity = 1,
-  }) =>
-      WmsLayer._(
-        layerId: layerId ?? LayerId(url),
-        url: url,
-        layersName: layersName,
-        credential: credential,
-        isVisible: isVisible,
-        opacity: opacity,
-      );
 
   @override
   Map<String, Object> toJson() {
@@ -52,9 +35,9 @@ class WmsLayer extends BaseTileLayer {
     bool? isVisibleParam,
     double? opacityParam,
   }) {
-    return WmsLayer._(
+    return WmsLayer.fromUrl(
+      url!,
       layerId: layerId,
-      url: url,
       credential: credential,
       layersName: layersName,
       isVisible: isVisibleParam ?? isVisible,

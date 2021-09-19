@@ -724,7 +724,7 @@ public class Convert {
         }
     }
 
-    private static Portal toPortal(Object o) {
+    public static Portal toPortal(Object o) {
         final Map<?, ?> data = toMap(o);
         final String postalUrl = (String) data.get("postalUrl");
         final boolean loginRequired = toBoolean(data.get("loginRequired"));
@@ -736,7 +736,7 @@ public class Convert {
         return portal;
     }
 
-    private static PortalItem toPortalItem(Object o) {
+    public static PortalItem toPortalItem(Object o) {
         final Map<?, ?> data = toMap(o);
         final Portal portal = toPortal(data.get("portal"));
         final String itemId = (String) data.get("itemId");
@@ -894,6 +894,10 @@ public class Convert {
 
     public static int toInt(Object o) {
         return ((Number) o).intValue();
+    }
+
+    public static long toLong(Object o){
+        return ((Number) o).longValue();
     }
 
 

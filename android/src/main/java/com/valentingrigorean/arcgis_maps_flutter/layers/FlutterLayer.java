@@ -12,6 +12,7 @@ import com.esri.arcgisruntime.layers.GroupLayer;
 import com.esri.arcgisruntime.layers.GroupVisibilityMode;
 import com.esri.arcgisruntime.layers.Layer;
 import com.esri.arcgisruntime.layers.WmsLayer;
+import com.esri.arcgisruntime.portal.PortalItem;
 import com.esri.arcgisruntime.security.Credential;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
 
@@ -31,12 +32,24 @@ public class FlutterLayer {
     private final float opacity;
     private final ServiceImageTiledLayerOptions serviceImageTiledLayerOptions;
     private final GroupLayerOptions groupLayerOptions;
+    private final PortalItem portalItem;
+
+    private final long portalItemLayerId;
 
     public FlutterLayer(Map<?, ?> data) {
         this.data = data;
         layerId = (String) data.get("layerId");
         layerType = (String) data.get("layerType");
-        url = (String) data.get("url");
+        if (data.containsKey("url")) {
+            url = (String) data.get("url");
+            portalItem = null;
+        } else if (data.containsKey("portalItem")) {
+            url = null;
+            portalItem = Convert.toPortalItem(data.get("portalItem"));
+        } else {
+            url = null;
+            portalItem = null;
+        }
         isVisible = Convert.toBoolean(data.get("isVisible"));
         opacity = Convert.toFloat(data.get("opacity"));
         if (data.containsKey("credential")) {
@@ -45,16 +58,31 @@ public class FlutterLayer {
             credential = null;
         }
 
-        if (layerType.equals("ServiceImageTiledLayer")) {
-            serviceImageTiledLayerOptions = Convert.toServiceImageTiledLayerOptions(data);
-        } else {
-            serviceImageTiledLayerOptions = null;
-        }
-
-        if (layerType.equals("GroupLayer")) {
-            groupLayerOptions = new GroupLayerOptions(data);
-        } else {
-            groupLayerOptions = null;
+        switch (layerType) {
+            case "ServiceImageTiledLayer":
+                serviceImageTiledLayerOptions = Convert.toServiceImageTiledLayerOptions(data);
+                groupLayerOptions = null;
+                portalItemLayerId = -1;
+                break;
+            case "GroupLayer":
+                groupLayerOptions = new GroupLayerOptions(data);
+                serviceImageTiledLayerOptions = null;
+                portalItemLayerId = -1;
+                break;
+            case "FeatureLayer":
+                if (data.containsKey("portalItemLayerId")) {
+                    portalItemLayerId = Convert.toLong(data.get("portalItemLayerId"));
+                } else {
+                    portalItemLayerId = -1;
+                }
+                serviceImageTiledLayerOptions = null;
+                groupLayerOptions = null;
+                break;
+            default:
+                serviceImageTiledLayerOptions = null;
+                groupLayerOptions = null;
+                portalItemLayerId = -1;
+                break;
         }
     }
 
@@ -72,9 +100,13 @@ public class FlutterLayer {
                 remoteResource = vectorTiledLayer;
                 break;
             case "FeatureLayer":
-                final ServiceFeatureTable serviceFeatureTable = new ServiceFeatureTable(url);
-                remoteResource = serviceFeatureTable;
-                layer = new FeatureLayer(serviceFeatureTable);
+                if(url != null) {
+                    final ServiceFeatureTable serviceFeatureTable = new ServiceFeatureTable(url);
+                    remoteResource = serviceFeatureTable;
+                    layer = new FeatureLayer(serviceFeatureTable);
+                }else{
+                    layer = new FeatureLayer(portalItem,portalItemLayerId);
+                }
                 break;
             case "TiledLayer":
                 final ArcGISTiledLayer tiledLayer = new ArcGISTiledLayer(url);
@@ -122,7 +154,7 @@ public class FlutterLayer {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FlutterLayer that = (FlutterLayer) o;
-        return isVisible == that.isVisible && Float.compare(that.opacity, opacity) == 0 && layerId.equals(that.layerId) && layerType.equals(that.layerType) && url.equals(that.url) && credential.equals(that.credential) && serviceImageTiledLayerOptions.equals(that.serviceImageTiledLayerOptions) && groupLayerOptions.equals(that.groupLayerOptions);
+        return isVisible == that.isVisible && Float.compare(that.opacity, opacity) == 0 && portalItemLayerId == that.portalItemLayerId && layerId.equals(that.layerId) && layerType.equals(that.layerType) && url.equals(that.url) && credential.equals(that.credential) && serviceImageTiledLayerOptions.equals(that.serviceImageTiledLayerOptions) && groupLayerOptions.equals(that.groupLayerOptions) && portalItem.equals(that.portalItem);
     }
 
     @Override

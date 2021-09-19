@@ -1,7 +1,7 @@
 part of arcgis_maps_flutter;
 
 @immutable
-class Portal {
+class Portal extends Equatable {
   const Portal({
     required this.postalUrl,
     required this.loginRequired,
@@ -9,7 +9,7 @@ class Portal {
   });
 
   factory Portal.arcGISOnline({
-    required withLoginRequired,
+    required bool withLoginRequired,
     Credential? credential,
   }) =>
       Portal(
@@ -35,15 +35,5 @@ class Portal {
   }
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Portal &&
-          runtimeType == other.runtimeType &&
-          postalUrl == other.postalUrl &&
-          loginRequired == other.loginRequired &&
-          credential == other.credential;
-
-  @override
-  int get hashCode =>
-      postalUrl.hashCode ^ loginRequired.hashCode ^ credential.hashCode;
+  List<Object?> get props => [postalUrl, loginRequired, credential];
 }

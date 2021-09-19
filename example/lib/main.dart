@@ -3,11 +3,13 @@ import 'package:arcgis_maps_flutter_example/map_page.dart';
 import 'package:arcgis_maps_flutter_example/map_page_assets_marker.dart';
 import 'package:arcgis_maps_flutter_example/map_page_auto_pan_mode.dart';
 import 'package:arcgis_maps_flutter_example/map_page_dynamic_layer.dart';
+import 'package:arcgis_maps_flutter_example/map_page_group_layer.dart';
 import 'package:arcgis_maps_flutter_example/map_page_layers_change.dart';
 import 'package:arcgis_maps_flutter_example/map_page_legend.dart';
 import 'package:arcgis_maps_flutter_example/map_page_marker_rotation.dart';
 import 'package:arcgis_maps_flutter_example/map_page_markers_visibility_filter.dart';
 import 'package:arcgis_maps_flutter_example/map_page_polygon.dart';
+import 'package:arcgis_maps_flutter_example/map_page_portal.dart';
 import 'package:arcgis_maps_flutter_example/map_page_scalerbar.dart';
 import 'package:arcgis_maps_flutter_example/map_page_screen_location.dart';
 import 'package:arcgis_maps_flutter_example/map_page_time_slider.dart';
@@ -17,9 +19,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await ArcGISRuntimeEnvironment.setApiKey('test');
-  final result = await ArcGISRuntimeEnvironment.setLicense('licenseKey');
   await dotenv.load(fileName: ".env");
+  await ArcGISRuntimeEnvironment.setApiKey(dotenv.env['apiKey'] ?? 'apiKey');
+  final result = await ArcGISRuntimeEnvironment.setLicense(dotenv.env['licenseKey'] ?? 'licenseKey');
   final apiVersion = await ArcGISRuntimeEnvironment.getAPIVersion();
 
   print(result);
@@ -79,6 +81,28 @@ class MainPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => MapPageScaleBar(),
+                    ),
+                  );
+                },
+              ),
+              ElevatedButton(
+                child: Text('Map Group Layer'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MapPageGroupLayer(),
+                    ),
+                  );
+                },
+              ),
+              ElevatedButton(
+                child: Text('Map Portal feature layer'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MapPagePortal(),
                     ),
                   );
                 },

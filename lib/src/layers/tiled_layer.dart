@@ -1,35 +1,20 @@
 part of arcgis_maps_flutter;
 
 class TiledLayer extends BaseTileLayer {
-  TiledLayer._({
-    required LayerId layerId,
-    required String url,
-    Credential? credential,
-    bool isVisible = true,
-    double opacity = 1,
-  }) : super(
-          isVisible: isVisible,
-          opacity: opacity,
-          layerId: layerId,
-          url: url,
-          type: 'TiledLayer',
-          credential: credential,
-        );
-
-  factory TiledLayer.fromUrl(
+  TiledLayer.fromUrl(
     String url, {
     LayerId? layerId,
     Credential? credential,
     bool isVisible = true,
     double opacity = 1,
-  }) =>
-      TiledLayer._(
-        layerId: layerId ?? LayerId(url),
-        url: url,
-        credential: credential,
-        isVisible: isVisible,
-        opacity: opacity,
-      );
+  }) : super.fromUrl(
+          isVisible: isVisible,
+          opacity: opacity,
+          layerId: layerId ?? LayerId(url),
+          url: url,
+          type: 'TiledLayer',
+          credential: credential,
+        );
 
   @override
   clone() {
@@ -40,9 +25,9 @@ class TiledLayer extends BaseTileLayer {
     bool? isVisibleParam,
     double? opacityParam,
   }) {
-    return TiledLayer._(
+    return TiledLayer.fromUrl(
+      url!,
       layerId: layerId,
-      url: url,
       credential: credential,
       isVisible: isVisibleParam ?? isVisible,
       opacity: opacityParam ?? opacity,

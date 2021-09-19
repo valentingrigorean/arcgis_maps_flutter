@@ -28,9 +28,14 @@ struct FlutterLayer: Hashable, Equatable {
         layerId = data["layerId"] as! String
         layerType = data["layerType"] as! String
         if let url = data["url"] as? String {
-            self.url = URL(string: data["url"] as! String)
-        } else {
+            self.url = URL(string: url)
+            portalItem = nil
+        } else if let portalItemData = data["portalItem"] as? Dictionary<String, Any>{
             url = nil
+            portalItem = AGSPortalItem(data: portalItemData)
+        }else{
+            url = nil
+            portalItem = nil
         }
 
         isVisible = data["isVisible"] as! Bool
@@ -44,7 +49,8 @@ struct FlutterLayer: Hashable, Equatable {
 
         layersName = data["layersName"] as? [String]
 
-        if layerType == "ServiceImageTiledLayer" {
+        switch (layerType) {
+        case "ServiceImageTiledLayer":
             serviceImageTiledLayerOptions = ServiceImageTiledLayerOptions(
                     tileInfo: AGSTileInfo(data: data["tileInfo"] as! Dictionary<String, Any>),
                     fullExtent: AGSEnvelope(data: data["fullExtent"] as! Dictionary<String, Any>),
@@ -52,19 +58,29 @@ struct FlutterLayer: Hashable, Equatable {
                     subdomains: data["subdomains"] as! [String],
                     additionalOptions: data["additionalOptions"] as! Dictionary<String, String>
             )
-        } else {
-            serviceImageTiledLayerOptions = nil
-        }
-
-        if layerType == "GroupLayer" {
+            groupLayerOptions = nil
+            portalItemLayerId = nil
+            break
+        case "GroupLayer":
             groupLayerOptions = GroupLayerOptions(
                     showChildrenInLegend: data["showChildrenInLegend"] as! Bool,
                     visibilityMode: AGSGroupVisibilityMode(rawValue: data["visibilityMode"] as! Int) ?? .independent,
                     layers: (data["layers"] as! [Any]).map {
                         FlutterLayer(data: $0 as! Dictionary<String, Any>)
                     })
-        } else {
+            serviceImageTiledLayerOptions = nil
+            portalItemLayerId = nil
+            break
+        case "FeatureLayer":
+            portalItemLayerId = data["portalItemLayerId"] as? Int
+            serviceImageTiledLayerOptions = nil
             groupLayerOptions = nil
+            break
+        default:
+            serviceImageTiledLayerOptions = nil
+            groupLayerOptions = nil
+            portalItemLayerId = nil
+            break
         }
     }
 
@@ -79,6 +95,9 @@ struct FlutterLayer: Hashable, Equatable {
 
     let serviceImageTiledLayerOptions: ServiceImageTiledLayerOptions?
     let groupLayerOptions: GroupLayerOptions?
+
+    let portalItem: AGSPortalItem?
+    let portalItemLayerId: Int?
 
     var hashValue: Int {
         layerId.hashValue

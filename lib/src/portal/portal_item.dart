@@ -1,7 +1,7 @@
 part of arcgis_maps_flutter;
 
 @immutable
-class PortalItem {
+class PortalItem extends Equatable {
   const PortalItem({
     required this.portal,
     required this.itemId,
@@ -18,13 +18,5 @@ class PortalItem {
   }
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is PortalItem &&
-          runtimeType == other.runtimeType &&
-          portal == other.portal &&
-          itemId == other.itemId;
-
-  @override
-  int get hashCode => portal.hashCode ^ itemId.hashCode;
+  List<Object?> get props => [portal, itemId];
 }

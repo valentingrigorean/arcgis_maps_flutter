@@ -53,4 +53,11 @@ class GroupLayer extends Layer {
     json['layers'] = layers.map((e) => e.toJson()).toList();
     return json;
   }
+
+  @override
+  List<Object?> get props => [
+        layers,
+        visibilityMode,
+        showChildrenInLegend,
+      ];
 }

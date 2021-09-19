@@ -22,7 +22,7 @@ class ServiceImageTiledLayer extends BaseTileLayer {
     this.additionalOptions = const <String, String>{},
     bool isVisible = true,
     double opacity = 1.0,
-  }) : super(
+  }) : super.fromUrl(
           type: 'ServiceImageTiledLayer',
           url: urlTemplate,
           layerId: layerId,
@@ -40,7 +40,7 @@ class ServiceImageTiledLayer extends BaseTileLayer {
   Layer clone() {
     return ServiceImageTiledLayer(
       layerId: layerId,
-      urlTemplate: url,
+      urlTemplate: url!,
       tileInfo: tileInfo,
       fullExtent: fullExtent,
       subdomains: subdomains,
@@ -58,4 +58,13 @@ class ServiceImageTiledLayer extends BaseTileLayer {
     json['additionalOptions'] = additionalOptions;
     return json;
   }
+
+  @override
+  List<Object?> get props => super.props
+    ..addAll([
+      tileInfo,
+      fullExtent,
+      subdomains,
+      additionalOptions,
+    ]);
 }

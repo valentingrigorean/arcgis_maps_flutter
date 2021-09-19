@@ -1,53 +1,69 @@
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 
-abstract class BaseTileLayer<T> extends Layer {
-  const BaseTileLayer({
+abstract class BaseTileLayer extends Layer {
+  const BaseTileLayer.fromUrl({
     required LayerId layerId,
-    required this.url,
+    required String url,
     required this.type,
     this.credential,
     bool isVisible = true,
     double opacity = 1,
-  }) : super(
+  })  : portalItem = null,
+        // ignore: prefer_initializing_formals
+        url = url,
+        super(
+          layerId: layerId,
           isVisible: isVisible,
           opacity: opacity,
-          layerId: layerId,
         );
 
-  final String url;
+  const BaseTileLayer.fromPortalItem({
+    required LayerId layerId,
+    required PortalItem portalItem,
+    required this.type,
+    bool isVisible = true,
+    double opacity = 1,
+  })  : url = null,
+        credential = null,
+        // ignore: prefer_initializing_formals
+        portalItem = portalItem,
+        super(
+          layerId: layerId,
+          isVisible: isVisible,
+          opacity: opacity,
+        );
+
+  final String? url;
 
   final String type;
 
   final Credential? credential;
 
+  final PortalItem? portalItem;
 
   @override
   Map<String, Object> toJson() {
     final Map<String, Object> json = super.toJson();
     json["layerType"] = type;
-    json["url"] = url;
+    if (url != null) {
+      json["url"] = url!;
+    }
     json["layerId"] = layerId.value;
     if (credential != null) {
       json["credential"] = credential!.toJson();
+    }
+    if (portalItem != null) {
+      json['portalItem'] = portalItem!.toJson();
     }
     return json;
   }
 
   @override
-  int get hashCode => layerId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is BaseTileLayer &&
-          runtimeType == other.runtimeType &&
-          layerId == other.layerId &&
-          url == other.url &&
-          type == other.type &&
-          credential == other.credential;
-
-  @override
-  String toString() {
-    return '$type{url: $url}';
-  }
+  List<Object?> get props => super.props
+    ..addAll([
+      type,
+      url,
+      credential,
+      portalItem,
+    ]);
 }

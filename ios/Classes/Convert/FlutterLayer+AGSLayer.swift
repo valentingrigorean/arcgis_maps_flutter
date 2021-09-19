@@ -14,9 +14,14 @@ extension FlutterLayer {
             setupDefaultParams(layer: layer)
             return layer
         case "FeatureLayer":
-            let featureTable = AGSServiceFeatureTable(url: url!)
-            featureTable.credential = credential
-            let featureLayer = AGSFeatureLayer(featureTable: featureTable)
+            let featureLayer: AGSFeatureLayer
+            if let url = url {
+                let featureTable = AGSServiceFeatureTable(url: url)
+                featureTable.credential = credential
+                featureLayer = AGSFeatureLayer(featureTable: featureTable)
+            } else {
+                featureLayer = AGSFeatureLayer(item: portalItem!, layerID: portalItemLayerId!)
+            }
             setupDefaultParams(layer: featureLayer)
             return featureLayer
         case "TiledLayer":
