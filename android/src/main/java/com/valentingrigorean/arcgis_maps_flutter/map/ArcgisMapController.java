@@ -19,10 +19,13 @@ import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.layers.Layer;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.LayerList;
+import com.esri.arcgisruntime.mapping.TimeExtent;
 import com.esri.arcgisruntime.mapping.Viewpoint;
 import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
 import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
+import com.esri.arcgisruntime.mapping.view.TimeExtentChangedEvent;
+import com.esri.arcgisruntime.mapping.view.TimeExtentChangedListener;
 import com.esri.arcgisruntime.mapping.view.ViewpointChangedEvent;
 import com.esri.arcgisruntime.mapping.view.ViewpointChangedListener;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
@@ -42,7 +45,7 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.platform.PlatformView;
 
-final class ArcgisMapController implements DefaultLifecycleObserver, PlatformView, MethodChannel.MethodCallHandler, ViewpointChangedListener, LocationDisplay.AutoPanModeChangedListener {
+final class ArcgisMapController implements DefaultLifecycleObserver, PlatformView, MethodChannel.MethodCallHandler, ViewpointChangedListener, LocationDisplay.AutoPanModeChangedListener, TimeExtentChangedListener {
 
     private static final String TAG = "ArcgisMapController";
 
@@ -79,9 +82,11 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
     private boolean haveScaleBar;
 
-    private boolean trackViewpointChangedListenerEvent = false;
+    private boolean trackViewpointChangedListenerEvents = false;
 
-    private boolean trackCameraPosition = false;
+    private boolean trackCameraPositionEvents = false;
+
+    private boolean trackTimeExtentEvents = false;
 
     private boolean disposed = false;
 
@@ -177,11 +182,11 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
     @Override
     public void viewpointChanged(ViewpointChangedEvent viewpointChangedEvent) {
-        if (trackViewpointChangedListenerEvent) {
+        if (trackViewpointChangedListenerEvents) {
             methodChannel.invokeMethod("map#viewpointChanged", null);
         }
 
-        if (trackCameraPosition) {
+        if (trackCameraPositionEvents) {
             methodChannel.invokeMethod("camera#onMove", null);
         }
     }
@@ -189,6 +194,11 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     @Override
     public void onAutoPanModeChanged(LocationDisplay.AutoPanModeChangedEvent autoPanModeChangedEvent) {
         methodChannel.invokeMethod("map#autoPanModeChanged", autoPanModeChangedEvent.getAutoPanMode().ordinal());
+    }
+
+    @Override
+    public void timeExtentChanged(TimeExtentChangedEvent timeExtentChangedEvent) {
+        methodChannel.invokeMethod("map#timeExtentChanged", Convert.timeExtentToJson(timeExtentChangedEvent.getTimeExtent()));
     }
 
     @Override
@@ -223,12 +233,34 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 result.success(null);
             }
             case "map#setViewpointChangedListenerEvents": {
-                trackViewpointChangedListenerEvent = call.arguments();
+                trackViewpointChangedListenerEvents = call.arguments();
                 result.success(null);
             }
             break;
             case "map#setLayersChangedListener": {
                 layersChangedController.setTrackLayersChange(call.arguments());
+                result.success(null);
+            }
+            break;
+            case "map#setTimeExtentChanged": {
+                final boolean track = call.arguments();
+                if (trackTimeExtentEvents != track) {
+                    trackTimeExtentEvents = track;
+                    if (trackTimeExtentEvents) {
+                        mapView.addTimeExtentChangedListener(this);
+                    } else {
+                        mapView.removeTimeExtentChangedListener(this);
+                    }
+                }
+                result.success(null);
+            }
+            break;
+            case "map#getTimeExtent":{
+                result.success(Convert.timeExtentToJson(mapView.getTimeExtent()));
+            }
+            break;
+            case "map#setTimeExtent":{
+                mapView.setTimeExtent(Convert.toTimeExtent(call.arguments));
                 result.success(null);
             }
             break;
@@ -406,8 +438,11 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         if (mapView == null) {
             return;
         }
+        trackTimeExtentEvents = false;
+        mapView.removeTimeExtentChangedListener(null);
         mapViewOnTouchListener.clearAllDelegates();
         mapViewOnTouchListener = null;
+        trackViewpointChangedListenerEvents = false;
         mapView.removeViewpointChangedListener(this);
         mapView.dispose();
         mapView = null;
@@ -499,7 +534,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
         final Object trackCameraPosition = data.get("trackCameraPosition");
         if (trackCameraPosition != null) {
-            this.trackCameraPosition = Convert.toBoolean(trackCameraPosition);
+            this.trackCameraPositionEvents = Convert.toBoolean(trackCameraPosition);
         }
 
         final Object trackIdentifyLayers = data.get("trackIdentifyLayers");
@@ -554,4 +589,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             polylinesController.addPolylines((List<Object>) polylinesToAdd);
         }
     }
+
+
 }

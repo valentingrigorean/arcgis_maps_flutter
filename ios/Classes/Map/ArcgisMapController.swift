@@ -46,6 +46,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private var legendInfoControllers = Array<LegendInfoController>()
 
+    private var timeExtentObservation: NSKeyValueObservation?
+
 
     public init(
             withRegistrar registrar: FlutterPluginRegistrar,
@@ -91,6 +93,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     deinit {
+        timeExtentObservation?.invalidate()
+        timeExtentObservation = nil
         clearSymbolsControllers()
         symbolVisibilityFilterController.clear()
         mapView.locationDisplay.autoPanModeChangedHandler = nil
@@ -148,6 +152,36 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 layersChangedController.trackLayersChange = val
             }
             result(nil)
+            break
+        case "map#setTimeExtentChanged":
+            if let val = call.arguments as? Bool {
+                if val, timeExtentObservation == nil {
+                    timeExtentObservation = mapView.observe(\.timeExtent, options: .new) { [weak self] (_,
+                                                                                                        _) in
+                        guard let self = self else {
+                            return
+                        }
+                        self.onTimeExtentChanged(timeExtent: self.mapView.timeExtent)
+                    }
+                }else{
+                    timeExtentObservation?.invalidate()
+                    timeExtentObservation = nil
+                }
+            }
+            result(nil)
+            break
+        case "map#setTimeExtent":
+            if let timeExtentRaw = call.arguments as? Dictionary<String,Any>{
+                let timeExtent = AGSTimeExtent(data: timeExtentRaw)
+                if mapView.timeExtent != timeExtent{
+                    mapView.timeExtent = timeExtent
+                }
+            }else{
+                mapView.timeExtent = nil
+            }
+            break
+        case "map#getTimeExtent":
+            result(mapView.timeExtent?.toJSONFlutter())
             break
         case "map#getMapRotation":
             result(mapView.rotation)
@@ -323,6 +357,10 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             controller.selectionPropertiesHandler = nil
             controller.symbolVisibilityFilterController = nil
         }
+    }
+
+    private func onTimeExtentChanged(timeExtent: AGSTimeExtent?) {
+        channel.invokeMethod("map#timeExtentChanged", arguments: timeExtent?.toJSONFlutter())
     }
 
     private func onAutoPanModeChanged(autoPanMode: AGSLocationDisplayAutoPanMode) {

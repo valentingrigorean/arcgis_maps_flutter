@@ -215,6 +215,14 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
+  Future<void> setTimeExtentChanged(int mapId, bool register) {
+    return channel(mapId).invokeMethod<void>(
+      'map#setTimeExtentChanged',
+      register,
+    );
+  }
+
+  @override
   Future<bool> isLocationDisplayStarted(int mapId) async {
     return await channel(mapId)
             .invokeMethod<bool>("map#isLocationDisplayStarted") ??
@@ -224,6 +232,19 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   @override
   Future<void> setLocationDisplay(int mapId, bool start) {
     return channel(mapId).invokeMethod<void>("map#setLocationDisplay", start);
+  }
+
+  @override
+  Future<TimeExtent?> getTimeExtent(int mapId) async {
+    final result = await channel(mapId)
+        .invokeMapMethod<String, dynamic>("map#getTimeExtent");
+    return result == null ? null : TimeExtent.fromJson(result);
+  }
+
+  @override
+  Future<void> setTimeExtent(int mapId, TimeExtent? timeExtent) {
+    return channel(mapId)
+        .invokeMethod<void>('map#setTimeExtent', timeExtent?.toJson());
   }
 
   @override
@@ -366,6 +387,11 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
     return _events(mapId).whereType<LayersChangedEvent>();
   }
 
+  @override
+  Stream<TimeExtentChangedEvent> onTimeExtentChanged({required int mapId}) {
+    return _events(mapId).whereType<TimeExtentChangedEvent>();
+  }
+
   // Returns a filtered view of the events in the _controller, by mapId.
   Stream<MapEvent> _events(int mapId) =>
       _mapEventStreamController.stream.where((event) => event.mapId == mapId);
@@ -470,7 +496,13 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
         }
         _mapEventStreamController.add(IdentifyLayersEvent(mapId, results));
         break;
-      case '':
+      case 'map#timeExtentChanged':
+        _mapEventStreamController.add(
+          TimeExtentChangedEvent(
+            mapId,
+            call.arguments == null ? null : TimeExtent.fromJson(call.arguments),
+          ),
+        );
         break;
       default:
         throw MissingPluginException();

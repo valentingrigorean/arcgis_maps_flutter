@@ -28,6 +28,8 @@ dependencies:
 
   location_permissions: ^4.0.0
 
+  another_xlider: ^1.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

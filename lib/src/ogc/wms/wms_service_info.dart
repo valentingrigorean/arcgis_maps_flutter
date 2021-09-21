@@ -48,3 +48,31 @@ class WmsServiceInfo extends Equatable {
         imageFormats
       ];
 }
+
+extension WmsServiceInfoExtension on WmsServiceInfo {
+  WmsLayerInfo? getLayerInfoByName(String layerName) {
+    for (final layerInfo in layersInfo) {
+      final result = _getLayerInfoByName(layerName, layerInfo);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
+  }
+
+  static WmsLayerInfo? _getLayerInfoByName(
+    String layerName,
+    WmsLayerInfo layerInfo,
+  ) {
+    if (layerName == layerInfo.name) {
+      return layerInfo;
+    }
+    for (final layerInfo in layerInfo.sublayerInfos) {
+      final result = _getLayerInfoByName(layerName, layerInfo);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
+  }
+}

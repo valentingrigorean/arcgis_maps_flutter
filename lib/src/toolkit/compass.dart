@@ -18,6 +18,12 @@ class CompassController extends ChangeNotifier
     return CompassController._(0, mapController);
   }
 
+  @override
+  void dispose() {
+    _mapController?.removeViewpointChangedListener(this);
+    super.dispose();
+  }
+
   double get rotation => _rotation;
 
   set rotation(double newValue) {
@@ -40,12 +46,6 @@ class CompassController extends ChangeNotifier
     final controller = _mapController;
     if (controller == null) return;
     rotation = await controller.getMapRotation();
-  }
-
-  @override
-  void dispose() {
-    _mapController?.removeViewpointChangedListener(this);
-    super.dispose();
   }
 }
 

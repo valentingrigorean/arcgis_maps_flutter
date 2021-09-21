@@ -14,8 +14,7 @@ class ArcgisMapController {
   });
   late final _EventBaseHandler<TimeExtentChangedListener>
       _timeExtentChangedHandlers = _EventBaseHandler((register) {
-    ArcgisMapsFlutterPlatform.instance
-        .setTimeExtentChanged(mapId, register);
+    ArcgisMapsFlutterPlatform.instance.setTimeExtentChanged(mapId, register);
   });
   final int mapId;
 
@@ -79,6 +78,14 @@ class ArcgisMapController {
     return ArcgisMapsFlutterPlatform.instance.setLocationDisplay(mapId, true);
   }
 
+  Future<TimeExtent?> getTimeExtent() {
+    return ArcgisMapsFlutterPlatform.instance.getTimeExtent(mapId);
+  }
+
+  Future<void> setTimeExtent(TimeExtent? timeExtent) {
+    return ArcgisMapsFlutterPlatform.instance.setTimeExtent(mapId, timeExtent);
+  }
+
   /// Stop the location display. Location updates will no longer
   /// be received or displayed on the map.
   Future<void> stopLocationDisplay() {
@@ -134,11 +141,6 @@ class ArcgisMapController {
   /// Return all time aware layers from Operational layers.
   Future<List<TimeAwareLayerInfo>> getTimeAwareLayerInfos() =>
       ArcgisMapsFlutterPlatform.instance.getTimeAwareLayerInfos(mapId);
-
-  Stream<TimeExtent?> onTimeExtentChanged() =>
-      ArcgisMapsFlutterPlatform.instance
-          .onTimeExtentChanged(mapId)
-          .map((e) => e.value);
 
   Future<void> _setMap(ArcGISMap map) {
     return ArcgisMapsFlutterPlatform.instance.setMap(mapId, map);
@@ -234,8 +236,18 @@ class ArcgisMapController {
 
     ArcgisMapsFlutterPlatform.instance
         .onAutoPanModeChanged(mapId: mapId)
-        .listen((AutoPanModeChangedEvent e) =>
-            _arcgisMapState.onAutoPanModeChanged(e.value));
+        .listen(
+          (AutoPanModeChangedEvent e) =>
+              _arcgisMapState.onAutoPanModeChanged(e.value),
+        );
+
+    ArcgisMapsFlutterPlatform.instance.onTimeExtentChanged(mapId: mapId).listen(
+      (TimeExtentChangedEvent e) {
+        for (final listener in _timeExtentChangedHandlers.handlers) {
+          listener.timeExtentChanged(e.value);
+        }
+      },
+    );
 
     ArcgisMapsFlutterPlatform.instance.onIdentifyLayer(mapId: mapId).listen(
         (IdentifyLayerEvent e) =>

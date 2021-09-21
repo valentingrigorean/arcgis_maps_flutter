@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 
 import androidx.annotation.NonNull;
@@ -55,6 +56,8 @@ import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.Scalebar;
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.Style;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -62,6 +65,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Convert {
+
+    private static String TAG = "Convert";
+
     private static final SimpleDateFormat ISO8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
     public static Scalebar.Alignment toScaleBarAlignment(int rawValue) {
@@ -532,6 +538,23 @@ public class Convert {
         return json;
     }
 
+    @Nullable
+    public static TimeExtent toTimeExtent(Object o) {
+        final Map<?, ?> data = toMap(o);
+        if (data == null || data.isEmpty()) {
+            return null;
+        }
+
+        final Object startTime = data.get("startTime");
+        final Object endTime = data.get("endTime");
+
+        if(startTime == null && endTime == null){
+            return null;
+        }
+
+        return new TimeExtent(toCalendarFromISO8601(startTime), toCalendarFromISO8601(endTime));
+    }
+
     @NonNull
     public static Object timeValueToJson(TimeValue timeValue) {
         final Map<Object, Object> json = new HashMap<>(2);
@@ -896,8 +919,25 @@ public class Convert {
         return ((Number) o).intValue();
     }
 
-    public static long toLong(Object o){
+    public static long toLong(Object o) {
         return ((Number) o).longValue();
+    }
+
+    @Nullable
+    public static Calendar toCalendarFromISO8601(Object o) {
+        final String dateStr = (String) o;
+        if (dateStr == null || dateStr.isEmpty()) {
+            return null;
+        }
+        try {
+            final Date date = ISO8601Format.parse(dateStr);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            return calendar;
+        } catch (Exception ex) {
+            Log.e(TAG, "toCalendarFromISO8601: failed to parse iso8601 - " + dateStr, ex);
+            return null;
+        }
     }
 
 

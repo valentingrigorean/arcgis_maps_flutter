@@ -44,8 +44,8 @@ class TimeExtent extends Equatable {
 
   Object toJson() {
     final Map<String, Object> json = {};
-    if (startTime != null) json['startTime'] = startTime!.toIso8601String();
-    if (endTime != null) json['endTime'] = endTime!.toIso8601String();
+    if (startTime != null) json['startTime'] = startTime!.toUtc().toIso8601String();
+    if (endTime != null) json['endTime'] = endTime!.toUtc().toIso8601String();
     return json;
   }
 }

@@ -104,6 +104,14 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
         'isLocationDisplayStarted() has not been implemented.');
   }
 
+  Future<TimeExtent?> getTimeExtent(int mapId) {
+    throw UnimplementedError('getTimeExtent() has not been implemented.');
+  }
+
+  Future<void> setTimeExtent(int mapId, TimeExtent? timeExtent) {
+    throw UnimplementedError('setTimeExtent() has not been implemented.');
+  }
+
   Future<void> clearMarkerSelection(int mapId) {
     throw UnimplementedError(
         'clearMarkerSelection() has not been implemented.');
@@ -212,12 +220,13 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('onLayersChanged() has not been implemented.');
   }
 
-  Stream<TimeExtentChangedEvent> onTimeExtentChanged(int mapId) {
+  Stream<TimeExtentChangedEvent> onTimeExtentChanged({required int mapId}) {
     throw UnimplementedError('onTimeExtentChanged() has not been implemented.');
   }
 
   void dispose(int mapId) {
     throw UnimplementedError('dispose() has not been implemented.');
   }
+
 
 }

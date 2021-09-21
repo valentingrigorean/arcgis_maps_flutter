@@ -21,7 +21,6 @@ import 'package:arcgis_maps_flutter/src/utils/polyline.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
-import 'package:meta/meta.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/arcgis_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/arcgis_maps_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/scene/arcgis_scene_flutter_platform.dart';

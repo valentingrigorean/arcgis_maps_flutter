@@ -17,6 +17,7 @@ void main() {
         var serviceInfo = await wmsService
             .getServiceInfo('https://public-wms.met.no/verportal/verportal.map?');
         assert(serviceInfo != null);
+
       });
 
       test('SMHI data', () async {
