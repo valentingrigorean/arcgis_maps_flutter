@@ -10,49 +10,24 @@ class MapPageTimeSlider extends StatefulWidget {
 }
 
 class _MapPageTimeSliderState extends State<MapPageTimeSlider> {
-  final WmsService _wmsService = WmsService();
-  ArcgisMapController? _controller;
-  List<DateTime> _dates = [];
+  TimeSliderController? _controller;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Time Slider'),
+        title: const Text('Time Slider'),
       ),
       body: Stack(
         children: [
           Positioned.fill(child: _buildMap()),
-          if (_dates.length > 2)
+          if (_controller != null)
             Positioned(
-              bottom: 20,
+              bottom: 60,
               left: 20,
               right: 20,
-              child: FlutterSlider(
-                values: [_dates.first.millisecondsSinceEpoch.toDouble()],
-                min: _dates.first.millisecondsSinceEpoch.toDouble(),
-                max: _dates.last.millisecondsSinceEpoch.toDouble(),
-                step: FlutterSliderStep(
-                    step: const Duration(minutes: 5).inMilliseconds.toDouble()),
-                tooltip: FlutterSliderTooltip(
-                  custom: (value) {
-                    DateTime dtValue =
-                        DateTime.fromMillisecondsSinceEpoch(value.toInt());
-
-                    return Text(dtValue.toString());
-                  },
-                ),
-                onDragging: (handlerIndex, lowerValue, upperValue) {
-                  DateTime dtValue =
-                      DateTime.fromMillisecondsSinceEpoch(lowerValue.toInt());
-                  print(dtValue.toIso8601String());
-                  _controller?.setTimeExtent(
-                    TimeExtent(
-                      startTime: dtValue,
-                      endTime: dtValue,
-                    ),
-                  );
-                },
+              child: TimeSlider(
+                controller: _controller!,
               ),
             ),
         ],
@@ -70,18 +45,25 @@ class _MapPageTimeSliderState extends State<MapPageTimeSlider> {
             'radar_precipitation_intensity_nordic',
           ],
         ),
+        // WmsLayer.fromUrl(
+        //   'https://view.eumetsat.int/geoserver/wms',
+        //   layersName: ['msg_fes:rgb_naturalenhncd'],
+        // ),
+
+        // WmsLayer.fromUrl(
+        //   'https://halo-wms.met.no/halo/default.map',
+        //   layersName: [
+        //     'freezing_level_altitude_feet',
+        //   ],
+        // ),
       },
       onMapCreated: (controller) async {
-        final info = await controller.getTimeAwareLayerInfos();
-        _controller = controller;
-        if (info.isNotEmpty) {
-          var controller = TimeSliderController();
-          controller.fullExtent = info.first.fullTimeExtent;
-          setState(() {
-            _dates = controller.timeSteps;
-          });
-          print(info.first);
-        }
+        _controller = TimeSliderController(
+          minDate: DateTime.now().toUtc().subtract(const Duration(hours: 12)),
+          maxDate: DateTime.now().toUtc().add(const Duration(hours: 12)),
+        );
+        _controller!.setMapController(controller);
+        setState(() {});
       },
     );
   }

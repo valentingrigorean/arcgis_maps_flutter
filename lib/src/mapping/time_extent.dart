@@ -7,9 +7,16 @@ class TimeExtent extends Equatable {
     this.endTime,
   });
 
+  factory TimeExtent.singleValue(DateTime date) => TimeExtent(
+        startTime: date,
+        endTime: date,
+      );
+
   final DateTime? startTime;
 
   final DateTime? endTime;
+
+  bool get haveTime => startTime != null || endTime != null;
 
   @override
   bool? get stringify => true;
@@ -44,8 +51,12 @@ class TimeExtent extends Equatable {
 
   Object toJson() {
     final Map<String, Object> json = {};
-    if (startTime != null) json['startTime'] = startTime!.toUtc().toIso8601String();
-    if (endTime != null) json['endTime'] = endTime!.toUtc().toIso8601String();
+    if (startTime != null) {
+      json['startTime'] = startTime!.toUtc().toIso8601String();
+    }
+    if (endTime != null) {
+      json['endTime'] = endTime!.toUtc().toIso8601String();
+    }
     return json;
   }
 }
