@@ -10,7 +10,7 @@ void main() {
         endTime: DateTime.now().add(const Duration(hours: 1)),
       );
 
-      expect(controller.timeSteps.length, 14);
+      expect(controller.timeSteps.length, 12);
     });
 
     test('Generate timeSteps interval 1min', () {
@@ -24,7 +24,7 @@ void main() {
         endTime: DateTime.now().add(const Duration(hours: 1)),
       );
 
-      expect(controller.timeSteps.length, 62);
+      expect(controller.timeSteps.length, 60);
     });
   });
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
@@ -52,7 +54,7 @@ class _MapPageLegendState extends State<MapPageLegend> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Map Legend'),
+        title: const Text('Map Legend'),
       ),
       body: ArcgisMapView(
         map: ArcGISMap.openStreetMap(),
@@ -74,7 +76,7 @@ class _MapPageLegendState extends State<MapPageLegend> {
                   builder: (context) {
                     return Scaffold(
                       appBar: AppBar(
-                        title: Text('Results'),
+                        title: const Text('Results'),
                       ),
                       body: ListView.builder(
                         itemCount: result.length,
@@ -103,7 +105,7 @@ class _MapPageLegendState extends State<MapPageLegend> {
                   },
                 );
               },
-        child: Icon(Icons.info),
+        child: const Icon(Icons.info),
       ),
     );
   }

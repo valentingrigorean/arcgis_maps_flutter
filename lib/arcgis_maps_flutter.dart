@@ -12,6 +12,7 @@ import 'package:arcgis_maps_flutter/src/method_channel/map/map_event.dart';
 import 'package:arcgis_maps_flutter/src/symbology/marker_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polygon_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polyline_updates.dart';
+import 'package:arcgis_maps_flutter/src/toolkit/flutter_xlider.dart';
 import 'package:arcgis_maps_flutter/src/utils/elevation_source.dart';
 import 'package:arcgis_maps_flutter/src/utils/json.dart';
 import 'package:arcgis_maps_flutter/src/utils/layers.dart';

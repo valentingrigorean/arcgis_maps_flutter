@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +17,7 @@ class _MapPageASsetsMarkerState extends State<MapPageASsetsMarker> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Assets Marker"),
+        title: const Text("Assets Marker"),
       ),
       body: Stack(
         children: [
@@ -23,7 +25,7 @@ class _MapPageASsetsMarkerState extends State<MapPageASsetsMarker> {
             map: ArcGISMap.imageryWithLabelsVector(),
             markers: {
               Marker(
-                markerId: MarkerId('test'),
+                markerId: const MarkerId('test'),
                 position: Point.fromLatLng(
                   latitude: 0.0,
                   longitude: 0.0,

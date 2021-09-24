@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 
 class Utils {
-  static Random _random = new Random();
+  static final Random _random = Random();
 
   Utils._();
 
@@ -21,9 +21,9 @@ class Utils {
     double y = w * sin(t) * 1.75;
 
     // Adjust the x-coordinate for the shrinking of the east-west distances
-    double new_x = x / sin(y0);
+    double newX = x / sin(y0);
 
-    double foundLatitude = new_x + x0;
+    double foundLatitude = newX + x0;
     double foundLongitude = y + y0;
 
     return Point.fromLatLng(latitude: foundLatitude, longitude: foundLongitude);

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:arcgis_maps_flutter_example/map_page.dart';
 import 'package:arcgis_maps_flutter_example/map_page_assets_marker.dart';
@@ -58,7 +60,7 @@ class MainPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Arcgis $apiVersion'),
       ),
-      body: Container(
+      body: SizedBox(
         width: double.infinity,
         height: double.infinity,
         child: SingleChildScrollView(
@@ -68,160 +70,160 @@ class MainPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               ElevatedButton(
-                child: Text('Map 2d'),
+                child: const Text('Map 2d'),
                 onPressed: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => MapPage()));
+                      MaterialPageRoute(builder: (context) => const MapPage()));
                 },
               ),
               ElevatedButton(
-                child: Text('Map ScaleBar'),
+                child: const Text('Map ScaleBar'),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MapPageScaleBar(),
+                      builder: (context) => const MapPageScaleBar(),
                     ),
                   );
                 },
               ),
               ElevatedButton(
-                child: Text('Map Group Layer'),
+                child: const Text('Map Group Layer'),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MapPageGroupLayer(),
+                      builder: (context) => const MapPageGroupLayer(),
                     ),
                   );
                 },
               ),
               ElevatedButton(
-                child: Text('Map Portal feature layer'),
+                child: const Text('Map Portal feature layer'),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MapPagePortal(),
+                      builder: (context) => const MapPagePortal(),
                     ),
                   );
                 },
               ),
               ElevatedButton(
-                child: Text('Map Legend'),
+                child: const Text('Map Legend'),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MapPageLegend(),
+                      builder: (context) => const MapPageLegend(),
                     ),
                   );
                 },
               ),
               ElevatedButton(
-                child: Text('Map Dynamic Layer'),
+                child: const Text('Map Dynamic Layer'),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MapPageDynamicLayer(),
+                      builder: (context) => const MapPageDynamicLayer(),
                     ),
                   );
                 },
               ),
               ElevatedButton(
-                child: Text('Map Page Polygon'),
+                child: const Text('Map Page Polygon'),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MapPagePolygon(),
+                      builder: (context) => const MapPagePolygon(),
                     ),
                   );
                 },
               ),
               ElevatedButton(
-                child: Text('Map Time Slider'),
+                child: const Text('Map Time Slider'),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MapPageTimeSlider(),
+                      builder: (context) => const MapPageTimeSlider(),
                     ),
                   );
                 },
               ),
               ElevatedButton(
-                child: Text('Map Asset Marker'),
+                child: const Text('Map Asset Marker'),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MapPageASsetsMarker(),
+                      builder: (context) => const MapPageASsetsMarker(),
                     ),
                   );
                 },
               ),
               ElevatedButton(
-                child: Text('Map Layers changed'),
+                child: const Text('Map Layers changed'),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MapPageLayersChange(),
+                      builder: (context) => const MapPageLayersChange(),
                     ),
                   );
                 },
               ),
               ElevatedButton(
-                child: Text('Map Marker rotation'),
+                child: const Text('Map Marker rotation'),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MapPageMarkerRotation(),
+                      builder: (context) => const MapPageMarkerRotation(),
                     ),
                   );
                 },
               ),
               ElevatedButton(
-                child: Text('Map Marker Visibility Filter'),
+                child: const Text('Map Marker Visibility Filter'),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MapPageMarkersVisibilityFilter(),
+                      builder: (context) => const MapPageMarkersVisibilityFilter(),
                     ),
                   );
                 },
               ),
               ElevatedButton(
-                child: Text('Map AutoPanMode'),
+                child: const Text('Map AutoPanMode'),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MapPageAutoPanMode(),
+                      builder: (context) => const MapPageAutoPanMode(),
                     ),
                   );
                 },
               ),
               ElevatedButton(
-                child: Text('Map ScreenLocation'),
+                child: const Text('Map ScreenLocation'),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MapPageScreenLocation(),
+                      builder: (context) => const MapPageScreenLocation(),
                     ),
                   );
                 },
               ),
               ElevatedButton(
-                child: Text('Scene 3d'),
+                child: const Text('Scene 3d'),
                 onPressed: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => ScenePage()));
+                      MaterialPageRoute(builder: (context) => const ScenePage()));
                 },
               ),
             ],

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:location_permissions/location_permissions.dart';
@@ -42,14 +44,14 @@ class _MapPageAutoPanModeState extends State<MapPageAutoPanMode> {
           onPressed: () {
             LocationPermissions().openAppSettings();
           },
-          child: Text('Permission Required'),
+          child: const Text('Permission Required'),
         ),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('AutoPanMode'),
+        title: const Text('AutoPanMode'),
       ),
       body: body,
       floatingActionButton: _permissionStatus != PermissionStatus.granted
@@ -105,7 +107,7 @@ class _MapPageAutoPanModeState extends State<MapPageAutoPanMode> {
       return icon;
     }
     return RotationTransition(
-      turns: new AlwaysStoppedAnimation(rotation / 360),
+      turns: AlwaysStoppedAnimation(rotation / 360),
       child: icon,
     );
   }

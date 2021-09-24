@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -10,12 +12,14 @@ final geodataCredentials = Credential.creteUserCredential(
 );
 
 class MapPage extends StatefulWidget {
+  const MapPage({Key? key}) : super(key: key);
+
   @override
   _MapPageState createState() => _MapPageState();
 }
 
 class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final Set<Layer> _lakeLayers = {
     FeatureLayer.fromUrl(
       'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/1',
@@ -33,9 +37,9 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
         'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/6'),
   };
 
-  bool _showLayers = false;
+  final bool _showLayers = false;
 
-  bool _trackCamera = false;
+  final bool _trackCamera = false;
 
   ArcGISMap map = ArcGISMap.openStreetMap();
 
@@ -48,14 +52,14 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
     return Scaffold(
       appBar: AppBar(
         key: _scaffoldKey,
-        title: Text("Map"),
+        title: const Text("Map"),
       ),
       body: _buildMap(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _mapController?.removeViewpointChangedListener(this);
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -74,7 +78,7 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
       },
       markers: {
         Marker(
-          markerId: MarkerId("markerId"),
+          markerId: const MarkerId("markerId"),
           position: Point.fromLatLng(latitude: 0, longitude: 0),
           onTap: () => print('On marker tap'),
           consumeTapEvents: true,

@@ -2,16 +2,18 @@ import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
 class ScenePage extends StatefulWidget {
+  const ScenePage({Key? key}) : super(key: key);
+
   @override
   _ScenePageState createState() => _ScenePageState();
 }
 
 class _ScenePageState extends State<ScenePage> {
-  ArcGISScene _scene = ArcGISScene.fromBasemap(Basemap.createImagery());
-  Surface _surface = Surface(
-      surfaceId: SurfaceId("my_surface"),
+  final ArcGISScene _scene = ArcGISScene.fromBasemap(Basemap.createImagery());
+  final Surface _surface = Surface(
+      surfaceId: const SurfaceId("my_surface"),
       elevationSources: <ElevationSource>{
-        ArcGISTiledElevationSource(
+        const ArcGISTiledElevationSource(
             elevationSourceId: ElevationSourceId("my_elevation"),
             url:
                 "https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer")
@@ -22,7 +24,7 @@ class _ScenePageState extends State<ScenePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Scene 3d"),
+        title: const Text("Scene 3d"),
       ),
       body: ArcgisSceneView(
         scene: _scene,

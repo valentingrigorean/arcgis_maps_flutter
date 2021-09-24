@@ -8,13 +8,13 @@ class MapPagePortal extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Portal'),
+        title: const Text('Portal'),
       ),
       body: ArcgisMapView(
         map: ArcGISMap.openStreetMap(),
         operationalLayers: {
           FeatureLayer.fromPortalItem(
-            layerId: LayerId('LayerId'),
+            layerId: const LayerId('LayerId'),
             portalItem: PortalItem(
               portal: Portal.arcGISOnline(withLoginRequired: false),
               itemId: 'af1ad38816814b7eba3fe74a3b84412d',

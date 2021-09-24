@@ -8,13 +8,13 @@ class MapPageGroupLayer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Group Layer'),
+        title: const Text('Group Layer'),
       ),
       body: ArcgisMapView(
         map: ArcGISMap.openStreetMap(),
         operationalLayers: {
           GroupLayer(
-            layerId: LayerId('Group'),
+            layerId: const LayerId('Group'),
             layers: {
               FeatureLayer.fromUrl(
                   'https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trailheads_Styled/FeatureServer/0'),

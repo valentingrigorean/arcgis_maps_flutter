@@ -12,14 +12,14 @@ class MapPageScaleBar extends StatefulWidget {
 
 class _MapPageScaleBarState extends State<MapPageScaleBar> {
   final ScalebarConfiguration _defaultScaleConfiguration =
-      ScalebarConfiguration(
+      const ScalebarConfiguration(
     inMapAlignment: ScalebarAlignment.center,
     style: ScalebarStyle.dualUnitLine,
   );
-  ScalebarConfiguration _customScaleConfiguration = ScalebarConfiguration(
+  static   ScalebarConfiguration _customScaleConfiguration = const ScalebarConfiguration(
     showInMap: false,
     autoHide: true,
-    hideAfter: const Duration(milliseconds: 500),
+    hideAfter: Duration(milliseconds: 500),
     units: ScalebarUnits.imperial,
     style: ScalebarStyle.dualUnitLineNauticalMile,
   );
@@ -30,7 +30,7 @@ class _MapPageScaleBarState extends State<MapPageScaleBar> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ScaleBar'),
+        title: const Text('ScaleBar'),
       ),
       body: _buildBody(),
       floatingActionButton: FloatingActionButton(
@@ -39,7 +39,7 @@ class _MapPageScaleBarState extends State<MapPageScaleBar> {
             _useCustom = !_useCustom;
           });
         },
-        child: Icon(Icons.edit),
+        child: const Icon(Icons.edit),
       ),
     );
   }

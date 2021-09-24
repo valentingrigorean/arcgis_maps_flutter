@@ -1,6 +1,5 @@
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:another_xlider/another_xlider.dart';
 
 class MapPageTimeSlider extends StatefulWidget {
   const MapPageTimeSlider({Key? key}) : super(key: key);
@@ -62,7 +61,10 @@ class _MapPageTimeSliderState extends State<MapPageTimeSlider> {
           minDate: DateTime.now().toUtc().subtract(const Duration(hours: 12)),
           maxDate: DateTime.now().toUtc().add(const Duration(hours: 12)),
         );
-        _controller!.setMapController(controller);
+        _controller!.setMapController(
+          controller,
+          autoUpdateLayersInterval: const Duration(minutes: 3),
+        );
         setState(() {});
       },
     );

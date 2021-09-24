@@ -10,7 +10,7 @@ class MapPageDynamicLayer extends StatefulWidget {
 
 class _MapPageDynamicLayerState extends State<MapPageDynamicLayer> {
   final ServiceImageTiledLayer _dynamicLayer = ServiceImageTiledLayer(
-    layerId: LayerId('dynamicLayer'),
+    layerId: const LayerId('dynamicLayer'),
     urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     tileInfo: _createTileInfo(),
     fullExtent: Envelope(
@@ -20,14 +20,14 @@ class _MapPageDynamicLayerState extends State<MapPageDynamicLayer> {
       yMax: 20037508.3427892,
       spatialReference: SpatialReference.webMercator(),
     ),
-    subdomains: ['a', 'b', 'c'],
+    subdomains: const ['a', 'b', 'c'],
   );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Dynamic Layer'),
+        title: const Text('Dynamic Layer'),
       ),
       body: ArcgisMapView(
         map: ArcGISMap.fromBaseLayer(_dynamicLayer),
@@ -40,7 +40,7 @@ class _MapPageDynamicLayerState extends State<MapPageDynamicLayer> {
     var resolution = 20037508.3427892 * 2 / 256;
     var scale = resolution * 96 * 39.37;
     for (int i = 0; i < 19; i++) {
-      levels.add(new LevelOfDetail(
+      levels.add(LevelOfDetail(
         level: i,
         resolution: resolution,
         scale: scale,

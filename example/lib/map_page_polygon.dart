@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +15,7 @@ class _MapPagePolygonState extends State<MapPagePolygon> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Polygon"),
+        title: const Text("Polygon"),
       ),
       body: ArcgisMapView(
         map: ArcGISMap.imagery(),
@@ -26,7 +28,7 @@ class _MapPagePolygonState extends State<MapPagePolygon> {
         ),
         polygons: {
           Polygon(
-            polygonId: PolygonId("test"),
+            polygonId: const PolygonId("test"),
             points: [
               Point.fromLatLng(
                 latitude: 60.443889,

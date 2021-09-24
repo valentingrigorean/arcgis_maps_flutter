@@ -26,7 +26,7 @@ class _MapPageMarkersVisibilityFilterState
     3: Colors.pinkAccent
   };
 
-  static final Map<int, SymbolVisibilityFilter> _filterMap = {
+  static const  Map<int, SymbolVisibilityFilter> _filterMap = {
     0: SymbolVisibilityFilter(
       minZoom: ZoomLevel.level16,
       maxZoom: ZoomLevel.level23,
@@ -62,7 +62,7 @@ class _MapPageMarkersVisibilityFilterState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Visibility Filter'),
+        title: const Text('Visibility Filter'),
       ),
       body: ArcgisMapView(
         map: ArcGISMap.imagery(),

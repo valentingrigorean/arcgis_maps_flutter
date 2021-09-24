@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
@@ -16,7 +18,7 @@ class _MapPageScreenLocationState extends State<MapPageScreenLocation> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Screen location'),
+        title: const Text('Screen location'),
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {

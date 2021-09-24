@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
@@ -18,7 +20,7 @@ class _MapPageLayersChangeState extends State<MapPageLayersChange> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Layers Changed event.'),
+        title: const Text('Layers Changed event.'),
       ),
       body: ArcgisMapView(
         map: ArcGISMap.imageryWithLabelsVector(),
@@ -28,7 +30,7 @@ class _MapPageLayersChangeState extends State<MapPageLayersChange> {
         operationalLayers: _isFeatureVisible ? {_featureLayer} : const {},
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
         onPressed: () {
           setState(() {
             _isFeatureVisible = !_isFeatureVisible;

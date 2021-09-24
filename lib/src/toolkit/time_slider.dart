@@ -14,18 +14,23 @@ class TimeSliderController extends ChangeNotifier
   DateTime? _minDate;
   DateTime? _maxDate;
 
+  bool _isDisposed = false;
+
   bool _isPlaying = false;
 
   int _currentStep = 0;
 
   Timer? _playbackTimer;
 
+  Timer? _autoUpdateLayersTimer;
+
   TimeSliderController({
     TimeValue timeStepInterval = const TimeValue(
       duration: 5,
       unit: TimeUnit.minutes,
     ),
-    this.loop = false,
+    this.autoLoop = false,
+    this.autoDispose = true,
     DateTime? minDate,
     DateTime? maxDate,
     Duration playbackInterval = const Duration(seconds: 1),
@@ -38,10 +43,18 @@ class TimeSliderController extends ChangeNotifier
   void dispose() {
     _mapController?.removeTimeExtentChangedListener(this);
     _mapController?.removeLayersChangedListener(this);
+    _playbackTimer?.cancel();
+    _playbackTimer = null;
+
+    _autoUpdateLayersTimer?.cancel();
+    _autoUpdateLayersTimer = null;
+    _isDisposed = true;
     super.dispose();
   }
 
-  final bool loop;
+  final bool autoLoop;
+
+  final bool autoDispose;
 
   bool get isPlaying => _isPlaying;
 
@@ -56,11 +69,15 @@ class TimeSliderController extends ChangeNotifier
     if (value) {
       _playbackTimer = Timer.periodic(_playbackInterval, (_) {
         var nextValue = currentStep + 1;
-        if (loop && nextValue >= totalSteps - 1) {
+        if (autoLoop && nextValue >= totalSteps - 1) {
           currentStep = 0;
-        } else if (nextValue < totalSteps - 1) {
+        } else if (nextValue <= totalSteps - 1) {
           currentStep = nextValue;
         } else {
+          isPlaying = false;
+        }
+
+        if ((totalSteps - 1) == nextValue && !autoLoop) {
           isPlaying = false;
         }
       });
@@ -75,11 +92,14 @@ class TimeSliderController extends ChangeNotifier
 
   int get currentStep => _currentStep;
 
-  bool get canMoveBack => currentStep > 0;
+  bool get canMoveBack => _isDisposed ? false :  currentStep > 0;
 
-  bool get canMoveForward => currentStep + 1 < totalSteps;
+  bool get canMoveForward =>_isDisposed ? false :  currentStep + 1 < totalSteps;
 
   set currentStep(int value) {
+    if(_isDisposed){
+      return;
+    }
     if (value == _currentStep) {
       return;
     }
@@ -95,6 +115,12 @@ class TimeSliderController extends ChangeNotifier
   TimeExtent? get fullExtent => _fullExtent;
 
   set fullExtent(TimeExtent? value) {
+    if(_isDisposed){
+      return;
+    }
+    if(_fullExtent == value){
+      return;
+    }
     _fullExtent = value;
     _invalidateTimeSteps();
   }
@@ -102,6 +128,9 @@ class TimeSliderController extends ChangeNotifier
   TimeValue get timeStepInterval => _timeStepInterval;
 
   set timeStepInterval(TimeValue value) {
+    if(_isDisposed){
+      return;
+    }
     if (_timeStepInterval == value) {
       return;
     }
@@ -112,6 +141,9 @@ class TimeSliderController extends ChangeNotifier
   DateTime? get minDate => _minDate;
 
   set minDate(DateTime? value) {
+    if(_isDisposed){
+      return;
+    }
     if (_minDate == value) {
       return;
     }
@@ -122,6 +154,9 @@ class TimeSliderController extends ChangeNotifier
   DateTime? get maxDate => _maxDate;
 
   set maxDate(DateTime? value) {
+    if(_isDisposed){
+      return;
+    }
     if (_maxDate == value) {
       return;
     }
@@ -132,45 +167,63 @@ class TimeSliderController extends ChangeNotifier
   @override
   void timeExtentChanged(TimeExtent? timeExtent) {
     _currentExtent = timeExtent;
+    if(_isDisposed){
+      return;
+    }
     notifyListeners();
   }
 
   @override
   void onLayersChanged(LayerType onLayer, LayerChangeType layerChange) async {
+    if(_isDisposed){
+      return;
+    }
     if (onLayer == LayerType.operational) {
-      fullExtent = await _getTimeExtentFromAwareLayers();
+      final fullExtent = await _getTimeExtentFromAwareLayers();
+      if(_isDisposed){
+        return;
+      }
+      this.fullExtent = fullExtent;
     }
   }
 
   void setMapController(
     ArcgisMapController? mapController, {
     bool observeLayerChanges = true,
+    Duration? autoUpdateLayersInterval,
   }) {
     if (_mapController != null) {
       if (_mapController == mapController) return;
       _mapController?.removeLayersChangedListener(this);
       _mapController?.removeTimeExtentChangedListener(this);
     }
+    _autoUpdateLayersTimer?.cancel();
+    _autoUpdateLayersTimer = null;
     _mapController = mapController;
     _mapController?.addTimeExtentChangedListener(this);
     if (observeLayerChanges) {
       _mapController?.addLayersChangedListener(this);
+      if (autoUpdateLayersInterval != null) {
+        Timer.periodic(autoUpdateLayersInterval, (timer) async {
+          fullExtent = await _getTimeExtentFromAwareLayers();
+        });
+      }
       _initFromMapController();
     }
   }
 
-  void back() {
+  void back({int steps = 5}) {
     isPlaying = false;
     if (currentStep > 0) {
-      currentStep = currentStep - 1;
+      final nextStep = currentStep - steps;
+      currentStep = nextStep > 0 ? nextStep : 0;
     }
   }
 
-  void forward() {
+  void forward({int steps = 5}) {
     isPlaying = false;
-    if (currentStep + 1 < totalSteps) {
-      currentStep = currentStep + 1;
-    }
+    final nextStep = currentStep + steps;
+    currentStep = nextStep < (totalSteps - 1) ? nextStep : totalSteps - 1;
   }
 
   void _invalidateTimeSteps() {
@@ -214,17 +267,15 @@ class TimeSliderController extends ChangeNotifier
     }
 
     var currentTime = startTime;
+    var diffOffset = endTime.difference(startTime);
+    var offset = diffOffset.inSeconds ~/ intervalSeconds.inSeconds;
 
-    while (true) {
+    _timeSteps.add(startTime);
+    for (int i = 1; i < offset - 1; i++) {
+      currentTime = currentTime.add(intervalSeconds);
       _timeSteps.add(currentTime);
-      if (currentTime.millisecondsSinceEpoch >=
-          endTime.millisecondsSinceEpoch) {
-        _timeSteps.add(endTime);
-        break;
-      } else {
-        currentTime = currentTime.add(intervalSeconds);
-      }
     }
+    _timeSteps.add(endTime);
   }
 
   void _updateCurrentExtent(TimeExtent? timeExtent) {
@@ -313,6 +364,8 @@ class TimeSlider extends StatefulWidget {
     this.currentTimeExtentFormat = 'd/MM/yyyy HH:mm',
     this.convertToLocalTime = true,
     this.backgroundDecoration,
+    this.stepsJump = 5,
+    this.showControls = true,
   }) : super(key: key);
 
   final TimeSliderController controller;
@@ -320,6 +373,10 @@ class TimeSlider extends StatefulWidget {
   final String currentTimeExtentFormat;
 
   final bool convertToLocalTime;
+
+  final bool showControls;
+
+  final int stepsJump;
 
   final Decoration? backgroundDecoration;
 
@@ -329,6 +386,10 @@ class TimeSlider extends StatefulWidget {
 
 class _TimeSliderState extends State<TimeSlider> {
   late TimeSliderController controller = widget.controller;
+  final List<FlutterSliderHatchMarkLabel> labels = [];
+  TimeExtent? _fullTimeExtent;
+
+  String? _formatTooltipAndHatchMarkLabel;
 
   @override
   void initState() {
@@ -348,66 +409,77 @@ class _TimeSliderState extends State<TimeSlider> {
   @override
   void dispose() {
     controller.removeListener(_handleChange);
+    if (controller.autoDispose) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    Widget child = Column(
+      mainAxisSize: MainAxisSize.max,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        _buildControllers(context),
+        _buildCurrentTimeExtent(context),
+        _buildSlider(context),
+      ],
+    );
+
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: _getBackgroundDecoration(),
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          _buildControllers(context),
-          _buildCurrentTimeExtent(context),
-          _buildSlider(context),
-        ],
-      ),
+      child: child,
     );
   }
 
   Widget _buildControllers(BuildContext context) {
+    if (!widget.showControls) {
+      return const SizedBox();
+    }
+
     final isInvalid = controller.totalSteps == 0;
 
+    var childrens = <Widget>[
+      IconButton(
+        icon: const Icon(
+          Icons.skip_previous,
+        ),
+        onPressed: isInvalid
+            ? null
+            : controller.canMoveBack
+                ? () => controller.back(steps: widget.stepsJump)
+                : null,
+      ),
+      IconButton(
+        icon: Icon(
+          !controller.isPlaying ? Icons.play_arrow : Icons.pause,
+        ),
+        onPressed: isInvalid
+            ? null
+            : controller.canMoveForward
+                ? () {
+                    controller.isPlaying = !controller.isPlaying;
+                  }
+                : null,
+      ),
+      IconButton(
+        icon: const Icon(
+          Icons.skip_next,
+        ),
+        onPressed: isInvalid
+            ? null
+            : controller.canMoveForward
+                ? () => controller.forward(steps: widget.stepsJump)
+                : null,
+      ),
+    ];
+
     return Row(
-      mainAxisSize: MainAxisSize.max,
+      mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        IconButton(
-          icon: const Icon(
-            Icons.skip_previous,
-          ),
-          onPressed: isInvalid
-              ? null
-              : controller.canMoveBack
-                  ? controller.back
-                  : null,
-        ),
-        IconButton(
-          icon: Icon(
-            !controller.isPlaying ? Icons.play_arrow : Icons.pause,
-          ),
-          onPressed: isInvalid
-              ? null
-              : controller.canMoveForward
-                  ? () {
-                      controller.isPlaying = !controller.isPlaying;
-                    }
-                  : null,
-        ),
-        IconButton(
-          icon: const Icon(
-            Icons.skip_next,
-          ),
-          onPressed: isInvalid
-              ? null
-              : controller.canMoveForward
-                  ? controller.forward
-                  : null,
-        ),
-      ],
+      children: childrens,
     );
   }
 
@@ -448,29 +520,67 @@ class _TimeSliderState extends State<TimeSlider> {
   }
 
   Widget _buildSlider(BuildContext context) {
-    final data = SliderTheme.of(context);
     final isInvalid = controller.totalSteps == 0;
 
-    return Offstage(
-      offstage: controller.totalSteps == 0,
-      child: SliderTheme(
-        data: data.copyWith(
-          tickMarkShape: _TimeSliderTickMarkShape(),
+    _calculateHatchMarkLabels();
+
+    return Visibility(
+      visible: controller.totalSteps != 0,
+      child: FlutterSlider(
+        min: 0,
+        max: isInvalid ? 1 : (controller.totalSteps - 1).toDouble(),
+        values: [
+          isInvalid ? 0 : controller.currentStep.toDouble(),
+        ],
+        hatchMark: FlutterSliderHatchMark(
+          density: 0.15,
+          // means 50 lines, from 0 to 100 percent
+          labelsDistanceFromTrackBar: 35,
+          displayLines: true,
+          linesAlignment: FlutterSliderHatchMarkAlignment.right,
+          labels: labels,
         ),
-        child: Slider(
-          value: isInvalid ? 0 : controller.currentStep.toDouble(),
-          min: 0,
-          max: isInvalid ? 1 : (controller.totalSteps - 1).toDouble(),
-          divisions: isInvalid ? null : controller.totalSteps,
-          onChanged: (val) {
-            controller.currentStep = val.toInt();
+        handler: FlutterSliderHandler(
+          decoration: const BoxDecoration(),
+          child: Container(
+            width: 16,
+            height: 16,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.white,
+              border: Border.all(
+                color: Colors.black.withOpacity(0.65),
+                width: 1,
+              ),
+            ),
+          ),
+        ),
+        handlerHeight: 30,
+        trackBar: const FlutterSliderTrackBar(
+          activeTrackBar: BoxDecoration(
+            color: Colors.black,
+          ),
+        ),
+        tooltip: FlutterSliderTooltip(
+          custom: (value) {
+            return Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                Jiffy(getDate(controller.timeSteps[value.toInt()])!).format(
+                  _formatTooltipAndHatchMarkLabel ??
+                      widget.currentTimeExtentFormat,
+                ),
+                style: const TextStyle(fontSize: 24),
+              ),
+            );
           },
-          label: isInvalid
-              ? null
-              : Jiffy(
-                  getDate(controller.timeSteps[controller.currentStep]),
-                ).format(widget.currentTimeExtentFormat),
         ),
+        onDragging: (handlerIndex, lowerValue, upperValue) {
+          controller.currentStep = lowerValue.toInt();
+        },
       ),
     );
   }
@@ -485,39 +595,97 @@ class _TimeSliderState extends State<TimeSlider> {
   Decoration _getBackgroundDecoration() {
     return widget.backgroundDecoration ??
         BoxDecoration(
-          color: Colors.grey.shade300.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(8),
+          color: Colors.grey.shade300.withOpacity(0.8),
         );
   }
 
   void _handleChange() {
+    if (_fullTimeExtent != controller.fullExtent) {
+      _calculateHatchMarkLabels();
+      _fullTimeExtent = controller.fullExtent;
+    }
     setState(() {
       // The listenable's state is our build state, and it changed already.
     });
   }
-}
 
-class _TimeSliderTickMarkShape extends SliderTickMarkShape {
-  @override
-  Size getPreferredSize({
-    required SliderThemeData sliderTheme,
-    required bool isEnabled,
-  }) {
-    return const Size(4, 20);
+  void _calculateHatchMarkLabels() {
+    final dates = controller.timeSteps;
+    labels.clear();
+    if (dates.isEmpty || dates.length == 1) {
+      return;
+    }
+    final startDate = dates.first;
+    final endDate = dates.last;
+    final diff = endDate.difference(startDate);
+    late String format;
+    if (diff.inDays == 0) {
+      format = 'HH:mm';
+    } else if (diff.inDays >= 30) {
+      format = 'MMMM';
+    } else {
+      format = 'YY';
+    }
+
+    _formatTooltipAndHatchMarkLabel = format;
+
+    if (dates.length >= 2) {
+      labels.addAll([
+        _createLabelFromDate(0, startDate, format),
+        _createLabelFromDate(100, endDate, format),
+      ]);
+    }
+
+    if (dates.length == 3) {
+      labels.insert(1, _createLabelFromDate(50, dates[1], format));
+      return;
+    }
+
+    final diffOffset = diff.inMilliseconds / 6;
+    labels.insert(
+      1,
+      _createLabelFromDate(
+        25,
+        startDate.add(
+          Duration(milliseconds: diffOffset.toInt()),
+        ),
+        format,
+      ),
+    );
+    labels.insert(
+      2,
+      _createLabelFromDate(
+        75,
+        endDate.subtract(
+          Duration(milliseconds: diffOffset.toInt()),
+        ),
+        format,
+      ),
+    );
+
+    if (dates.length > 5) {
+      labels.insert(
+        2,
+        _createLabelFromDate(
+          50,
+          startDate.add(
+            Duration(milliseconds: diffOffset.toInt() * 2),
+          ),
+          format,
+        ),
+      );
+    }
   }
 
-  @override
-  void paint(
-    PaintingContext context,
-    Offset center, {
-    required RenderBox parentBox,
-    required SliderThemeData sliderTheme,
-    required Animation<double> enableAnimation,
-    required Offset thumbCenter,
-    required bool isEnabled,
-    required TextDirection textDirection,
-  }) {
-    var paint = Paint()..color = Colors.black;
-
-    context.canvas.drawLine(Offset(center.dx, 0), Offset(center.dx, 10), paint);
+  FlutterSliderHatchMarkLabel _createLabelFromDate(
+      double percent, DateTime date, String format) {
+    return FlutterSliderHatchMarkLabel(
+      percent: percent,
+      label: Text(
+        Jiffy(getDate(date)!).format(format),
+        style: const TextStyle(fontSize: 12),
+      ),
+    );
   }
 }
