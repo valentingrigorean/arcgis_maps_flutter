@@ -311,7 +311,8 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     }
 
     if (layer == null) {
-      throw UnknownMapObjectIdError('layer', layerId, 'onLayerLoaded');
+      //throw UnknownMapObjectIdError('layer', layerId, 'onLayerLoaded');
+      return;
     }
     final completion = widget.onLayerLoaded;
     if (completion != null) {
