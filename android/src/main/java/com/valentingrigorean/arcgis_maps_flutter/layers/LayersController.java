@@ -2,8 +2,11 @@ package com.valentingrigorean.arcgis_maps_flutter.layers;
 
 import androidx.annotation.Nullable;
 
+import com.esri.arcgisruntime.arcgisservices.TimeAware;
 import com.esri.arcgisruntime.layers.Layer;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
+import com.esri.arcgisruntime.mapping.TimeValue;
+import com.valentingrigorean.arcgis_maps_flutter.Convert;
 import com.valentingrigorean.arcgis_maps_flutter.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -18,6 +21,7 @@ import io.flutter.plugin.common.MethodChannel;
 
 
 public class LayersController implements MapChangeAware {
+
 
     public enum LayerType {
         OPERATIONAL,
@@ -111,6 +115,26 @@ public class LayersController implements MapChangeAware {
             }
         }
     }
+
+
+    public void setTimeOffset(Object arguments) {
+        final Map<?, ?> data = Convert.toMap(arguments);
+        if (data == null) {
+            return;
+        }
+
+        final String layerId = (String) data.get("layerId");
+        if (layerId == null) {
+            return;
+        }
+
+        final Layer layer = getLayerByLayerId(layerId);
+        if(layer instanceof TimeAware){
+            final TimeAware timeAware = (TimeAware) layer;
+            timeAware.setTimeOffset(Convert.toTimeValue(data.get("timeValue")));
+        }
+    }
+
 
     private void addLayers(Object args, LayerType layerType) {
 

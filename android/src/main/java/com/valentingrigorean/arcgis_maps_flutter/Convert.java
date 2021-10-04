@@ -16,6 +16,7 @@ import com.esri.arcgisruntime.UnitSystem;
 import com.esri.arcgisruntime.arcgisservices.LevelOfDetail;
 import com.esri.arcgisruntime.arcgisservices.TileInfo;
 import com.esri.arcgisruntime.arcgisservices.TimeAware;
+import com.esri.arcgisruntime.arcgisservices.TimeUnit;
 import com.esri.arcgisruntime.geometry.Envelope;
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.geometry.PointCollection;
@@ -548,11 +549,22 @@ public class Convert {
         final Object startTime = data.get("startTime");
         final Object endTime = data.get("endTime");
 
-        if(startTime == null && endTime == null){
+        if (startTime == null && endTime == null) {
             return null;
         }
 
         return new TimeExtent(toCalendarFromISO8601(startTime), toCalendarFromISO8601(endTime));
+    }
+
+    @Nullable
+    public static TimeValue toTimeValue(Object o) {
+        final Map<?, ?> data = toMap(o);
+        if (data == null) {
+            return null;
+        }
+        final double duration = toDouble(data.get("duration"));
+        final int unit = toInt(data.get("unit"));
+        return new TimeValue(duration, TimeUnit.values()[unit]);
     }
 
     @NonNull

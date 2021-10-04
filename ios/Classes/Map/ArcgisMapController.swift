@@ -302,6 +302,10 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             }
             result(nil)
             break
+        case "layer#setTimeOffset":
+            layersController.setTimeOffset(arguments:call.arguments)
+            result(nil)
+            break
         default:
             result(FlutterMethodNotImplemented)
             break

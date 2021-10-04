@@ -322,6 +322,18 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
+  Future<void> setLayerTimeOffset(
+      int mapId, LayerId layerId, TimeValue? timeValue) async {
+    return channel(mapId).invokeMethod<void>(
+      'layer#setTimeOffset',
+      {
+        'layerId': layerId.value,
+        'timeValue': timeValue?.toJson(),
+      },
+    );
+  }
+
+  @override
   void dispose(int mapId) {
     _channels.remove(mapId);
   }

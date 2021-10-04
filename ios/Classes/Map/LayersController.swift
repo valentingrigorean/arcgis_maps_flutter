@@ -117,6 +117,27 @@ class LayersController {
         }
     }
 
+    func setTimeOffset(arguments: Any?) {
+        guard let data = arguments as? Dictionary<String, Any> else {
+            return
+        }
+
+        guard let layerId = data["layerId"] as? String else {
+            return
+        }
+
+        guard let layer = getLayerByLayerId(layerId: layerId) as? AGSTimeAware else {
+            return
+        }
+
+        guard let timeValue = data["timeValue"] as? Dictionary<String, Any> else {
+            layer.timeOffset = nil
+            return
+        }
+
+        layer.timeOffset = AGSTimeValue(data: timeValue)
+    }
+
 
     private func addLayers(args: Any,
                            layerType: LayerType) {
@@ -351,5 +372,6 @@ class LayersController {
         }
         return nil
     }
+
 
 }

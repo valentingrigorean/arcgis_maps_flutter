@@ -33,6 +33,28 @@ class ArcgisMapController {
         .getLegendInfos(mapId, layer);
   }
 
+  List<T> getLayersOfType<T extends Layer>() {
+    var layers = <T>[];
+    for (final pair in _arcgisMapState._baseLayers.entries) {
+      if (pair.value is T) {
+        layers.add(pair.value as T);
+      }
+    }
+
+    for (final pair in _arcgisMapState._referenceLayers.entries) {
+      if (pair.value is T) {
+        layers.add(pair.value as T);
+      }
+    }
+
+    for (final pair in _arcgisMapState._operationalLayers.entries) {
+      if (pair.value is T) {
+        layers.add(pair.value as T);
+      }
+    }
+    return layers;
+  }
+
   Future<List<LegendInfoResult>> getLegendInfosForLayers(
       Set<Layer> layers) async {
     var futures = <Future<List<LegendInfoResult>>>[];
@@ -137,6 +159,14 @@ class ArcgisMapController {
   /// half of the extent before re-centering occurs.
   Future<double> getWanderExtentFactor() =>
       ArcgisMapsFlutterPlatform.instance.getWanderExtentFactor(mapId);
+
+  /// Sets a time offset for this object. The time offset is subtracted from
+  /// the time extent set on the owning GeoView. This allows for data from
+  /// different periods of time to be compared. Can be null if there is
+  /// no time offset.
+  Future<void> setLayerTimeOffset(LayerId layerId, TimeValue? timeValue) =>
+      ArcgisMapsFlutterPlatform.instance
+          .setLayerTimeOffset(mapId, layerId, timeValue);
 
   /// Return all time aware layers from Operational layers.
   Future<List<TimeAwareLayerInfo>> getTimeAwareLayerInfos() =>

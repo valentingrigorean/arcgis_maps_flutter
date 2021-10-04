@@ -164,6 +164,15 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
         'updateIdentifyLayerListeners() has not been implemented.');
   }
 
+  /// Sets a time offset for this object. The time offset is subtracted from
+  /// the time extent set on the owning GeoView. This allows for data from
+  /// different periods of time to be compared. Can be null if there is
+  /// no time offset.
+  Future<void> setLayerTimeOffset(int mapId,LayerId layerId,TimeValue? timeValue){
+    throw UnimplementedError(
+        'setLayerTimeOffset() has not been implemented.');
+  }
+
   Stream<MapLoadedEvent> onMapLoad({required int mapId}) {
     throw UnimplementedError('onMapLoad() has not been implemented.');
   }

@@ -19,7 +19,6 @@ import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.layers.Layer;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.LayerList;
-import com.esri.arcgisruntime.mapping.TimeExtent;
 import com.esri.arcgisruntime.mapping.Viewpoint;
 import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
 import com.esri.arcgisruntime.mapping.view.LocationDisplay;
@@ -255,11 +254,11 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 result.success(null);
             }
             break;
-            case "map#getTimeExtent":{
+            case "map#getTimeExtent": {
                 result.success(Convert.timeExtentToJson(mapView.getTimeExtent()));
             }
             break;
-            case "map#setTimeExtent":{
+            case "map#setTimeExtent": {
                 mapView.setTimeExtent(Convert.toTimeExtent(call.arguments));
                 result.success(null);
             }
@@ -370,6 +369,11 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 polylinesController.changePolylines(polylinesToChange);
                 List<Object> polylineIdsToRemove = call.argument("polylineIdsToRemove");
                 polylinesController.removePolylines(polylineIdsToRemove);
+                result.success(null);
+                break;
+            }
+            case "layer#setTimeOffset": {
+                layersController.setTimeOffset(call.arguments);
                 result.success(null);
                 break;
             }
