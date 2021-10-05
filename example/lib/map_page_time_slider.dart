@@ -60,6 +60,8 @@ class _MapPageTimeSliderState extends State<MapPageTimeSlider> {
         _controller = TimeSliderController(
           minDate: DateTime.now().toUtc().subtract(const Duration(hours: 12)),
           maxDate: DateTime.now().toUtc().add(const Duration(hours: 12)),
+          autoSetTimeOffset: true,
+          timeStepInterval: const TimeValue(duration: 1, unit: TimeUnit.minutes),
         );
         _controller!.setMapController(
           controller,

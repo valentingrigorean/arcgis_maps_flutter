@@ -18,6 +18,8 @@ class TimeExtent extends Equatable {
 
   bool get haveTime => startTime != null || endTime != null;
 
+  bool get only1Time => startTime == endTime && haveTime;
+
   @override
   bool? get stringify => true;
 

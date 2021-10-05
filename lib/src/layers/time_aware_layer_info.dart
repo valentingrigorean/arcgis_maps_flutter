@@ -1,7 +1,7 @@
 part of arcgis_maps_flutter;
 
 @immutable
-class TimeAwareLayerInfo {
+class TimeAwareLayerInfo extends Equatable {
   const TimeAwareLayerInfo({
     this.layerId,
     this.fullTimeExtent,
@@ -10,6 +10,23 @@ class TimeAwareLayerInfo {
     this.timeOffset,
     this.timeInterval,
   });
+
+  factory TimeAwareLayerInfo.fromJson(Map<dynamic, dynamic> json) {
+    final layerId = json['layerId'];
+    final fullTimeExtent = json['fullTimeExtent'];
+    final timeOffset = json['timeOffset'];
+    final timeInterval = json['timeInterval'];
+    return TimeAwareLayerInfo(
+      layerId: layerId == null ? null : LayerId(layerId),
+      fullTimeExtent:
+          fullTimeExtent == null ? null : TimeExtent.fromJson(fullTimeExtent),
+      supportsTimeFiltering: json['supportsTimeFiltering'],
+      isTimeFilteringEnabled: json['isTimeFilteringEnabled'],
+      timeOffset: timeOffset == null ? null : TimeValue.fromJson(timeOffset),
+      timeInterval:
+          timeInterval == null ? null : TimeValue.fromJson(timeInterval),
+    );
+  }
 
   final LayerId? layerId;
 
@@ -35,25 +52,15 @@ class TimeAwareLayerInfo {
   /// Can be null if no time interval is suggested for this time aware object.
   final TimeValue? timeInterval;
 
-  factory TimeAwareLayerInfo.fromJson(Map<dynamic, dynamic> json) {
-    final layerId = json['layerId'];
-    final fullTimeExtent = json['fullTimeExtent'];
-    final timeOffset = json['timeOffset'];
-    final timeInterval = json['timeInterval'];
-    return TimeAwareLayerInfo(
-      layerId: layerId == null ? null : LayerId(layerId),
-      fullTimeExtent:
-          fullTimeExtent == null ? null : TimeExtent.fromJson(fullTimeExtent),
-      supportsTimeFiltering: json['supportsTimeFiltering'],
-      isTimeFilteringEnabled: json['isTimeFilteringEnabled'],
-      timeOffset: timeOffset == null ? null : TimeValue.fromJson(timeOffset),
-      timeInterval:
-          timeInterval == null ? null : TimeValue.fromJson(timeInterval),
-    );
-  }
+  @override
+  bool? get stringify => true;
 
   @override
-  String toString() {
-    return 'TimeAwareLayerInfo{layerId: $layerId, fullTimeExtent: $fullTimeExtent, supportsTimeFiltering: $supportsTimeFiltering, isTimeFilteringEnabled: $isTimeFilteringEnabled, timeOffset: $timeOffset, timeInterval: $timeInterval}';
-  }
+  List<Object?> get props => [
+        layerId,
+        fullTimeExtent,
+        isTimeFilteringEnabled,
+        timeOffset,
+        timeInterval
+      ];
 }

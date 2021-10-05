@@ -33,8 +33,8 @@ class ArcgisMapController {
         .getLegendInfos(mapId, layer);
   }
 
-  List<T> getLayersOfType<T extends Layer>() {
-    var layers = <T>[];
+  Set<T> getLayersOfType<T extends Layer>() {
+    var layers = <T>{};
     for (final pair in _arcgisMapState._baseLayers.entries) {
       if (pair.value is T) {
         layers.add(pair.value as T);
