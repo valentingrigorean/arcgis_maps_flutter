@@ -443,7 +443,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             return;
         }
         trackTimeExtentEvents = false;
-        mapView.removeTimeExtentChangedListener(null);
+        mapView.removeTimeExtentChangedListener(this);
         mapViewOnTouchListener.clearAllDelegates();
         mapViewOnTouchListener = null;
         trackViewpointChangedListenerEvents = false;
