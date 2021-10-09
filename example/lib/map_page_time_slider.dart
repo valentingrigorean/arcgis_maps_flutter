@@ -9,6 +9,40 @@ class MapPageTimeSlider extends StatefulWidget {
 }
 
 class _MapPageTimeSliderState extends State<MapPageTimeSlider> {
+  final Set<WmsLayer> radarLayers = {
+    WmsLayer.fromUrl(
+      'https://public-wms.met.no/verportal/verportal.map',
+      layersName: [
+        'radar_precipitation_intensity_nordic',
+      ],
+    ),
+    WmsLayer.fromUrl(
+      'https://public-wms.met.no/verportal/verportal.map',
+      layerId: const LayerId(
+        'radar_precipitation_intensity',
+      ),
+      layersName: const [
+        'radar_precipitation_intensity',
+      ],
+    ),
+    // WmsLayer.fromUrl(
+    //   'https://wts2.smhi.se/tile/baltrad',
+    //   layerId: const LayerId(
+    //     'baltrad:radarcomp-lightning_scandinavia_wpt',
+    //   ),
+    //   layersName: const [
+    //     'baltrad:radarcomp-lightning_scandinavia_wpt',
+    //   ],
+    // ),
+    // WmsLayer.fromUrl(
+    //   'https://wts2.smhi.se/tile/baltrad',
+    //   layerId: const LayerId(
+    //     'baltrad:radarcomp-lightning_sweden_wpt',
+    //   ),
+    //   layersName: const ['baltrad:radarcomp-lightning_sweden_wpt'],
+    // ),
+  };
+
   TimeSliderController? _controller;
 
   @override
@@ -37,36 +71,20 @@ class _MapPageTimeSliderState extends State<MapPageTimeSlider> {
   Widget _buildMap() {
     return ArcgisMapView(
       map: ArcGISMap.imageryWithLabelsVector(),
-      operationalLayers: {
-        WmsLayer.fromUrl(
-          'https://public-wms.met.no/verportal/verportal.map?request=GetCapabilities&service=WMS&version=1.3.0',
-          layersName: [
-            'radar_precipitation_intensity_nordic',
-          ],
-        ),
-        // WmsLayer.fromUrl(
-        //   'https://view.eumetsat.int/geoserver/wms',
-        //   layersName: ['msg_fes:rgb_naturalenhncd'],
-        // ),
-
-        // WmsLayer.fromUrl(
-        //   'https://halo-wms.met.no/halo/default.map',
-        //   layersName: [
-        //     'freezing_level_altitude_feet',
-        //   ],
-        // ),
-      },
+      operationalLayers: radarLayers,
       onMapCreated: (controller) async {
         _controller = TimeSliderController(
+          mapController: controller,
+          dataProvider: TimeSliderWmsServiceDataProvider(
+            mapController: controller,
+            layers: radarLayers,
+          ),
           minDate: DateTime.now().toUtc().subtract(const Duration(hours: 12)),
           maxDate: DateTime.now().toUtc().add(const Duration(hours: 12)),
-          autoSetTimeOffset: true,
-          timeStepInterval: const TimeValue(duration: 1, unit: TimeUnit.minutes),
+          timeStepInterval:
+              const TimeValue(duration: 1, unit: TimeUnit.minutes),
         );
-        _controller!.setMapController(
-          controller,
-          autoUpdateLayersInterval: const Duration(minutes: 3),
-        );
+
         setState(() {});
       },
     );

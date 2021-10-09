@@ -1,98 +1,10 @@
 part of arcgis_maps_flutter;
 
-class _LayerDimensionInfo {
-  _LayerDimensionInfo({
-    this.timeExtent,
-    this.timeDimension,
-  });
-
-  final TimeExtent? timeExtent;
-
-  final WmsLayerTimeDimension? timeDimension;
-
-  TimeValue? getClosedTimeValue(TimeExtent currentTimeExtent) {
-    final timeDimension = this.timeDimension;
-    if (timeDimension == null) {
-      return null;
-    }
-
-    if (!currentTimeExtent.only1Time) {
-      return null;
-    }
-
-    final currentStart = currentTimeExtent.startTime!;
-
-    for (int i = 0; i < timeDimension.dates.length; i++) {
-      final dateInfo = timeDimension.dates[i];
-      if (dateInfo.timeExtent == currentTimeExtent) {
-        return null;
-      }
-      if (dateInfo.interval != null && timeExtent != null) {
-        // impl
-      }
-      if (!dateInfo.timeExtent.only1Time) {
-        continue;
-      }
-
-      final startDate = dateInfo.timeExtent.startTime!;
-
-      if (currentStart.isBefore(startDate)) {
-        if (i == 0) {
-          return null;
-        }
-        var prev = timeDimension.dates[i - 1];
-        return _calculateOffset(
-          currentStart,
-          prev.timeExtent.only1Time ? prev.timeExtent.startTime! : null,
-          startDate,
-        );
-      }
-    }
-
-    return null;
-  }
-
-  TimeValue? _calculateOffset(
-      DateTime current, DateTime? prevDate, DateTime nextDate) {
-    var diff = current.difference(nextDate);
-    if (prevDate == null) {
-      return TimeValue(
-        duration: diff.inSeconds.toDouble(),
-        unit: TimeUnit.seconds,
-      );
-    }
-    var prevDiff = current.difference(prevDate);
-    if (prevDiff.abs() > diff.abs()) {
-      return diff.inSeconds == 0
-          ? null
-          : TimeValue(
-              duration: diff.inSeconds.toDouble(),
-              unit: TimeUnit.seconds,
-            );
-    }
-    return prevDiff.inSeconds == 0
-        ? null
-        : TimeValue(
-            duration: prevDiff.inSeconds.toDouble(),
-            unit: TimeUnit.seconds,
-          );
-    ;
-  }
-}
-
 class TimeSliderController extends ChangeNotifier
-    implements TimeExtentChangedListener, LayersChangedListener {
-  final WmsService _wmsService = const WmsService();
-  final Set<WmsLayer> _wmsLayers = {};
-  final Map<LayerId, _LayerDimensionInfo> _layersData = {};
-
+    implements TimeExtentChangedListener {
   final List<DateTime> _timeSteps = [];
 
   final Duration _playbackInterval;
-
-  final bool _autoSetTimeOffset;
-
-  ArcgisMapController? _mapController;
 
   TimeValue _timeStepInterval;
   TimeExtent? _currentExtent;
@@ -108,9 +20,9 @@ class TimeSliderController extends ChangeNotifier
 
   Timer? _playbackTimer;
 
-  Timer? _autoUpdateLayersTimer;
-
   TimeSliderController({
+    required this.mapController,
+    this.dataProvider,
     TimeValue timeStepInterval = const TimeValue(
       duration: 5,
       unit: TimeUnit.minutes,
@@ -120,22 +32,24 @@ class TimeSliderController extends ChangeNotifier
     DateTime? minDate,
     DateTime? maxDate,
     Duration playbackInterval = const Duration(seconds: 1),
-    bool autoSetTimeOffset = false,
   })  : _timeStepInterval = timeStepInterval,
         _minDate = minDate,
         _maxDate = maxDate,
-        _playbackInterval = playbackInterval,
-        _autoSetTimeOffset = autoSetTimeOffset;
+        _playbackInterval = playbackInterval {
+    if (dataProvider != null) {
+      dataProvider!
+          .addFullTimeExtentChangeListener(_handleFullTimeExtentChange);
+      _handleFullTimeExtentChange();
+    }
+  }
 
   @override
   void dispose() {
-    _mapController?.removeTimeExtentChangedListener(this);
-    _mapController?.removeLayersChangedListener(this);
+    mapController.removeTimeExtentChangedListener(this);
+    dataProvider?.dispose();
     _playbackTimer?.cancel();
     _playbackTimer = null;
 
-    _autoUpdateLayersTimer?.cancel();
-    _autoUpdateLayersTimer = null;
     _isDisposed = true;
     super.dispose();
   }
@@ -143,6 +57,10 @@ class TimeSliderController extends ChangeNotifier
   final bool autoLoop;
 
   final bool autoDispose;
+
+  final ArcgisMapController mapController;
+
+  final TimeSliderDataProvider? dataProvider;
 
   bool get isPlaying => _isPlaying;
 
@@ -261,43 +179,7 @@ class TimeSliderController extends ChangeNotifier
     if (_isDisposed) {
       return;
     }
-    _updateAllLayersOffset();
     notifyListeners();
-  }
-
-  @override
-  void onLayersChanged(LayerType onLayer, LayerChangeType layerChange) async {
-    if (_isDisposed) {
-      return;
-    }
-    if (onLayer == LayerType.operational) {
-      await _updateData();
-    }
-  }
-
-  void setMapController(
-    ArcgisMapController? mapController, {
-    bool observeLayerChanges = true,
-    Duration? autoUpdateLayersInterval,
-  }) {
-    if (_mapController != null) {
-      if (_mapController == mapController) return;
-      _mapController?.removeLayersChangedListener(this);
-      _mapController?.removeTimeExtentChangedListener(this);
-    }
-    _autoUpdateLayersTimer?.cancel();
-    _autoUpdateLayersTimer = null;
-    _mapController = mapController;
-    _mapController?.addTimeExtentChangedListener(this);
-    if (observeLayerChanges) {
-      _mapController?.addLayersChangedListener(this);
-      if (autoUpdateLayersInterval != null) {
-        Timer.periodic(autoUpdateLayersInterval, (timer) async {
-          await _updateData();
-        });
-      }
-      _initFromMapController();
-    }
   }
 
   void back({int steps = 5}) {
@@ -314,6 +196,14 @@ class TimeSliderController extends ChangeNotifier
     currentStep = nextStep < (totalSteps - 1) ? nextStep : totalSteps - 1;
   }
 
+  void _handleFullTimeExtentChange() async {
+    if (_isDisposed) {
+      return;
+    }
+    fullExtent = await dataProvider!.getFullTimeExtent();
+    dataProvider!.onCurrentTimeExtentChanged(currentExtent);
+  }
+
   void _invalidateTimeSteps() {
     _calculateTimeSteps();
     _currentStep =
@@ -321,7 +211,6 @@ class TimeSliderController extends ChangeNotifier
     if (_moveTimeStep(_currentStep)) {
       _updateCurrentExtent(_currentExtent);
     }
-    _updateAllLayersOffset();
     notifyListeners();
   }
 
@@ -368,8 +257,8 @@ class TimeSliderController extends ChangeNotifier
   }
 
   void _updateCurrentExtent(TimeExtent? timeExtent) {
-    _mapController?.setTimeExtent(timeExtent);
-    _updateAllLayersOffset();
+    mapController.setTimeExtent(timeExtent);
+    dataProvider?.onCurrentTimeExtentChanged(timeExtent);
   }
 
   int _findClosedStep(DateTime date) {
@@ -412,138 +301,6 @@ class TimeSliderController extends ChangeNotifier
     }
     _currentExtent = timeExtent;
     return true;
-  }
-
-  Future<void> _updateData() async {
-    _wmsLayers.clear();
-
-    final mapController = _mapController;
-    if (mapController == null) {
-      return;
-    }
-    final timeAwareLayers = await mapController.getTimeAwareLayerInfos();
-    if (_isDisposed) {
-      return;
-    }
-    final validTimeAwareLayers = timeAwareLayers
-        .where((e) => e.fullTimeExtent != null && e.isTimeFilteringEnabled)
-        .toList();
-
-    fullExtent = _getFullTimeExtentFromAwareLayers(validTimeAwareLayers);
-
-    if (_autoSetTimeOffset) {
-      _wmsLayers.addAll(mapController.getLayersOfType<WmsLayer>());
-      for (final layerInfo in timeAwareLayers) {
-        _fetchTimeDimensionIfNeededForLayer(layerInfo);
-      }
-    }
-  }
-
-  TimeExtent? _getFullTimeExtentFromAwareLayers(
-      List<TimeAwareLayerInfo> layers) {
-    if (layers.isEmpty) {
-      return null;
-    }
-
-    var fullTimeExtent = layers.first.fullTimeExtent!;
-
-    for (final layer in layers.skip(1)) {
-      fullTimeExtent = fullTimeExtent.union(layer.fullTimeExtent!);
-    }
-
-    return fullTimeExtent;
-  }
-
-  Future<void> _updateAllLayersOffset() {
-    return Future.wait(_layersData.keys.map((e) => _updateLayerOffset(e)));
-  }
-
-  Future<void> _updateLayerOffset(LayerId layerId) async {
-    if (_isDisposed) {
-      return;
-    }
-    final data = _layersData[layerId];
-    if (data == null) {
-      return;
-    }
-    final mapController = _mapController;
-    if (mapController == null) {
-      return;
-    }
-    if (currentExtent == null) {
-      return;
-    }
-
-    await mapController.setLayerTimeOffset(
-        layerId, data.getClosedTimeValue(currentExtent!));
-  }
-
-  Future<void> _initFromMapController() async {
-    final mapController = _mapController;
-    if (mapController == null) {
-      return;
-    }
-
-    _currentExtent = await mapController.getTimeExtent();
-    await _updateData();
-  }
-
-  Future<void> _fetchTimeDimensionIfNeededForLayer(
-      TimeAwareLayerInfo layerInfo) async {
-    if (layerInfo.layerId == null) {
-      return;
-    }
-    final layer = _findLayerById(layerInfo.layerId!);
-    if (layer == null || layer.url == null) {
-      if (layer != null) {
-        _layersData.remove(layer.layerId);
-      }
-      return;
-    }
-
-    if (layer.layersName.isEmpty || layer.layersName.length > 1) {
-      _layersData.remove(layer.layerId);
-      return;
-    }
-
-    try {
-      final wmsServiceInfo = await _wmsService.getServiceInfo(layer.url!);
-      if (_isDisposed) {
-        return;
-      }
-      if (wmsServiceInfo == null) {
-        return;
-      }
-      for (final subLayerName in layer.layersName) {
-        final subLayerInfo = wmsServiceInfo.getLayerInfoByName(subLayerName);
-        if (subLayerInfo == null) {
-          continue;
-        }
-
-        for (final dimension in subLayerInfo.dimensions) {
-          final timeDimension = dimension.timeDimension;
-          if (timeDimension != null) {
-            _layersData[layer.layerId] = _LayerDimensionInfo(
-              timeExtent: layerInfo.fullTimeExtent,
-              timeDimension: timeDimension,
-            );
-            _updateLayerOffset(layer.layerId);
-            break;
-          }
-        }
-      }
-    } catch (_) {
-      _layersData.remove(layer.layerId);
-    }
-  }
-
-  WmsLayer? _findLayerById(LayerId layerId) {
-    for (final layer in _wmsLayers) {
-      if (layer.layerId == layerId) {
-        return layer;
-      }
-    }
-    return null;
   }
 }
 
@@ -769,6 +526,7 @@ class _TimeSliderState extends State<TimeSlider> {
           },
         ),
         onDragging: (handlerIndex, lowerValue, upperValue) {
+          controller.isPlaying = false;
           controller.currentStep = lowerValue.toInt();
         },
       ),

@@ -179,6 +179,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             }else{
                 mapView.timeExtent = nil
             }
+            print("map#setTimeExtent")
             break
         case "map#getTimeExtent":
             result(mapView.timeExtent?.toJSONFlutter())

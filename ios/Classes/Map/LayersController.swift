@@ -135,6 +135,7 @@ class LayersController {
             return
         }
 
+        print("LayerId:\(layerId):\(timeValue)")
         layer.timeOffset = AGSTimeValue(data: timeValue)
     }
 
