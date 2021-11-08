@@ -9,7 +9,8 @@ class Viewpoint {
     this.rotation,
   });
 
-  factory Viewpoint.fromPoint({required Point point, required double scale}) =>
+  factory Viewpoint.fromPoint(
+          {required AGSPoint point, required double scale}) =>
       Viewpoint._(
         targetGeometry: point,
         scale: scale,
@@ -24,7 +25,7 @@ class Viewpoint {
       Viewpoint._(
         scale: scale,
         targetGeometry:
-            Point.fromLatLng(latitude: latitude, longitude: longitude),
+            AGSPoint.fromLatLng(latitude: latitude, longitude: longitude),
         viewpointType: ViewpointType.centerAndScale,
       );
 
@@ -45,7 +46,7 @@ class Viewpoint {
     }
     return Viewpoint._(
       targetGeometry: targetGeometry,
-      viewpointType: targetGeometry is Envelope
+      viewpointType: targetGeometry is AGSEnvelope
           ? ViewpointType.boundingGeometry
           : ViewpointType.centerAndScale,
       scale: json['scale']?.toDouble(),

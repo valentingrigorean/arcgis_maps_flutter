@@ -31,7 +31,7 @@ class ServiceImageTiledLayer extends BaseTileLayer {
         );
 
   final TileInfo tileInfo;
-  final Envelope fullExtent;
+  final AGSEnvelope fullExtent;
 
   final List<String> subdomains;
   final Map<String, String> additionalOptions;

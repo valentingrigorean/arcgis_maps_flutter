@@ -5,6 +5,7 @@ import 'package:arcgis_maps_flutter_example/map_page.dart';
 import 'package:arcgis_maps_flutter_example/map_page_assets_marker.dart';
 import 'package:arcgis_maps_flutter_example/map_page_auto_pan_mode.dart';
 import 'package:arcgis_maps_flutter_example/map_page_dynamic_layer.dart';
+import 'package:arcgis_maps_flutter_example/map_page_geometry_engine.dart';
 import 'package:arcgis_maps_flutter_example/map_page_gesture.dart';
 import 'package:arcgis_maps_flutter_example/map_page_group_layer.dart';
 import 'package:arcgis_maps_flutter_example/map_page_layers_change.dart';
@@ -24,7 +25,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
   await ArcGISRuntimeEnvironment.setApiKey(dotenv.env['apiKey'] ?? 'apiKey');
-  final result = await ArcGISRuntimeEnvironment.setLicense(dotenv.env['licenseKey'] ?? 'licenseKey');
+  final result = await ArcGISRuntimeEnvironment.setLicense(
+      dotenv.env['licenseKey'] ?? 'licenseKey');
   final apiVersion = await ArcGISRuntimeEnvironment.getAPIVersion();
 
   print(result);
@@ -95,6 +97,17 @@ class MainPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const MapPageGesture(),
+                    ),
+                  );
+                },
+              ),
+              ElevatedButton(
+                child: const Text('Map GeometryEngine'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MapPageGeometryEngine(),
                     ),
                   );
                 },
@@ -204,7 +217,8 @@ class MainPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const MapPageMarkersVisibilityFilter(),
+                      builder: (context) =>
+                          const MapPageMarkersVisibilityFilter(),
                     ),
                   );
                 },
@@ -234,8 +248,10 @@ class MainPage extends StatelessWidget {
               ElevatedButton(
                 child: const Text('Scene 3d'),
                 onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const ScenePage()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ScenePage()));
                 },
               ),
             ],

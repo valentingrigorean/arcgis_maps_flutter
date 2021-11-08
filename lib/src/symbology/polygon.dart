@@ -17,7 +17,7 @@ class Polygon implements MapsObject {
     required this.polygonId,
     this.consumeTapEvents = false,
     this.fillColor = Colors.black,
-    this.points = const <Point>[],
+    this.points = const <AGSPoint>[],
     this.strokeColor = Colors.black,
     this.strokeWidth = 10,
     this.visible = true,
@@ -39,7 +39,7 @@ class Polygon implements MapsObject {
   final Color fillColor;
 
   /// The vertices of the polygon to be drawn.
-  final List<Point> points;
+  final List<AGSPoint> points;
 
   /// True if the marker is visible.
   final bool visible;
@@ -75,7 +75,7 @@ class Polygon implements MapsObject {
   Polygon copyWith(
       {bool? consumeTapEventsParam,
       Color? fillColorParam,
-      List<Point>? pointsParam,
+      List<AGSPoint>? pointsParam,
       Color? strokeColorParam,
       int? strokeWidthParam,
       bool? visibleParam,
@@ -100,7 +100,7 @@ class Polygon implements MapsObject {
 
   @override
   clone() {
-    return copyWith(pointsParam: List<Point>.of(points));
+    return copyWith(pointsParam: List<AGSPoint>.of(points));
   }
 
   @override

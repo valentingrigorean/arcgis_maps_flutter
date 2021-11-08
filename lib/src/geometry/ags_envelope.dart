@@ -1,13 +1,17 @@
 part of arcgis_maps_flutter;
 
-class Envelope implements Geometry {
-  const Envelope({
+@immutable
+class AGSEnvelope extends Geometry {
+  const AGSEnvelope({
     required this.xMin,
     required this.yMin,
     required this.xMax,
     required this.yMax,
-    this.spatialReference,
-  });
+    SpatialReference? spatialReference,
+  }) : super(
+          spatialReference: spatialReference,
+          geometryType: GeometryType.envelope,
+        );
 
   final double xMin;
   final double xMax;
@@ -15,12 +19,10 @@ class Envelope implements Geometry {
   final double yMin;
   final double yMax;
 
-  final SpatialReference? spatialReference;
-
-  static Envelope? fromJson(Map<dynamic, dynamic>? json) {
+  static AGSEnvelope? fromJson(Map<dynamic, dynamic>? json) {
     if (json == null) return null;
     final bbox = json['bbox'] as List<dynamic>;
-    return Envelope(
+    return AGSEnvelope(
       xMin: bbox[0].toDouble(),
       yMin: bbox[1].toDouble(),
       xMax: bbox[2].toDouble(),
@@ -30,15 +32,9 @@ class Envelope implements Geometry {
   }
 
   @override
-  Object toJson() {
-    final Map<String, Object> json = <String, Object>{};
-
+  Map<String, Object> toJson() {
+    final Map<String, Object> json = super.toJson();
     json['bbox'] = [xMin, yMin, xMax, yMax];
-
-    if (spatialReference != null) {
-      json['spatialReference'] = spatialReference!.toJson();
-    }
-
     return json;
   }
 

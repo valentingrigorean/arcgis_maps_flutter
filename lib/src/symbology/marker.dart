@@ -27,7 +27,7 @@ class Marker extends Symbol {
   /// Uniquely identifies a [Marker].
   final MarkerId markerId;
 
-  final Point position;
+  final AGSPoint position;
 
   final BitmapDescriptor icon;
 

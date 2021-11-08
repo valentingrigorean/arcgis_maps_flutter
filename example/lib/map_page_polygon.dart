@@ -20,7 +20,7 @@ class _MapPagePolygonState extends State<MapPagePolygon> {
       body: ArcgisMapView(
         map: ArcGISMap.imagery(),
         viewpoint: Viewpoint.fromPoint(
-          point: Point.fromLatLng(
+          point: AGSPoint.fromLatLng(
             latitude: 60.443889,
             longitude: 6.413889,
           ),
@@ -30,19 +30,19 @@ class _MapPagePolygonState extends State<MapPagePolygon> {
           Polygon(
             polygonId: const PolygonId("test"),
             points: [
-              Point.fromLatLng(
+              AGSPoint.fromLatLng(
                 latitude: 60.443889,
                 longitude: 6.413889,
               ),
-              Point.fromLatLng(
+              AGSPoint.fromLatLng(
                 latitude: 60.443889,
                 longitude: 6.415278,
               ),
-              Point.fromLatLng(
+              AGSPoint.fromLatLng(
                 latitude: 60.433333,
                 longitude: 6.418611,
               ),
-              Point.fromLatLng(
+              AGSPoint.fromLatLng(
                 latitude: 60.432778,
                 longitude: 6.416667,
               ),

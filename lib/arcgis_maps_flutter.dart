@@ -8,12 +8,14 @@ import 'package:arcgis_maps_flutter/src/layers/base_tile_layer.dart';
 import 'package:arcgis_maps_flutter/src/layers/layer_updates.dart';
 import 'package:arcgis_maps_flutter/src/mapping/basemap_type_options.dart';
 import 'package:arcgis_maps_flutter/src/maps_object.dart';
+import 'package:arcgis_maps_flutter/src/method_channel/geometry/geometry_engine_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/map_event.dart';
 import 'package:arcgis_maps_flutter/src/symbology/marker_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polygon_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polyline_updates.dart';
 import 'package:arcgis_maps_flutter/src/toolkit/time_slider/flutter_xlider.dart';
 import 'package:arcgis_maps_flutter/src/utils/elevation_source.dart';
+import 'package:arcgis_maps_flutter/src/utils/geometry_type.dart';
 import 'package:arcgis_maps_flutter/src/utils/json.dart';
 import 'package:arcgis_maps_flutter/src/utils/layers.dart';
 import 'package:arcgis_maps_flutter/src/utils/markers.dart';
@@ -42,10 +44,12 @@ part 'src/data/tile_key.dart';
 
 part 'src/geometry/ags_polygon.dart';
 part 'src/geometry/ags_polyline.dart';
-part 'src/geometry/envelope.dart';
-part 'src/geometry/point.dart';
+part 'src/geometry/ags_envelope.dart';
+part 'src/geometry/ags_point.dart';
 part 'src/geometry/spatial_references.dart';
 part 'src/geometry/geometry.dart';
+part 'src/geometry/geometry_type.dart';
+part 'src/geometry/geometry_engine.dart';
 
 
 part 'src/layers/layer.dart';

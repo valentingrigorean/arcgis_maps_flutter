@@ -272,7 +272,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<Offset?> locationToScreen(int mapId, Point mapPoint) async {
+  Future<Offset?> locationToScreen(int mapId, AGSPoint mapPoint) async {
     final result = await channel(mapId)
         .invokeListMethod<double>('map#locationToScreen', mapPoint.toJson());
     if (result == null) {
@@ -288,13 +288,13 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<Point?> screenToLocation(
+  Future<AGSPoint?> screenToLocation(
       int mapId, Offset screenPoint, SpatialReference spatialReference) async {
     final result = await channel(mapId).invokeMethod('map#screenToLocation', {
       'position': [screenPoint.dx, screenPoint.dy],
       'spatialReference': spatialReference.toJson(),
     });
-    return Point.fromJson(toSafeMapNullable(result));
+    return AGSPoint.fromJson(toSafeMapNullable(result));
   }
 
   @override
@@ -490,7 +490,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
         break;
       case 'map#onTap':
         final args = call.arguments['position'];
-        Point point = Point.fromJson(toSafeMapNullable(args))!;
+        AGSPoint point = AGSPoint.fromJson(toSafeMapNullable(args))!;
         _mapEventStreamController.add(
           MapTapEvent(
             mapId,
@@ -500,7 +500,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
         break;
       case 'map#onLongPress':
         final args = call.arguments['position'];
-        Point point = Point.fromJson(toSafeMapNullable(args))!;
+        AGSPoint point = AGSPoint.fromJson(toSafeMapNullable(args))!;
         _mapEventStreamController.add(
           MapLongPressEvent(
             mapId,

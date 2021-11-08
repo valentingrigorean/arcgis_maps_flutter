@@ -1,14 +1,16 @@
 part of arcgis_maps_flutter;
 
-class AGSPolygon implements Geometry {
-  AGSPolygon({
+@immutable
+class AGSPolygon extends Geometry {
+  const AGSPolygon({
     required this.points,
-    this.spatialReference,
-  });
+    SpatialReference? spatialReference,
+  }) : super(
+          spatialReference: spatialReference,
+          geometryType: GeometryType.polygon,
+        );
 
-  final List<Point> points;
-
-  final SpatialReference? spatialReference;
+  final List<AGSPoint> points;
 
   static AGSPolygon? fromJson(Map<dynamic, dynamic>? json) {
     if (json == null) {
@@ -23,14 +25,14 @@ class AGSPolygon implements Geometry {
         SpatialReference.fromJson(json['spatialReference']);
 
     return AGSPolygon(
-      points: Point.fromJsonList(rings, hasZ),
+      points: AGSPoint.fromJsonList(rings, hasZ),
       spatialReference: spatialReference,
     );
   }
 
   @override
-  Object toJson() {
-    final Map<String, Object> json = <String, Object>{};
+  Map<String, Object> toJson() {
+    final Map<String, Object> json = super.toJson();
 
     void addIfPresent(String fieldName, Object? value) {
       if (value != null) {
@@ -40,15 +42,14 @@ class AGSPolygon implements Geometry {
 
     Object _pointsToJson() {
       final List<Object> result = <Object>[];
-      for (final Point point in points) {
+      for (final AGSPoint point in points) {
         result.add(point.toJson());
       }
       return result;
     }
 
     addIfPresent('rings', _pointsToJson());
-    addIfPresent('spatialReference', spatialReference?.toJson());
 
-    return Object();
+    return json;
   }
 }

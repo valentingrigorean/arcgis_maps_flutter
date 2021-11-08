@@ -13,7 +13,7 @@ class _MapPageDynamicLayerState extends State<MapPageDynamicLayer> {
     layerId: const LayerId('dynamicLayer'),
     urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     tileInfo: _createTileInfo(),
-    fullExtent: Envelope(
+    fullExtent: AGSEnvelope(
       xMin: -20037508.3427892,
       yMin: -20037508.3427892,
       xMax: 20037508.3427892,
@@ -52,7 +52,7 @@ class _MapPageDynamicLayerState extends State<MapPageDynamicLayer> {
       dpi: 96,
       imageFormat: ImageFormat.png,
       levelOfDetails: levels,
-      origin: Point(
+      origin: AGSPoint(
         x: -20037508.3427892,
         y: 20037508.3427892,
         spatialReference: SpatialReference.webMercator(),

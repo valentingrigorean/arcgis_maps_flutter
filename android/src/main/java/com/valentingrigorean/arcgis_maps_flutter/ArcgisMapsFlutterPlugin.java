@@ -8,6 +8,7 @@ import androidx.lifecycle.Lifecycle;
 
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
 import com.esri.arcgisruntime.LicenseResult;
+import com.valentingrigorean.arcgis_maps_flutter.geometry.GeometryEngineController;
 import com.valentingrigorean.arcgis_maps_flutter.map.ArcgisMapFactory;
 import com.valentingrigorean.arcgis_maps_flutter.scene.ArcgisSceneViewFactory;
 
@@ -28,6 +29,8 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
     private static final String VIEW_TYPE_MAP = "plugins.flutter.io/arcgis_maps";
     private static final String VIEW_TYPE_SCENE = "plugins.flutter.io/arcgis_scene";
 
+    private GeometryEngineController geometryEngineController;
+
     private MethodChannel channel;
 
     @Nullable
@@ -44,11 +47,14 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
 
         channel = new MethodChannel(binding.getBinaryMessenger(), "plugins.flutter.io/arcgis_channel");
         channel.setMethodCallHandler(this);
+
+        geometryEngineController = new GeometryEngineController(binding.getBinaryMessenger());
     }
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
         channel.setMethodCallHandler(null);
+        geometryEngineController = null;
     }
 
     @Override

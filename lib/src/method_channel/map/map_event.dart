@@ -89,14 +89,14 @@ class MapTapEvent extends _PositionedMapEvent<void> {
   /// The `position` of this event is the LatLng where the Map was tapped.
   const MapTapEvent(
     int mapId,
-    Point position,
+    AGSPoint position,
   ) : super(mapId, position, null);
 }
 
 class MapLongPressEvent extends _PositionedMapEvent<void> {
   const MapLongPressEvent(
     int mapId,
-    Point position,
+    AGSPoint position,
   ) : super(mapId, position, null);
 }
 
@@ -147,5 +147,5 @@ class _PositionedMapEvent<T> extends MapEvent<T> {
   ) : super(mapId, value);
 
   /// The position where this event happened.
-  final Point position;
+  final AGSPoint position;
 }

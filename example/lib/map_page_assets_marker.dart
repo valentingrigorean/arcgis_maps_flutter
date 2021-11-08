@@ -26,7 +26,7 @@ class _MapPageASsetsMarkerState extends State<MapPageASsetsMarker> {
             markers: {
               Marker(
                 markerId: const MarkerId('test'),
-                position: Point.fromLatLng(
+                position: AGSPoint.fromLatLng(
                   latitude: 0.0,
                   longitude: 0.0,
                 ),

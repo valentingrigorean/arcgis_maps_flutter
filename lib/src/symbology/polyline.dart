@@ -21,7 +21,7 @@ class Polyline implements MapsObject {
     this.consumeTapEvents = false,
     this.color = Colors.black,
     this.style = SimpleLineSymbolStyle.solid,
-    this.points = const <Point>[],
+    this.points = const <AGSPoint>[],
     this.visible = true,
     this.width = 10,
     this.zIndex = 0,
@@ -49,7 +49,7 @@ class Polyline implements MapsObject {
   final SimpleLineSymbolStyle style;
 
   /// The vertices of the polygon to be drawn.
-  final List<Point> points;
+  final List<AGSPoint> points;
 
   /// True if the marker is visible.
   final bool visible;
@@ -83,7 +83,7 @@ class Polyline implements MapsObject {
     bool? consumeTapEventsParam,
     Color? colorParam,
     SimpleLineSymbolStyle? styleParam,
-    List<Point>? pointsParam,
+    List<AGSPoint>? pointsParam,
     bool? visibleParam,
     int? widthParam,
     int? zIndexParam,
@@ -111,7 +111,7 @@ class Polyline implements MapsObject {
   @override
   clone() {
     return copyWith(
-      pointsParam: List<Point>.of(points),
+      pointsParam: List<AGSPoint>.of(points),
     );
   }
 
@@ -161,7 +161,7 @@ class Polyline implements MapsObject {
 
   Object _pointsToJson() {
     final List<Object> result = <Object>[];
-    for (final Point point in points) {
+    for (final AGSPoint point in points) {
       result.add(point.toJson());
     }
     return result;

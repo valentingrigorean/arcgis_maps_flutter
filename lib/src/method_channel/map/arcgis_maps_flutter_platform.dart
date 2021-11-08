@@ -130,11 +130,11 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
         'onViewpointChangedListener() has not been implemented.');
   }
 
-  Future<Offset?> locationToScreen(int mapId, Point mapPoint) {
+  Future<Offset?> locationToScreen(int mapId, AGSPoint mapPoint) {
     throw UnimplementedError('locationToScreen() has not been implemented.');
   }
 
-  Future<Point?> screenToLocation(
+  Future<AGSPoint?> screenToLocation(
       int mapId, Offset screenPoint, SpatialReference spatialReference) {
     throw UnimplementedError('screenToLocation() has not been implemented.');
   }

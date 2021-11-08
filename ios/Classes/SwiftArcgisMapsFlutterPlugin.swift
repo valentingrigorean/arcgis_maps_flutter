@@ -4,13 +4,25 @@ import ArcGIS
 
 
 public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
+
+    private let channel: FlutterMethodChannel
+    private let geometryController: GeometryEngineController
+
+    init(with registrar: FlutterPluginRegistrar) {
+        channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel", binaryMessenger: registrar.messenger())
+        geometryController = GeometryEngineController(messenger: registrar.messenger())
+
+        super.init()
+
+        registrar.addMethodCallDelegate(self, channel: channel)
+    }
+
+
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel", binaryMessenger: registrar.messenger())
-        let instance = SwiftArcgisMapsFlutterPlugin()
+        let _ = SwiftArcgisMapsFlutterPlugin(with: registrar)
         registrar.register(ArcgisMapFactory(registrar: registrar),
                 withId: "plugins.flutter.io/arcgis_maps",
                 gestureRecognizersBlockingPolicy: FlutterPlatformViewGestureRecognizersBlockingPolicyWaitUntilTouchesEnded)
-        registrar.addMethodCallDelegate(instance, channel: channel)
     }
 
     public func handle(_ call: FlutterMethodCall,

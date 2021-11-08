@@ -32,7 +32,7 @@ class TileInfo {
   final List<LevelOfDetail> levelOfDetails;
 
   /// The tiling scheme origin which specifies the starting location of Row 0 and Column 0.
-  final Point origin;
+  final AGSPoint origin;
 
   final SpatialReference spatialReference;
 

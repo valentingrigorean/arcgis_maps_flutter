@@ -1,31 +1,34 @@
 part of arcgis_maps_flutter;
 
 @immutable
-class Point implements Geometry {
-  const Point({
+class AGSPoint extends Geometry {
+  const AGSPoint({
     required this.x,
     required this.y,
     this.z,
     this.m,
-    this.spatialReference,
-  });
+    SpatialReference? spatialReference,
+  }) : super(
+          spatialReference: spatialReference,
+          geometryType: GeometryType.point,
+        );
 
-  factory Point.fromLatLng({
+  factory AGSPoint.fromLatLng({
     required double latitude,
     required double longitude,
   }) =>
-      Point(
+      AGSPoint(
         x: longitude,
         y: latitude,
         spatialReference: SpatialReference.wgs84(),
       );
 
-  static Point? fromJson(Map<dynamic, dynamic>? json) {
+  static AGSPoint? fromJson(Map<dynamic, dynamic>? json) {
     if (json == null) {
       return null;
     }
 
-    return Point(
+    return AGSPoint(
       x: json['x'].toDouble(),
       y: json['y'].toDouble(),
       z: json['z']?.toDouble(),
@@ -34,15 +37,15 @@ class Point implements Geometry {
     );
   }
 
-  static List<Point> fromJsonList(List<dynamic> json, bool hasZ) {
-    final List<Point> points = [];
+  static List<AGSPoint> fromJsonList(List<dynamic> json, bool hasZ) {
+    final List<AGSPoint> points = [];
 
     for (final path in json) {
       for (final point in path) {
         final double x = toDoubleSafe(point[0]);
         final double y = toDoubleSafe(point[1]);
         final double? z = hasZ ? toDoubleSafeNullable(point[2]) : null;
-        points.add(Point(x: x, y: y, z: z));
+        points.add(AGSPoint(x: x, y: y, z: z));
       }
     }
     return points;
@@ -57,11 +60,9 @@ class Point implements Geometry {
 
   double get longitude => x;
 
-  final SpatialReference? spatialReference;
-
   @override
-  Object toJson() {
-    final Map<String, Object> json = <String, Object>{};
+  Map<String, Object> toJson() {
+    final Map<String, Object> json = super.toJson();
 
     void addIfPresent(String fieldName, Object? value) {
       if (value != null) {
@@ -73,15 +74,13 @@ class Point implements Geometry {
     json['y'] = y;
     addIfPresent('z', z);
     addIfPresent('m', m);
-    addIfPresent('spatialReference', spatialReference?.toJson());
-
     return json;
   }
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Point &&
+      other is AGSPoint &&
           runtimeType == other.runtimeType &&
           x == other.x &&
           y == other.y &&
@@ -99,6 +98,6 @@ class Point implements Geometry {
 
   @override
   String toString() {
-    return 'Point{x: $x, y: $y, z: $z, m: $m, spatialReference: $spatialReference}';
+    return 'AGSPoint{x: $x, y: $y, z: $z, m: $m, spatialReference: $spatialReference}';
   }
 }

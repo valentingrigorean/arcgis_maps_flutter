@@ -18,6 +18,8 @@ import com.esri.arcgisruntime.arcgisservices.TileInfo;
 import com.esri.arcgisruntime.arcgisservices.TimeAware;
 import com.esri.arcgisruntime.arcgisservices.TimeUnit;
 import com.esri.arcgisruntime.geometry.Envelope;
+import com.esri.arcgisruntime.geometry.Geometry;
+import com.esri.arcgisruntime.geometry.GeometryType;
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.geometry.PointCollection;
 import com.esri.arcgisruntime.geometry.Polygon;
@@ -114,6 +116,26 @@ public class Convert {
         }
     }
 
+    public static Geometry toGeometry(Object o){
+        final Map<?, ?> data = toMap(o);
+        if(data == null){
+            return null;
+        }
+        final GeometryType geometryType = GeometryType.values()[toInt(data.get("geometryType"))];
+        switch (geometryType){
+
+            case POINT:
+                return toPoint(data);
+            case UNKNOWN:
+                return null;
+            case ENVELOPE:
+            case POLYLINE:
+            case POLYGON:
+            case MULTIPOINT:
+                throw new RuntimeException("Not implemented");
+        }
+        return null;
+    }
 
     public static Point toPoint(Object o) {
         final Map<?, ?> data = toMap(o);
@@ -709,7 +731,7 @@ public class Convert {
         }
     }
 
-    private static SpatialReference toSpatialReference(Object o) {
+    public static SpatialReference toSpatialReference(Object o) {
         final Map<?, ?> data = toMap(o);
         if (data == null)
             return null;

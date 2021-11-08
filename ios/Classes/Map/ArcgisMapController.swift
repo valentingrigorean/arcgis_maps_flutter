@@ -538,7 +538,7 @@ extension ArcgisMapController: AGSGeoViewTouchDelegate {
     private func identifyGraphicsOverlaysCallback(results: [AGSIdentifyGraphicsOverlayResult]?,
                                                   error: Error?) {
         graphicsHandle = nil
-        if let error = error {
+        if error != nil {
             return
         }
 
@@ -556,7 +556,7 @@ extension ArcgisMapController: AGSGeoViewTouchDelegate {
     private func identifyLayersCallback(results: [AGSIdentifyLayerResult]?,
                                         error: Error?) {
         layerHandle = nil
-        if let error = error {
+        if error != nil {
             return
         }
         guard let results = results else {

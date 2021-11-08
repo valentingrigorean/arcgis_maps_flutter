@@ -30,7 +30,7 @@ class Camera {
       );
 
   factory Camera.fromPoint(
-    Point cameraLocation,
+    AGSPoint cameraLocation,
     double heading,
     double pitch,
     double roll,
@@ -49,7 +49,7 @@ class Camera {
   final double? pitch;
   final double? roll;
 
-  final Point? cameraLocation;
+  final AGSPoint? cameraLocation;
 
   Object toJson() {
     final Map<String, Object> json = <String, Object>{};

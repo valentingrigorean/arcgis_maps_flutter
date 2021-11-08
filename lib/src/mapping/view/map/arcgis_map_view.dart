@@ -183,9 +183,9 @@ class ArcgisMapView extends StatefulWidget {
   final ArgumentCallback<AutoPanMode>? onAutoPanModeChanged;
 
   /// Called every time a [ArcgisMapView] is tapped.
-  final ArgumentCallback<Point>? onTap;
+  final ArgumentCallback<AGSPoint>? onTap;
 
-  final ArgumentCallback<Point>? onLongPress;
+  final ArgumentCallback<AGSPoint>? onLongPress;
 
   /// Called repeatedly as the camera continues to move after an
   /// onCameraMoveStarted call.
@@ -363,14 +363,14 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     }
   }
 
-  void onTap(Point point) {
+  void onTap(AGSPoint point) {
     final onTap = widget.onTap;
     if (onTap != null) {
       onTap(point);
     }
   }
 
-  void onLongPress(Point position) {
+  void onLongPress(AGSPoint position) {
     final onLongPress = widget.onLongPress;
     if (onLongPress != null) {
       onLongPress(position);

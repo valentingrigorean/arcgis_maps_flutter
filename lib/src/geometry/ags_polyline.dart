@@ -1,14 +1,17 @@
 part of arcgis_maps_flutter;
 
-class AGSPolyline implements Geometry {
-  AGSPolyline({
+@immutable
+class AGSPolyline extends Geometry {
+
+  const AGSPolyline({
     required this.points,
-    this.spatialReference,
-  });
+    SpatialReference? spatialReference,
+  }) : super(
+          spatialReference: spatialReference,
+          geometryType: GeometryType.polyline,
+        );
 
-  final List<Point> points;
-
-  final SpatialReference? spatialReference;
+  final List<AGSPoint> points;
 
   static AGSPolyline? fromJson(Map<dynamic, dynamic>? json) {
     if (json == null) {
@@ -23,14 +26,14 @@ class AGSPolyline implements Geometry {
         SpatialReference.fromJson(json['spatialReference']);
 
     return AGSPolyline(
-      points: Point.fromJsonList(paths, hasZ),
+      points: AGSPoint.fromJsonList(paths, hasZ),
       spatialReference: spatialReference,
     );
   }
 
   @override
-  Object toJson() {
-    final Map<String, Object> json = <String, Object>{};
+  Map<String, Object> toJson() {
+    final Map<String, Object> json = super.toJson();
 
     void addIfPresent(String fieldName, Object? value) {
       if (value != null) {
@@ -40,15 +43,13 @@ class AGSPolyline implements Geometry {
 
     Object _pointsToJson() {
       final List<Object> result = <Object>[];
-      for (final Point point in points) {
+      for (final AGSPoint point in points) {
         result.add(point.toJson());
       }
       return result;
     }
 
     addIfPresent('paths', _pointsToJson());
-    addIfPresent('spatialReference', spatialReference?.toJson());
-
-    return Object();
+    return json;
   }
 }

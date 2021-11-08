@@ -131,11 +131,11 @@ class ArcgisMapController {
     return ArcgisMapsFlutterPlatform.instance.getCurrentViewpoint(mapId, type);
   }
 
-  Future<Offset?> locationToScreen(Point mapPoint) {
+  Future<Offset?> locationToScreen(AGSPoint mapPoint) {
     return ArcgisMapsFlutterPlatform.instance.locationToScreen(mapId, mapPoint);
   }
 
-  Future<Point?> screenToLocation(Offset screenPoint,
+  Future<AGSPoint?> screenToLocation(Offset screenPoint,
       {SpatialReference? spatialReference}) {
     return ArcgisMapsFlutterPlatform.instance.screenToLocation(
       mapId,
