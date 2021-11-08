@@ -163,7 +163,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                         }
                         self.onTimeExtentChanged(timeExtent: self.mapView.timeExtent)
                     }
-                }else{
+                } else {
                     timeExtentObservation?.invalidate()
                     timeExtentObservation = nil
                 }
@@ -171,12 +171,12 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             result(nil)
             break
         case "map#setTimeExtent":
-            if let timeExtentRaw = call.arguments as? Dictionary<String,Any>{
+            if let timeExtentRaw = call.arguments as? Dictionary<String, Any> {
                 let timeExtent = AGSTimeExtent(data: timeExtentRaw)
-                if mapView.timeExtent != timeExtent{
+                if mapView.timeExtent != timeExtent {
                     mapView.timeExtent = timeExtent
                 }
-            }else{
+            } else {
                 mapView.timeExtent = nil
             }
             print("map#setTimeExtent")
@@ -304,7 +304,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             result(nil)
             break
         case "layer#setTimeOffset":
-            layersController.setTimeOffset(arguments:call.arguments)
+            layersController.setTimeOffset(arguments: call.arguments)
             result(nil)
             break
         default:
@@ -530,6 +530,11 @@ extension ArcgisMapController: AGSGeoViewTouchDelegate {
     }
 
 
+    public func geoView(_ geoView: AGSGeoView, didLongPressAtScreenPoint screenPoint: CGPoint, mapPoint: AGSPoint) {
+        sendOnMapLongPress(screenPoint: screenPoint)
+    }
+
+
     private func identifyGraphicsOverlaysCallback(results: [AGSIdentifyGraphicsOverlayResult]?,
                                                   error: Error?) {
         graphicsHandle = nil
@@ -593,7 +598,13 @@ extension ArcgisMapController: AGSGeoViewTouchDelegate {
 
     private func sendOnMapTap(screenPoint: CGPoint) {
         if let json = try? mapView.screen(toLocation: screenPoint).toJSON() {
-            channel.invokeMethod("map#onTap", arguments: ["position": json])
+            channel.invokeMethod("map#onTap", arguments: ["screenPoint": screenPoint.toJSON(), "position": json])
+        }
+    }
+
+    private func sendOnMapLongPress(screenPoint: CGPoint) {
+        if let json = try? mapView.screen(toLocation: screenPoint).toJSON() {
+            channel.invokeMethod("map#onLongPress", arguments: ["screenPoint": screenPoint.toJSON(), "position": json])
         }
     }
 }

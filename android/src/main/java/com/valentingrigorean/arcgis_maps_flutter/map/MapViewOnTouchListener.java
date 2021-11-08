@@ -70,6 +70,13 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
         return true;
     }
 
+    @Override
+    public void onLongPress(MotionEvent e) {
+        super.onLongPress(e);
+        final android.graphics.Point screenPoint = new android.graphics.Point((int) e.getX(), (int) e.getY());
+        sendOnMapLongPress(screenPoint);
+    }
+
     private void identifyGraphicsOverlays(android.graphics.Point screenPoint) {
         graphicHandler = mMapView.identifyGraphicsOverlaysAsync(screenPoint, 12, false);
         graphicHandler.addDoneListener(() -> {
@@ -131,6 +138,14 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
         final HashMap<String, Object> data = new HashMap<>(1);
         data.put("position", json);
         methodChannel.invokeMethod("map#onTap", data);
+    }
+
+    private void sendOnMapLongPress(android.graphics.Point screenPoint) {
+        final Point mapPoint = mMapView.screenToLocation(screenPoint);
+        final String json = mapPoint.toJson();
+        final HashMap<String, Object> data = new HashMap<>(1);
+        data.put("position", json);
+        methodChannel.invokeMethod("map#onLongPress", data);
     }
 
     private void clearHandlers() {

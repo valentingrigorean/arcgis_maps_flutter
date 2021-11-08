@@ -12,7 +12,8 @@ typedef LayerLoadedCallback = void Function(Layer layer, ArcgisError? error);
 
 typedef IdentifyLayerCallback = void Function(IdentifyLayerResult result);
 
-typedef IdentifyLayersCallback = void Function(List<IdentifyLayerResult> results);
+typedef IdentifyLayersCallback = void Function(
+    List<IdentifyLayerResult> results);
 
 /// Callback function taking a single argument.
 typedef ArgumentCallback<T> = void Function(T argument);
@@ -76,6 +77,7 @@ class ArcgisMapView extends StatefulWidget {
     this.wanderExtentFactor = 0.5,
     this.onAutoPanModeChanged,
     this.onTap,
+    this.onLongPress,
     this.onCameraMove,
     this.onIdentifyLayer = const {},
     this.onIdentifyLayers,
@@ -182,6 +184,8 @@ class ArcgisMapView extends StatefulWidget {
 
   /// Called every time a [ArcgisMapView] is tapped.
   final ArgumentCallback<Point>? onTap;
+
+  final ArgumentCallback<Point>? onLongPress;
 
   /// Called repeatedly as the camera continues to move after an
   /// onCameraMoveStarted call.
@@ -366,6 +370,13 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     }
   }
 
+  void onLongPress(Point position) {
+    final onLongPress = widget.onLongPress;
+    if (onLongPress != null) {
+      onLongPress(position);
+    }
+  }
+
   void onCameraMove() {
     final onCameraMove = widget.onCameraMove;
     if (onCameraMove != null) {
@@ -470,6 +481,8 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     controller._updateIdentifyLayerListeners(layers);
     _identifyLayerAsync = layers;
   }
+
+
 }
 
 class _ArcgisMapOptions {

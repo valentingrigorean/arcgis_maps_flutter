@@ -93,6 +93,13 @@ class MapTapEvent extends _PositionedMapEvent<void> {
   ) : super(mapId, position, null);
 }
 
+class MapLongPressEvent extends _PositionedMapEvent<void> {
+  const MapLongPressEvent(
+    int mapId,
+    Point position,
+  ) : super(mapId, position, null);
+}
+
 /// An event fired while the Camera of a [mapId] moves.
 class CameraMoveEvent extends MapEvent<void> {
   /// Build a CameraMove Event triggered from the map represented by `mapId`.

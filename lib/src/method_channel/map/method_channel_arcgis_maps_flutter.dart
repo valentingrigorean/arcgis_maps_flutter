@@ -363,6 +363,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
     return _events(mapId).whereType<PolygonTapEvent>();
   }
 
+
   @override
   Stream<PolylineTapEvent> onPolylineTap({required int mapId}) {
     return _events(mapId).whereType<PolylineTapEvent>();
@@ -372,6 +373,12 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   Stream<MapTapEvent> onTap({required int mapId}) {
     return _events(mapId).whereType<MapTapEvent>();
   }
+
+  @override
+  Stream<MapLongPressEvent> onLongPress({required int mapId}) {
+    return _events(mapId).whereType<MapLongPressEvent>();
+  }
+
 
   @override
   Stream<CameraMoveEvent> onCameraMove({required int mapId}) {
@@ -486,6 +493,16 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
         Point point = Point.fromJson(toSafeMapNullable(args))!;
         _mapEventStreamController.add(
           MapTapEvent(
+            mapId,
+            point,
+          ),
+        );
+        break;
+      case 'map#onLongPress':
+        final args = call.arguments['position'];
+        Point point = Point.fromJson(toSafeMapNullable(args))!;
+        _mapEventStreamController.add(
+          MapLongPressEvent(
             mapId,
             point,
           ),

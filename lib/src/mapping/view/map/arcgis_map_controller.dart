@@ -237,6 +237,10 @@ class ArcgisMapController {
         .onTap(mapId: mapId)
         .listen((MapTapEvent e) => _arcgisMapState.onTap(e.position));
 
+    ArcgisMapsFlutterPlatform.instance
+        .onLongPress(mapId: mapId)
+        .listen((MapLongPressEvent e) => _arcgisMapState.onLongPress(e.position));
+
     ArcgisMapsFlutterPlatform.instance.onLayerLoad(mapId: mapId).listen(
         (LayerLoadedEvent e) =>
             _arcgisMapState.onLayerLoaded(e.value, e.error));
