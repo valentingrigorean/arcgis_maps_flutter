@@ -11,6 +11,7 @@ import com.esri.arcgisruntime.LicenseResult;
 import com.valentingrigorean.arcgis_maps_flutter.geometry.GeometryEngineController;
 import com.valentingrigorean.arcgis_maps_flutter.map.ArcgisMapFactory;
 import com.valentingrigorean.arcgis_maps_flutter.scene.ArcgisSceneViewFactory;
+import com.valentingrigorean.arcgis_maps_flutter.tasks.geocode.LocatorTaskController;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -30,6 +31,7 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
     private static final String VIEW_TYPE_SCENE = "plugins.flutter.io/arcgis_scene";
 
     private GeometryEngineController geometryEngineController;
+    private LocatorTaskController locatorTaskController;
 
     private MethodChannel channel;
 
@@ -49,12 +51,18 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
         channel.setMethodCallHandler(this);
 
         geometryEngineController = new GeometryEngineController(binding.getBinaryMessenger());
+
+        locatorTaskController = new LocatorTaskController(binding.getBinaryMessenger());
     }
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
         channel.setMethodCallHandler(null);
+        geometryEngineController.dispose();
         geometryEngineController = null;
+
+        locatorTaskController.dispose();
+        locatorTaskController = null;
     }
 
     @Override

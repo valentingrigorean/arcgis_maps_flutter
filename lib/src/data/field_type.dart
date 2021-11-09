@@ -15,7 +15,20 @@ dynamic fromNativeField(Map<dynamic, dynamic>? map) {
     case FieldType.nullable:
       return null;
     case FieldType.date:
-      if (value is String) return DateTime.tryParse(value);
+      if (value is String) {
+        return DateTime.tryParse(value);
+      }
       return null;
   }
+}
+
+Map<String, Object?>? parseAttributes(Map<dynamic, dynamic>? attributes) {
+  if (attributes == null) {
+    return null;
+  }
+  final Map<String, Object> result = <String, Object>{};
+  attributes.forEach((key, value) {
+    result[key] = fromNativeField(value);
+  });
+  return result;
 }

@@ -35,6 +35,7 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
             break
         case "arcgis#getApiKey":
             result(AGSArcGISRuntimeEnvironment.apiKey)
+            AGSLocatorTask
             break
         case "arcgis#setLicense":
             let licenseKey = call.arguments as! String

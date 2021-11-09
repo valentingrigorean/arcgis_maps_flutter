@@ -21,6 +21,10 @@ public class GeometryEngineController implements MethodChannel.MethodCallHandler
         channel.setMethodCallHandler(this);
     }
 
+    public void dispose(){
+        channel.setMethodCallHandler(null);
+    }
+
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
         switch (call.method) {

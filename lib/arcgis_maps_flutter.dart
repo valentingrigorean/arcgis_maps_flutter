@@ -10,6 +10,7 @@ import 'package:arcgis_maps_flutter/src/mapping/basemap_type_options.dart';
 import 'package:arcgis_maps_flutter/src/maps_object.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/geometry/geometry_engine_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/map_event.dart';
+import 'package:arcgis_maps_flutter/src/method_channel/tasks/geocode/locator_task_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/symbology/marker_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polygon_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polyline_updates.dart';
@@ -113,6 +114,9 @@ part 'src/symbology/polygon.dart';
 part 'src/symbology/polyline.dart';
 part 'src/symbology/symbol.dart';
 part 'src/symbology/symbol_visibility_filter.dart';
+
+part 'src/tasks/geocode/geocode_result.dart';
+part 'src/tasks/geocode/locator_task.dart';
 
 part 'src/toolkit/compass.dart';
 part 'src/toolkit/time_slider/time_slider.dart';

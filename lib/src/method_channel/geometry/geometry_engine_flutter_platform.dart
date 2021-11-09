@@ -19,5 +19,7 @@ abstract class GeometryEngineFlutterPlatform extends PlatformInterface {
   }
 
   /// Projects the given geometry from it's current spatial reference system into the given spatial reference system.
-  Future<Geometry?> project(Geometry geometry, SpatialReference spatialReference);
+  Future<Geometry?> project(Geometry geometry, SpatialReference spatialReference){
+    throw UnimplementedError('project() has not been implemented.');
+  }
 }

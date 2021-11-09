@@ -45,6 +45,7 @@ import com.esri.arcgisruntime.security.Credential;
 import com.esri.arcgisruntime.security.UserCredential;
 import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
 import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
+import com.esri.arcgisruntime.tasks.geocode.GeocodeResult;
 import com.valentingrigorean.arcgis_maps_flutter.data.FieldTypeFlutter;
 import com.valentingrigorean.arcgis_maps_flutter.layers.FlutterLayer;
 import com.valentingrigorean.arcgis_maps_flutter.map.BitmapDescriptorFactory;
@@ -116,13 +117,13 @@ public class Convert {
         }
     }
 
-    public static Geometry toGeometry(Object o){
+    public static Geometry toGeometry(Object o) {
         final Map<?, ?> data = toMap(o);
-        if(data == null){
+        if (data == null) {
             return null;
         }
         final GeometryType geometryType = GeometryType.values()[toInt(data.get("geometryType"))];
-        switch (geometryType){
+        switch (geometryType) {
 
             case POINT:
                 return toPoint(data);
@@ -135,6 +136,15 @@ public class Convert {
                 throw new RuntimeException("Not implemented");
         }
         return null;
+    }
+
+    public static String geometryToJson(Geometry geometry) {
+        final StringBuffer sb = new StringBuffer(geometry.toJson());
+        if (sb.length() > "{}".length()) {
+            final String geometryType = ",\"geometryType\":" + geometry.getGeometryType().ordinal();
+            sb.insert(sb.length() - 1, geometryType);
+        }
+        return sb.toString();
     }
 
     public static Point toPoint(Object o) {
@@ -672,6 +682,40 @@ public class Convert {
             results.add(identifyLayerResultToJson(result));
         }
         return results;
+    }
+
+    public static Object geocodeResultToJson(GeocodeResult result) {
+        final Map<String, Object> data = new HashMap<>(6);
+        final Map<String, Object> attributes = new HashMap<>(result.getAttributes().size());
+        result.getAttributes().forEach((k, v) -> {
+            attributes.put(k, toFieldFlutter(v));
+        });
+        data.put("attributes", attributes);
+
+        if (result.getDisplayLocation() != null) {
+            data.put("displayLocation", geometryToJson(result.getDisplayLocation()));
+        }
+        if (result.getExtent() != null) {
+            data.put("extent", geometryToJson(result.getExtent()));
+        }
+        if (result.getInputLocation() != null) {
+            data.put("inputLocation", geometryToJson(result.getInputLocation()));
+        }
+        data.put("label", result.getLabel());
+
+        if (result.getRouteLocation() != null) {
+            data.put("routeLocation", geometryToJson(result.getRouteLocation()));
+        }
+
+        return data;
+    }
+
+    public static Object geocodeResultsToJson(List<GeocodeResult> results) {
+        final List<Object> jsonResults = new ArrayList<>(results.size());
+        for (final GeocodeResult result : results) {
+            jsonResults.add(geocodeResultToJson(result));
+        }
+        return jsonResults;
     }
 
 

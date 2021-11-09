@@ -9,11 +9,7 @@ abstract class GeoElement {
   Geometry? get geometry;
 
   factory GeoElement.fromJson(Map<dynamic, dynamic> json) {
-    final Map<String, Object?> attributes = {};
-    final Map<dynamic, dynamic> attributesData = json['attributes'];
-    attributesData.forEach((key, value) {
-      attributes[key] = fromNativeField(value);
-    });
+    final Map<String, Object?> attributes = parseAttributes(json['attributes']) ?? {};
 
     Geometry? geometry;
 
