@@ -17,6 +17,6 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
     if(result == null){
       return null;
     }
-    return Geometry.fromJson(toSafeMapNullable(result));
+    return Geometry.fromJson(result);
   }
 }

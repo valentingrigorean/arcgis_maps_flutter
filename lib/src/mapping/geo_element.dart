@@ -13,7 +13,7 @@ abstract class GeoElement {
 
     Geometry? geometry;
 
-    geometry = Geometry.fromJson(toSafeMapNullable(json['geometry']));
+    geometry = Geometry.fromJson(json['geometry']);
 
     return _GeoElementImpl(attributes, geometry);
   }

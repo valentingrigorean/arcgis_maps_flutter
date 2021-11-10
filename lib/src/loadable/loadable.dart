@@ -1,11 +1,12 @@
 part of arcgis_maps_flutter;
 
-// enum LoadStatus {
-//   loaded,
-//   loading,
-//   failedToLoad,
-//   notLoaded,
-// }
+enum LoadStatus {
+  loaded,
+  loading,
+  failedToLoad,
+  notLoaded,
+}
+
 //
 // class Loadable {
 //   LoadStatus _loadStatus = LoadStatus.notLoaded;

@@ -597,15 +597,13 @@ extension ArcgisMapController: AGSGeoViewTouchDelegate {
     }
 
     private func sendOnMapTap(screenPoint: CGPoint) {
-        if let json = try? mapView.screen(toLocation: screenPoint).toJSON() {
-            channel.invokeMethod("map#onTap", arguments: ["screenPoint": screenPoint.toJSON(), "position": json])
-        }
+        let json = mapView.screen(toLocation: screenPoint).toJSONFlutter()
+        channel.invokeMethod("map#onTap", arguments: ["screenPoint": screenPoint.toJSON(), "position": json])
     }
 
     private func sendOnMapLongPress(screenPoint: CGPoint) {
-        if let json = try? mapView.screen(toLocation: screenPoint).toJSON() {
-            channel.invokeMethod("map#onLongPress", arguments: ["screenPoint": screenPoint.toJSON(), "position": json])
-        }
+        let json = mapView.screen(toLocation: screenPoint).toJSONFlutter()
+        channel.invokeMethod("map#onLongPress", arguments: ["screenPoint": screenPoint.toJSON(), "position": json])
     }
 }
 

@@ -19,11 +19,22 @@ abstract class LocatorTaskFlutterPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<List<GeocodeResult>> reverseGeocode({
-    required String url,
-    required AGSPoint location,
-    Credential? credential,
-  }) {
+  Future<void> createLocatorTask(int id,String url,Credential? credential){
+    throw UnimplementedError('createLocatorHandler() has not been implemented.');
+  }
+
+  Future<void> destroyLocatorTask(int id){
+    throw UnimplementedError('destroyLocatorHandler() has not been implemented.');
+  }
+
+  Future<LocatorInfo> getLocatorInfo(int id){
+    throw UnimplementedError('getLocatorInfo() has not been implemented.');
+  }
+
+  Future<List<GeocodeResult>> reverseGeocode(
+    int id,
+    AGSPoint location,
+  ) {
     throw UnimplementedError('reverseGeocodeAsync() has not been implemented.');
   }
 }

@@ -46,6 +46,10 @@ import com.esri.arcgisruntime.security.UserCredential;
 import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
 import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
 import com.esri.arcgisruntime.tasks.geocode.GeocodeResult;
+import com.esri.arcgisruntime.tasks.geocode.LocatorAttribute;
+import com.esri.arcgisruntime.tasks.geocode.LocatorInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.valentingrigorean.arcgis_maps_flutter.data.FieldTypeFlutter;
 import com.valentingrigorean.arcgis_maps_flutter.layers.FlutterLayer;
 import com.valentingrigorean.arcgis_maps_flutter.map.BitmapDescriptorFactory;
@@ -73,6 +77,8 @@ public class Convert {
     private static String TAG = "Convert";
 
     private static final SimpleDateFormat ISO8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
 
     public static Scalebar.Alignment toScaleBarAlignment(int rawValue) {
         switch (rawValue) {
@@ -138,13 +144,19 @@ public class Convert {
         return null;
     }
 
-    public static String geometryToJson(Geometry geometry) {
+    public static Object geometryToJson(Geometry geometry) {
         final StringBuffer sb = new StringBuffer(geometry.toJson());
         if (sb.length() > "{}".length()) {
             final String geometryType = ",\"geometryType\":" + geometry.getGeometryType().ordinal();
             sb.insert(sb.length() - 1, geometryType);
         }
-        return sb.toString();
+
+        try {
+            return objectMapper.readValue(sb.toString(), Map.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static Point toPoint(Object o) {
@@ -669,7 +681,7 @@ public class Convert {
 
             elementData.put("attributes", attributes);
             if (element.getGeometry() != null)
-                elementData.put("geometry", element.getGeometry().toJson());
+                elementData.put("geometry", geometryToJson(element.getGeometry()));
             elements.add(elementData);
         }
         data.put("elements", elements);
@@ -706,6 +718,8 @@ public class Convert {
         if (result.getRouteLocation() != null) {
             data.put("routeLocation", geometryToJson(result.getRouteLocation()));
         }
+
+        data.put("score", result.getScore());
 
         return data;
     }
@@ -790,6 +804,12 @@ public class Convert {
         return null;
     }
 
+    public static Object spatialReferenceToJson(SpatialReference spatialReference) {
+        final Map<String, Object> data = new HashMap<>(1);
+        data.put("wkid", spatialReference.getWkid());
+        return data;
+    }
+
     private static SimpleLineSymbol.Style toSimpleLineStyle(int rawValue) {
         switch (rawValue) {
             case 0:
@@ -842,6 +862,46 @@ public class Convert {
         final Portal portal = toPortal(data.get("portal"));
         final String itemId = (String) data.get("itemId");
         return new PortalItem(portal, itemId);
+    }
+
+    public static Object locatorInfoToJson(LocatorInfo locatorInfo) {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("name", locatorInfo.getName());
+        data.put("description", locatorInfo.getDescription());
+        data.put("intersectionResultAttributes", locatorAttributesToJson(locatorInfo.getIntersectionResultAttributes()));
+
+        if (locatorInfo.getProperties() != null) {
+            data.put("properties", locatorInfo.getProperties());
+        }
+        data.put("resultAttributes", locatorAttributesToJson(locatorInfo.getResultAttributes()));
+        data.put("searchAttributes", locatorAttributesToJson(locatorInfo.getSearchAttributes()));
+        if (locatorInfo.getSpatialReference() != null) {
+            data.put("spatialReference", spatialReferenceToJson(locatorInfo.getSpatialReference()));
+        }
+        data.put("supportsPOI",locatorInfo.isSupportsPoi());
+        data.put("supportsAddresses",locatorInfo.isSupportsAddresses());
+        data.put("supportsIntersections",locatorInfo.isSupportsIntersections());
+        data.put("supportsSuggestions",locatorInfo.isSupportsSuggestions());
+        data.put("version",locatorInfo.getVersion());
+
+        return data;
+    }
+
+    private static Object locatorAttributeToJson(LocatorAttribute attribute) {
+        final Map<String, Object> data = new HashMap<>(3);
+        data.put("name", attribute.getName());
+        data.put("displayName", attribute.getDisplayName());
+        data.put("required", attribute.isRequired());
+        data.put("type", attribute.getType().ordinal());
+        return data;
+    }
+
+    private static List<Object> locatorAttributesToJson(List<LocatorAttribute> attributes) {
+        final ArrayList<Object> data = new ArrayList<>(attributes.size());
+        for (final LocatorAttribute attribute : attributes) {
+            data.add(locatorAttributeToJson(attribute));
+        }
+        return data;
     }
 
     private static Basemap createBasemapFromType(String type) {

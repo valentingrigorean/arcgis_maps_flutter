@@ -324,7 +324,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                     if (mapPoint.getSpatialReference().getWkid() != screenLocationData.getSpatialReference().getWkid()) {
                         mapPoint = (Point) GeometryEngine.project(mapPoint, screenLocationData.getSpatialReference());
                     }
-                    result.success(mapPoint.toJson());
+                    result.success(Convert.geometryToJson(mapPoint));
                 }
             }
             break;

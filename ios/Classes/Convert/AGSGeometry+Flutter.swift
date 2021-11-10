@@ -14,17 +14,17 @@ extension AGSGeometry {
         case .envelope:
             return AGSEnvelope(data: data)
         case .polyline:
-            return nil
+            fatalError("not impl")
         case .polygon:
-            return nil
+            fatalError("not impl")
         case .multipoint:
-            return nil
+            fatalError("not impl")
         @unknown default:
             return nil
         }
     }
 
-    func toFlutterJson() -> Any{
+    func toJSONFlutter() -> Any{
         let json = try! toJSON()
         if var dict = json as? Dictionary<String,Any>{
             dict["geometryType"] = geometryType.rawValue

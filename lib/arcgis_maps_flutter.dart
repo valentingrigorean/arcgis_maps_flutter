@@ -116,6 +116,8 @@ part 'src/symbology/symbol.dart';
 part 'src/symbology/symbol_visibility_filter.dart';
 
 part 'src/tasks/geocode/geocode_result.dart';
+part 'src/tasks/geocode/locator_attribute.dart';
+part 'src/tasks/geocode/locator_info.dart';
 part 'src/tasks/geocode/locator_task.dart';
 
 part 'src/toolkit/compass.dart';

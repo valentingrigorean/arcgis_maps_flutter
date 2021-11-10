@@ -18,4 +18,11 @@ extension AGSSpatialReference {
 
         fatalError("Not implemented")
     }
+
+    func toJSONFlutter() -> Any {
+        [
+            "wkId": wkid,
+            "wkText": wkText
+        ]
+    }
 }

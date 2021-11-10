@@ -47,12 +47,12 @@ class GeocodeResult {
   /// Creates a new [GeocodeResult] from a JSON object.
   factory GeocodeResult.fromJson(Map<dynamic, dynamic> json) {
     return GeocodeResult(
-      attibutes: parseAttributes(json['attibutes']),
-      displayLocation: AGSPoint.fromJson(json['displayLocation'] as Map<String, dynamic>),
-      extent: AGSEnvelope.fromJson(json['extent'] as Map<String, dynamic>),
-      inputLocation: AGSPoint.fromJson(json['inputLocation'] as Map<String, dynamic>),
+      attibutes: parseAttributes(json['attributes']),
+      displayLocation: AGSPoint.fromJson(json['displayLocation']),
+      extent: AGSEnvelope.fromJson(json['extent']),
+      inputLocation: AGSPoint.fromJson(json['inputLocation']),
       label: json['label'] as String,
-      routeLocation: AGSPoint.fromJson(json['routeLocation'] as Map<String, dynamic>),
+      routeLocation: AGSPoint.fromJson(json['routeLocation']),
       score: json['score'] as double,
     );
   }

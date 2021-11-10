@@ -134,17 +134,16 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
 
     private void sendOnMapTap(android.graphics.Point screenPoint) {
         final Point mapPoint = mMapView.screenToLocation(screenPoint);
-        final String json = mapPoint.toJson();
         final HashMap<String, Object> data = new HashMap<>(1);
-        data.put("position", json);
+        data.put("position", Convert.geometryToJson(mapPoint));
         methodChannel.invokeMethod("map#onTap", data);
     }
 
     private void sendOnMapLongPress(android.graphics.Point screenPoint) {
         final Point mapPoint = mMapView.screenToLocation(screenPoint);
-        final String json = mapPoint.toJson();
+
         final HashMap<String, Object> data = new HashMap<>(1);
-        data.put("position", json);
+        data.put("position", Convert.geometryToJson(mapPoint));
         methodChannel.invokeMethod("map#onLongPress", data);
     }
 

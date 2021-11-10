@@ -7,20 +7,34 @@ class MethodChannelLocatorTaskFlutter extends LocatorTaskFlutterPlatform {
       const MethodChannel("plugins.flutter.io/locator_task");
 
   @override
-  Future<List<GeocodeResult>> reverseGeocode({
-    required String url,
-    required AGSPoint location,
-    Credential? credential,
-  }) async {
-    final result =
-        await _channel.invokeMethod<List<dynamic>>("reverseGeocode", {
+  Future<void> createLocatorTask(int id, String url, Credential? credential) {
+    return _channel.invokeMethod("createLocatorTask", {
+      "id": id,
       "url": url,
-      "location": location.toJson(),
-      if (credential != null) "credential": credential!.toJson(),
+      "credential": credential?.toJson(),
     });
-    if (result == null) {
-      return const [];
-    }
+  }
+
+  @override
+  Future<void> destroyLocatorTask(int id) {
+    return _channel.invokeMethod("destroyLocatorTask", id);
+  }
+
+  @override
+  Future<LocatorInfo> getLocatorInfo(int id) async {
+    final result = await _channel.invokeMethod("getLocatorInfo", id);
+    return LocatorInfo.fromJson(result);
+  }
+
+  @override
+  Future<List<GeocodeResult>> reverseGeocode(int id, AGSPoint location) async {
+    final List<dynamic> result = await _channel.invokeMethod(
+      "reverseGeocode",
+      {
+        "id": id,
+        "location": location.toJson(),
+      },
+    );
     return result
         .map<GeocodeResult>((json) => GeocodeResult.fromJson(json))
         .toList();

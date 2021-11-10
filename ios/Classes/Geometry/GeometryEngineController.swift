@@ -32,7 +32,7 @@ class GeometryEngineController {
                     result(nil)
                     return
                 }
-                result(projectedGeometry.toFlutterJson())
+                result(projectedGeometry.toJSONFlutter())
             }
             break
         default:

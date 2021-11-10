@@ -26,7 +26,7 @@ class SpatialReference {
     if (json == null) {
       return null;
     }
-    final int wkId = json['wkid'];
+    final int wkId = json['wkid'] ?? json['wkId'];
     switch (wkId) {
       case 4326:
         return _wgs84;

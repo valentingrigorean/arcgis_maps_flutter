@@ -4,11 +4,14 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.esri.arcgisruntime.ArcGISRuntimeException;
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
+import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.tasks.geocode.GeocodeResult;
 import com.esri.arcgisruntime.tasks.geocode.LocatorTask;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +22,8 @@ import io.flutter.plugin.common.MethodChannel;
 public class LocatorTaskController implements MethodChannel.MethodCallHandler {
 
     private static final String TAG = "LocatorTaskController";
+
+    private final Map<Integer, LocatorTask> locatorTasks = new HashMap<>();
 
     private final MethodChannel channel;
 
@@ -34,8 +39,19 @@ public class LocatorTaskController implements MethodChannel.MethodCallHandler {
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
         switch (call.method) {
+            case "createLocatorTask":
+                createLocatorTask(Convert.toMap(call.arguments));
+                result.success(null);
+                break;
+            case "destroyLocatorTask":
+                locatorTasks.remove(call.arguments());
+                result.success(null);
+                break;
+            case "getLocatorInfo":
+                getLocatorInfo(call.arguments(), result);
+                break;
             case "reverseGeocode":
-                reverseGeocode(Convert.toMap(call.arguments), result);
+                reverseGeocode(call.arguments(), result);
                 break;
             default:
                 result.notImplemented();
@@ -43,8 +59,27 @@ public class LocatorTaskController implements MethodChannel.MethodCallHandler {
         }
     }
 
+    private void getLocatorInfo(int id, MethodChannel.Result result) {
+        final LocatorTask locatorTask = locatorTasks.get(id);
+        if (locatorTask == null) {
+            result.error("ERROR", "No LocatorTask found with id:" + id, null);
+            return;
+        }
+        if (locatorTask.getLoadStatus() != LoadStatus.LOADED) {
+            locatorTask.loadAsync();
+        }
+        locatorTask.addDoneLoadingListener(() -> {
+            if (locatorTask.getLoadStatus() == LoadStatus.LOADED) {
+                result.success(Convert.locatorInfoToJson(locatorTask.getLocatorInfo()));
+            } else {
+                final ArcGISRuntimeException exception = locatorTask.getLoadError();
+                result.error("ERROR", exception != null ? exception.getMessage() : "Unknown error.", null);
+            }
+        });
+    }
+
     private void reverseGeocode(Map<?, ?> data, MethodChannel.Result result) {
-        final LocatorTask locatorTask = createLocatorTask(data);
+        final LocatorTask locatorTask = locatorTasks.get(data.get("id"));
         ListenableFuture<List<GeocodeResult>> future = locatorTask.reverseGeocodeAsync(Convert.toPoint(data.get("location")));
         future.addDoneListener(() -> {
             try {
@@ -52,12 +87,13 @@ public class LocatorTaskController implements MethodChannel.MethodCallHandler {
                 result.success(Convert.geocodeResultsToJson(results));
             } catch (Exception e) {
                 Log.e(TAG, "reverseGeocode: Failed to reverse geocode", e);
-                result.error("Failed to reverse geocode.", e.getMessage(), null);
+                result.error("ERROR", "Failed to reverse geocode.", e.getMessage());
             }
         });
     }
 
-    private static LocatorTask createLocatorTask(Map<?, ?> data) {
+
+    private void createLocatorTask(Map<?, ?> data) {
         final String url = (String) data.get("url");
         final LocatorTask locatorTask = new LocatorTask(url);
 
@@ -65,7 +101,6 @@ public class LocatorTaskController implements MethodChannel.MethodCallHandler {
         if (credential != null) {
             locatorTask.setCredential(Convert.toCredentials(credential));
         }
-
-        return locatorTask;
+        locatorTasks.put(Convert.toInt(data.get("id")), locatorTask);
     }
 }

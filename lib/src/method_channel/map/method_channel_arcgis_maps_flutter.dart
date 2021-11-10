@@ -294,7 +294,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
       'position': [screenPoint.dx, screenPoint.dy],
       'spatialReference': spatialReference.toJson(),
     });
-    return AGSPoint.fromJson(toSafeMapNullable(result));
+    return AGSPoint.fromJson(result);
   }
 
   @override
@@ -490,7 +490,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
         break;
       case 'map#onTap':
         final args = call.arguments['position'];
-        AGSPoint point = AGSPoint.fromJson(toSafeMapNullable(args))!;
+        AGSPoint point = AGSPoint.fromJson(args)!;
         _mapEventStreamController.add(
           MapTapEvent(
             mapId,
@@ -500,7 +500,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
         break;
       case 'map#onLongPress':
         final args = call.arguments['position'];
-        AGSPoint point = AGSPoint.fromJson(toSafeMapNullable(args))!;
+        AGSPoint point = AGSPoint.fromJson(args)!;
         _mapEventStreamController.add(
           MapLongPressEvent(
             mapId,

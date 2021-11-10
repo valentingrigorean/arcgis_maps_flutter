@@ -7,10 +7,12 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
 
     private let channel: FlutterMethodChannel
     private let geometryController: GeometryEngineController
+    private let locatorTaskController: LocatorTaskController
 
     init(with registrar: FlutterPluginRegistrar) {
         channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel", binaryMessenger: registrar.messenger())
         geometryController = GeometryEngineController(messenger: registrar.messenger())
+        locatorTaskController = LocatorTaskController(messenger: registrar.messenger())
 
         super.init()
 
@@ -35,7 +37,6 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
             break
         case "arcgis#getApiKey":
             result(AGSArcGISRuntimeEnvironment.apiKey)
-            AGSLocatorTask
             break
         case "arcgis#setLicense":
             let licenseKey = call.arguments as! String
