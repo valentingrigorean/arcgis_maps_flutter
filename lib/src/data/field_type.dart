@@ -26,7 +26,7 @@ Map<String, Object?>? parseAttributes(Map<dynamic, dynamic>? attributes) {
   if (attributes == null) {
     return null;
   }
-  final Map<String, Object> result = <String, Object>{};
+  final Map<String, Object?> result = <String, Object?>{};
   attributes.forEach((key, value) {
     result[key] = fromNativeField(value);
   });
