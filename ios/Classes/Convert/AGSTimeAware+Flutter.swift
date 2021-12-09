@@ -14,7 +14,7 @@ extension AGSTimeAware {
         }
 
         if let fullTimeExtent = fullTimeExtent {
-            var fullTimeExtentData = fullTimeExtent.toJSONFlutter()
+            let fullTimeExtentData = fullTimeExtent.toJSONFlutter()
 
             if let fullTimeExtentData = fullTimeExtentData {
                 data["fullTimeExtent"] = fullTimeExtentData

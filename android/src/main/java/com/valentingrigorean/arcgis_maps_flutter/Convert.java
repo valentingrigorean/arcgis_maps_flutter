@@ -17,14 +17,18 @@ import com.esri.arcgisruntime.arcgisservices.LevelOfDetail;
 import com.esri.arcgisruntime.arcgisservices.TileInfo;
 import com.esri.arcgisruntime.arcgisservices.TimeAware;
 import com.esri.arcgisruntime.arcgisservices.TimeUnit;
+import com.esri.arcgisruntime.geometry.AngularUnitId;
 import com.esri.arcgisruntime.geometry.Envelope;
+import com.esri.arcgisruntime.geometry.GeodeticCurveType;
 import com.esri.arcgisruntime.geometry.Geometry;
 import com.esri.arcgisruntime.geometry.GeometryType;
+import com.esri.arcgisruntime.geometry.LinearUnitId;
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.geometry.PointCollection;
 import com.esri.arcgisruntime.geometry.Polygon;
 import com.esri.arcgisruntime.geometry.Polyline;
 import com.esri.arcgisruntime.geometry.SpatialReference;
+import com.esri.arcgisruntime.location.LocationDataSource;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.ArcGISScene;
 import com.esri.arcgisruntime.mapping.ArcGISTiledElevationSource;
@@ -121,6 +125,20 @@ public class Convert {
             default:
                 throw new IllegalStateException("Unexpected value: " + rawValue);
         }
+    }
+
+    public static Object locationToJson(LocationDataSource.Location location) {
+        final Map<String, Object> json = new HashMap<>(7);
+        json.put("course", location.getCourse());
+        json.put("horizontalAccuracy", location.getHorizontalAccuracy());
+        json.put("lastKnown", location.isLastKnown());
+        if (location.getPosition() != null) {
+            json.put("position", geometryToJson(location.getPosition()));
+        }
+        json.put("velocity",location.getVelocity());
+        json.put("timestamp", ISO8601Format.format(location.getTimeStamp().getTime()));
+        json.put("verticalAccuracy", location.getVerticalAccuracy());
+        return json;
     }
 
     public static Geometry toGeometry(Object o) {
@@ -732,6 +750,40 @@ public class Convert {
         return jsonResults;
     }
 
+    public static LinearUnitId toLinearUnitId(Object o) {
+        final int index = toInt(o);
+        switch (index) {
+            case 0:
+                return LinearUnitId.CENTIMETERS;
+            case 1:
+                return LinearUnitId.FEET;
+            case 2:
+                return LinearUnitId.INCHES;
+            case 3:
+                return LinearUnitId.KILOMETERS;
+            case 4:
+                return LinearUnitId.METERS;
+            case 5:
+                return LinearUnitId.MILES;
+            case 6:
+                return LinearUnitId.NAUTICAL_MILES;
+            case 7:
+                return LinearUnitId.YARDS;
+            default:
+                return LinearUnitId.OTHER;
+        }
+    }
+
+    public static AngularUnitId toAngularUnitId(Object o) {
+        final int index = toInt(o);
+        return AngularUnitId.values()[index];
+    }
+
+    public static GeodeticCurveType toGeodeticCurveType(Object o) {
+        final int index = toInt(o);
+        return GeodeticCurveType.values()[index];
+    }
+
 
     private static void interpretBaseGraphicController(Map<?, ?> data, GraphicControllerSink controller, SymbolVisibilityFilterController symbolVisibilityFilterController) {
 
@@ -878,11 +930,11 @@ public class Convert {
         if (locatorInfo.getSpatialReference() != null) {
             data.put("spatialReference", spatialReferenceToJson(locatorInfo.getSpatialReference()));
         }
-        data.put("supportsPOI",locatorInfo.isSupportsPoi());
-        data.put("supportsAddresses",locatorInfo.isSupportsAddresses());
-        data.put("supportsIntersections",locatorInfo.isSupportsIntersections());
-        data.put("supportsSuggestions",locatorInfo.isSupportsSuggestions());
-        data.put("version",locatorInfo.getVersion());
+        data.put("supportsPOI", locatorInfo.isSupportsPoi());
+        data.put("supportsAddresses", locatorInfo.isSupportsAddresses());
+        data.put("supportsIntersections", locatorInfo.isSupportsIntersections());
+        data.put("supportsSuggestions", locatorInfo.isSupportsSuggestions());
+        data.put("version", locatorInfo.getVersion());
 
         return data;
     }

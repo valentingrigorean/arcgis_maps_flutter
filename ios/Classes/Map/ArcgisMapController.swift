@@ -97,6 +97,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         timeExtentObservation = nil
         clearSymbolsControllers()
         symbolVisibilityFilterController.clear()
+        mapView.locationDisplay.locationChangedHandler = nil
         mapView.locationDisplay.autoPanModeChangedHandler = nil
         mapView.viewpointChangedHandler = nil
     }
@@ -112,6 +113,21 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         case "map#waitForMap":
             result(nil)
             break
+        case "map#getLocation":
+            let location = mapView.locationDisplay.location
+            if location == nil {
+                result(nil)
+            } else {
+                result(location!.toJSONFlutter())
+            }
+            break
+        case "map#getMapLocation":
+            let mapLocation = mapView.locationDisplay.mapLocation
+            if mapLocation == nil {
+                result(nil)
+            } else {
+                result(mapLocation!.toJSONFlutter())
+            }
         case "map#update":
             if let data = call.arguments as? Dictionary<String, Any> {
                 if let mapOptions = data["options"] as? Dictionary<String, Any> {
@@ -153,7 +169,17 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             }
             result(nil)
             break
-        case "map#setTimeExtentChanged":
+        case "map#setLocationChangedListener":
+            if let _ = call.arguments as? Bool {
+                mapView.locationDisplay.locationChangedHandler = { [weak self] location in
+                    self?.onLocationChangeListener(location: location)
+                }
+            } else {
+                mapView.locationDisplay.locationChangedHandler = nil
+            }
+            result(nil)
+            break
+        case "map#setTimeExtentChangedListener":
             if let val = call.arguments as? Bool {
                 if val, timeExtentObservation == nil {
                     timeExtentObservation = mapView.observe(\.timeExtent, options: .new) { [weak self] (_,
@@ -366,6 +392,10 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private func onTimeExtentChanged(timeExtent: AGSTimeExtent?) {
         channel.invokeMethod("map#timeExtentChanged", arguments: timeExtent?.toJSONFlutter())
+    }
+
+    private func onLocationChangeListener(location: AGSLocation) {
+        channel.invokeMethod("map#locationChangeListener", arguments: location.toJSONFlutter())
     }
 
     private func onAutoPanModeChanged(autoPanMode: AGSLocationDisplayAutoPanMode) {

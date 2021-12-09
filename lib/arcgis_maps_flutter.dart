@@ -51,7 +51,7 @@ part 'src/geometry/spatial_references.dart';
 part 'src/geometry/geometry.dart';
 part 'src/geometry/geometry_type.dart';
 part 'src/geometry/geometry_engine.dart';
-
+part 'src/geometry/geodetic_distance_result.dart';
 
 part 'src/layers/layer.dart';
 part 'src/layers/service_image_tiled_layer.dart';
@@ -66,6 +66,8 @@ part 'src/layers/vector_tile_layer.dart';
 part 'src/layers/wms_layer.dart';
 part 'src/layers/time_aware_layer_info.dart';
 
+part 'src/location/location.dart';
+part 'src/location/location_change_listener.dart';
 
 part 'src/mapping/viewpoint.dart';
 part 'src/mapping/camera.dart';

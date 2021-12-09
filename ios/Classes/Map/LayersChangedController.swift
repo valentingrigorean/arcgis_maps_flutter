@@ -68,12 +68,15 @@ class LayersChangedController {
         var changeType = 0
 
         switch change.kind {
-
         case .insertion:
             changeType = 0
             break
         case .removal:
             changeType = 1
+            break
+        case .setting:
+            break
+        case .replacement:
             break
         @unknown default:
             changeType = 2

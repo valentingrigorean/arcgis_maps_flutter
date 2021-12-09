@@ -51,6 +51,14 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('buildView() has not been implemented.');
   }
 
+  Future<Location?> getLocation(int mapId) {
+    throw UnimplementedError('getLocation() has not been implemented.');
+  }
+
+  Future<AGSPoint?> getMapLocation(int mapId) {
+    throw UnimplementedError('getMapLocation() has not been implemented.');
+  }
+
   Future<List<LegendInfoResult>> getLegendInfos(int mapId, Layer layer) {
     throw UnimplementedError(
         'setMgetLegendInfosap() has not been implemented.');
@@ -88,10 +96,14 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
         'setOperationLayersChangedListener() has not been implemented.');
   }
 
-
-  Future<void> setTimeExtentChanged(int mapId, bool register) {
+  Future<void> setTimeExtentChangedListener(int mapId, bool register) {
     throw UnimplementedError(
         'setOperationLayersChangedListener() has not been implemented.');
+  }
+
+  Future<void> setLocationChangedListener(int mapId, bool register) {
+    throw UnimplementedError(
+        'setLocationChangedListener() has not been implemented.');
   }
 
   Future<bool> isLocationDisplayStarted(int mapId) {
@@ -168,9 +180,9 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
   /// the time extent set on the owning GeoView. This allows for data from
   /// different periods of time to be compared. Can be null if there is
   /// no time offset.
-  Future<void> setLayerTimeOffset(int mapId,LayerId layerId,TimeValue? timeValue){
-    throw UnimplementedError(
-        'setLayerTimeOffset() has not been implemented.');
+  Future<void> setLayerTimeOffset(
+      int mapId, LayerId layerId, TimeValue? timeValue) {
+    throw UnimplementedError('setLayerTimeOffset() has not been implemented.');
   }
 
   Stream<MapLoadedEvent> onMapLoad({required int mapId}) {
@@ -224,10 +236,14 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('onIdentifyLayers() has not been implemented.');
   }
 
-  Stream<ViewpointChangedEvent> onViewpointChangedListener(
-      {required int mapId}) {
+  Stream<ViewpointChangedEvent> onViewpointChanged({required int mapId}) {
     throw UnimplementedError(
         'onViewpointChangedListener() has not been implemented.');
+  }
+
+  Stream<LocationChangedEvent> onLocationChanged({required int mapId}) {
+    throw UnimplementedError(
+        'onLocationChangedListener() has not been implemented.');
   }
 
   Stream<LayersChangedEvent> onLayersChanged({required int mapId}) {
@@ -241,6 +257,5 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
   void dispose(int mapId) {
     throw UnimplementedError('dispose() has not been implemented.');
   }
-
 
 }

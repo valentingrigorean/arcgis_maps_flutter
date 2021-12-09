@@ -111,6 +111,11 @@ class ViewpointChangedEvent extends MapEvent<void> {
   const ViewpointChangedEvent(int mapId) : super(mapId, null);
 }
 
+class LocationChangedEvent extends MapEvent<Location> {
+  const LocationChangedEvent(int mapId, Location location)
+      : super(mapId, location);
+}
+
 class LayersChangedEvent extends MapEvent<LayerType> {
   const LayersChangedEvent(
     int mapId,

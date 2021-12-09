@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:arcgis_maps_flutter/src/symbology/marker_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polygon_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polyline_updates.dart';
-import 'package:arcgis_maps_flutter/src/utils/json.dart';
 import 'package:arcgis_maps_flutter/src/utils/markers.dart';
 import 'package:arcgis_maps_flutter/src/utils/polygons.dart';
 import 'package:arcgis_maps_flutter/src/utils/polyline.dart';
@@ -147,6 +146,24 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
+  Future<Location?> getLocation(int mapId) async {
+    final result = await channel(mapId).invokeMapMethod('map#getLocation');
+    if (result == null) {
+      return null;
+    }
+    return Location.fromJson(result);
+  }
+
+  @override
+  Future<AGSPoint?> getMapLocation(int mapId) async {
+    final result = await channel(mapId).invokeMapMethod('map#getMapLocation');
+    if (result == null) {
+      return null;
+    }
+    return AGSPoint.fromJson(result);
+  }
+
+  @override
   Future<List<LegendInfoResult>> getLegendInfos(int mapId, Layer layer) async {
     final results = await channel(mapId).invokeListMethod(
       "map#getLegendInfos",
@@ -215,9 +232,17 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<void> setTimeExtentChanged(int mapId, bool register) {
+  Future<void> setTimeExtentChangedListener(int mapId, bool register) {
     return channel(mapId).invokeMethod<void>(
-      'map#setTimeExtentChanged',
+      'map#setTimeExtentChangedListener',
+      register,
+    );
+  }
+
+  @override
+  Future<void> setLocationChangedListener(int mapId, bool register) {
+    return channel(mapId).invokeMethod<void>(
+      'map#setLocationChangedListener',
       register,
     );
   }
@@ -363,7 +388,6 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
     return _events(mapId).whereType<PolygonTapEvent>();
   }
 
-
   @override
   Stream<PolylineTapEvent> onPolylineTap({required int mapId}) {
     return _events(mapId).whereType<PolylineTapEvent>();
@@ -378,7 +402,6 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   Stream<MapLongPressEvent> onLongPress({required int mapId}) {
     return _events(mapId).whereType<MapLongPressEvent>();
   }
-
 
   @override
   Stream<CameraMoveEvent> onCameraMove({required int mapId}) {
@@ -396,9 +419,13 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Stream<ViewpointChangedEvent> onViewpointChangedListener(
-      {required int mapId}) {
+  Stream<ViewpointChangedEvent> onViewpointChanged({required int mapId}) {
     return _events(mapId).whereType<ViewpointChangedEvent>();
+  }
+
+  @override
+  Stream<LocationChangedEvent> onLocationChanged({required int mapId}) {
+    return _events(mapId).whereType<LocationChangedEvent>();
   }
 
   @override
@@ -530,6 +557,14 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
           TimeExtentChangedEvent(
             mapId,
             call.arguments == null ? null : TimeExtent.fromJson(call.arguments),
+          ),
+        );
+        break;
+      case 'map#locationChangeListener':
+        _mapEventStreamController.add(
+          LocationChangedEvent(
+            mapId,
+            Location.fromJson(call.arguments),
           ),
         );
         break;

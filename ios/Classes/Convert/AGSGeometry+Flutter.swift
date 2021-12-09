@@ -19,6 +19,8 @@ extension AGSGeometry {
             fatalError("not impl")
         case .multipoint:
             fatalError("not impl")
+        case .unknown:
+            fatalError("not impl")
         @unknown default:
             return nil
         }

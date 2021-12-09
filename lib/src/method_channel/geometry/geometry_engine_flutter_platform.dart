@@ -5,7 +5,8 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 abstract class GeometryEngineFlutterPlatform extends PlatformInterface {
   static final Object _token = Object();
 
-  static GeometryEngineFlutterPlatform _instance = MethodChannelGeometryEngineFlutter();
+  static GeometryEngineFlutterPlatform _instance =
+      MethodChannelGeometryEngineFlutter();
 
   GeometryEngineFlutterPlatform() : super(token: _token);
 
@@ -19,7 +20,18 @@ abstract class GeometryEngineFlutterPlatform extends PlatformInterface {
   }
 
   /// Projects the given geometry from it's current spatial reference system into the given spatial reference system.
-  Future<Geometry?> project(Geometry geometry, SpatialReference spatialReference){
+  Future<Geometry?> project(
+      Geometry geometry, SpatialReference spatialReference) {
     throw UnimplementedError('project() has not been implemented.');
+  }
+
+  Future<GeodeticDistanceResult?> distanceGeodetic({
+    required AGSPoint point1,
+    required AGSPoint point2,
+    required LinearUnitId distanceUnitId,
+    required AngularUnitId azimuthUnitId,
+    required GeodeticCurveType curveType,
+  }) {
+    throw UnimplementedError('distanceGeodetic() has not been implemented.');
   }
 }

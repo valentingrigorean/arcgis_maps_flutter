@@ -7,7 +7,7 @@ import ArcGIS
 
 extension AGSGeoElement {
     func toJSONFlutter() -> Any {
-        let flutterGeometry = try? geometry?.toJSONFlutter()
+        let flutterGeometry = try! geometry?.toJSONFlutter()
         return ["geometry": flutterGeometry, "attributes": attributes.toFlutterTypes()]
     }
 }

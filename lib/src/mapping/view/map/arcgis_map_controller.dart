@@ -14,8 +14,16 @@ class ArcgisMapController {
   });
   late final _EventBaseHandler<TimeExtentChangedListener>
       _timeExtentChangedHandlers = _EventBaseHandler((register) {
-    ArcgisMapsFlutterPlatform.instance.setTimeExtentChanged(mapId, register);
+    ArcgisMapsFlutterPlatform.instance
+        .setTimeExtentChangedListener(mapId, register);
   });
+
+  late final _EventBaseHandler<LocationChangeListener> _locationChangeHandlers =
+      _EventBaseHandler((register) {
+    ArcgisMapsFlutterPlatform.instance
+        .setLocationChangedListener(mapId, register);
+  });
+
   final int mapId;
 
   ArcgisMapController._(this._arcgisMapState, this.mapId) {
@@ -26,6 +34,19 @@ class ArcgisMapController {
       int id, _ArcgisMapViewState arcgisMapState) async {
     await ArcgisMapsFlutterPlatform.instance.init(id);
     return ArcgisMapController._(arcgisMapState, id);
+  }
+
+  /// Most recent location update provided by the dataSource property.
+  /// It includes the raw information about the location and may not be
+  /// in the map's spatial reference.
+  Future<Location?> getLocation() {
+    return ArcgisMapsFlutterPlatform.instance.getLocation(mapId);
+  }
+
+  /// Position of the location symbol, as provided by the
+  /// most recent location update, projected to the map's spatial reference.
+  Future<AGSPoint?> getMapLocation(){
+    return ArcgisMapsFlutterPlatform.instance.getMapLocation(mapId);
   }
 
   Future<List<LegendInfoResult>> getLegendInfosForLayer(Layer layer) async {
@@ -87,6 +108,14 @@ class ArcgisMapController {
 
   void removeTimeExtentChangedListener(TimeExtentChangedListener listener) {
     _timeExtentChangedHandlers.removeHandler(listener);
+  }
+
+  void addLocationChangedListener(LocationChangeListener listener) {
+    _locationChangeHandlers.addHandler(listener);
+  }
+
+  void removeLocationChangedListener(LocationChangeListener listener) {
+    _locationChangeHandlers.removeHandler(listener);
   }
 
   /// Indicates whether the location display is active or not.
@@ -237,9 +266,8 @@ class ArcgisMapController {
         .onTap(mapId: mapId)
         .listen((MapTapEvent e) => _arcgisMapState.onTap(e.position));
 
-    ArcgisMapsFlutterPlatform.instance
-        .onLongPress(mapId: mapId)
-        .listen((MapLongPressEvent e) => _arcgisMapState.onLongPress(e.position));
+    ArcgisMapsFlutterPlatform.instance.onLongPress(mapId: mapId).listen(
+        (MapLongPressEvent e) => _arcgisMapState.onLongPress(e.position));
 
     ArcgisMapsFlutterPlatform.instance.onLayerLoad(mapId: mapId).listen(
         (LayerLoadedEvent e) =>
@@ -250,10 +278,18 @@ class ArcgisMapController {
         .listen((CameraMoveEvent e) => _arcgisMapState.onCameraMove());
 
     ArcgisMapsFlutterPlatform.instance
-        .onViewpointChangedListener(mapId: mapId)
+        .onViewpointChanged(mapId: mapId)
         .listen((ViewpointChangedEvent event) {
       for (final listener in _viewpointChangedHandlers.handlers) {
         listener.viewpointChanged();
+      }
+    });
+
+    ArcgisMapsFlutterPlatform.instance
+        .onLocationChanged(mapId: mapId)
+        .listen((LocationChangedEvent event) {
+      for (final listener in _locationChangeHandlers.handlers) {
+        listener.onLocationChanged(event.value);
       }
     });
 

@@ -5,6 +5,7 @@ import 'package:arcgis_maps_flutter_example/map_page.dart';
 import 'package:arcgis_maps_flutter_example/map_page_assets_marker.dart';
 import 'package:arcgis_maps_flutter_example/map_page_auto_pan_mode.dart';
 import 'package:arcgis_maps_flutter_example/map_page_dynamic_layer.dart';
+import 'package:arcgis_maps_flutter_example/map_page_geodesic_distance.dart';
 import 'package:arcgis_maps_flutter_example/map_page_geometry_engine.dart';
 import 'package:arcgis_maps_flutter_example/map_page_gesture.dart';
 import 'package:arcgis_maps_flutter_example/map_page_group_layer.dart';
@@ -108,7 +109,18 @@ class MainPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const MapPageLocator(),
+                      builder: (context) =>  const MapPageLocator(),
+                    ),
+                  );
+                },
+              ),
+              ElevatedButton(
+                child: const Text('Map Geodesic'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>const MapPageGeodeticDistance(),
                     ),
                   );
                 },

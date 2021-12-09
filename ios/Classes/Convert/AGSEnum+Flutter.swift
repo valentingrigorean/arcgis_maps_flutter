@@ -47,3 +47,91 @@ public func toScalebarUnits(rawValue: Int) -> ScalebarUnits {
         fatalError("Invalid ScalebarUnits type \(rawValue)")
     }
 }
+
+extension AGSLinearUnitID {
+    static func fromFlutter(_ index: Int) -> AGSLinearUnitID {
+        switch index {
+        case 0:
+            return .centimeters
+        case 1:
+            return .feet
+        case 2:
+            return .inches
+        case 3:
+            return .kilometers
+        case 4:
+            return .meters
+        case 5:
+            return .miles
+        case 6:
+            return .nauticalMiles
+        case 7:
+            return .yards
+        default:
+            return .other
+        }
+    }
+
+    func toFlutter() -> Int {
+        switch self {
+        case .centimeters:
+            return 0
+        case .feet:
+            return 1
+        case .inches:
+            return 2
+        case .kilometers:
+            return 3
+        case .meters:
+            return 4
+        case .miles:
+            return 5
+        case .nauticalMiles:
+            return 6
+        case .yards:
+            return 7
+        default:
+            return 8
+        }
+    }
+}
+
+
+extension AGSAngularUnitID {
+
+    static func fromFlutter(_ index: Int) -> AGSAngularUnitID {
+        switch index {
+        case 0:
+            return .degrees
+        case 1:
+            return .minutes
+        case 2:
+            return .seconds
+        case 3:
+            return .grads
+        case 4:
+            return .radians
+        default:
+            return .other
+        }
+    }
+
+    func toFlutter() -> Int {
+        switch self {
+        case .degrees:
+            return 0
+        case .minutes:
+            return 1
+        case .seconds:
+            return 2
+        case .grads:
+            return 3
+        case .radians:
+            return 4
+        case .other:
+            return 5
+        default:
+            return -1
+        }
+    }
+}

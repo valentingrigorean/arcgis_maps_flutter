@@ -44,8 +44,7 @@ class LocatorTaskController {
 
     private func getLocatorInfo(id:Int, result: @escaping FlutterResult) {
         let locatorTask = locatorTasks[id]!
-        locatorTask.load(completion: { [weak self] (error) in
-            guard let self = self else { return }
+        locatorTask.load(completion: { (error) in
             if let error = error {
                 result(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))
                 return
@@ -60,7 +59,7 @@ class LocatorTaskController {
         let location = AGSGeometry.fromFlutter(data: data["location"] as! Dictionary<String, Any>) as! AGSPoint
         let callback = result
 
-      locatorTask.reverseGeocode(withLocation: location) { [weak self] (results, error) in
+      locatorTask.reverseGeocode(withLocation: location) {(results, error) in
             if let error = error {
                 callback(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))
             } else {

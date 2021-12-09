@@ -17,6 +17,7 @@ import com.esri.arcgisruntime.arcgisservices.TimeAware;
 import com.esri.arcgisruntime.geometry.GeometryEngine;
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.layers.Layer;
+import com.esri.arcgisruntime.location.LocationDataSource;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.LayerList;
 import com.esri.arcgisruntime.mapping.Viewpoint;
@@ -44,7 +45,7 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.platform.PlatformView;
 
-final class ArcgisMapController implements DefaultLifecycleObserver, PlatformView, MethodChannel.MethodCallHandler, ViewpointChangedListener, LocationDisplay.AutoPanModeChangedListener, TimeExtentChangedListener {
+final class ArcgisMapController implements DefaultLifecycleObserver, PlatformView, MethodChannel.MethodCallHandler, ViewpointChangedListener, LocationDisplay.AutoPanModeChangedListener, TimeExtentChangedListener, LocationDisplay.LocationChangedListener {
 
     private static final String TAG = "ArcgisMapController";
 
@@ -201,10 +202,33 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     }
 
     @Override
+    public void onLocationChanged(LocationDisplay.LocationChangedEvent locationChangedEvent) {
+        methodChannel.invokeMethod("map#locationChangeListener", Convert.locationToJson(locationChangedEvent.getLocation()));
+    }
+
+    @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
         switch (call.method) {
             case "map#waitForMap": {
                 result.success(null);
+            }
+            break;
+            case "map#getLocation": {
+                final LocationDataSource.Location location = mapView.getLocationDisplay().getLocation();
+                if (location != null) {
+                    result.success(Convert.locationToJson(location));
+                } else {
+                    result.success(null);
+                }
+            }
+            break;
+            case "map#getMapLocation": {
+                final Point mapLocation = mapView.getLocationDisplay().getMapLocation();
+                if (mapLocation != null) {
+                    result.success(Convert.geometryToJson(mapLocation));
+                } else {
+                    result.success(null);
+                }
             }
             break;
             case "map#update": {
@@ -231,9 +255,18 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 }
                 result.success(null);
             }
-            case "map#setViewpointChangedListenerEvents": {
+            case "map#setViewpointChangedEvents": {
                 trackViewpointChangedListenerEvents = call.arguments();
                 result.success(null);
+            }
+            break;
+            case "map#setLocationChangedListener": {
+                final boolean val = call.arguments();
+                if (val) {
+                    mapView.getLocationDisplay().addLocationChangedListener(this);
+                } else {
+                    mapView.getLocationDisplay().removeLocationChangedListener(this);
+                }
             }
             break;
             case "map#setLayersChangedListener": {
@@ -241,7 +274,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 result.success(null);
             }
             break;
-            case "map#setTimeExtentChanged": {
+            case "map#setTimeExtentChangedListener": {
                 final boolean track = call.arguments();
                 if (trackTimeExtentEvents != track) {
                     trackTimeExtentEvents = track;
@@ -447,6 +480,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         mapViewOnTouchListener.clearAllDelegates();
         mapViewOnTouchListener = null;
         trackViewpointChangedListenerEvents = false;
+        mapView.getLocationDisplay().removeLocationChangedListener(this);
         mapView.removeViewpointChangedListener(this);
         mapView.dispose();
         mapView = null;
