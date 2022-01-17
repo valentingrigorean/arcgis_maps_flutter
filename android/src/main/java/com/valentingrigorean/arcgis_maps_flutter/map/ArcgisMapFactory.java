@@ -11,6 +11,7 @@ import io.flutter.plugin.common.StandardMessageCodec;
 import io.flutter.plugin.platform.PlatformView;
 import io.flutter.plugin.platform.PlatformViewFactory;
 
+
 public class ArcgisMapFactory extends PlatformViewFactory {
 
     private final BinaryMessenger binaryMessenger;

@@ -8,11 +8,13 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
     private let channel: FlutterMethodChannel
     private let geometryController: GeometryEngineController
     private let locatorTaskController: LocatorTaskController
+    private let coordinateFormatterController: CoordinateFormatterController
 
     init(with registrar: FlutterPluginRegistrar) {
         channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel", binaryMessenger: registrar.messenger())
         geometryController = GeometryEngineController(messenger: registrar.messenger())
         locatorTaskController = LocatorTaskController(messenger: registrar.messenger())
+        coordinateFormatterController = CoordinateFormatterController(messenger: registrar.messenger())
 
         super.init()
 

@@ -23,6 +23,4 @@ extension AGSPoint {
         }
         self.init(x: x, y: y, spatialReference: spatialReference)
     }
-
-
 }
