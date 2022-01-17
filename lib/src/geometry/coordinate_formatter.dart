@@ -22,7 +22,7 @@ class CoordinateFormatter {
   /// contain spaces separating the components (degrees, minutes, seconds)
   /// of each value. The precision of the output is controlled by both
   /// the [format] and [decimalPlaces] parameters.
-  Future<String?> latitudeLongitudeString({
+  static Future<String?> latitudeLongitudeString({
     required AGSPoint from,
     required LatitudeLongitudeFormat format,
     required int decimalPlaces,
