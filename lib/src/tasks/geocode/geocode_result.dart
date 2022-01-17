@@ -2,9 +2,8 @@ part of arcgis_maps_flutter;
 
 @immutable
 class GeocodeResult {
-
   const GeocodeResult({
-    this.attibutes,
+    this.attributes,
     this.displayLocation,
     this.extent,
     this.inputLocation,
@@ -13,11 +12,10 @@ class GeocodeResult {
     required this.score,
   });
 
-
   /// A collection of attributes as requeste
   /// Available attributes depend on the data stored with the locator, and can
   /// include things like place name, URL, phone number, and so on.
-  final Map<String, Object?>? attibutes;
+  final Map<String, Object?>? attributes;
 
   /// Location of the candidate suitable for display on a map.
   /// For example, this may provide a more precise rooftop location of a house,
@@ -47,7 +45,7 @@ class GeocodeResult {
   /// Creates a new [GeocodeResult] from a JSON object.
   factory GeocodeResult.fromJson(Map<dynamic, dynamic> json) {
     return GeocodeResult(
-      attibutes: parseAttributes(json['attributes']),
+      attributes: parseAttributes(json['attributes']),
       displayLocation: AGSPoint.fromJson(json['displayLocation']),
       extent: AGSEnvelope.fromJson(json['extent']),
       inputLocation: AGSPoint.fromJson(json['inputLocation']),
@@ -55,5 +53,10 @@ class GeocodeResult {
       routeLocation: AGSPoint.fromJson(json['routeLocation']),
       score: json['score'] as double,
     );
+  }
+
+  @override
+  String toString() {
+    return 'GeocodeResult{attributes: $attributes, displayLocation: $displayLocation, extent: $extent, inputLocation: $inputLocation, label: $label, routeLocation: $routeLocation, score: $score}';
   }
 }
