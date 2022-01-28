@@ -25,7 +25,45 @@ class RouteTaskInfo {
     required this.supportsRerouting,
   });
 
+  factory RouteTaskInfo.fromJson(Map<String, dynamic> json) {
+    final accumulateAttributeNames =
+        json['accumulateAttributeNames'] as List<String>;
+    final costAttributes = (json['costAttributes'] as Map<String, dynamic>)
+        .map((key, value) => MapEntry(key, CostAttribute.fromJson(json)));
 
+    final restrictionAttributes =
+        (json['restrictionAttributes'] as Map<String, dynamic>).map(
+            (key, value) => MapEntry(key, RestrictionAttribute.fromJson(json)));
+
+    return RouteTaskInfo._(
+        accumulateAttributeNames: accumulateAttributeNames,
+        costAttributes: costAttributes,
+        defaultTravelModeName: json['defaultTravelModeName'] as String,
+        directionsDistanceUnits: json.containsKey('directionsDistanceUnits')
+            ? UnitSystem.values[json['directionsDistanceUnits']]
+            : UnitSystem.unknown,
+        directionsLanguage: json['directionsLanguage'] as String,
+        directionsStyle: DirectionsStyle.values[json['directionsStyle']],
+        findBestSequence: json['findBestSequence'] as bool,
+        maxLocatingDistance: json['maxLocatingDistance'] as double,
+        startTime: parseDateTimeSafeNullable(json['startTime']),
+        networkName: json['networkName'] as String,
+        outputSpatialReference: json['outputSpatialReference'] == null
+            ? null
+            : SpatialReference.fromJson(
+                json['outputSpatialReference'] as Map<String, dynamic>),
+        preserveFirstStop: json['preserveFirstStop'] as bool,
+        preserveLastStop: json['preserveLastStop'] as bool,
+        restrictionAttributes: restrictionAttributes,
+        routeShapeType: RouteShapeType.values[json['routeShapeType']],
+        supportedLanguages: json['supportedLanguages'] as List<String>,
+        supportedRestrictionUsageParameterValues:
+            json['supportedRestrictionUsageParameterValues'] as List<String>,
+        directionsSupport:
+            NetworkDirectionsSupport.values[json['directionsSupport']],
+        travelModes: TravelMode.fromJsonList(json['travelModes']),
+        supportsRerouting: json['supportsRerouting'] as bool);
+  }
 
   /// A list of network attributes that can be accumulated and returned as
   /// part of the route. You might want to perform the analysis using a

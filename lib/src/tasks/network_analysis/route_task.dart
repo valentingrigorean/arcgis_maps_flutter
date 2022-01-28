@@ -14,8 +14,7 @@ class RouteTask {
   RouteTask({
     required this.url,
     Credential? credential,
-  })
-      : _id = _routeTaskHandlerId++,
+  })  : _id = _routeTaskHandlerId++,
         _credential = credential;
 
   final String url;
@@ -24,22 +23,22 @@ class RouteTask {
     if (_isDisposed) return;
     _isDisposed = true;
     if (!_created) return;
-    //LocatorTaskFlutterPlatform.instance.destroyLocatorTask(_id);
+    RouteTaskFlutterPlatform.instance.destroyRouteTask(_id);
   }
 
-  Future<RouteTask> geRouteTaskInfo() async {
+  Future<RouteTaskInfo> geRouteTaskInfo() async {
     await _ensureCreated();
-    throw UnimplementedError();
+    return await RouteTaskFlutterPlatform.instance.getRouteTaskInfo(_id);
   }
 
   Future<RouteParameters> createDefaultParameters() async {
     await _ensureCreated();
-    throw UnimplementedError();
+    return await RouteTaskFlutterPlatform.instance.createDefaultParameters(_id);
   }
 
-  Future<RouteResult> solve(RouteParameters parameters) async {
+  Future<RouteResult> solveRoute(RouteParameters parameters) async {
     await _ensureCreated();
-    throw UnimplementedError();
+    return await RouteTaskFlutterPlatform.instance.solveRoute(_id, parameters);
   }
 
   Future<void> _ensureCreated() async {
@@ -51,8 +50,8 @@ class RouteTask {
       return;
     }
     _created = true;
-    await LocatorTaskFlutterPlatform.instance
-        .createLocatorTask(_id, url, _credential);
+    await RouteTaskFlutterPlatform.instance
+        .createRouteTask(_id, url, _credential);
     _completer.complete(_id);
   }
 }

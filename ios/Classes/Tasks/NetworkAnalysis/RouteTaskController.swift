@@ -12,6 +12,5 @@ class RouteTaskController{
     init(messenger: FlutterBinaryMessenger) {
         channel = FlutterMethodChannel(name: "plugins.flutter.io/route_task", binaryMessenger: messenger)
         //channel.setMethodCallHandler(handle)
-
     }
 }

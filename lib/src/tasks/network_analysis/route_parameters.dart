@@ -22,6 +22,35 @@ class RouteParameters {
     this.travelMode,
   });
 
+  factory RouteParameters.fromJson(Map<String, dynamic> json) {
+    return RouteParameters(
+      accumulateAttributeNames:
+          json['accumulateAttributeNames'] as List<String>,
+      directionsDistanceUnits:
+          UnitSystem.values[json['directionsDistanceUnits'] as int],
+      directionsLanguage: json['directionsLanguage'] as String,
+      directionsStyle: DirectionsStyle.values[json['directionsStyle'] as int],
+      findBestSequence: json['findBestSequence'] as bool,
+      startTime: parseDateTimeSafeNullable(json['startTime']),
+      outputSpatialReference: json['outputSpatialReference'] != null
+          ? SpatialReference.fromJson(
+              json['outputSpatialReference'] as Map<String, dynamic>)
+          : null,
+      preserveFirstStop: json['preserveFirstStop'] as bool,
+      preserveLastStop: json['preserveLastStop'] as bool,
+      returnDirections: json['returnDirections'] as bool,
+      returnPointBarriers: json['returnPointBarriers'] as bool,
+      returnPolygonBarriers: json['returnPolygonBarriers'] as bool,
+      returnPolylineBarriers: json['returnPolylineBarriers'] as bool,
+      returnRoutes: json['returnRoutes'] as bool,
+      returnStops: json['returnStops'] as bool,
+      routeShapeType: RouteShapeType.values[json['routeShapeType'] as int],
+      travelMode: json['travelMode'] != null
+          ? TravelMode.fromJson(json['travelMode'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
   /// A list of network attributes to be accumulated and returned as part
   /// of the route. You might want to perform the analysis using a
   /// distance-based impedance attribute and accumulate a time-based cost
@@ -89,4 +118,26 @@ class RouteParameters {
 
   /// Specifies the travel mode to use when computing the routes
   final TravelMode? travelMode;
+
+  Object toJson() {
+    var json = <String, dynamic>{};
+    json['accumulateAttributeNames'] = accumulateAttributeNames;
+    json['directionsDistanceUnits'] = directionsDistanceUnits;
+    json['directionsLanguage'] = directionsLanguage;
+    json['directionsStyle'] = directionsStyle;
+    json['findBestSequence'] = findBestSequence;
+    json['startTime'] = startTime;
+    json['outputSpatialReference'] = outputSpatialReference;
+    json['preserveFirstStop'] = preserveFirstStop;
+    json['preserveLastStop'] = preserveLastStop;
+    json['returnDirections'] = returnDirections;
+    json['returnPointBarriers'] = returnPointBarriers;
+    json['returnPolygonBarriers'] = returnPolygonBarriers;
+    json['returnPolylineBarriers'] = returnPolylineBarriers;
+    json['returnRoutes'] = returnRoutes;
+    json['returnStops'] = returnStops;
+    json['routeShapeType'] = routeShapeType;
+    if (travelMode != null) json['travelMode'] = travelMode!.toJson();
+    return json;
+  }
 }

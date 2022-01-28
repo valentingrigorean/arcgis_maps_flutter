@@ -34,7 +34,7 @@ abstract class RouteTaskFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('createDefaultParameters() has not been implemented.');
   }
 
-  Future<RouteResult> solve(int id,RouteParameters parameters) async {
+  Future<RouteResult> solveRoute(int id,RouteParameters parameters) async {
     throw UnimplementedError('solve() has not been implemented.');
   }
 }

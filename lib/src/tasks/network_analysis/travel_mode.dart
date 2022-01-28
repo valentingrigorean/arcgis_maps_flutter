@@ -16,7 +16,7 @@ class TravelMode {
     required this.uTurnPolicy,
   });
 
-  static TravelMode fromJson(Map<String, dynamic> json) {
+  factory TravelMode.fromJson(Map<String, dynamic> json) {
     return TravelMode._(
       attributeParameterValues:
           (json['attributeParameterValues'] as List<Map<dynamic, dynamic>>)
@@ -34,6 +34,10 @@ class TravelMode {
       useHierarchy: json['useHierarchy'] as bool,
       uTurnPolicy: UTurnPolicy.values[json['uTurnPolicy'] as int],
     );
+  }
+
+  static List<TravelMode> fromJsonList(List<dynamic> json) {
+    return json.map((e) => TravelMode.fromJson(e as Map<String, dynamic>)).toList();
   }
 
   /// Overrides to the attribute values of a cost attribute specified in
@@ -82,4 +86,20 @@ class TravelMode {
   /// Allowing U-turns implies the vehicle can turn around at a junction
   /// and double back on the same street.
   final UTurnPolicy uTurnPolicy;
+
+  Object toJson(){
+    return {
+      'attributeParameterValues': attributeParameterValues.map((e) => e.toJson()).toList(),
+      'travelModeDescription': travelModeDescription,
+      'distanceAttributeName': distanceAttributeName,
+      'impedanceAttributeName': impedanceAttributeName,
+      'name': name,
+      'outputGeometryPrecision': outputGeometryPrecision,
+      'restrictionAttributeNames': restrictionAttributeNames,
+      'timeAttributeName': timeAttributeName,
+      'type': type,
+      'useHierarchy': useHierarchy,
+      'uTurnPolicy': uTurnPolicy.index,
+    };
+  }
 }
