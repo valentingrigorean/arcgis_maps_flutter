@@ -36,6 +36,8 @@ import 'package:xml2json/xml2json.dart';
 import 'package:jiffy/jiffy.dart';
 
 
+part 'src/unit_system.dart';
+
 part 'src/arcgis_error.dart';
 part 'src/arcgis_runtime_environment.dart';
 
@@ -123,6 +125,20 @@ part 'src/tasks/geocode/geocode_result.dart';
 part 'src/tasks/geocode/locator_attribute.dart';
 part 'src/tasks/geocode/locator_info.dart';
 part 'src/tasks/geocode/locator_task.dart';
+
+part 'src/tasks/network_analysis/attribute_parameter_value.dart';
+part 'src/tasks/network_analysis/cost_attribute.dart';
+part 'src/tasks/network_analysis/directions_style.dart';
+part 'src/tasks/network_analysis/network_directions_support.dart';
+part 'src/tasks/network_analysis/restriction_attribute.dart';
+part 'src/tasks/network_analysis/route.dart';
+part 'src/tasks/network_analysis/route_parameters.dart';
+part 'src/tasks/network_analysis/route_result.dart';
+part 'src/tasks/network_analysis/route_shape_type.dart';
+part 'src/tasks/network_analysis/route_task.dart';
+part 'src/tasks/network_analysis/route_task_info.dart';
+part 'src/tasks/network_analysis/travel_mode.dart';
+part 'src/tasks/network_analysis/u_turn_policy.dart';
 
 part 'src/toolkit/compass.dart';
 part 'src/toolkit/time_slider/time_slider.dart';

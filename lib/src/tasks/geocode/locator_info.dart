@@ -2,7 +2,7 @@ part of arcgis_maps_flutter;
 
 @immutable
 class LocatorInfo {
-  const LocatorInfo({
+  const LocatorInfo._({
     required this.name,
     required this.description,
     required this.intersectionResultAttributes,
@@ -17,8 +17,8 @@ class LocatorInfo {
     required this.version,
   });
 
-  factory LocatorInfo.fromJson(Map<dynamic, dynamic> json) {
-    return LocatorInfo(
+  static LocatorInfo fromJson(Map<dynamic, dynamic> json) {
+    return LocatorInfo._(
       name: json['name'] as String,
       description: json['description'] as String,
       intersectionResultAttributes:

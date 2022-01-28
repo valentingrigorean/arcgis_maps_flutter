@@ -1,4 +1,11 @@
-enum FieldType { unknown, integer, double, date, text, nullable }
+enum FieldType {
+  unknown,
+  integer,
+  double,
+  date,
+  text,
+  nullable,
+}
 
 dynamic fromNativeField(Map<dynamic, dynamic>? map) {
   if (map == null) {

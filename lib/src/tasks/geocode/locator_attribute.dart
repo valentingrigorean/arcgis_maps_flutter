@@ -10,15 +10,15 @@ enum LocatorAttributeType {
 
 @immutable
 class LocatorAttribute {
-  const LocatorAttribute({
+  const LocatorAttribute._({
     required this.name,
     required this.displayName,
     required this.required,
     this.type = LocatorAttributeType.unknown,
   });
 
-  factory LocatorAttribute.fromJson(Map<dynamic, dynamic> json) {
-    return LocatorAttribute(
+  static LocatorAttribute fromJson(Map<dynamic, dynamic> json) {
+    return LocatorAttribute._(
       name: json['name'] as String,
       displayName: json['displayName'] as String,
       required: json['required'] as bool,

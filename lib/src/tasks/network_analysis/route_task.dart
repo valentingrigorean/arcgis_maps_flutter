@@ -1,18 +1,22 @@
 part of arcgis_maps_flutter;
 
-int _locatorTaskHandlerId = 0;
+int _routeTaskHandlerId = 0;
 
-class LocatorTask {
+class RouteTask {
   final Completer<int> _completer = Completer<int>();
 
   final int _id;
   final Credential? _credential;
+
   bool _created = false;
   bool _isDisposed = false;
 
-  LocatorTask({required this.url, Credential? credential})
-      : _credential = credential,
-        _id = _locatorTaskHandlerId++;
+  RouteTask({
+    required this.url,
+    Credential? credential,
+  })
+      : _id = _routeTaskHandlerId++,
+        _credential = credential;
 
   final String url;
 
@@ -20,18 +24,22 @@ class LocatorTask {
     if (_isDisposed) return;
     _isDisposed = true;
     if (!_created) return;
-    LocatorTaskFlutterPlatform.instance.destroyLocatorTask(_id);
+    //LocatorTaskFlutterPlatform.instance.destroyLocatorTask(_id);
   }
 
-  Future<LocatorInfo> getLocatorInfo() async {
+  Future<RouteTask> geRouteTaskInfo() async {
     await _ensureCreated();
-    return await LocatorTaskFlutterPlatform.instance.getLocatorInfo(_id);
+    throw UnimplementedError();
   }
 
-  Future<List<GeocodeResult>> reverseGeocode(AGSPoint location) async {
+  Future<RouteParameters> createDefaultParameters() async {
     await _ensureCreated();
-    return await LocatorTaskFlutterPlatform.instance
-        .reverseGeocode(_id, location);
+    throw UnimplementedError();
+  }
+
+  Future<RouteResult> solve(RouteParameters parameters) async {
+    await _ensureCreated();
+    throw UnimplementedError();
   }
 
   Future<void> _ensureCreated() async {
