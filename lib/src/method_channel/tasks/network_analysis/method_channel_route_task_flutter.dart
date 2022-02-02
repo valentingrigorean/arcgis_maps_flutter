@@ -45,7 +45,7 @@ class MethodChannelRouteTaskFlutter extends RouteTaskFlutterPlatform {
   @override
   Future<RouteResult> solveRoute(int id, RouteParameters parameters) async {
     return _channel.invokeMapMethod<String, dynamic>(
-      "solve",
+      "solveRoute",
       {
         "id": id,
         "parameters": parameters.toJson(),

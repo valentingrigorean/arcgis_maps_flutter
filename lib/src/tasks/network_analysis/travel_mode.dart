@@ -16,10 +16,10 @@ class TravelMode {
     required this.uTurnPolicy,
   });
 
-  factory TravelMode.fromJson(Map<String, dynamic> json) {
+  factory TravelMode.fromJson(Map<dynamic, dynamic> json) {
     return TravelMode._(
       attributeParameterValues:
-          (json['attributeParameterValues'] as List<Map<dynamic, dynamic>>)
+          (json['attributeParameterValues'] as List<dynamic>)
               .map((e) => AttributeParameterValue.fromJson(e))
               .toList(),
       travelModeDescription: json['travelModeDescription'],
@@ -28,7 +28,7 @@ class TravelMode {
       name: json['name'],
       outputGeometryPrecision: json['outputGeometryPrecision'],
       restrictionAttributeNames:
-          json['restrictionAttributeNames'] as List<String>,
+          (json['restrictionAttributeNames'] as List<dynamic>).cast<String>(),
       timeAttributeName: json['timeAttributeName'] as String,
       type: json['type'] as String,
       useHierarchy: json['useHierarchy'] as bool,
@@ -37,7 +37,9 @@ class TravelMode {
   }
 
   static List<TravelMode> fromJsonList(List<dynamic> json) {
-    return json.map((e) => TravelMode.fromJson(e as Map<String, dynamic>)).toList();
+    return json
+        .map((e) => TravelMode.fromJson(e as Map<dynamic, dynamic>))
+        .toList();
   }
 
   /// Overrides to the attribute values of a cost attribute specified in
@@ -87,9 +89,10 @@ class TravelMode {
   /// and double back on the same street.
   final UTurnPolicy uTurnPolicy;
 
-  Object toJson(){
+  Object toJson() {
     return {
-      'attributeParameterValues': attributeParameterValues.map((e) => e.toJson()).toList(),
+      'attributeParameterValues':
+          attributeParameterValues.map((e) => e.toJson()).toList(),
       'travelModeDescription': travelModeDescription,
       'distanceAttributeName': distanceAttributeName,
       'impedanceAttributeName': impedanceAttributeName,

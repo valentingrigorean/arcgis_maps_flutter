@@ -27,13 +27,15 @@ class RouteTaskInfo {
 
   factory RouteTaskInfo.fromJson(Map<String, dynamic> json) {
     final accumulateAttributeNames =
-        json['accumulateAttributeNames'] as List<String>;
-    final costAttributes = (json['costAttributes'] as Map<String, dynamic>)
-        .map((key, value) => MapEntry(key, CostAttribute.fromJson(json)));
+        (json['accumulateAttributeNames'] as List<dynamic>).cast<String>();
+    final costAttributes = (json['costAttributes'] as Map<dynamic, dynamic>)
+        .map((key, value) =>
+            MapEntry(key as String, CostAttribute.fromJson(value)));
 
     final restrictionAttributes =
-        (json['restrictionAttributes'] as Map<String, dynamic>).map(
-            (key, value) => MapEntry(key, RestrictionAttribute.fromJson(json)));
+        (json['restrictionAttributes'] as Map<dynamic, dynamic>).map(
+            (key, value) =>
+                MapEntry(key as String, RestrictionAttribute.fromJson(value)));
 
     return RouteTaskInfo._(
         accumulateAttributeNames: accumulateAttributeNames,
@@ -51,14 +53,16 @@ class RouteTaskInfo {
         outputSpatialReference: json['outputSpatialReference'] == null
             ? null
             : SpatialReference.fromJson(
-                json['outputSpatialReference'] as Map<String, dynamic>),
+                json['outputSpatialReference'] as Map<dynamic, dynamic>),
         preserveFirstStop: json['preserveFirstStop'] as bool,
         preserveLastStop: json['preserveLastStop'] as bool,
         restrictionAttributes: restrictionAttributes,
         routeShapeType: RouteShapeType.values[json['routeShapeType']],
-        supportedLanguages: json['supportedLanguages'] as List<String>,
+        supportedLanguages:
+            (json['supportedLanguages'] as List<dynamic>).cast<String>(),
         supportedRestrictionUsageParameterValues:
-            json['supportedRestrictionUsageParameterValues'] as List<String>,
+            (json['supportedRestrictionUsageParameterValues'] as List<dynamic>)
+                .cast<String>(),
         directionsSupport:
             NetworkDirectionsSupport.values[json['directionsSupport']],
         travelModes: TravelMode.fromJsonList(json['travelModes']),

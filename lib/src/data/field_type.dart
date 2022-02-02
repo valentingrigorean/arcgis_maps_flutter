@@ -24,7 +24,7 @@ Object toNativeField(Object? value) {
     type = FieldType.unknown;
   }
   return {
-    'type': type.toString(),
+    'type': type.index,
     'value': value,
   };
 }

@@ -7,7 +7,7 @@ class RestrictionAttribute {
     required this.restrictionUsageParameterName,
   });
 
-  factory RestrictionAttribute.fromJson(Map<String, dynamic> json) {
+  factory RestrictionAttribute.fromJson(Map<dynamic, dynamic> json) {
     return RestrictionAttribute._(
       parameterValues: parseAttributes(json['parameterValues']),
       restrictionUsageParameterName: json['restrictionUsageParameterName'],

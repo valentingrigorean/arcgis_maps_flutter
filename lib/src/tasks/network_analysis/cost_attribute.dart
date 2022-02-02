@@ -25,7 +25,7 @@ class CostAttribute {
     required this.unit,
   });
 
-  factory CostAttribute.fromJson(Map<String, dynamic> json) {
+  factory CostAttribute.fromJson(Map<dynamic, dynamic> json) {
     return CostAttribute._(
       parameterValues: parseAttributes(json['parameterValues']),
       unit: json.containsKey('unit')

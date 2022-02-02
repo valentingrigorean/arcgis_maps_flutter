@@ -25,7 +25,7 @@ class RouteParameters {
   factory RouteParameters.fromJson(Map<String, dynamic> json) {
     return RouteParameters(
       accumulateAttributeNames:
-          json['accumulateAttributeNames'] as List<String>,
+          (json['accumulateAttributeNames'] as List<dynamic>).cast<String>(),
       directionsDistanceUnits:
           UnitSystem.values[json['directionsDistanceUnits'] as int],
       directionsLanguage: json['directionsLanguage'] as String,
@@ -33,8 +33,7 @@ class RouteParameters {
       findBestSequence: json['findBestSequence'] as bool,
       startTime: parseDateTimeSafeNullable(json['startTime']),
       outputSpatialReference: json['outputSpatialReference'] != null
-          ? SpatialReference.fromJson(
-              json['outputSpatialReference'] as Map<String, dynamic>)
+          ? SpatialReference.fromJson(json['outputSpatialReference'])
           : null,
       preserveFirstStop: json['preserveFirstStop'] as bool,
       preserveLastStop: json['preserveLastStop'] as bool,
@@ -46,7 +45,7 @@ class RouteParameters {
       returnStops: json['returnStops'] as bool,
       routeShapeType: RouteShapeType.values[json['routeShapeType'] as int],
       travelMode: json['travelMode'] != null
-          ? TravelMode.fromJson(json['travelMode'] as Map<String, dynamic>)
+          ? TravelMode.fromJson(json['travelMode'])
           : null,
     );
   }
@@ -119,15 +118,39 @@ class RouteParameters {
   /// Specifies the travel mode to use when computing the routes
   final TravelMode? travelMode;
 
+  RouteParameters copyWith({bool? returnRoutes}) {
+    return RouteParameters(
+      accumulateAttributeNames: accumulateAttributeNames,
+      directionsDistanceUnits: directionsDistanceUnits,
+      directionsLanguage: directionsLanguage,
+      directionsStyle: directionsStyle,
+      findBestSequence: findBestSequence,
+      outputSpatialReference: outputSpatialReference,
+      preserveFirstStop: preserveFirstStop,
+      preserveLastStop: preserveLastStop,
+      returnDirections: returnDirections,
+      returnPointBarriers: returnPointBarriers,
+      returnPolygonBarriers: returnPolygonBarriers,
+      returnPolylineBarriers: returnPolylineBarriers,
+      returnRoutes: returnRoutes ?? this.returnRoutes,
+      returnStops: returnStops,
+      routeShapeType: routeShapeType,
+      startTime: startTime,
+      travelMode: travelMode,
+    );
+  }
+
   Object toJson() {
     var json = <String, dynamic>{};
     json['accumulateAttributeNames'] = accumulateAttributeNames;
-    json['directionsDistanceUnits'] = directionsDistanceUnits;
+    json['directionsDistanceUnits'] = directionsDistanceUnits.index;
     json['directionsLanguage'] = directionsLanguage;
-    json['directionsStyle'] = directionsStyle;
+    json['directionsStyle'] = directionsStyle.index;
     json['findBestSequence'] = findBestSequence;
     json['startTime'] = startTime;
-    json['outputSpatialReference'] = outputSpatialReference;
+    if (outputSpatialReference != null) {
+      json['outputSpatialReference'] = outputSpatialReference!.toJson();
+    }
     json['preserveFirstStop'] = preserveFirstStop;
     json['preserveLastStop'] = preserveLastStop;
     json['returnDirections'] = returnDirections;
@@ -136,8 +159,10 @@ class RouteParameters {
     json['returnPolylineBarriers'] = returnPolylineBarriers;
     json['returnRoutes'] = returnRoutes;
     json['returnStops'] = returnStops;
-    json['routeShapeType'] = routeShapeType;
-    if (travelMode != null) json['travelMode'] = travelMode!.toJson();
+    json['routeShapeType'] = routeShapeType.index;
+    if (travelMode != null) {
+      json['travelMode'] = travelMode!.toJson();
+    }
     return json;
   }
 }

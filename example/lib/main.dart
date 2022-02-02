@@ -16,6 +16,7 @@ import 'package:arcgis_maps_flutter_example/map_page_marker_rotation.dart';
 import 'package:arcgis_maps_flutter_example/map_page_markers_visibility_filter.dart';
 import 'package:arcgis_maps_flutter_example/map_page_polygon.dart';
 import 'package:arcgis_maps_flutter_example/map_page_portal.dart';
+import 'package:arcgis_maps_flutter_example/map_page_route.dart';
 import 'package:arcgis_maps_flutter_example/map_page_scalerbar.dart';
 import 'package:arcgis_maps_flutter_example/map_page_screen_location.dart';
 import 'package:arcgis_maps_flutter_example/map_page_time_slider.dart';
@@ -110,6 +111,17 @@ class MainPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>  const MapPageLocator(),
+                    ),
+                  );
+                },
+              ),
+              ElevatedButton(
+                child: const Text('Map Route'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>  const MapPageRoute(),
                     ),
                   );
                 },
