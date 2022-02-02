@@ -4,6 +4,7 @@ package com.valentingrigorean.arcgis_maps_flutter.tasks.networkanalysis;
 import androidx.annotation.NonNull;
 
 import com.esri.arcgisruntime.tasks.networkanalysis.RouteTask;
+import com.esri.arcgisruntime.tasks.networkanalysis.Stop;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +18,8 @@ public class RouteTaskController implements MethodChannel.MethodCallHandler {
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
 
+        Stop stop;
+        stop.getNetworkLocation();
         switch (call.method) {
 
             default:

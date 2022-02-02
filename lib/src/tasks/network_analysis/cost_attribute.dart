@@ -1,23 +1,5 @@
 part of arcgis_maps_flutter;
 
-enum AttributeUnit {
-  unknown,
-  inches,
-  feet,
-  yards,
-  miles,
-  millimeters,
-  centimeters,
-  meters,
-  kilometers,
-  nauticalMiles,
-  decimalDegrees,
-  seconds,
-  minutes,
-  hours,
-  days,
-}
-
 @immutable
 class CostAttribute {
   const CostAttribute._({

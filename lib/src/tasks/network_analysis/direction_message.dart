@@ -1,27 +1,5 @@
 part of arcgis_maps_flutter;
 
-enum DirectionMessageType {
-  unknown,
-
-  /// A street name.
-  streetName,
-
-  /// An alternative street name.
-  alternativeName,
-
-  /// A signpost branch.
-  branch,
-
-  /// A signpost toward.
-  toward,
-
-  /// An intersected street name.
-  crossStreet,
-
-  /// A signpost exit.
-  exit
-}
-
 @immutable
 class DirectionMessage {
   const DirectionMessage._({
