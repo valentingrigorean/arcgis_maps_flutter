@@ -2,14 +2,14 @@ part of arcgis_maps_flutter;
 
 @immutable
 class Stop {
-  const Stop({
+  const Stop._({
     this.arrivalCurbApproach = CurbApproach.unknown,
     this.departureCurbApproach = CurbApproach.unknown,
     this.curbApproach = CurbApproach.eitherSide,
     this.currentBearing = double.nan,
     this.currentBearingTolerance = double.nan,
     this.distanceToNetworkLocation = double.nan,
-    required AGSPoint point,
+    this.geometry,
     this.arrivalTime,
     this.arrivalTimeShift = 0,
     this.departureTime,
@@ -26,7 +26,63 @@ class Stop {
     this.sequence = 0,
     this.violationTime = 0,
     this.waitTime = 0,
-  }) : geometry = point;
+  });
+
+  const Stop({
+    required AGSPoint point,
+    String name = '',
+    StopType stopType = StopType.stop,
+    String routeName = '',
+    CurbApproach curbApproach = CurbApproach.eitherSide,
+    double currentBearingTolerance = double.nan,
+    double navigationLatency = double.nan,
+    double navigationSpeed = double.nan,
+  }) : this._(
+          geometry: point,
+          name: name,
+          stopType: stopType,
+          routeName: routeName,
+          curbApproach: curbApproach,
+          currentBearingTolerance: currentBearingTolerance,
+          navigationLatency: navigationLatency,
+          navigationSpeed: navigationSpeed,
+        );
+
+  factory Stop.fromJson(Map<String, dynamic> json) {
+    return Stop._(
+      arrivalCurbApproach: CurbApproach.values[json['arrivalCurbApproach']],
+      departureCurbApproach: CurbApproach.values[json['departureCurbApproach']],
+      curbApproach: CurbApproach.values[json['curbApproach']],
+      currentBearing: json['currentBearing'],
+      currentBearingTolerance: json['currentBearingTolerance'],
+      distanceToNetworkLocation: json['distanceToNetworkLocation'],
+      geometry: json.containsKey('geometry')
+          ? Geometry.fromJson(json['geometry']) as AGSPoint
+          : null,
+      arrivalTime: parseDateTimeSafeNullable(json['arrivalTime']),
+      arrivalTimeShift: json['arrivalTimeShift'],
+      departureTime: parseDateTimeSafeNullable(json['departureTime']),
+      departureTimeShift: json['departureTimeShift'],
+      timeWindowStart: parseDateTimeSafeNullable(json['timeWindowStart']),
+      timeWindowEnd: parseDateTimeSafeNullable(json['timeWindowEnd']),
+      locationStatus: LocationStatus.values[json['locationStatus']],
+      name: json['name'],
+      stopType: StopType.values[json['stopType']],
+      stopID: json['stopID'],
+      navigationLatency: json['navigationLatency'],
+      navigationSpeed: json['navigationSpeed'],
+      routeName: json['routeName'],
+      sequence: json['sequence'],
+      violationTime: json['violationTime'],
+      waitTime: json['waitTime'],
+    );
+  }
+
+  static List<Stop> fromJsonList(List<dynamic> jsonList) {
+    return jsonList
+        .map((json) => Stop.fromJson(json as Map<String, dynamic>))
+        .toList();
+  }
 
   /// Specifies the direction a vehicle arrives at this stop.
   final CurbApproach arrivalCurbApproach;
@@ -118,4 +174,17 @@ class Stop {
   /// to open when the route arrives early
   /// This is the difference between [localArrivalTime] and [localTimeWindowEnd]
   final double waitTime;
+
+  Object toJson() {
+    return {
+      'geometry': geometry!.toJson(),
+      'name': name,
+      'stopType': stopType.index,
+      'routeName': routeName,
+      'curbApproach': curbApproach.index,
+      'currentBearingTolerance': currentBearingTolerance,
+      'navigationLatency': navigationLatency,
+      'navigationSpeed': navigationSpeed,
+    };
+  }
 }

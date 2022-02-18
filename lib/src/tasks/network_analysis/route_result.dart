@@ -12,7 +12,7 @@ class RouteResult {
   factory RouteResult.fromJson(Map<String, dynamic> json) {
     return RouteResult._(
       directionsLanguage: json['directionsLanguage'] as String,
-      messages: json['messages'] as List<String>,
+      messages: (json['messages'] as List<dynamic>).cast<String>(),
       routes: Route.fromJsonList(json['routes'] as List<dynamic>),
     );
   }
@@ -28,4 +28,9 @@ class RouteResult {
   /// Each elements represents an indepdendent route with its own driving directions.
   /// Stops are grouped into diffrent routes based on @c AGSStop#routeName.
   final List<Route> routes;
+
+  @override
+  String toString(){
+    return 'RouteResult{directionsLanguage: $directionsLanguage, messages: $messages, routes: $routes}';
+  }
 }

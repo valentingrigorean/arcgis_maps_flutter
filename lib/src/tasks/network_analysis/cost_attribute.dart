@@ -19,4 +19,9 @@ class CostAttribute {
   final Map<String, Object?>? parameterValues;
 
   final AttributeUnit unit;
+
+  @override
+  String toString(){
+    return 'CostAttribute{parameterValues: $parameterValues, unit: $unit}';
+  }
 }

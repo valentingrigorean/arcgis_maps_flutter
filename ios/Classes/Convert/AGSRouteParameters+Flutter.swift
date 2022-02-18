@@ -31,6 +31,11 @@ extension AGSRouteParameters {
         if let travelMode = data["travelMode"] as? Dictionary<String, Any> {
             self.travelMode = AGSTravelMode(data: travelMode)
         }
+        if let stops = data["stops"] as? [Dictionary<String, Any>] {
+            setStops(stops.map {
+                AGSStop(data: $0)
+            })
+        }
     }
 
 

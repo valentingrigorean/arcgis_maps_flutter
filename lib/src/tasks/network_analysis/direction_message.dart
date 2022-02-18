@@ -15,7 +15,7 @@ class DirectionMessage {
   }
 
   static List<DirectionMessage> fromJsonList(List<dynamic> json) {
-    return json.map((e) => DirectionMessage.fromJson(e)).toList();
+    return json.map((e) => DirectionMessage.fromJson(e.cast<String,dynamic>())).toList();
   }
 
   final DirectionMessageType type;

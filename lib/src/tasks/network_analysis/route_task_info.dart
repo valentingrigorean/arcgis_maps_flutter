@@ -146,4 +146,9 @@ class RouteTaskInfo {
   /// Indicates whether the network analyst service or dataset supports rerouting.
   /// If the property doesn't exist on a service, it will default to [false]. For local data value will be [true].
   final bool supportsRerouting;
+
+  @override
+  String toString() {
+    return 'RouteParameters{accumulateAttributeNames: $accumulateAttributeNames, costAttributes: $costAttributes, defaultTravelModeName: $defaultTravelModeName, directionsDistanceUnits: $directionsDistanceUnits, directionsLanguage: $directionsLanguage, directionsStyle: $directionsStyle, findBestSequence: $findBestSequence, maxLocatingDistance: $maxLocatingDistance, startTime: $startTime, networkName: $networkName, outputSpatialReference: $outputSpatialReference, preserveFirstStop: $preserveFirstStop, preserveLastStop: $preserveLastStop, restrictionAttributes: $restrictionAttributes, routeShapeType: $routeShapeType, supportedLanguages: $supportedLanguages, supportedRestrictionUsageParameterValues: $supportedRestrictionUsageParameterValues, directionsSupport: $directionsSupport, travelModes: $travelModes, supportsRerouting: $supportsRerouting}';
+  }
 }

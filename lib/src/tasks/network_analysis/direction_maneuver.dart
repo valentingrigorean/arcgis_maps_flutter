@@ -33,7 +33,7 @@ class DirectionManeuver {
   }
 
   static List<DirectionManeuver> fromJsonList(List<dynamic> jsonList) {
-    return jsonList.map((json) => DirectionManeuver.fromJson(json)).toList();
+    return jsonList.map((json) => DirectionManeuver.fromJson(json.cast<String,dynamic>())).toList();
   }
 
   /// Events along the maneuver

@@ -9,8 +9,10 @@ class Viewpoint {
     this.rotation,
   });
 
-  factory Viewpoint.fromPoint(
-          {required AGSPoint point, required double scale}) =>
+  factory Viewpoint.fromPoint({
+    required AGSPoint point,
+    required double scale,
+  }) =>
       Viewpoint._(
         targetGeometry: point,
         scale: scale,

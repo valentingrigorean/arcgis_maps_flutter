@@ -16,4 +16,9 @@ class RestrictionAttribute {
 
   final Map<String, Object?>? parameterValues;
   final String restrictionUsageParameterName;
+
+  @override
+  String toString(){
+    return 'RestrictionAttribute{parameterValues: $parameterValues, restrictionUsageParameterName: $restrictionUsageParameterName}';
+  }
 }

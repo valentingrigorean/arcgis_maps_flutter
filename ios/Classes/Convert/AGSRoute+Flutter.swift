@@ -23,6 +23,9 @@ extension AGSRoute {
         if let routeGeometry = routeGeometry {
             json["routeGeometry"] = routeGeometry.toJSONFlutter()
         }
+        json["stops"] = stops.map {
+            $0.toJSONFlutter()
+        }
         json["routeName"] = routeName
         json["totalTime"] = totalTime
         json["travelTime"] = travelTime

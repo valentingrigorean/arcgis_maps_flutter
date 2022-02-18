@@ -10,8 +10,8 @@ class Route {
     required this.endTimeShift,
     required this.totalLength,
     required this.routeGeometry,
+    required this.stops,
     required this.routeName,
-    //TODO(vali): add stops
     required this.totalTime,
     required this.travelTime,
     required this.violationTime,
@@ -33,11 +33,14 @@ class Route {
       travelTime: json['travelTime'] as double,
       violationTime: json['violationTime'] as double,
       waitTime: json['waitTime'] as double,
+      stops: Stop.fromJsonList(json['stops']),
     );
   }
 
   static List<Route> fromJsonList(List<dynamic> json) {
-    return json.map((e) => Route.fromJson(e as Map<String, dynamic>)).toList();
+    return json
+        .map((e) => Route.fromJson((e as Map).cast<String, dynamic>()))
+        .toList();
   }
 
   /// Turn-by-turn driving directions along this route.
@@ -64,6 +67,13 @@ class Route {
   /// The route geometry.
   final AGSPolyline? routeGeometry;
 
+  /// The stops visited along this route.
+  /// Only available if [RouteParameters.returnStop] was enabled.
+  /// The sequence stops are visited in the route may be different from
+  /// the order they are present in the list if
+  /// [RouteParameters.findBestSequence] is enabled.
+  final List<Stop> stops;
+
   /// Name of the route.
   final String routeName;
 
@@ -82,4 +92,9 @@ class Route {
   /// Total time (in minutes) spent at stops waiting for time windows to open.
   /// Only applicable if time windows were specified for stops.
   final double waitTime;
+
+  @override
+  String toString() {
+    return 'Route(directionManeuvers: $directionManeuvers, startTime: $startTime, startTimeShift: $startTimeShift, endTime: $endTime, endTimeShift: $endTimeShift, totalLength: $totalLength, routeGeometry: $routeGeometry, stops: $stops, routeName: $routeName, totalTime: $totalTime, travelTime: $travelTime, violationTime: $violationTime, waitTime: $waitTime)';
+  }
 }

@@ -20,6 +20,7 @@ class RouteParameters {
     this.returnStops = false,
     this.routeShapeType = RouteShapeType.trueShapeWithMeasures,
     this.travelMode,
+    this.stops = const [],
   });
 
   factory RouteParameters.fromJson(Map<String, dynamic> json) {
@@ -118,7 +119,23 @@ class RouteParameters {
   /// Specifies the travel mode to use when computing the routes
   final TravelMode? travelMode;
 
-  RouteParameters copyWith({bool? returnRoutes}) {
+  final List<Stop> stops;
+
+  RouteParameters copyWith({
+    bool? returnDirections,
+    bool? returnRoutes,
+    List<Stop>? stops,
+  }) {
+    if (returnRoutes != null && returnRoutes) {
+      assert(stops != null, 'stops must be provided when returnRoutes is true');
+      assert(stops!.length > 1,
+          'At least two stops are required to return routes');
+    }
+    if(stops != null){
+      if(stops.length > 1 && returnRoutes == null){
+        returnRoutes = true;
+      }
+    }
     return RouteParameters(
       accumulateAttributeNames: accumulateAttributeNames,
       directionsDistanceUnits: directionsDistanceUnits,
@@ -128,7 +145,7 @@ class RouteParameters {
       outputSpatialReference: outputSpatialReference,
       preserveFirstStop: preserveFirstStop,
       preserveLastStop: preserveLastStop,
-      returnDirections: returnDirections,
+      returnDirections: returnDirections ?? this.returnDirections,
       returnPointBarriers: returnPointBarriers,
       returnPolygonBarriers: returnPolygonBarriers,
       returnPolylineBarriers: returnPolylineBarriers,
@@ -137,6 +154,7 @@ class RouteParameters {
       routeShapeType: routeShapeType,
       startTime: startTime,
       travelMode: travelMode,
+      stops: stops ?? this.stops,
     );
   }
 
@@ -162,6 +180,9 @@ class RouteParameters {
     json['routeShapeType'] = routeShapeType.index;
     if (travelMode != null) {
       json['travelMode'] = travelMode!.toJson();
+    }
+    if (stops.isNotEmpty) {
+      json['stops'] = stops.map((s) => s.toJson()).toList();
     }
     return json;
   }
