@@ -26,7 +26,7 @@ class RouteTask {
     RouteTaskFlutterPlatform.instance.destroyRouteTask(_id);
   }
 
-  Future<RouteTaskInfo> geRouteTaskInfo() async {
+  Future<RouteTaskInfo> getRouteTaskInfo() async {
     await _ensureCreated();
     return await RouteTaskFlutterPlatform.instance.getRouteTaskInfo(_id);
   }

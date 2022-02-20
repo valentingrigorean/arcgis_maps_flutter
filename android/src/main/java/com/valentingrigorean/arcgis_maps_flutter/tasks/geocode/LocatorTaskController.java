@@ -40,7 +40,7 @@ public class LocatorTaskController implements MethodChannel.MethodCallHandler {
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
         switch (call.method) {
             case "createLocatorTask":
-                createLocatorTask(Convert.toMap(call.arguments));
+                createLocatorTask(call.arguments());
                 result.success(null);
                 break;
             case "destroyLocatorTask":
@@ -70,7 +70,7 @@ public class LocatorTaskController implements MethodChannel.MethodCallHandler {
         }
         locatorTask.addDoneLoadingListener(() -> {
             if (locatorTask.getLoadStatus() == LoadStatus.LOADED) {
-                result.success(Convert.locatorInfoToJson(locatorTask.getLocatorInfo()));
+                result.success(ConvertLocatorTask.locatorInfoToJson(locatorTask.getLocatorInfo()));
             } else {
                 final ArcGISRuntimeException exception = locatorTask.getLoadError();
                 result.error("ERROR", exception != null ? exception.getMessage() : "Unknown error.", null);
@@ -84,7 +84,7 @@ public class LocatorTaskController implements MethodChannel.MethodCallHandler {
         future.addDoneListener(() -> {
             try {
                 List<GeocodeResult> results = future.get();
-                result.success(Convert.geocodeResultsToJson(results));
+                result.success(ConvertLocatorTask.geocodeResultsToJson(results));
             } catch (Exception e) {
                 Log.e(TAG, "reverseGeocode: Failed to reverse geocode", e);
                 result.error("ERROR", "Failed to reverse geocode.", e.getMessage());

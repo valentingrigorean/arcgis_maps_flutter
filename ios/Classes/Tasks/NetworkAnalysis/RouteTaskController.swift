@@ -23,7 +23,7 @@ class RouteTaskController {
     private func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
         case "createRouteTask":
-            createLocatorTask(data: call.arguments as! [String: Any])
+            createRouteTask(data: call.arguments as! [String: Any])
             result(nil)
             break
         case "destroyRouteTask":
@@ -45,7 +45,7 @@ class RouteTaskController {
     }
 
 
-    private func createLocatorTask(data: Dictionary<String, Any>) {
+    private func createRouteTask(data: Dictionary<String, Any>) {
         let routeTask = AGSRouteTask(url: URL(string: data["url"] as! String)!)
         if let credential = data["credential"] as? Dictionary<String, Any> {
             routeTask.credential = AGSCredential(data: credential)

@@ -13,6 +13,7 @@ import com.valentingrigorean.arcgis_maps_flutter.geometry.GeometryEngineControll
 import com.valentingrigorean.arcgis_maps_flutter.map.ArcgisMapFactory;
 import com.valentingrigorean.arcgis_maps_flutter.scene.ArcgisSceneViewFactory;
 import com.valentingrigorean.arcgis_maps_flutter.tasks.geocode.LocatorTaskController;
+import com.valentingrigorean.arcgis_maps_flutter.tasks.networkanalysis.RouteTaskController;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -32,9 +33,9 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
     private static final String VIEW_TYPE_SCENE = "plugins.flutter.io/arcgis_scene";
 
     private GeometryEngineController geometryEngineController;
-    private LocatorTaskController locatorTaskController;
     private CoordinateFormatterController coordinateFormatterController;
-
+    private LocatorTaskController locatorTaskController;
+    private RouteTaskController routeTaskController;
     private MethodChannel channel;
 
     @Nullable
@@ -54,9 +55,11 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
 
         geometryEngineController = new GeometryEngineController(binding.getBinaryMessenger());
 
+        coordinateFormatterController = new CoordinateFormatterController(binding.getBinaryMessenger());
+
         locatorTaskController = new LocatorTaskController(binding.getBinaryMessenger());
 
-        coordinateFormatterController = new CoordinateFormatterController(binding.getBinaryMessenger());
+        routeTaskController = new RouteTaskController(binding.getApplicationContext(), binding.getBinaryMessenger());
     }
 
     @Override
@@ -65,11 +68,14 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
         geometryEngineController.dispose();
         geometryEngineController = null;
 
+        coordinateFormatterController.dispose();
+        coordinateFormatterController = null;
+
         locatorTaskController.dispose();
         locatorTaskController = null;
 
-        coordinateFormatterController.dispose();
-        coordinateFormatterController = null;
+        routeTaskController.dispose();
+        routeTaskController = null;
     }
 
     @Override

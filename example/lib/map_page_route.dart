@@ -90,6 +90,8 @@ class _MapPageRouteState extends State<MapPageRoute> {
   }
 
   void _testRoute() async {
+    final routeTaskInfo = await _routeTask.getRouteTaskInfo();
+    print(routeTaskInfo);
     final defaultParam = (await _routeTask.createDefaultParameters())
         .copyWith(returnDirections: true, stops: [
       Stop(
