@@ -8,6 +8,7 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
     private let channel: FlutterMethodChannel
     private let geometryController: GeometryEngineController
     private let locatorTaskController: LocatorTaskController
+    private let routeTaskController: RouteTaskController
     private let coordinateFormatterController: CoordinateFormatterController
 
     init(with registrar: FlutterPluginRegistrar) {
@@ -15,6 +16,7 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
         geometryController = GeometryEngineController(messenger: registrar.messenger())
         locatorTaskController = LocatorTaskController(messenger: registrar.messenger())
         coordinateFormatterController = CoordinateFormatterController(messenger: registrar.messenger())
+        routeTaskController = RouteTaskController(messenger: registrar.messenger())
 
         super.init()
 
@@ -58,6 +60,4 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
             break
         }
     }
-
-
 }

@@ -29,9 +29,9 @@ func getFieldType(value: Any?) -> FieldTypeFlutter {
         return .double
     } else if let number = value as? NSNumber {
         switch number.type {
-        case .floatType, .float32Type, .float64Type, .cgFloatType,.doubleType:
+        case .floatType, .float32Type, .float64Type, .cgFloatType, .doubleType:
             return .double
-        case .intType, .sInt8Type, .sInt16Type, .sInt32Type, .sInt64Type, .cfIndexType, .nsIntegerType,.shortType,.longType,.longLongType,.charType:
+        case .intType, .sInt8Type, .sInt16Type, .sInt32Type, .sInt64Type, .cfIndexType, .nsIntegerType, .shortType, .longType, .longLongType, .charType:
             return .integer
         @unknown default:
             return .unknown
@@ -41,7 +41,44 @@ func getFieldType(value: Any?) -> FieldTypeFlutter {
     } else if let _ = value as? NSData {
         return .date
     }
-
-
     return .unknown
+}
+
+func toFlutterFieldType(obj: Any?) -> Any {
+    let flutterType = getFieldType(value: obj)
+    var value: Any? = nil
+
+    switch flutterType {
+    case .date:
+        if let date = obj as? Date {
+            value = date.toIso8601String()
+        } else if let nsDate = obj as? NSDate {
+            value = nsDate.toIso8601String()
+        } else {
+            value = nil
+        }
+        break
+    default:
+        value = obj
+        break
+    }
+    return [
+        "type": flutterType.rawValue,
+        "value": value
+    ]
+}
+
+func fromFlutterField(data: Dictionary<String, Any>) -> Any? {
+    let type = FieldTypeFlutter(rawValue: data["type"] as! Int)!
+    var value = data["value"]
+    switch type {
+    case .date:
+        if let date = value as? String {
+            value = date.toDateFromIso8601()
+        }
+        break
+    default:
+        break
+    }
+    return value
 }

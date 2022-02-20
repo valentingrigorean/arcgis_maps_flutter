@@ -60,6 +60,16 @@ class AGSPoint extends Geometry {
 
   double get longitude => x;
 
+  AGSPoint copyWithSpatialReference(SpatialReference? spatialReference) {
+    return AGSPoint(
+      x: x,
+      y: y,
+      z: z,
+      m: m,
+      spatialReference: spatialReference,
+    );
+  }
+
   @override
   Map<String, Object> toJson() {
     final Map<String, Object> json = super.toJson();

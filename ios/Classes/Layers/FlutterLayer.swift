@@ -24,6 +24,7 @@ struct GroupLayerOptions: Hashable, Equatable {
 
 struct FlutterLayer: Hashable, Equatable {
 
+
     init(data: Dictionary<String, Any>) {
         layerId = data["layerId"] as! String
         layerType = data["layerType"] as! String
@@ -99,7 +100,15 @@ struct FlutterLayer: Hashable, Equatable {
     let portalItem: AGSPortalItem?
     let portalItemLayerId: Int?
 
-    var hashValue: Int {
-        layerId.hashValue
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(layerId)
     }
+
+    static func ==(lhs: FlutterLayer, rhs: FlutterLayer) -> Bool {
+        if lhs.layerId != rhs.layerId {
+            return false
+        }
+        return true
+    }
+
 }

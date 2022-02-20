@@ -19,6 +19,7 @@ class LocatorTask {
   void dispose() {
     if (_isDisposed) return;
     _isDisposed = true;
+    if (!_created) return;
     LocatorTaskFlutterPlatform.instance.destroyLocatorTask(_id);
   }
 

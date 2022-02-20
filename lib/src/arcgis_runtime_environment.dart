@@ -1,6 +1,11 @@
 part of arcgis_maps_flutter;
 
-enum LicenseStatus { invalid, expired, loginRequired, valid }
+enum LicenseStatus {
+  invalid,
+  expired,
+  loginRequired,
+  valid,
+}
 
 class ArcGISRuntimeEnvironment {
   ArcGISRuntimeEnvironment._();

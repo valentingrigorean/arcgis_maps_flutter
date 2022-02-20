@@ -8,10 +8,6 @@ import 'package:arcgis_maps_flutter/src/layers/base_tile_layer.dart';
 import 'package:arcgis_maps_flutter/src/layers/layer_updates.dart';
 import 'package:arcgis_maps_flutter/src/mapping/basemap_type_options.dart';
 import 'package:arcgis_maps_flutter/src/maps_object.dart';
-import 'package:arcgis_maps_flutter/src/method_channel/geometry/geometry_engine_flutter_platform.dart';
-import 'package:arcgis_maps_flutter/src/method_channel/geometry/coordinate_formatter_flutter_platform.dart';
-import 'package:arcgis_maps_flutter/src/method_channel/map/map_event.dart';
-import 'package:arcgis_maps_flutter/src/method_channel/tasks/geocode/locator_task_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/symbology/marker_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polygon_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polyline_updates.dart';
@@ -29,12 +25,19 @@ import 'package:flutter/gestures.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/arcgis_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/arcgis_maps_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/scene/arcgis_scene_flutter_platform.dart';
+import 'package:arcgis_maps_flutter/src/method_channel/geometry/geometry_engine_flutter_platform.dart';
+import 'package:arcgis_maps_flutter/src/method_channel/geometry/coordinate_formatter_flutter_platform.dart';
+import 'package:arcgis_maps_flutter/src/method_channel/map/map_event.dart';
+import 'package:arcgis_maps_flutter/src/method_channel/tasks/geocode/locator_task_flutter_platform.dart';
+import 'package:arcgis_maps_flutter/src/method_channel/tasks/network_analysis/route_task_flutter_platform.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:http/http.dart' as http;
 import 'package:xml2json/xml2json.dart';
 import 'package:jiffy/jiffy.dart';
 
+
+part 'src/unit_system.dart';
 
 part 'src/arcgis_error.dart';
 part 'src/arcgis_runtime_environment.dart';
@@ -123,6 +126,21 @@ part 'src/tasks/geocode/geocode_result.dart';
 part 'src/tasks/geocode/locator_attribute.dart';
 part 'src/tasks/geocode/locator_info.dart';
 part 'src/tasks/geocode/locator_task.dart';
+
+part 'src/tasks/network_analysis/attribute_parameter_value.dart';
+part 'src/tasks/network_analysis/cost_attribute.dart';
+part 'src/tasks/network_analysis/direction_event.dart';
+part 'src/tasks/network_analysis/direction_maneuver.dart';
+part 'src/tasks/network_analysis/direction_message.dart';
+part 'src/tasks/network_analysis/restriction_attribute.dart';
+part 'src/tasks/network_analysis/route.dart';
+part 'src/tasks/network_analysis/route_parameters.dart';
+part 'src/tasks/network_analysis/route_result.dart';
+part 'src/tasks/network_analysis/route_task.dart';
+part 'src/tasks/network_analysis/route_task_info.dart';
+part 'src/tasks/network_analysis/route_types.dart';
+part 'src/tasks/network_analysis/stop.dart';
+part 'src/tasks/network_analysis/travel_mode.dart';
 
 part 'src/toolkit/compass.dart';
 part 'src/toolkit/time_slider/time_slider.dart';

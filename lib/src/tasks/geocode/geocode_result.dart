@@ -2,7 +2,7 @@ part of arcgis_maps_flutter;
 
 @immutable
 class GeocodeResult {
-  const GeocodeResult({
+  const GeocodeResult._({
     this.attributes,
     this.displayLocation,
     this.extent,
@@ -43,8 +43,8 @@ class GeocodeResult {
   final double score;
 
   /// Creates a new [GeocodeResult] from a JSON object.
-  factory GeocodeResult.fromJson(Map<dynamic, dynamic> json) {
-    return GeocodeResult(
+  static GeocodeResult fromJson(Map<dynamic, dynamic> json) {
+    return GeocodeResult._(
       attributes: parseAttributes(json['attributes']),
       displayLocation: AGSPoint.fromJson(json['displayLocation']),
       extent: AGSEnvelope.fromJson(json['extent']),

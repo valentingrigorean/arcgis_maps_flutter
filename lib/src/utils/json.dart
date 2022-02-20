@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 // Map<dynamic, dynamic> toSafeMap(dynamic o) {
 //   return toSafeMapNullable(o)!;
@@ -24,6 +23,17 @@ double? toDoubleSafeNullable(dynamic o) {
   }
   if (o is double) {
     return o;
+  }
+  return null;
+}
+
+DateTime parseDateTime(dynamic o) {
+  return parseDateTimeSafeNullable(o)!;
+}
+
+DateTime? parseDateTimeSafeNullable(dynamic o) {
+  if (o is String) {
+    return DateTime.tryParse(o);
   }
   return null;
 }

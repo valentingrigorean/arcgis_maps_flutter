@@ -78,7 +78,7 @@ import java.util.stream.Collectors;
 
 public class Convert {
 
-    private static String TAG = "Convert";
+    private static String TAG = "ConvertRouteTask";
 
     private static final SimpleDateFormat ISO8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -135,7 +135,7 @@ public class Convert {
         if (location.getPosition() != null) {
             json.put("position", geometryToJson(location.getPosition()));
         }
-        json.put("velocity",location.getVelocity());
+        json.put("velocity", location.getVelocity());
         json.put("timestamp", ISO8601Format.format(location.getTimeStamp().getTime()));
         json.put("verticalAccuracy", location.getVerticalAccuracy());
         return json;
@@ -148,7 +148,6 @@ public class Convert {
         }
         final GeometryType geometryType = GeometryType.values()[toInt(data.get("geometryType"))];
         switch (geometryType) {
-
             case POINT:
                 return toPoint(data);
             case UNKNOWN:
@@ -692,7 +691,7 @@ public class Convert {
 
             final Map<String, Object> attributes = new HashMap<>(element.getAttributes().size());
             element.getAttributes().forEach((k, v) -> {
-                attributes.put(k, toFieldFlutter(v));
+                attributes.put(k, toFlutterFieldType(v));
             });
 
             final Map<String, Object> elementData = new HashMap<>(2);
@@ -718,7 +717,7 @@ public class Convert {
         final Map<String, Object> data = new HashMap<>(6);
         final Map<String, Object> attributes = new HashMap<>(result.getAttributes().size());
         result.getAttributes().forEach((k, v) -> {
-            attributes.put(k, toFieldFlutter(v));
+            attributes.put(k, toFlutterFieldType(v));
         });
         data.put("attributes", attributes);
 
@@ -742,13 +741,6 @@ public class Convert {
         return data;
     }
 
-    public static Object geocodeResultsToJson(List<GeocodeResult> results) {
-        final List<Object> jsonResults = new ArrayList<>(results.size());
-        for (final GeocodeResult result : results) {
-            jsonResults.add(geocodeResultToJson(result));
-        }
-        return jsonResults;
-    }
 
     public static LinearUnitId toLinearUnitId(Object o) {
         final int index = toInt(o);
@@ -916,45 +908,6 @@ public class Convert {
         return new PortalItem(portal, itemId);
     }
 
-    public static Object locatorInfoToJson(LocatorInfo locatorInfo) {
-        final Map<String, Object> data = new HashMap<>();
-        data.put("name", locatorInfo.getName());
-        data.put("description", locatorInfo.getDescription());
-        data.put("intersectionResultAttributes", locatorAttributesToJson(locatorInfo.getIntersectionResultAttributes()));
-
-        if (locatorInfo.getProperties() != null) {
-            data.put("properties", locatorInfo.getProperties());
-        }
-        data.put("resultAttributes", locatorAttributesToJson(locatorInfo.getResultAttributes()));
-        data.put("searchAttributes", locatorAttributesToJson(locatorInfo.getSearchAttributes()));
-        if (locatorInfo.getSpatialReference() != null) {
-            data.put("spatialReference", spatialReferenceToJson(locatorInfo.getSpatialReference()));
-        }
-        data.put("supportsPOI", locatorInfo.isSupportsPoi());
-        data.put("supportsAddresses", locatorInfo.isSupportsAddresses());
-        data.put("supportsIntersections", locatorInfo.isSupportsIntersections());
-        data.put("supportsSuggestions", locatorInfo.isSupportsSuggestions());
-        data.put("version", locatorInfo.getVersion());
-
-        return data;
-    }
-
-    private static Object locatorAttributeToJson(LocatorAttribute attribute) {
-        final Map<String, Object> data = new HashMap<>(3);
-        data.put("name", attribute.getName());
-        data.put("displayName", attribute.getDisplayName());
-        data.put("required", attribute.isRequired());
-        data.put("type", attribute.getType().ordinal());
-        return data;
-    }
-
-    private static List<Object> locatorAttributesToJson(List<LocatorAttribute> attributes) {
-        final ArrayList<Object> data = new ArrayList<>(attributes.size());
-        for (final LocatorAttribute attribute : attributes) {
-            data.add(locatorAttributeToJson(attribute));
-        }
-        return data;
-    }
 
     private static Basemap createBasemapFromType(String type) {
         switch (type) {
@@ -1065,7 +1018,7 @@ public class Convert {
     }
 
 
-    private static Object toFieldFlutter(Object o) {
+    protected static Object toFlutterFieldType(Object o) {
         final Map<String, Object> data = new HashMap<>(2);
         FieldTypeFlutter fieldTypeFlutter = FieldTypeFlutter.UNKNOWN;
         if (o == null) {
@@ -1083,6 +1036,20 @@ public class Convert {
         data.put("type", fieldTypeFlutter.getValue());
         data.put("value", o);
         return data;
+    }
+
+    protected static Object fromFlutterField(Object o) {
+        final Map<?, ?> data = toMap(o);
+        final FieldTypeFlutter fieldTypeFlutter = FieldTypeFlutter.values()[toInt(data.get("type"))];
+        Object value = data.get("value");
+        if (fieldTypeFlutter == FieldTypeFlutter.DATE) {
+            try{
+                value = ISO8601Format.parse(value.toString());
+            }catch (Exception e){
+                // no op
+            }
+        }
+        return value;
     }
 
     public static boolean toBoolean(Object o) {
