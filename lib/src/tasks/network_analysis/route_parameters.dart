@@ -122,8 +122,23 @@ class RouteParameters {
   final List<Stop> stops;
 
   RouteParameters copyWith({
+    List<String>? accumulateAttributeNames,
+    UnitSystem? directionsDistanceUnits,
+    String? directionsLanguage,
+    DirectionsStyle? directionsStyle,
+    bool? findBestSequence,
+    DateTime? startTime,
+    SpatialReference? outputSpatialReference,
+    bool? preserveFirstStop,
+    bool? preserveLastStop,
     bool? returnDirections,
+    bool? returnPointBarriers,
+    bool? returnPolygonBarriers,
+    bool? returnPolylineBarriers,
     bool? returnRoutes,
+    bool? returnStops,
+    RouteShapeType? routeShapeType,
+    TravelMode? travelMode,
     List<Stop>? stops,
   }) {
     if (returnRoutes != null && returnRoutes) {
@@ -131,29 +146,34 @@ class RouteParameters {
       assert(stops!.length > 1,
           'At least two stops are required to return routes');
     }
-    if(stops != null){
-      if(stops.length > 1 && returnRoutes == null){
+    if (stops != null) {
+      if (stops.length > 1 && returnRoutes == null) {
         returnRoutes = true;
       }
     }
     return RouteParameters(
-      accumulateAttributeNames: accumulateAttributeNames,
-      directionsDistanceUnits: directionsDistanceUnits,
-      directionsLanguage: directionsLanguage,
-      directionsStyle: directionsStyle,
-      findBestSequence: findBestSequence,
-      outputSpatialReference: outputSpatialReference,
-      preserveFirstStop: preserveFirstStop,
-      preserveLastStop: preserveLastStop,
+      accumulateAttributeNames:
+          accumulateAttributeNames ?? this.accumulateAttributeNames,
+      directionsDistanceUnits:
+          directionsDistanceUnits ?? this.directionsDistanceUnits,
+      directionsLanguage: directionsLanguage ?? this.directionsLanguage,
+      directionsStyle: directionsStyle ?? this.directionsStyle,
+      findBestSequence: findBestSequence ?? this.findBestSequence,
+      outputSpatialReference:
+          outputSpatialReference ?? this.outputSpatialReference,
+      preserveFirstStop: preserveFirstStop ?? this.preserveFirstStop,
+      preserveLastStop: preserveLastStop ?? this.preserveLastStop,
       returnDirections: returnDirections ?? this.returnDirections,
-      returnPointBarriers: returnPointBarriers,
-      returnPolygonBarriers: returnPolygonBarriers,
-      returnPolylineBarriers: returnPolylineBarriers,
+      returnPointBarriers: returnPointBarriers ?? this.returnPointBarriers,
+      returnPolygonBarriers:
+          returnPolygonBarriers ?? this.returnPolygonBarriers,
+      returnPolylineBarriers:
+          returnPolylineBarriers ?? this.returnPolylineBarriers,
       returnRoutes: returnRoutes ?? this.returnRoutes,
-      returnStops: returnStops,
-      routeShapeType: routeShapeType,
-      startTime: startTime,
-      travelMode: travelMode,
+      returnStops: returnStops ?? this.returnStops,
+      routeShapeType: routeShapeType ?? this.routeShapeType,
+      startTime: startTime ?? this.startTime,
+      travelMode: travelMode ?? this.travelMode,
       stops: stops ?? this.stops,
     );
   }
