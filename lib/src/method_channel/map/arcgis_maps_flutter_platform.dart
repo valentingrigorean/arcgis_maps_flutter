@@ -133,6 +133,10 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('setViewpoint() has not been implemented.');
   }
 
+  Future<bool> setViewpointGeometry(int mapId, Geometry geometry,double? padding) {
+    throw UnimplementedError('setViewpointGeometry() has not been implemented.');
+  }
+
   Future<Viewpoint?> getCurrentViewpoint(int mapId, ViewpointType type) {
     throw UnimplementedError('getCurrentViewpoint() has not been implemented.');
   }

@@ -156,7 +156,13 @@ public class Convert {
             case POLYLINE:
             case POLYGON:
             case MULTIPOINT:
-                throw new RuntimeException("Not implemented");
+                try {
+                    final String json = objectMapper.writeValueAsString(data);
+                    return Geometry.fromJson(json);
+                } catch (Exception e) {
+                    Log.e(TAG, "toGeometry: ", e);
+                    throw new RuntimeException("Not implemented");
+                }
         }
         return null;
     }
@@ -837,7 +843,7 @@ public class Convert {
         final Map<?, ?> data = toMap(o);
         if (data == null)
             return null;
-        final Object wkId = data.get("wkId");
+        final Object wkId = data.get("wkid");
         if (wkId != null) {
             return SpatialReference.create(toInt(wkId));
         }
@@ -1043,9 +1049,9 @@ public class Convert {
         final FieldTypeFlutter fieldTypeFlutter = FieldTypeFlutter.values()[toInt(data.get("type"))];
         Object value = data.get("value");
         if (fieldTypeFlutter == FieldTypeFlutter.DATE) {
-            try{
+            try {
                 value = ISO8601Format.parse(value.toString());
-            }catch (Exception e){
+            } catch (Exception e) {
                 // no op
             }
         }

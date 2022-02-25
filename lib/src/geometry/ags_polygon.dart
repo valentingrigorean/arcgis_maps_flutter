@@ -2,15 +2,32 @@ part of arcgis_maps_flutter;
 
 @immutable
 class AGSPolygon extends Geometry {
-  const AGSPolygon({
+  final bool? _hasZ;
+  final bool? _hasM;
+
+  const AGSPolygon._({
     required this.points,
+    bool? hasZ,
+    bool? hasM,
     SpatialReference? spatialReference,
-  }) : super(
+  })  : _hasZ = hasZ,
+        _hasM = hasM,
+        super(
           spatialReference: spatialReference,
           geometryType: GeometryType.polygon,
         );
 
-  final List<AGSPoint> points;
+  const AGSPolygon({
+    required List<List<AGSPoint>> points,
+    SpatialReference? spatialReference,
+  }) : this._(
+          points: points,
+          spatialReference: spatialReference,
+          hasZ: false,
+          hasM: false,
+        );
+
+  final List<List<AGSPoint>> points;
 
   static AGSPolygon? fromJson(Map<dynamic, dynamic>? json) {
     if (json == null) {
@@ -18,14 +35,17 @@ class AGSPolygon extends Geometry {
     }
 
     final bool hasZ = json['hasZ'] ?? false;
+    final bool hasM = json['hasM'] ?? false;
 
     final List<dynamic> rings = json['rings'];
 
     final SpatialReference? spatialReference =
         SpatialReference.fromJson(json['spatialReference']);
 
-    return AGSPolygon(
-      points: AGSPoint.fromJsonList(rings, hasZ),
+    return AGSPolygon._(
+      points: AGSPoint.fromJsonList(rings, hasZ: hasZ, hasM: hasM),
+      hasZ: hasZ,
+      hasM: hasM,
       spatialReference: spatialReference,
     );
   }
@@ -40,12 +60,26 @@ class AGSPolygon extends Geometry {
       }
     }
 
+    final hasZ = _hasZ ?? points.any((p) => p.any((e) => e.z != null));
+    final hasM = _hasM ?? points.any((p) => p.any((e) => e.m != null));
+
+    if(hasZ){
+      json['hasZ'] = hasZ;
+    }
+    if(hasM){
+      json['hasM'] = hasM;
+    }
+
     Object _pointsToJson() {
-      final List<Object> result = <Object>[];
-      for (final AGSPoint point in points) {
-        result.add(point.toJson());
+      final results = <List<Object>>[];
+      for(final part in points) {
+        final List<Object> pointsRaw = <Object>[];
+        for (final AGSPoint point in part) {
+          pointsRaw.add(pointToList(point, hasZ: hasZ, hasM: hasM));
+        }
+        results.add(pointsRaw);
       }
-      return result;
+      return results;
     }
 
     addIfPresent('rings', _pointsToJson());

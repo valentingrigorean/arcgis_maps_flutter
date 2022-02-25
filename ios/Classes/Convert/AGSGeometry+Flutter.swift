@@ -13,12 +13,13 @@ extension AGSGeometry {
             return AGSPoint(data: data)
         case .envelope:
             return AGSEnvelope(data: data)
-        case .polyline:
-            fatalError("not impl")
-        case .polygon:
-            fatalError("not impl")
-        case .multipoint:
-            fatalError("not impl")
+        case .polyline, .polygon, .multipoint:
+            do {
+                let geometry = try AGSGeometry.fromJSON(data)
+                return geometry as? AGSGeometry
+            } catch let error {
+                fatalError("\(error)")
+            }
         case .unknown:
             fatalError("not impl")
         @unknown default:
@@ -26,9 +27,9 @@ extension AGSGeometry {
         }
     }
 
-    func toJSONFlutter() -> Any{
+    func toJSONFlutter() -> Any {
         let json = try! toJSON()
-        if var dict = json as? Dictionary<String,Any>{
+        if var dict = json as? Dictionary<String, Any> {
             dict["geometryType"] = geometryType.rawValue
             return dict
         }

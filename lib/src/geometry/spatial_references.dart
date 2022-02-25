@@ -26,7 +26,7 @@ class SpatialReference {
     if (json == null) {
       return null;
     }
-    final int wkId = json['wkid'] ?? json['wkId'];
+    final int wkId = json['wkid'];
     switch (wkId) {
       case 4326:
         return _wgs84;
@@ -39,7 +39,7 @@ class SpatialReference {
   Object toJson() {
     final Map<String, Object> json = <String, Object>{};
     if (wkId != null) {
-      json['wkId'] = wkId!;
+      json['wkid'] = wkId!;
     }
 
     if (wkText != null) {

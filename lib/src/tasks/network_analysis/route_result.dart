@@ -26,7 +26,7 @@ class RouteResult {
   final List<String> messages;
 
   /// Each elements represents an indepdendent route with its own driving directions.
-  /// Stops are grouped into diffrent routes based on @c AGSStop#routeName.
+  /// Stops are grouped into diffrent routes based on [Stop.routeName]
   final List<Route> routes;
 
   @override

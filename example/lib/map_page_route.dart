@@ -36,6 +36,7 @@ class _MapPageRouteState extends State<MapPageRoute> {
     ),
   };
 
+  late final ArcgisMapController _mapController;
   final Set<Polyline> _routeLines = {};
   final List<DirectionManeuver> _directions = [];
 
@@ -54,6 +55,9 @@ class _MapPageRouteState extends State<MapPageRoute> {
               longitude: -117.15083257944445,
               scale: 200000,
             ),
+            onMapCreated: (controller) {
+              _mapController = controller;
+            },
             markers: _markers,
             polylines: _routeLines,
           ),
@@ -91,7 +95,6 @@ class _MapPageRouteState extends State<MapPageRoute> {
 
   void _testRoute() async {
     final routeTaskInfo = await _routeTask.getRouteTaskInfo();
-    print(routeTaskInfo);
     final defaultParam = (await _routeTask.createDefaultParameters())
         .copyWith(returnDirections: true, stops: [
       Stop(
@@ -112,11 +115,16 @@ class _MapPageRouteState extends State<MapPageRoute> {
     final routeResults = await _routeTask.solveRoute(defaultParam);
     if (routeResults.routes.isNotEmpty) {
       final route = routeResults.routes.first;
+      if (route.routeGeometry != null) {
+        final didSetViewPoint = await _mapController.setViewpointGeometry(route.routeGeometry!,
+            padding: 50);
+        print('didSetViewPoint: $didSetViewPoint');
+      }
       _routeLines.clear();
       _routeLines.add(
         Polyline(
           polylineId: const PolylineId('route'),
-          points: route.routeGeometry!.points
+          points: route.routeGeometry!.points.first
               .map((e) => e.copyWithSpatialReference(
                     route.routeGeometry!.spatialReference,
                   ))

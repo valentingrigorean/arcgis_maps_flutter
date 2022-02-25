@@ -45,7 +45,7 @@ class ArcgisMapController {
 
   /// Position of the location symbol, as provided by the
   /// most recent location update, projected to the map's spatial reference.
-  Future<AGSPoint?> getMapLocation(){
+  Future<AGSPoint?> getMapLocation() {
     return ArcgisMapsFlutterPlatform.instance.getMapLocation(mapId);
   }
 
@@ -149,6 +149,12 @@ class ArcgisMapController {
 
   Future<void> setViewpoint(Viewpoint viewpoint) {
     return ArcgisMapsFlutterPlatform.instance.setViewpoint(mapId, viewpoint);
+  }
+
+  /// True if the zoom animation completed, false if it was interrupted by another view navigation.
+  Future<bool> setViewpointGeometry(Geometry geometry, {double? padding}) {
+    return ArcgisMapsFlutterPlatform.instance
+        .setViewpointGeometry(mapId, geometry, padding);
   }
 
   Future<void> setViewpointRotation(double angleDegrees) {

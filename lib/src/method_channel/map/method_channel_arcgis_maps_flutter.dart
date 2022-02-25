@@ -291,6 +291,19 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
+  Future<bool> setViewpointGeometry(
+      int mapId, Geometry geometry, double? padding) async {
+    final result = await channel(mapId).invokeMethod<bool>(
+      'map#setViewpointGeometry',
+      {
+        'geometry': geometry.toJson(),
+        if (padding != null) 'padding': padding,
+      },
+    );
+    return result ?? false;
+  }
+
+  @override
   Future<void> setViewpointRotation(int mapId, double angleDegrees) {
     return channel(mapId)
         .invokeMethod<void>("map#setViewpointRotation", angleDegrees);

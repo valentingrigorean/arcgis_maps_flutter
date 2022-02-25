@@ -232,6 +232,22 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             setViewpoint(args: call.arguments, animated: true)
             result(nil)
             break
+        case "map#setViewpointGeometry":
+            if let data = call.arguments as? Dictionary<String, Any> {
+                let geometry = AGSGeometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
+
+                if let padding = data["padding"] as? Double {
+                    mapView.setViewpointGeometry(geometry.extent, padding: padding) { finished in
+                        result(finished)
+                    }
+                } else {
+                    mapView.setViewpointGeometry(geometry.extent) { finished in
+                        result(finished)
+                    }
+                }
+            }
+
+            break
         case "map#setViewpointRotation":
             if let angleDegrees = call.arguments as? Double {
                 mapView.setViewpointRotation(angleDegrees)

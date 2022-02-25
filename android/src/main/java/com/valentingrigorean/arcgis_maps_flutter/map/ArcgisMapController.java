@@ -14,6 +14,8 @@ import androidx.lifecycle.LifecycleOwner;
 
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
 import com.esri.arcgisruntime.arcgisservices.TimeAware;
+import com.esri.arcgisruntime.concurrent.ListenableFuture;
+import com.esri.arcgisruntime.geometry.Geometry;
 import com.esri.arcgisruntime.geometry.GeometryEngine;
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.layers.Layer;
@@ -332,6 +334,26 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             case "map#setViewpoint": {
                 viewpoint = Convert.toViewPoint(call.arguments);
                 mapView.setViewpointAsync(viewpoint).addDoneListener(() -> result.success(null));
+            }
+            break;
+            case "map#setViewpointGeometry": {
+                final Map<?, ?> data = call.arguments();
+                final Geometry geometry = Convert.toGeometry(data.get("geometry"));
+                final Object padding = data.get("padding");
+                ListenableFuture<Boolean> future;
+                if (padding == null) {
+                    future = mapView.setViewpointGeometryAsync(geometry);
+                } else {
+                    final double paddingDouble = Convert.toDouble(padding);
+                    future = mapView.setViewpointGeometryAsync(geometry, paddingDouble);
+                }
+                future.addDoneListener(() -> {
+                    try {
+                        result.success(future.get());
+                    } catch (Exception e) {
+                        result.success(false);
+                    }
+                });
             }
             break;
             case "map#setViewpointRotation": {

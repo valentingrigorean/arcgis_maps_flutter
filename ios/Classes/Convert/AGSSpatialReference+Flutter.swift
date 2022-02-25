@@ -7,7 +7,7 @@ import ArcGIS
 
 extension AGSSpatialReference {
     convenience init?(data: Dictionary<String, Any>) {
-        if let wkId = data["wkId"] as? Int {
+        if let wkId = data["wkid"] as? Int {
             self.init(wkid: wkId)
             return
         }
@@ -21,7 +21,7 @@ extension AGSSpatialReference {
 
     func toJSONFlutter() -> Any {
         [
-            "wkId": wkid,
+            "wkid": wkid,
             "wkText": wkText
         ]
     }

@@ -1,4 +1,3 @@
-
 // Map<dynamic, dynamic> toSafeMap(dynamic o) {
 //   return toSafeMapNullable(o)!;
 // }
@@ -12,6 +11,8 @@
 //   }
 //   return null;
 // }
+
+import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 
 double toDoubleSafe(dynamic o) {
   return toDoubleSafeNullable(o)!;
@@ -36,4 +37,24 @@ DateTime? parseDateTimeSafeNullable(dynamic o) {
     return DateTime.tryParse(o);
   }
   return null;
+}
+
+List<Object> pointToList(
+  AGSPoint point, {
+  required bool hasZ,
+  required bool hasM,
+}) {
+  final pointLength = 2 + (hasZ ? 1 : 0) + (hasM ? 1 : 0);
+  final List<Object> pointJson = List.generate(pointLength, (index) => 0.0);
+  pointJson[0] = point.x;
+  pointJson[1] = point.y;
+  int i = 2;
+  if (point.z != null) {
+    pointJson[i] = point.z!;
+    i++;
+  }
+  if (point.m != null) {
+    pointJson[i] = point.m!;
+  }
+  return pointJson;
 }

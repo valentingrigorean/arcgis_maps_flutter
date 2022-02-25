@@ -37,18 +37,30 @@ class AGSPoint extends Geometry {
     );
   }
 
-  static List<AGSPoint> fromJsonList(List<dynamic> json, bool hasZ) {
-    final List<AGSPoint> points = [];
+  static List<List<AGSPoint>> fromJsonList(
+    List<dynamic> json, {
+    required bool hasZ,
+    bool hasM = false,
+  }) {
+
+    List<List<AGSPoint>> result = [];
 
     for (final path in json) {
+      final List<AGSPoint> points = [];
       for (final point in path) {
         final double x = toDoubleSafe(point[0]);
         final double y = toDoubleSafe(point[1]);
         final double? z = hasZ ? toDoubleSafeNullable(point[2]) : null;
-        points.add(AGSPoint(x: x, y: y, z: z));
+        final double? m = hasM
+            ? hasZ
+                ? toDoubleSafeNullable(point[3])
+                : toDoubleSafeNullable(point[2])
+            : null;
+        points.add(AGSPoint(x: x, y: y, z: z, m: m));
       }
+      result.add(points);
     }
-    return points;
+    return result;
   }
 
   final double x;
