@@ -42,4 +42,18 @@ class AGSEnvelope extends Geometry {
   String toString() {
     return 'Envelope{xMin: $xMin, xMax: $xMax, yMin: $yMin, yMax: $yMax, spatialReference: $spatialReference}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AGSEnvelope &&
+          runtimeType == other.runtimeType &&
+          xMin == other.xMin &&
+          xMax == other.xMax &&
+          yMin == other.yMin &&
+          yMax == other.yMax;
+
+  @override
+  int get hashCode =>
+      xMin.hashCode ^ xMax.hashCode ^ yMin.hashCode ^ yMax.hashCode;
 }

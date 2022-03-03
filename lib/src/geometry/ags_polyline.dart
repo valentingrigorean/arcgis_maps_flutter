@@ -2,22 +2,31 @@ part of arcgis_maps_flutter;
 
 @immutable
 class AGSPolyline extends Geometry {
-  final bool? _hasZ;
-  final bool? _hasM;
 
   const AGSPolyline._({
     required this.points,
-    bool? hasZ,
-    bool? hasM,
+    required this.hasZ,
+    required this.hasM,
     SpatialReference? spatialReference,
-  })  : _hasZ = hasZ,
-        _hasM = hasM,
-        super(
-          spatialReference: spatialReference,
-          geometryType: GeometryType.polyline,
-        );
+  }) : super(
+    spatialReference: spatialReference,
+    geometryType: GeometryType.polyline,
+  );
 
-  final  List<List<AGSPoint>>  points;
+  AGSPolyline({
+    required List<List<AGSPoint>> points,
+    SpatialReference? spatialReference,
+  }) : this._(
+    points: points,
+    spatialReference: spatialReference,
+    hasZ: points.any((e) => e.any((i) => i.hasZ)),
+    hasM: points.any((e) => e.any((i) => i.hasM)),
+  );
+
+  final bool hasZ;
+  final bool hasM;
+
+  final List<List<AGSPoint>> points;
 
   static AGSPolyline? fromJson(Map<dynamic, dynamic>? json) {
     if (json == null) {
@@ -30,7 +39,7 @@ class AGSPolyline extends Geometry {
     final List<dynamic> paths = json['paths'];
 
     final SpatialReference? spatialReference =
-        SpatialReference.fromJson(json['spatialReference']);
+    SpatialReference.fromJson(json['spatialReference']);
 
     return AGSPolyline._(
       points: AGSPoint.fromJsonList(paths, hasZ: hasZ, hasM: hasM),
@@ -44,13 +53,10 @@ class AGSPolyline extends Geometry {
   Map<String, Object> toJson() {
     final Map<String, Object> json = super.toJson();
 
-    final hasZ = _hasZ ?? points.any((p) => p.any((e) => e.z != null));
-    final hasM = _hasM ?? points.any((p) => p.any((e) => e.m != null));
-
-    if(hasZ){
+    if (hasZ) {
       json['hasZ'] = hasZ;
     }
-    if(hasM){
+    if (hasM) {
       json['hasM'] = hasM;
     }
 
@@ -62,7 +68,7 @@ class AGSPolyline extends Geometry {
 
     Object _pointsToJson() {
       final results = <List<Object>>[];
-      for(final part in points) {
+      for (final part in points) {
         final List<Object> pointsRaw = <Object>[];
         for (final AGSPoint point in part) {
           pointsRaw.add(pointToList(point, hasZ: hasZ, hasM: hasM));
@@ -75,4 +81,16 @@ class AGSPolyline extends Geometry {
     addIfPresent('paths', _pointsToJson());
     return json;
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AGSPolyline &&
+          runtimeType == other.runtimeType &&
+          hasZ == other.hasZ &&
+          hasM == other.hasM &&
+          points == other.points;
+
+  @override
+  int get hashCode => hasZ.hashCode ^ hasM.hashCode ^ points.hashCode;
 }

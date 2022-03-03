@@ -2,30 +2,28 @@ part of arcgis_maps_flutter;
 
 @immutable
 class AGSPolygon extends Geometry {
-  final bool? _hasZ;
-  final bool? _hasM;
-
   const AGSPolygon._({
     required this.points,
-    bool? hasZ,
-    bool? hasM,
+    required this.hasZ,
+    required this.hasM,
     SpatialReference? spatialReference,
-  })  : _hasZ = hasZ,
-        _hasM = hasM,
-        super(
+  }) : super(
           spatialReference: spatialReference,
           geometryType: GeometryType.polygon,
         );
 
-  const AGSPolygon({
+  AGSPolygon({
     required List<List<AGSPoint>> points,
     SpatialReference? spatialReference,
   }) : this._(
           points: points,
           spatialReference: spatialReference,
-          hasZ: false,
-          hasM: false,
+          hasZ: points.any((e) => e.any((i) => i.hasZ)),
+          hasM: points.any((e) => e.any((i) => i.hasM)),
         );
+
+  final bool hasZ;
+  final bool hasM;
 
   final List<List<AGSPoint>> points;
 
@@ -60,19 +58,16 @@ class AGSPolygon extends Geometry {
       }
     }
 
-    final hasZ = _hasZ ?? points.any((p) => p.any((e) => e.z != null));
-    final hasM = _hasM ?? points.any((p) => p.any((e) => e.m != null));
-
-    if(hasZ){
+    if (hasZ) {
       json['hasZ'] = hasZ;
     }
-    if(hasM){
+    if (hasM) {
       json['hasM'] = hasM;
     }
 
     Object _pointsToJson() {
       final results = <List<Object>>[];
-      for(final part in points) {
+      for (final part in points) {
         final List<Object> pointsRaw = <Object>[];
         for (final AGSPoint point in part) {
           pointsRaw.add(pointToList(point, hasZ: hasZ, hasM: hasM));
@@ -86,4 +81,16 @@ class AGSPolygon extends Geometry {
 
     return json;
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AGSPolygon &&
+          runtimeType == other.runtimeType &&
+          hasZ == other.hasZ &&
+          hasM == other.hasM &&
+          points == other.points;
+
+  @override
+  int get hashCode => hasZ.hashCode ^ hasM.hashCode ^ points.hashCode;
 }

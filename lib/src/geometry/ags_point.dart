@@ -42,7 +42,6 @@ class AGSPoint extends Geometry {
     required bool hasZ,
     bool hasM = false,
   }) {
-
     List<List<AGSPoint>> result = [];
 
     for (final path in json) {
@@ -67,6 +66,10 @@ class AGSPoint extends Geometry {
   final double y;
   final double? z;
   final double? m;
+
+  bool get hasZ => z != null;
+
+  bool get hasM => m != null;
 
   double get latitude => y;
 
