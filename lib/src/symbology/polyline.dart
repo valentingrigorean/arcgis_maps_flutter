@@ -6,7 +6,7 @@ enum SimpleLineSymbolStyle { dash, dashDot, dashDotDot, dot, none, solid }
 ///
 /// This does not have to be globally unique, only unique among the list.
 @immutable
-class PolylineId extends MapsObjectId<Polyline> {
+class PolylineId extends SymbolId<Polyline> {
   /// Creates an immutable object representing a [PolylineId] among [ArcgisMapView] polylines.
   ///
   /// An [AssertionError] will be thrown if [value] is null.
@@ -14,7 +14,7 @@ class PolylineId extends MapsObjectId<Polyline> {
 }
 
 @immutable
-class Polyline implements MapsObject {
+class Polyline extends Symbol {
   /// Creates an immutable object representing a line drawn through geographical locations on the map.
   const Polyline({
     required this.polylineId,
@@ -29,13 +29,10 @@ class Polyline implements MapsObject {
     this.onTap,
     this.selectedColor,
     this.visibilityFilter,
-  });
+  }) : super(symbolId: polylineId);
 
   /// Uniquely identifies a [Polyline].
   final PolylineId polylineId;
-
-  @override
-  MapsObjectId get mapsId => polylineId;
 
   /// True if the [Polyline] consumes tap events.
   ///

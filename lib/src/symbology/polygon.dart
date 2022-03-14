@@ -4,14 +4,14 @@ part of arcgis_maps_flutter;
 ///
 /// This does not have to be globally unique, only unique among the list.
 @immutable
-class PolygonId extends MapsObjectId<Polygon> {
+class PolygonId extends SymbolId<Polygon> {
   /// Creates an immutable identifier for a [Polygon].
   const PolygonId(String value) : super(value);
 }
 
 /// Draws a polygon through geographical locations on the map.
 @immutable
-class Polygon implements MapsObject {
+class Polygon extends Symbol {
   /// Creates an immutable representation of a polygon through geographical locations on the map.
   const Polygon({
     required this.polygonId,
@@ -25,7 +25,7 @@ class Polygon implements MapsObject {
     this.onTap,
     this.selectedColor,
     this.visibilityFilter,
-  });
+  }) : super(symbolId: polygonId);
 
   /// Uniquely identifies a [Polygon].
   final PolygonId polygonId;
@@ -66,9 +66,6 @@ class Polygon implements MapsObject {
   final Color? selectedColor;
 
   final SymbolVisibilityFilter? visibilityFilter;
-
-  @override
-  MapsObjectId get mapsId => polygonId;
 
   /// Creates a new [Polygon] object whose values are the same as this instance,
   /// unless overwritten by the specified parameters.
