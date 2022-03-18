@@ -157,6 +157,12 @@ class ArcgisMapController {
         .setViewpointGeometry(mapId, geometry, padding);
   }
 
+  Future<bool> setViewpointCenter(AGSPoint center, {double? scale}) async {
+    scale ??= await getMapScale();
+    return ArcgisMapsFlutterPlatform.instance.setViewpointCenter(
+        mapId, center, scale);
+  }
+
   Future<void> setViewpointRotation(double angleDegrees) {
     return ArcgisMapsFlutterPlatform.instance
         .setViewpointRotation(mapId, angleDegrees);

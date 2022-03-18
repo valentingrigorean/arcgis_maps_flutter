@@ -76,6 +76,9 @@ class ArcgisMapView extends StatefulWidget {
     this.autoPanMode = AutoPanMode.off,
     this.wanderExtentFactor = 0.5,
     this.onAutoPanModeChanged,
+    this.insetsContentInsetFromSafeArea = true,
+    this.isAttributionTextVisible = true,
+    this.contentInset = EdgeInsets.zero,
     this.onTap,
     this.onLongPress,
     this.onCameraMove,
@@ -179,6 +182,23 @@ class ArcgisMapView extends StatefulWidget {
   ///  The default value is 0.5, indicating the location may wander up
   ///  to half of the extent before re-centering occurs.
   final double wanderExtentFactor;
+
+  /// Indicates whether the content inset is relative to the safe area.
+  /// When [true], the content inset is interpreted as a value relative to the safe area.
+  /// When [false], the content inset is interpreted as a value from the edge of bounds.
+  /// Defaults to [true].
+  final bool insetsContentInsetFromSafeArea;
+
+  /// Defines the edges where the [ArcgisMapView]is obscured by some other UI.
+  /// This is important so that callouts display correctly, the location
+  /// display is anchored appropriately, and setting a new viewpoint adjusts
+  /// the map contents to correctly display in the unobscured part of the view.
+  /// Setting this will affect the @c visibleArea that is reported by the [ArcgisMapView].
+  final EdgeInsets contentInset;
+
+  /// Specifies whether the attribution text banner (along the bottom edge of the view) should be visible.
+  /// Defaults to [true].
+  final bool isAttributionTextVisible;
 
   final ArgumentCallback<AutoPanMode>? onAutoPanModeChanged;
 
@@ -481,8 +501,6 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     controller._updateIdentifyLayerListeners(layers);
     _identifyLayerAsync = layers;
   }
-
-
 }
 
 class _ArcgisMapOptions {
@@ -493,6 +511,9 @@ class _ArcgisMapOptions {
         trackIdentifyLayers = map.onIdentifyLayers != null,
         autoPanMode = map.autoPanMode,
         wanderExtentFactor = map.wanderExtentFactor,
+        insetsContentInsetFromSafeArea = map.insetsContentInsetFromSafeArea,
+        isAttributionTextVisible = map.isAttributionTextVisible,
+        contentInset = map.contentInset,
         scalebarConfiguration = map.scalebarConfiguration;
 
   final InteractionOptions interactionOptions;
@@ -501,6 +522,9 @@ class _ArcgisMapOptions {
   final bool trackIdentifyLayers;
   final AutoPanMode autoPanMode;
   final double wanderExtentFactor;
+  final bool insetsContentInsetFromSafeArea;
+  final bool isAttributionTextVisible;
+  final EdgeInsets contentInset;
   final ScalebarConfiguration? scalebarConfiguration;
 
   Map<String, dynamic> toMap() {
@@ -512,6 +536,14 @@ class _ArcgisMapOptions {
       'autoPanMode': autoPanMode.index,
       'wanderExtentFactor': wanderExtentFactor,
       'haveScalebar': scalebarConfiguration != null,
+      'insetsContentInsetFromSafeArea': insetsContentInsetFromSafeArea,
+      'isAttributionTextVisible': isAttributionTextVisible,
+      'contentInset': [
+        contentInset.left,
+        contentInset.top,
+        contentInset.right,
+        contentInset.bottom,
+      ],
       if (scalebarConfiguration != null)
         'scalebarConfiguration': scalebarConfiguration!.toJson(),
     };
@@ -524,6 +556,9 @@ class _ArcgisMapOptions {
       ..removeWhere((String key, dynamic value) {
         if (key == 'interactionOptions') {
           return interactionOptions == newOptions.interactionOptions;
+        }
+        if (key == 'contentInset') {
+          return contentInset == newOptions.contentInset;
         }
         return prevOptionsMap[key] == value;
       });

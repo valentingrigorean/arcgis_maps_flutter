@@ -245,8 +245,20 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                         result(finished)
                     }
                 }
+            } else {
+                result(false)
             }
-
+            break
+        case "map#setViewpointCenter":
+            if let data = call.arguments as? Dictionary<String, Any> {
+                let center = AGSPoint.fromFlutter(data: data["center"] as! Dictionary<String, Any>)! as! AGSPoint
+                let scale = data["scale"] as! Double
+                mapView.setViewpointCenter(center, scale: scale) { finished in
+                    result(finished)
+                }
+            } else {
+                result(false)
+            }
             break
         case "map#setViewpointRotation":
             if let angleDegrees = call.arguments as? Double {
@@ -477,6 +489,20 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             mapView.locationDisplay.wanderExtentFactor = Float(wanderExtentFactor)
         }
 
+        if let insetsContentInsetFromSafeArea = mapOptions["insetsContentInsetFromSafeArea"] as? Bool {
+            mapView.insetsContentInsetFromSafeArea = insetsContentInsetFromSafeArea
+        }
+
+        if let isAttributionTextVisible = mapOptions["isAttributionTextVisible"] as? Bool {
+            mapView.isAttributionTextVisible = isAttributionTextVisible
+        }
+
+        if let contentInsets = mapOptions["contentInsets"] as? [Double] {
+            // order is left,top,right,bottom
+            mapView.contentInset = UIEdgeInsets(top: CGFloat(contentInsets[1]), left: CGFloat(contentInsets[0]),
+                    bottom: CGFloat(contentInsets[3]), right: CGFloat(contentInsets[2]))
+        }
+
         if let haveScaleBar = mapOptions["haveScalebar"] as? Bool {
             if self.haveScaleBar && !haveScaleBar {
                 scaleBarController.removeScaleBar()
@@ -486,6 +512,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         if let scalebarConfiguration = mapOptions["scalebarConfiguration"] {
             scaleBarController.interpretConfiguration(args: scalebarConfiguration)
         }
+
     }
 
     private func updateInteractionOptions(interactionOptions: Dictionary<String, Any>) {

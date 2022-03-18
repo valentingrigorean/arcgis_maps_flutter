@@ -351,6 +351,22 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                     try {
                         result.success(future.get());
                     } catch (Exception e) {
+                        Log.w(TAG, "map#setViewpointGeometry: ", e);
+                        result.success(false);
+                    }
+                });
+            }
+            break;
+            case "map#setViewpointCenter": {
+                final Map<?, ?> data = call.arguments();
+                final Point center = Convert.toPoint(data.get("center"));
+                final double scale = Convert.toDouble(data.get("scale"));
+                ListenableFuture<Boolean> future = mapView.setViewpointCenterAsync(center, scale);
+                future.addDoneListener(() -> {
+                    try {
+                        result.success(future.get());
+                    } catch (Exception e) {
+                        Log.w(TAG, "map#setViewpointCenter: ", e);
                         result.success(false);
                     }
                 });
@@ -606,6 +622,18 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
         if (haveScaleBar != null) {
             this.haveScaleBar = Convert.toBoolean(haveScaleBar);
+        }
+
+        final Object isAttributionTextVisible = data.get("isAttributionTextVisible");
+        if (isAttributionTextVisible != null) {
+            mapView.setAttributionTextVisible(Convert.toBoolean(isAttributionTextVisible));
+        }
+
+        final Object contentInset = data.get("contentInset");
+        if (contentInset != null) {
+            // order is left,top,right,bottom
+            final List<?> rect = Convert.toList(contentInset);
+            mapView.setViewInsets(Convert.toDouble(rect.get(0)), Convert.toDouble(rect.get(1)), Convert.toDouble(rect.get(2)), Convert.toDouble(rect.get(3)));
         }
 
         final Object scaleBarConfiguration = data.get("scalebarConfiguration");

@@ -304,6 +304,19 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
+  Future<bool> setViewpointCenter(
+      int mapId, AGSPoint center, double scale) async {
+    final result = await channel(mapId).invokeMethod<bool>(
+      'map#setViewpointCenter',
+      {
+        'center': center.toJson(),
+        'scale': scale,
+      },
+    );
+    return result ?? false;
+  }
+
+  @override
   Future<void> setViewpointRotation(int mapId, double angleDegrees) {
     return channel(mapId)
         .invokeMethod<void>("map#setViewpointRotation", angleDegrees);
