@@ -78,7 +78,7 @@ class ArcgisMapView extends StatefulWidget {
     this.onAutoPanModeChanged,
     this.insetsContentInsetFromSafeArea = true,
     this.isAttributionTextVisible = true,
-    this.contentInset = EdgeInsets.zero,
+    this.contentInsets = EdgeInsets.zero,
     this.onTap,
     this.onLongPress,
     this.onCameraMove,
@@ -194,7 +194,7 @@ class ArcgisMapView extends StatefulWidget {
   /// display is anchored appropriately, and setting a new viewpoint adjusts
   /// the map contents to correctly display in the unobscured part of the view.
   /// Setting this will affect the @c visibleArea that is reported by the [ArcgisMapView].
-  final EdgeInsets contentInset;
+  final EdgeInsets contentInsets;
 
   /// Specifies whether the attribution text banner (along the bottom edge of the view) should be visible.
   /// Defaults to [true].
@@ -513,7 +513,7 @@ class _ArcgisMapOptions {
         wanderExtentFactor = map.wanderExtentFactor,
         insetsContentInsetFromSafeArea = map.insetsContentInsetFromSafeArea,
         isAttributionTextVisible = map.isAttributionTextVisible,
-        contentInset = map.contentInset,
+        contentInsets = map.contentInsets,
         scalebarConfiguration = map.scalebarConfiguration;
 
   final InteractionOptions interactionOptions;
@@ -524,7 +524,7 @@ class _ArcgisMapOptions {
   final double wanderExtentFactor;
   final bool insetsContentInsetFromSafeArea;
   final bool isAttributionTextVisible;
-  final EdgeInsets contentInset;
+  final EdgeInsets contentInsets;
   final ScalebarConfiguration? scalebarConfiguration;
 
   Map<String, dynamic> toMap() {
@@ -538,11 +538,11 @@ class _ArcgisMapOptions {
       'haveScalebar': scalebarConfiguration != null,
       'insetsContentInsetFromSafeArea': insetsContentInsetFromSafeArea,
       'isAttributionTextVisible': isAttributionTextVisible,
-      'contentInset': [
-        contentInset.left,
-        contentInset.top,
-        contentInset.right,
-        contentInset.bottom,
+      'contentInsets': [
+        contentInsets.left,
+        contentInsets.top,
+        contentInsets.right,
+        contentInsets.bottom,
       ],
       if (scalebarConfiguration != null)
         'scalebarConfiguration': scalebarConfiguration!.toJson(),
@@ -557,8 +557,8 @@ class _ArcgisMapOptions {
         if (key == 'interactionOptions') {
           return interactionOptions == newOptions.interactionOptions;
         }
-        if (key == 'contentInset') {
-          return contentInset == newOptions.contentInset;
+        if (key == 'contentInsets') {
+          return contentInsets == newOptions.contentInsets;
         }
         return prevOptionsMap[key] == value;
       });

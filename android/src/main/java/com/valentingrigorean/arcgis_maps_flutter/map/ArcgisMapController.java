@@ -629,10 +629,10 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             mapView.setAttributionTextVisible(Convert.toBoolean(isAttributionTextVisible));
         }
 
-        final Object contentInset = data.get("contentInset");
-        if (contentInset != null) {
+        final Object contentInsets = data.get("contentInsets");
+        if (contentInsets != null) {
             // order is left,top,right,bottom
-            final List<?> rect = Convert.toList(contentInset);
+            final List<?> rect = Convert.toList(contentInsets);
             mapView.setViewInsets(Convert.toDouble(rect.get(0)), Convert.toDouble(rect.get(1)), Convert.toDouble(rect.get(2)), Convert.toDouble(rect.get(3)));
         }
 
