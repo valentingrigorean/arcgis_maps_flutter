@@ -19,6 +19,12 @@ class AGSEnvelope extends Geometry {
   final double yMin;
   final double yMax;
 
+  AGSPoint get center => AGSPoint(
+        x: (xMin + xMax) / 2,
+        y: (yMin + yMax) / 2,
+        spatialReference: spatialReference,
+      );
+
   static AGSEnvelope? fromJson(Map<dynamic, dynamic>? json) {
     if (json == null) return null;
     final bbox = json['bbox'] as List<dynamic>;
