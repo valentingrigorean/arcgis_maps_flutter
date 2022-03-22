@@ -4,6 +4,7 @@ import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:arcgis_maps_flutter_example/map_page.dart';
 import 'package:arcgis_maps_flutter_example/map_page_assets_marker.dart';
 import 'package:arcgis_maps_flutter_example/map_page_auto_pan_mode.dart';
+import 'package:arcgis_maps_flutter_example/map_page_buffer.dart';
 import 'package:arcgis_maps_flutter_example/map_page_dynamic_layer.dart';
 import 'package:arcgis_maps_flutter_example/map_page_geodesic_distance.dart';
 import 'package:arcgis_maps_flutter_example/map_page_geometry_engine.dart';
@@ -106,6 +107,17 @@ class MainPage extends StatelessWidget {
                 },
               ),
               ElevatedButton(
+                child: const Text('Map Buffers'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MapPageBuffer(),
+                    ),
+                  );
+                },
+              ),
+              ElevatedButton(
                 child: const Text('Map View insets'),
                 onPressed: () {
                   Navigator.push(
@@ -122,7 +134,7 @@ class MainPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>  const MapPageLocator(),
+                      builder: (context) => const MapPageLocator(),
                     ),
                   );
                 },
@@ -133,7 +145,7 @@ class MainPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>  const MapPageRoute(),
+                      builder: (context) => const MapPageRoute(),
                     ),
                   );
                 },
@@ -144,7 +156,7 @@ class MainPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>const MapPageGeodeticDistance(),
+                      builder: (context) => const MapPageGeodeticDistance(),
                     ),
                   );
                 },

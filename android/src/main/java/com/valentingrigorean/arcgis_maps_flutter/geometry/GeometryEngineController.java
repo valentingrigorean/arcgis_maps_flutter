@@ -13,6 +13,7 @@ import com.esri.arcgisruntime.geometry.GeometryEngine;
 import com.esri.arcgisruntime.geometry.LinearUnit;
 import com.esri.arcgisruntime.geometry.LinearUnitId;
 import com.esri.arcgisruntime.geometry.Point;
+import com.esri.arcgisruntime.geometry.Polygon;
 import com.esri.arcgisruntime.geometry.SpatialReference;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
 
@@ -54,6 +55,33 @@ public class GeometryEngineController implements MethodChannel.MethodCallHandler
             case "distanceGeodetic": {
                 final Map<?, ?> data = Convert.toMap(call.arguments);
                 handleDistanceGeodetic(data, result);
+            }
+            break;
+            case "bufferGeometry": {
+                final Map<?, ?> data = Convert.toMap(call.arguments);
+                final Geometry geometry = Convert.toGeometry(data.get("geometry"));
+                final double distance = Convert.toDouble(data.get("distance"));
+                final Polygon polygon = GeometryEngine.buffer(geometry, distance);
+                if (polygon == null) {
+                    result.success(null);
+                } else {
+                    result.success(Convert.geometryToJson(polygon));
+                }
+            }
+            break;
+            case "geodeticBufferGeometry": {
+                final Map<?, ?> data = Convert.toMap(call.arguments);
+                final Geometry geometry = Convert.toGeometry(data.get("geometry"));
+                final double distance = Convert.toDouble(data.get("distance"));
+                final LinearUnitId distanceUnitId = Convert.toLinearUnitId(data.get("distanceUnit"));
+                final double maxDeviation = Convert.toDouble(data.get("maxDeviation"));
+                final GeodeticCurveType curveType = Convert.toGeodeticCurveType(data.get("curveType"));
+                final Polygon polygon = GeometryEngine.bufferGeodetic(geometry, distance, new LinearUnit(distanceUnitId), maxDeviation, curveType);
+                if (polygon == null) {
+                    result.success(null);
+                } else {
+                    result.success(Convert.geometryToJson(polygon));
+                }
             }
             break;
             default:

@@ -20,6 +20,7 @@ class Polygon extends Symbol {
     this.points = const <AGSPoint>[],
     this.strokeColor = Colors.black,
     this.strokeWidth = 10,
+    this.strokeStyle = SimpleLineSymbolStyle.solid,
     this.visible = true,
     this.zIndex = 0,
     this.onTap,
@@ -53,6 +54,9 @@ class Polygon extends Symbol {
   /// The default value is 10.
   final int strokeWidth;
 
+  /// Style of the stroke.
+  final SimpleLineSymbolStyle strokeStyle;
+
   /// The z-index of the polygon, used to determine relative drawing order of
   /// map overlays.
   ///
@@ -75,11 +79,13 @@ class Polygon extends Symbol {
       List<AGSPoint>? pointsParam,
       Color? strokeColorParam,
       int? strokeWidthParam,
+      SimpleLineSymbolStyle? strokeStyleParam,
       bool? visibleParam,
       int? zIndexParam,
       VoidCallback? onTapParam,
       Color? selectedColorParam,
-      SymbolVisibilityFilter? visibilityFilterParam}) {
+      SymbolVisibilityFilter? visibilityFilterParam,
+      }) {
     return Polygon(
       polygonId: polygonId,
       consumeTapEvents: consumeTapEventsParam ?? consumeTapEvents,
@@ -87,6 +93,7 @@ class Polygon extends Symbol {
       points: pointsParam ?? points,
       strokeColor: strokeColorParam ?? strokeColor,
       strokeWidth: strokeWidthParam ?? strokeWidth,
+      strokeStyle: strokeStyleParam ?? strokeStyle,
       visible: visibleParam ?? visible,
       onTap: onTapParam ?? onTap,
       zIndex: zIndexParam ?? zIndex,
@@ -115,6 +122,7 @@ class Polygon extends Symbol {
     addIfPresent('fillColor', fillColor.value);
     addIfPresent('strokeColor', strokeColor.value);
     addIfPresent('strokeWidth', strokeWidth);
+    addIfPresent('strokeStyle', strokeStyle.index);
     addIfPresent('visible', visible);
     addIfPresent('zIndex', zIndex);
     addIfPresent('selectedColor', selectedColor?.value);
@@ -140,6 +148,7 @@ class Polygon extends Symbol {
           visible == other.visible &&
           strokeColor == other.strokeColor &&
           strokeWidth == other.strokeWidth &&
+          strokeStyle == other.strokeStyle &&
           zIndex == other.zIndex &&
           selectedColor == other.selectedColor &&
           visibilityFilter == other.visibilityFilter;

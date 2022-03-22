@@ -51,6 +51,32 @@ class GeometryEngineController {
                     azimuthUnit: AGSAngularUnit(unitID: azimuthUnitId)!,
                     curveType: curveType)
             result(geodeticDistanceResult?.toJSONFlutter())
+        case "bufferGeometry":
+            guard let data = call.arguments as? Dictionary<String, Any> else {
+                result(nil)
+                return
+            }
+            let geometry = AGSGeometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
+            let distance = data["distance"] as! Double
+            let polygon = AGSGeometryEngine.bufferGeometry(geometry, byDistance: distance)
+            result(polygon?.toJSONFlutter())
+            break
+        case "geodeticBufferGeometry":
+            guard let data = call.arguments as? Dictionary<String, Any> else {
+                result(nil)
+                return
+            }
+            let geometry = AGSGeometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
+            let distance = data["distance"] as! Double
+            let distanceUnitId = AGSLinearUnitID.fromFlutter(data["distanceUnit"] as! Int)
+            let maxDeviation = data["maxDeviation"] as! Double
+            let curveType = AGSGeodeticCurveType.init(rawValue: data["curveType"] as! Int)!
+            let polygon = AGSGeometryEngine.geodeticBufferGeometry(geometry, distance: distance,
+                    distanceUnit: AGSLinearUnit(unitID: distanceUnitId)!,
+                    maxDeviation: maxDeviation,
+                    curveType: curveType)
+            result(polygon?.toJSONFlutter())
+            break
         default:
             result(FlutterMethodNotImplemented)
             break

@@ -491,6 +491,12 @@ public class Convert {
         if (strokeWidth != null) {
             controller.setStrokeWidth(toInt(strokeWidth));
         }
+
+        final Object strokeStyle = data.get("strokeStyle");
+        if (strokeStyle != null) {
+            controller.setStrokeStyle(toSimpleLineStyle(toInt(strokeStyle)));
+        }
+
         final List<?> points = toList(data.get("points"));
         if (points != null) {
             final ArrayList<Point> nativePoints = new ArrayList<>(points.size());

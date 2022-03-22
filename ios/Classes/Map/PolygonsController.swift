@@ -82,6 +82,10 @@ class PolygonsController: NSObject, SymbolsController {
             controller.setStrokeWidth(width: CGFloat(strokeWidth))
         }
 
+        if let strokeStyle = data["strokeStyle"] as? Int {
+            controller.setStrokeStyle(style: AGSSimpleLineSymbolStyle(rawValue: strokeStyle)!)
+        }
+
         if let pointsData = data["points"] as? [Dictionary<String, Any>] {
             var points: [AGSPoint] = []
             for data in pointsData {

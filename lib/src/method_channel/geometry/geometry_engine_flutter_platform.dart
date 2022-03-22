@@ -34,4 +34,20 @@ abstract class GeometryEngineFlutterPlatform extends PlatformInterface {
   }) {
     throw UnimplementedError('distanceGeodetic() has not been implemented.');
   }
+
+  Future<AGSPolygon?> bufferGeometry(
+      {required Geometry geometry, required double distance}) {
+    throw UnimplementedError('bufferGeometry() has not been implemented.');
+  }
+
+  Future<AGSPolygon?> geodeticBufferGeometry({
+    required Geometry geometry,
+    required double distance,
+    required LinearUnitId distanceUnit,
+    required double maxDeviation,
+    required GeodeticCurveType curveType,
+  }) {
+    throw UnimplementedError(
+        'geodeticBufferGeometry() has not been implemented.');
+  }
 }

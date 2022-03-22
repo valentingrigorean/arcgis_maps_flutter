@@ -20,7 +20,7 @@ class _MapPageViewInsetsState extends State<MapPageViewInsets> {
             map: ArcGISMap.imagery(),
             isAttributionTextVisible: false,
             insetsContentInsetFromSafeArea: false,
-            contentInset: const EdgeInsets.only(bottom: 200),
+            contentInsets: const EdgeInsets.only(bottom: 200),
             onTap: (point) {
               _mapController.setViewpointCenter(point);
             },

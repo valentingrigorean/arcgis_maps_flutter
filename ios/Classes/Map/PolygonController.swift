@@ -36,8 +36,11 @@ class PolygonController : BaseGraphicController {
         polygonStrokeSymbol.width = width
     }
 
+    func setStrokeStyle(style: AGSSimpleLineSymbolStyle) {
+        polygonStrokeSymbol.style = style
+    }
+
     func setZIndex(zIndex: Int) {
         graphics.zIndex = zIndex
     }
-
 }

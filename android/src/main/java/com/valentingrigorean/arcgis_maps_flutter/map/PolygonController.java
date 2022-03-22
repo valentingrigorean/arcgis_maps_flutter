@@ -17,6 +17,7 @@ public final class PolygonController extends BaseGraphicController implements Po
         polygonSymbol = new SimpleFillSymbol(SimpleFillSymbol.Style.SOLID, Color.BLACK, polygonStrokeSymbol);
 
         graphic = new Graphic();
+
         graphic.setSymbol(polygonSymbol);
         graphic.getAttributes().put("polygonId", polygonId);
     }
@@ -31,6 +32,10 @@ public final class PolygonController extends BaseGraphicController implements Po
 
     public void setStrokeWidth(float width) {
         polygonStrokeSymbol.setWidth(width);
+    }
+
+    public void setStrokeStyle(SimpleLineSymbol.Style style) {
+        polygonStrokeSymbol.setStyle(style);
     }
 
     @Override

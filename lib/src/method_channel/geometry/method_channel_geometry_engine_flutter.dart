@@ -9,11 +9,11 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
   @override
   Future<Geometry?> project(
       Geometry geometry, SpatialReference spatialReference) async {
-    final result = await  _channel.invokeMethod("project", {
+    final result = await _channel.invokeMethod("project", {
       "geometry": geometry.toJson(),
       "spatialReference": spatialReference.toJson(),
     });
-    if(result == null){
+    if (result == null) {
       return null;
     }
     return Geometry.fromJson(result);
@@ -26,7 +26,7 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
     required LinearUnitId distanceUnitId,
     required AngularUnitId azimuthUnitId,
     required GeodeticCurveType curveType,
-  })async{
+  }) async {
     final result = await _channel.invokeMethod("distanceGeodetic", {
       "point1": point1.toJson(),
       "point2": point2.toJson(),
@@ -34,9 +34,47 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
       "azimuthUnitId": azimuthUnitId.index,
       "curveType": curveType.index,
     });
-    if(result == null){
+    if (result == null) {
       return null;
     }
     return GeodeticDistanceResult.fromJson(result);
+  }
+
+  @override
+  Future<AGSPolygon?> bufferGeometry({
+    required Geometry geometry,
+    required double distance,
+  }) {
+    return _channel.invokeMethod("bufferGeometry", {
+      "geometry": geometry.toJson(),
+      "distance": distance,
+    }).then((result) {
+      if (result == null) {
+        return null;
+      }
+      return AGSPolygon.fromJson(result);
+    });
+  }
+
+  @override
+  Future<AGSPolygon?> geodeticBufferGeometry({
+    required Geometry geometry,
+    required double distance,
+    required LinearUnitId distanceUnit,
+    required double maxDeviation,
+    required GeodeticCurveType curveType,
+  }) {
+    return _channel.invokeMethod("geodeticBufferGeometry", {
+      "geometry": geometry.toJson(),
+      "distance": distance,
+      "distanceUnit": distanceUnit.index,
+      "maxDeviation": maxDeviation,
+      "curveType": curveType.index,
+    }).then((result) {
+      if (result == null) {
+        return null;
+      }
+      return AGSPolygon.fromJson(result);
+    });
   }
 }
