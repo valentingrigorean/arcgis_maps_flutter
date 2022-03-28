@@ -294,7 +294,6 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
       _mapId,
       onPlatformViewCreated,
       map: _map,
-      mapOptions: _arcgisMapOptions.toMap(),
       viewpoint: widget.viewpoint,
       operationalLayers: widget.operationalLayers,
       baseLayers: widget.baseLayers,
@@ -302,6 +301,8 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
       markers: widget.markers,
       polygons: widget.polygons,
       polylines: widget.polylines,
+      gestureRecognizers: widget.gestureRecognizers,
+      mapOptions: _arcgisMapOptions.toMap(),
     );
   }
 

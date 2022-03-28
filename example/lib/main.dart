@@ -20,6 +20,7 @@ import 'package:arcgis_maps_flutter_example/map_page_portal.dart';
 import 'package:arcgis_maps_flutter_example/map_page_route.dart';
 import 'package:arcgis_maps_flutter_example/map_page_scalerbar.dart';
 import 'package:arcgis_maps_flutter_example/map_page_screen_location.dart';
+import 'package:arcgis_maps_flutter_example/map_page_scrolling_list.dart';
 import 'package:arcgis_maps_flutter_example/map_page_time_slider.dart';
 import 'package:arcgis_maps_flutter_example/map_page_view_insests.dart';
 import 'package:arcgis_maps_flutter_example/scene_page.dart';
@@ -102,6 +103,17 @@ class MainPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const MapPageGesture(),
+                    ),
+                  );
+                },
+              ),
+              ElevatedButton(
+                child: const Text('Map Scrolling list'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MapPageScrollingList(),
                     ),
                   );
                 },
