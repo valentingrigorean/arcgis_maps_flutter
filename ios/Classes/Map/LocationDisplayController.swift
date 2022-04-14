@@ -27,10 +27,11 @@ class LocationDisplayController {
         locationGraphic.attributes[LOCATION_ATTRIBUTE_NAME] = true
         locationGraphic.symbol = locationDisplay.defaultSymbol
         locationGraphic.zIndex = Int.max
+        locationGraphic.geometry = locationDisplay.mapLocation
         locationGraphicsOverlay.graphics.add(locationGraphic)
         locationDisplay.autoPanModeChangedHandler = autoPanModeChanged
         locationDisplay.locationChangedHandler = locationChanged
-
+        locationDisplay.dataSourceStatusChangedHandler = dataSourceStatusChanged
 
         self.methodChannel.setMethodCallHandler(handle)
     }
@@ -134,6 +135,10 @@ class LocationDisplayController {
             return
         }
         locationGraphic.geometry = position
+    }
+
+    private func dataSourceStatusChanged(status: Bool) {
+        locationGraphic.geometry = locationDisplay.mapLocation
     }
 }
 

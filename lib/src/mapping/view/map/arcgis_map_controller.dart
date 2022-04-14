@@ -20,19 +20,22 @@ class ArcgisMapController {
 
   final int mapId;
 
-  ArcgisMapController._(this._arcgisMapState, this.mapId) {
+  ArcgisMapController._(
+      this._arcgisMapState, this.mapId, this.locationDisplay) {
     _connectStream(mapId);
-    locationDisplay = LocationDisplayImpl(mapId);
   }
 
   static Future<ArcgisMapController> init(
       int id, _ArcgisMapViewState arcgisMapState) async {
     await ArcgisMapsFlutterPlatform.instance.init(id);
-
-    return ArcgisMapController._(arcgisMapState, id);
+    return ArcgisMapController._(
+      arcgisMapState,
+      id,
+      LocationDisplayImpl(id),
+    );
   }
 
-  late final LocationDisplay locationDisplay;
+  final LocationDisplay locationDisplay;
 
   Future<List<LegendInfoResult>> getLegendInfosForLayer(Layer layer) async {
     return await ArcgisMapsFlutterPlatform.instance
@@ -264,7 +267,6 @@ class ArcgisMapController {
       }
     });
 
-
     ArcgisMapsFlutterPlatform.instance.onTimeExtentChanged(mapId: mapId).listen(
       (TimeExtentChangedEvent e) {
         for (final listener in _timeExtentChangedHandlers.handlers) {
@@ -279,6 +281,10 @@ class ArcgisMapController {
 
     ArcgisMapsFlutterPlatform.instance.onIdentifyLayers(mapId: mapId).listen(
         (IdentifyLayersEvent e) => _arcgisMapState.onIdentifyLayers(e.results));
+
+    ArcgisMapsFlutterPlatform.instance.onUserLocationTap(mapId: mapId).listen(
+          (UserLocationTapEvent e) => _arcgisMapState.onUserLocationTap(),
+        );
   }
 }
 

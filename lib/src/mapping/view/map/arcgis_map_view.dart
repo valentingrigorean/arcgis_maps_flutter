@@ -184,7 +184,6 @@ class ArcgisMapView extends StatefulWidget {
 
   final ArgumentCallback<AGSPoint>? onLongPress;
 
-
   /// Options to configure user interactions with the view.
   final InteractionOptions interactionOptions;
 
@@ -285,9 +284,20 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
 
     _controller.complete(controller);
 
+    if (widget.myLocationEnabled) {
+      await controller.locationDisplay.start();
+    }
+
     final MapCreatedCallback? onMapCreated = widget.onMapCreated;
     if (onMapCreated != null) {
       onMapCreated(controller);
+    }
+  }
+
+  void onUserLocationTap(){
+    final callback = widget.onUserLocationTap;
+    if (callback != null) {
+      callback();
     }
   }
 
@@ -392,6 +402,15 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
         _arcgisMapOptions.updatesMap(newOptions);
     if (updates.isEmpty) {
       return;
+    }
+    if (updates.containsKey('myLocationEnabled')) {
+      final ArcgisMapController controller = await _controller.future;
+      final bool isStarted = await controller.locationDisplay.started;
+      if (updates['myLocationEnabled'] && !isStarted) {
+        await controller.locationDisplay.start();
+      } else if (isStarted) {
+        await controller.locationDisplay.stop();
+      }
     }
     final ArcgisMapController controller = await _controller.future;
     controller._updateMapOptions(updates);

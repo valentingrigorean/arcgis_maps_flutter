@@ -211,6 +211,10 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('onLongPress() has not been implemented.');
   }
 
+  Stream<UserLocationTapEvent> onUserLocationTap({required int mapId}) {
+    throw UnimplementedError('onUserLocationTap() has not been implemented.');
+  }
+
   Stream<IdentifyLayerEvent> onIdentifyLayer({required int mapId}) {
     throw UnimplementedError('onIdentifyLayer() has not been implemented.');
   }

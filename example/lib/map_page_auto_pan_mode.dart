@@ -16,6 +16,7 @@ class MapPageAutoPanMode extends StatefulWidget {
 class _MapPageAutoPanModeState extends State<MapPageAutoPanMode> {
   PermissionStatus _permissionStatus = PermissionStatus.unknown;
 
+  late LocationDisplay _locationDisplay;
   StreamSubscription? _onAutoPanModeChangedSubscription;
   AutoPanMode _autoPanMode = AutoPanMode.off;
 
@@ -40,7 +41,7 @@ class _MapPageAutoPanModeState extends State<MapPageAutoPanMode> {
         map: ArcGISMap.topographic(),
         myLocationEnabled: true,
         onMapCreated: (controller) {
-          controller.locationDisplay = controller.locationDisplay;
+          _locationDisplay = controller.locationDisplay;
           controller.locationDisplay.wanderExtentFactor = 0.0;
           controller.locationDisplay.autoPanMode = _autoPanMode;
 
@@ -93,6 +94,7 @@ class _MapPageAutoPanModeState extends State<MapPageAutoPanMode> {
                   default:
                     break;
                 }
+                _locationDisplay.autoPanMode = _autoPanMode;
               },
             ),
     );

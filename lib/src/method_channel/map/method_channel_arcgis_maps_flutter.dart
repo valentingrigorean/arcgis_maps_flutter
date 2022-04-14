@@ -397,6 +397,11 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
+  Stream<UserLocationTapEvent> onUserLocationTap({required int mapId}) {
+    return _events(mapId).whereType<UserLocationTapEvent>();
+  }
+
+  @override
   Stream<IdentifyLayerEvent> onIdentifyLayer({required int mapId}) {
     return _events(mapId).whereType<IdentifyLayerEvent>();
   }
@@ -525,6 +530,13 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
           TimeExtentChangedEvent(
             mapId,
             call.arguments == null ? null : TimeExtent.fromJson(call.arguments),
+          ),
+        );
+        break;
+      case 'map#onUserLocationTap':
+        _mapEventStreamController.add(
+          UserLocationTapEvent(
+            mapId,
           ),
         );
         break;

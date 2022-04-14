@@ -46,6 +46,10 @@ class PolylineTapEvent extends MapEvent<PolylineId> {
   ) : super(mapId, polylineId);
 }
 
+class UserLocationTapEvent extends MapEvent<void> {
+  const UserLocationTapEvent(int mapId) : super(mapId, null);
+}
+
 class IdentifyLayerEvent extends MapEvent<LayerId> {
   const IdentifyLayerEvent(
     int mapId,
@@ -121,7 +125,6 @@ class TimeExtentChangedEvent extends MapEvent<TimeExtent?> {
   const TimeExtentChangedEvent(int mapId, TimeExtent? value)
       : super(mapId, value);
 }
-
 
 /// A `MapEvent` associated to a `position`.
 class _PositionedMapEvent<T> extends MapEvent<T> {
