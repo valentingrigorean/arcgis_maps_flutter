@@ -101,21 +101,6 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
         'setOperationLayersChangedListener() has not been implemented.');
   }
 
-  Future<void> setLocationChangedListener(int mapId, bool register) {
-    throw UnimplementedError(
-        'setLocationChangedListener() has not been implemented.');
-  }
-
-  Future<bool> isLocationDisplayStarted(int mapId) {
-    throw UnimplementedError(
-        'isLocationDisplayStarted() has not been implemented.');
-  }
-
-  Future<void> setLocationDisplay(int mapId, bool start) {
-    throw UnimplementedError(
-        'isLocationDisplayStarted() has not been implemented.');
-  }
-
   Future<TimeExtent?> getTimeExtent(int mapId) {
     throw UnimplementedError('getTimeExtent() has not been implemented.');
   }
@@ -201,11 +186,6 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('onMapLoad() has not been implemented.');
   }
 
-  Stream<AutoPanModeChangedEvent> onAutoPanModeChanged({required int mapId}) {
-    throw UnimplementedError(
-        'onAutoPanModeChanged() has not been implemented.');
-  }
-
   /// A [Marker] has been tapped.
   Stream<MarkerTapEvent> onMarkerTap({required int mapId}) {
     throw UnimplementedError('onMarkerTap() has not been implemented.');
@@ -231,11 +211,6 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('onLongPress() has not been implemented.');
   }
 
-  /// The Camera finished moving to a new [CameraPosition].
-  Stream<CameraMoveEvent> onCameraMove({required int mapId}) {
-    throw UnimplementedError('onCameraMove() has not been implemented.');
-  }
-
   Stream<IdentifyLayerEvent> onIdentifyLayer({required int mapId}) {
     throw UnimplementedError('onIdentifyLayer() has not been implemented.');
   }
@@ -247,11 +222,6 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
   Stream<ViewpointChangedEvent> onViewpointChanged({required int mapId}) {
     throw UnimplementedError(
         'onViewpointChangedListener() has not been implemented.');
-  }
-
-  Stream<LocationChangedEvent> onLocationChanged({required int mapId}) {
-    throw UnimplementedError(
-        'onLocationChangedListener() has not been implemented.');
   }
 
   Stream<LayersChangedEvent> onLayersChanged({required int mapId}) {

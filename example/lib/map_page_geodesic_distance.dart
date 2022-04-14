@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:location_permissions/location_permissions.dart';
@@ -10,11 +12,11 @@ class MapPageGeodeticDistance extends StatefulWidget {
       _MapPageGeodeticDistanceState();
 }
 
-class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance>
-    implements LocationChangeListener {
+class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance> {
   PermissionStatus _permissionStatus = PermissionStatus.unknown;
-  ArcgisMapController? _controller;
   AGSPoint? _userLocation;
+
+  StreamSubscription? _locationSubscription;
 
   @override
   void initState() {
@@ -25,7 +27,7 @@ class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance>
 
   @override
   void dispose() {
-    _controller?.removeLocationChangedListener(this);
+    _locationSubscription?.cancel();
     super.dispose();
   }
 
@@ -36,13 +38,15 @@ class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance>
       body = ArcgisMapView(
         map: ArcGISMap.topographic(),
         myLocationEnabled: true,
-        wanderExtentFactor: 0.0,
         onMapCreated: (controller) {
-          controller.addLocationChangedListener(this);
-          _controller = controller;
+          controller.locationDisplay.wanderExtentFactor = 0.0;
+          _locationSubscription = controller.locationDisplay.onLocationChanged
+              .listen((Location location) {
+            _userLocation = location.position;
+          });
           Future.delayed(const Duration(seconds: 1)).then((value) async {
             if (mounted) {
-              _userLocation = await controller.getMapLocation();
+              _userLocation = await controller.locationDisplay.mapLocation;
             }
           });
         },
@@ -106,10 +110,5 @@ class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance>
     setState(() {
       _permissionStatus = permissionRequestResult;
     });
-  }
-
-  @override
-  void onLocationChanged(Location location) {
-    _userLocation = location.position;
   }
 }

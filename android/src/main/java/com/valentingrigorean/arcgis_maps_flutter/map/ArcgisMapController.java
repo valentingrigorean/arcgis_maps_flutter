@@ -47,7 +47,7 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.platform.PlatformView;
 
-final class ArcgisMapController implements DefaultLifecycleObserver, PlatformView, MethodChannel.MethodCallHandler, ViewpointChangedListener, LocationDisplay.AutoPanModeChangedListener, TimeExtentChangedListener, LocationDisplay.LocationChangedListener {
+final class ArcgisMapController implements DefaultLifecycleObserver, PlatformView, MethodChannel.MethodCallHandler, ViewpointChangedListener,  TimeExtentChangedListener{
 
     private static final String TAG = "ArcgisMapController";
 
@@ -146,7 +146,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         mapView.getGraphicsOverlays().add(graphicsOverlay);
         mapView.setOnTouchListener(mapViewOnTouchListener);
         mapView.addViewpointChangedListener(this);
-        mapView.getLocationDisplay().addAutoPanModeChangedListener(this);
 
 
         lifecycleProvider.getLifecycle().addObserver(this);
@@ -193,20 +192,14 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         }
     }
 
-    @Override
-    public void onAutoPanModeChanged(LocationDisplay.AutoPanModeChangedEvent autoPanModeChangedEvent) {
-        methodChannel.invokeMethod("map#autoPanModeChanged", autoPanModeChangedEvent.getAutoPanMode().ordinal());
-    }
+
 
     @Override
     public void timeExtentChanged(TimeExtentChangedEvent timeExtentChangedEvent) {
         methodChannel.invokeMethod("map#timeExtentChanged", Convert.timeExtentToJson(timeExtentChangedEvent.getTimeExtent()));
     }
 
-    @Override
-    public void onLocationChanged(LocationDisplay.LocationChangedEvent locationChangedEvent) {
-        methodChannel.invokeMethod("map#locationChangeListener", Convert.locationToJson(locationChangedEvent.getLocation()));
-    }
+
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
@@ -262,15 +255,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 result.success(null);
             }
             break;
-            case "map#setLocationChangedListener": {
-                final boolean val = call.arguments();
-                if (val) {
-                    mapView.getLocationDisplay().addLocationChangedListener(this);
-                } else {
-                    mapView.getLocationDisplay().removeLocationChangedListener(this);
-                }
-            }
-            break;
             case "map#setLayersChangedListener": {
                 layersChangedController.setTrackLayersChange(call.arguments());
                 result.success(null);
@@ -295,22 +279,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             break;
             case "map#setTimeExtent": {
                 mapView.setTimeExtent(Convert.toTimeExtent(call.arguments));
-                result.success(null);
-            }
-            break;
-            case "map#isLocationDisplayStarted": {
-                result.success(mapView.getLocationDisplay().isStarted());
-            }
-            break;
-            case "map#setLocationDisplay": {
-                final Boolean started = Convert.toBoolean(call.arguments);
-                if (started != mapView.getLocationDisplay().isStarted()) {
-                    if (started) {
-                        mapView.getLocationDisplay().startAsync();
-                    } else {
-                        mapView.getLocationDisplay().stop();
-                    }
-                }
                 result.success(null);
             }
             break;

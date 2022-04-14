@@ -18,36 +18,21 @@ class ArcgisMapController {
         .setTimeExtentChangedListener(mapId, register);
   });
 
-  late final _EventBaseHandler<LocationChangeListener> _locationChangeHandlers =
-      _EventBaseHandler((register) {
-    ArcgisMapsFlutterPlatform.instance
-        .setLocationChangedListener(mapId, register);
-  });
-
   final int mapId;
 
   ArcgisMapController._(this._arcgisMapState, this.mapId) {
     _connectStream(mapId);
+    locationDisplay = LocationDisplayImpl(mapId);
   }
 
   static Future<ArcgisMapController> init(
       int id, _ArcgisMapViewState arcgisMapState) async {
     await ArcgisMapsFlutterPlatform.instance.init(id);
+
     return ArcgisMapController._(arcgisMapState, id);
   }
 
-  /// Most recent location update provided by the dataSource property.
-  /// It includes the raw information about the location and may not be
-  /// in the map's spatial reference.
-  Future<Location?> getLocation() {
-    return ArcgisMapsFlutterPlatform.instance.getLocation(mapId);
-  }
-
-  /// Position of the location symbol, as provided by the
-  /// most recent location update, projected to the map's spatial reference.
-  Future<AGSPoint?> getMapLocation() {
-    return ArcgisMapsFlutterPlatform.instance.getMapLocation(mapId);
-  }
+  late final LocationDisplay locationDisplay;
 
   Future<List<LegendInfoResult>> getLegendInfosForLayer(Layer layer) async {
     return await ArcgisMapsFlutterPlatform.instance
@@ -110,37 +95,12 @@ class ArcgisMapController {
     _timeExtentChangedHandlers.removeHandler(listener);
   }
 
-  void addLocationChangedListener(LocationChangeListener listener) {
-    _locationChangeHandlers.addHandler(listener);
-  }
-
-  void removeLocationChangedListener(LocationChangeListener listener) {
-    _locationChangeHandlers.removeHandler(listener);
-  }
-
-  /// Indicates whether the location display is active or not.
-  Future<bool> isLocationDisplayStarted() {
-    return ArcgisMapsFlutterPlatform.instance.isLocationDisplayStarted(mapId);
-  }
-
-  /// Start the location display, which will in-turn start receiving location updates.
-  /// As the updates are received they will be displayed on the map.
-  Future<void> startLocationDisplay() {
-    return ArcgisMapsFlutterPlatform.instance.setLocationDisplay(mapId, true);
-  }
-
   Future<TimeExtent?> getTimeExtent() {
     return ArcgisMapsFlutterPlatform.instance.getTimeExtent(mapId);
   }
 
   Future<void> setTimeExtent(TimeExtent? timeExtent) {
     return ArcgisMapsFlutterPlatform.instance.setTimeExtent(mapId, timeExtent);
-  }
-
-  /// Stop the location display. Location updates will no longer
-  /// be received or displayed on the map.
-  Future<void> stopLocationDisplay() {
-    return ArcgisMapsFlutterPlatform.instance.setLocationDisplay(mapId, false);
   }
 
   Future<void> clearMarkerSelection() {
@@ -159,8 +119,8 @@ class ArcgisMapController {
 
   Future<bool> setViewpointCenter(AGSPoint center, {double? scale}) async {
     scale ??= await getMapScale();
-    return ArcgisMapsFlutterPlatform.instance.setViewpointCenter(
-        mapId, center, scale);
+    return ArcgisMapsFlutterPlatform.instance
+        .setViewpointCenter(mapId, center, scale);
   }
 
   Future<void> setViewpointRotation(double angleDegrees) {
@@ -286,22 +246,10 @@ class ArcgisMapController {
             _arcgisMapState.onLayerLoaded(e.value, e.error));
 
     ArcgisMapsFlutterPlatform.instance
-        .onCameraMove(mapId: mapId)
-        .listen((CameraMoveEvent e) => _arcgisMapState.onCameraMove());
-
-    ArcgisMapsFlutterPlatform.instance
         .onViewpointChanged(mapId: mapId)
         .listen((ViewpointChangedEvent event) {
       for (final listener in _viewpointChangedHandlers.handlers) {
         listener.viewpointChanged();
-      }
-    });
-
-    ArcgisMapsFlutterPlatform.instance
-        .onLocationChanged(mapId: mapId)
-        .listen((LocationChangedEvent event) {
-      for (final listener in _locationChangeHandlers.handlers) {
-        listener.onLocationChanged(event.value);
       }
     });
 
@@ -316,12 +264,6 @@ class ArcgisMapController {
       }
     });
 
-    ArcgisMapsFlutterPlatform.instance
-        .onAutoPanModeChanged(mapId: mapId)
-        .listen(
-          (AutoPanModeChangedEvent e) =>
-              _arcgisMapState.onAutoPanModeChanged(e.value),
-        );
 
     ArcgisMapsFlutterPlatform.instance.onTimeExtentChanged(mapId: mapId).listen(
       (TimeExtentChangedEvent e) {

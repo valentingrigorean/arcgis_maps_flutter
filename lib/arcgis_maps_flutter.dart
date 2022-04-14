@@ -7,6 +7,7 @@ import 'package:arcgis_maps_flutter/src/data/field_type.dart';
 import 'package:arcgis_maps_flutter/src/layers/base_tile_layer.dart';
 import 'package:arcgis_maps_flutter/src/layers/layer_updates.dart';
 import 'package:arcgis_maps_flutter/src/mapping/basemap_type_options.dart';
+import 'package:arcgis_maps_flutter/src/mapping/view/location_display_impl.dart';
 import 'package:arcgis_maps_flutter/src/maps_object.dart';
 import 'package:arcgis_maps_flutter/src/symbology/marker_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polygon_updates.dart';
@@ -72,7 +73,6 @@ part 'src/layers/wms_layer.dart';
 part 'src/layers/time_aware_layer_info.dart';
 
 part 'src/location/location.dart';
-part 'src/location/location_change_listener.dart';
 
 part 'src/mapping/viewpoint.dart';
 part 'src/mapping/camera.dart';
@@ -87,6 +87,7 @@ part 'src/mapping/arcgis_map.dart';
 part 'src/mapping/view/auto_pan_mode.dart';
 part 'src/mapping/view/identify_layer_result.dart';
 part 'src/mapping/view/layers_changed_listener.dart';
+part 'src/mapping/view/location_display.dart';
 part 'src/mapping/view/time_extent_changed_listener.dart';
 part 'src/mapping/view/viewpoint_changed_listener.dart';
 

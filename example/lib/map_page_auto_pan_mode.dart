@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 
+import 'dart:async';
+
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:location_permissions/location_permissions.dart';
@@ -14,6 +16,7 @@ class MapPageAutoPanMode extends StatefulWidget {
 class _MapPageAutoPanModeState extends State<MapPageAutoPanMode> {
   PermissionStatus _permissionStatus = PermissionStatus.unknown;
 
+  StreamSubscription? _onAutoPanModeChangedSubscription;
   AutoPanMode _autoPanMode = AutoPanMode.off;
 
   @override
@@ -24,17 +27,29 @@ class _MapPageAutoPanModeState extends State<MapPageAutoPanMode> {
   }
 
   @override
+  void dispose() {
+    _onAutoPanModeChangedSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     late Widget body;
     if (_permissionStatus == PermissionStatus.granted) {
       body = ArcgisMapView(
         map: ArcGISMap.topographic(),
-        autoPanMode: _autoPanMode,
         myLocationEnabled: true,
-        wanderExtentFactor: 0.0,
-        onAutoPanModeChanged: (newPanMode) {
-          setState(() {
-            _autoPanMode = newPanMode;
+        onMapCreated: (controller) {
+          controller.locationDisplay = controller.locationDisplay;
+          controller.locationDisplay.wanderExtentFactor = 0.0;
+          controller.locationDisplay.autoPanMode = _autoPanMode;
+
+          _onAutoPanModeChangedSubscription = controller
+              .locationDisplay.onAutoPanModeChanged
+              .listen((newPanMode) {
+            setState(() {
+              _autoPanMode = newPanMode;
+            });
           });
         },
       );

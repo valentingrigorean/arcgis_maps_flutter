@@ -232,34 +232,6 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<void> setTimeExtentChangedListener(int mapId, bool register) {
-    return channel(mapId).invokeMethod<void>(
-      'map#setTimeExtentChangedListener',
-      register,
-    );
-  }
-
-  @override
-  Future<void> setLocationChangedListener(int mapId, bool register) {
-    return channel(mapId).invokeMethod<void>(
-      'map#setLocationChangedListener',
-      register,
-    );
-  }
-
-  @override
-  Future<bool> isLocationDisplayStarted(int mapId) async {
-    return await channel(mapId)
-            .invokeMethod<bool>("map#isLocationDisplayStarted") ??
-        false;
-  }
-
-  @override
-  Future<void> setLocationDisplay(int mapId, bool start) {
-    return channel(mapId).invokeMethod<void>("map#setLocationDisplay", start);
-  }
-
-  @override
   Future<TimeExtent?> getTimeExtent(int mapId) async {
     final result = await channel(mapId)
         .invokeMapMethod<String, dynamic>("map#getTimeExtent");
@@ -400,11 +372,6 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Stream<AutoPanModeChangedEvent> onAutoPanModeChanged({required int mapId}) {
-    return _events(mapId).whereType<AutoPanModeChangedEvent>();
-  }
-
-  @override
   Stream<MarkerTapEvent> onMarkerTap({required int mapId}) {
     return _events(mapId).whereType<MarkerTapEvent>();
   }
@@ -430,11 +397,6 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Stream<CameraMoveEvent> onCameraMove({required int mapId}) {
-    return _events(mapId).whereType<CameraMoveEvent>();
-  }
-
-  @override
   Stream<IdentifyLayerEvent> onIdentifyLayer({required int mapId}) {
     return _events(mapId).whereType<IdentifyLayerEvent>();
   }
@@ -447,11 +409,6 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   @override
   Stream<ViewpointChangedEvent> onViewpointChanged({required int mapId}) {
     return _events(mapId).whereType<ViewpointChangedEvent>();
-  }
-
-  @override
-  Stream<LocationChangedEvent> onLocationChanged({required int mapId}) {
-    return _events(mapId).whereType<LocationChangedEvent>();
   }
 
   @override
@@ -484,14 +441,6 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
           LayerChangeType.values[call.arguments['layerChangeType']!],
         );
         _mapEventStreamController.add(event);
-        break;
-      case 'map#autoPanModeChanged':
-        _mapEventStreamController.add(
-          AutoPanModeChangedEvent(
-            mapId,
-            AutoPanMode.values[call.arguments],
-          ),
-        );
         break;
       case 'marker#onTap':
         _mapEventStreamController.add(
@@ -531,13 +480,6 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
             mapId,
             ArcgisError.fromJson(call.arguments['error']),
             LayerId(call.arguments['layerId']),
-          ),
-        );
-        break;
-      case 'camera#onMove':
-        _mapEventStreamController.add(
-          CameraMoveEvent(
-            mapId,
           ),
         );
         break;
@@ -583,14 +525,6 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
           TimeExtentChangedEvent(
             mapId,
             call.arguments == null ? null : TimeExtent.fromJson(call.arguments),
-          ),
-        );
-        break;
-      case 'map#locationChangeListener':
-        _mapEventStreamController.add(
-          LocationChangedEvent(
-            mapId,
-            Location.fromJson(call.arguments),
           ),
         );
         break;

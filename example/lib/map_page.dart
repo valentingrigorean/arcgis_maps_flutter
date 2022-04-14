@@ -68,7 +68,6 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
     var mapView = ArcgisMapView(
       map: map,
       onMapCreated: onMapCreated,
-      autoPanMode: AutoPanMode.navigation,
       onMapLoaded: (error) {
         if (error != null) {
           print(error);
@@ -90,29 +89,6 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
         )
       },
       referenceLayers: _showLayers ? _lakeLayers : const {},
-      // operationalLayers: {
-      //   WmsLayer.fromUrl(
-      //       'https://wms.geonorge.no/skwms1/wms.dybdedata2?service=WMS&request=GetCapabilities',
-      //       layersName: [
-      //         'grunne',
-      //         'flytedokk',
-      //         'Dybdepunkt',
-      //         'Dybdelag',
-      //         'Dybdekontur'
-      //       ]),
-      // },
-      // onIdentifyLayers: (layers) {
-      //   for (var layer in layers) {
-      //     print('LayerName:' + layer.layerName);
-      //     for (var element in layer.elements) {
-      //       print('geometry:' +
-      //           (element.geometry?.toJson().toString() ?? 'null'));
-      //       element.attributes.forEach((key, value) {
-      //         print(key + ':' + (value?.toString() ?? 'null'));
-      //       });
-      //     }
-      //   }
-      // },
       onLayerLoaded: (layer, error) {
         if (error != null) {
           print('Failed to load $layer:$error');
@@ -120,11 +96,6 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
           print('Loaded layer $layer');
         }
       },
-      onCameraMove: _trackCamera
-          ? () {
-              print('onCameraMove');
-            }
-          : null,
     );
 
     return Stack(
@@ -174,6 +145,7 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
 
   void onMapCreated(ArcgisMapController mapController) {
     _mapController = mapController;
+    mapController.locationDisplay.autoPanMode = AutoPanMode.navigation;
     _compasController = CompassController.fromMapController(mapController);
     setState(() {});
   }

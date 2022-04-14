@@ -385,26 +385,6 @@ public class Convert {
         if (interactionOptions != null) {
             interpretInteractionOptions(interactionOptions, mapView);
         }
-        final Object myLocationEnabled = data.get("myLocationEnabled");
-        if (myLocationEnabled != null) {
-            final Boolean enabled = toBoolean(myLocationEnabled);
-            mapView.getLocationDisplay().setShowLocation(enabled);
-            if (enabled) {
-                mapView.getLocationDisplay().startAsync();
-            } else {
-                mapView.getLocationDisplay().stop();
-            }
-        }
-
-        final Object autoPanMode = data.get("autoPanMode");
-        if (autoPanMode != null) {
-            mapView.getLocationDisplay().setAutoPanMode(Convert.toAutoPanMode(autoPanMode));
-        }
-
-        final Object wanderExtentFactor = data.get("wanderExtentFactor");
-        if (wanderExtentFactor != null) {
-            mapView.getLocationDisplay().setWanderExtentFactor(toFloat(wanderExtentFactor));
-        }
     }
 
 

@@ -73,23 +73,18 @@ class ArcgisMapView extends StatefulWidget {
     this.polygons = const <Polygon>{},
     this.polylines = const <Polyline>{},
     this.myLocationEnabled = false,
-    this.autoPanMode = AutoPanMode.off,
-    this.wanderExtentFactor = 0.5,
-    this.onAutoPanModeChanged,
     this.insetsContentInsetFromSafeArea = true,
     this.isAttributionTextVisible = true,
     this.contentInsets = EdgeInsets.zero,
     this.onTap,
     this.onLongPress,
-    this.onCameraMove,
     this.onIdentifyLayer = const {},
     this.onIdentifyLayers,
+    this.onUserLocationTap,
   })  : assert(onIdentifyLayer.isNotEmpty ? onIdentifyLayers == null : true,
             'You can use only onIdentifyLayer or onIdentifyLayers'),
         assert(onIdentifyLayers != null ? onIdentifyLayer.isEmpty : true,
             'You can use only onIdentifyLayer or onIdentifyLayers'),
-        assert(wanderExtentFactor >= 0.0 && wanderExtentFactor <= 1.0,
-            'wanderExtendFactor can be between >= 0.0  && <= 1.0'),
         super(key: key);
 
   /// Callback method for when the map is ready to be used.
@@ -167,22 +162,6 @@ class ArcgisMapView extends StatefulWidget {
   /// when the map tries to turn on the My Location layer.
   final bool myLocationEnabled;
 
-  /// Defines how to automatically pan the map when new location updates are received.
-  /// Default is [AutoPanMode.off]
-  final AutoPanMode autoPanMode;
-
-  ///  The factor of map extent within which the location symbol may move
-  ///  before causing auto-panning to re-center the map on the current location.
-  ///  Applies only to [AutoPanMode.recenter] mode.
-  ///  Permitted values are between 1 (indicating the symbol may move within
-  ///  the current extent of the MapView without causing re-centering),
-  ///  and 0 (indicating that any location movement will re-center the map).
-  ///  Lower values within this range will cause the map to re-center more often,
-  ///  leading to higher CPU and battery consumption.
-  ///  The default value is 0.5, indicating the location may wander up
-  ///  to half of the extent before re-centering occurs.
-  final double wanderExtentFactor;
-
   /// Indicates whether the content inset is relative to the safe area.
   /// When [true], the content inset is interpreted as a value relative to the safe area.
   /// When [false], the content inset is interpreted as a value from the edge of bounds.
@@ -200,19 +179,11 @@ class ArcgisMapView extends StatefulWidget {
   /// Defaults to [true].
   final bool isAttributionTextVisible;
 
-  final ArgumentCallback<AutoPanMode>? onAutoPanModeChanged;
-
   /// Called every time a [ArcgisMapView] is tapped.
   final ArgumentCallback<AGSPoint>? onTap;
 
   final ArgumentCallback<AGSPoint>? onLongPress;
 
-  /// Called repeatedly as the camera continues to move after an
-  /// onCameraMoveStarted call.
-  ///
-  /// This may be called as often as once every frame and should
-  /// not perform expensive operations.
-  final CameraPositionCallback? onCameraMove;
 
   /// Options to configure user interactions with the view.
   final InteractionOptions interactionOptions;
@@ -231,6 +202,8 @@ class ArcgisMapView extends StatefulWidget {
   final Map<LayerId, IdentifyLayerCallback> onIdentifyLayer;
 
   final IdentifyLayersCallback? onIdentifyLayers;
+
+  final VoidCallback? onUserLocationTap;
 
   @override
   _ArcgisMapViewState createState() => _ArcgisMapViewState();
@@ -345,12 +318,6 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     }
   }
 
-  void onAutoPanModeChanged(AutoPanMode autoPanMode) {
-    final callback = widget.onAutoPanModeChanged;
-    if (callback == null) return;
-    callback(autoPanMode);
-  }
-
   void onMarkerTap(MarkerId markerId) {
     final Marker? marker = _markers[markerId];
     if (marker == null) {
@@ -395,13 +362,6 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     final onLongPress = widget.onLongPress;
     if (onLongPress != null) {
       onLongPress(position);
-    }
-  }
-
-  void onCameraMove() {
-    final onCameraMove = widget.onCameraMove;
-    if (onCameraMove != null) {
-      onCameraMove();
     }
   }
 
@@ -508,10 +468,8 @@ class _ArcgisMapOptions {
   _ArcgisMapOptions.fromWidget(ArcgisMapView map)
       : interactionOptions = map.interactionOptions,
         myLocationEnabled = map.myLocationEnabled,
-        trackCameraPosition = map.onCameraMove != null,
         trackIdentifyLayers = map.onIdentifyLayers != null,
-        autoPanMode = map.autoPanMode,
-        wanderExtentFactor = map.wanderExtentFactor,
+        trackUserLocationTap = map.onUserLocationTap != null,
         insetsContentInsetFromSafeArea = map.insetsContentInsetFromSafeArea,
         isAttributionTextVisible = map.isAttributionTextVisible,
         contentInsets = map.contentInsets,
@@ -519,10 +477,8 @@ class _ArcgisMapOptions {
 
   final InteractionOptions interactionOptions;
   final bool myLocationEnabled;
-  final bool trackCameraPosition;
   final bool trackIdentifyLayers;
-  final AutoPanMode autoPanMode;
-  final double wanderExtentFactor;
+  final bool trackUserLocationTap;
   final bool insetsContentInsetFromSafeArea;
   final bool isAttributionTextVisible;
   final EdgeInsets contentInsets;
@@ -532,10 +488,8 @@ class _ArcgisMapOptions {
     return <String, dynamic>{
       'interactionOptions': interactionOptions.toJson(),
       'myLocationEnabled': myLocationEnabled,
-      'trackCameraPosition': trackCameraPosition,
       'trackIdentifyLayers': trackIdentifyLayers,
-      'autoPanMode': autoPanMode.index,
-      'wanderExtentFactor': wanderExtentFactor,
+      'trackUserLocationTap': myLocationEnabled,
       'haveScalebar': scalebarConfiguration != null,
       'insetsContentInsetFromSafeArea': insetsContentInsetFromSafeArea,
       'isAttributionTextVisible': isAttributionTextVisible,

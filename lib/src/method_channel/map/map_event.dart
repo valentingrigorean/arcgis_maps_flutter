@@ -100,20 +100,8 @@ class MapLongPressEvent extends _PositionedMapEvent<void> {
   ) : super(mapId, position, null);
 }
 
-/// An event fired while the Camera of a [mapId] moves.
-class CameraMoveEvent extends MapEvent<void> {
-  /// Build a CameraMove Event triggered from the map represented by `mapId`.
-  ///
-  const CameraMoveEvent(int mapId) : super(mapId, null);
-}
-
 class ViewpointChangedEvent extends MapEvent<void> {
   const ViewpointChangedEvent(int mapId) : super(mapId, null);
-}
-
-class LocationChangedEvent extends MapEvent<Location> {
-  const LocationChangedEvent(int mapId, Location location)
-      : super(mapId, location);
 }
 
 class LayersChangedEvent extends MapEvent<LayerType> {
@@ -134,10 +122,6 @@ class TimeExtentChangedEvent extends MapEvent<TimeExtent?> {
       : super(mapId, value);
 }
 
-class AutoPanModeChangedEvent extends MapEvent<AutoPanMode> {
-  const AutoPanModeChangedEvent(int mapId, AutoPanMode value)
-      : super(mapId, value);
-}
 
 /// A `MapEvent` associated to a `position`.
 class _PositionedMapEvent<T> extends MapEvent<T> {
