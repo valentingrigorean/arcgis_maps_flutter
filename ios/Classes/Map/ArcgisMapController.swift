@@ -17,6 +17,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     private let polygonsController: PolygonsController
     private let polylinesController: PolylinesController
 
+    private let locationDisplayController: LocationDisplayController
 
     private let symbolVisibilityFilterController: SymbolVisibilityFilterController
 
@@ -36,7 +37,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private var layerHandle: AGSCancelable?
 
-    private var trackCameraPosition = false
 
     private var trackIdentityLayers = false
 
@@ -73,32 +73,33 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         mapView.graphicsOverlays.add(graphicsOverlay)
 
-        graphicsTouchDelegates = [markersController, polygonsController, polylinesController]
 
         layersController = LayersController(methodChannel: channel)
 
         scaleBarController = ScaleBarController(mapView: mapView)
 
         layersChangedController = LayersChangedController(geoView: mapView, channel: channel, layersController: layersController)
+        let locationDisplayChannel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)_location_display", binaryMessenger: registrar.messenger())
+        locationDisplayController = LocationDisplayController(methodChannel: locationDisplayChannel, mapView: mapView)
+        graphicsTouchDelegates = [markersController, polygonsController, polylinesController, locationDisplayController]
 
         super.init()
 
         initSymbolsControllers()
 
         mapView.touchDelegate = self
-        mapView.locationDisplay.autoPanModeChangedHandler = onAutoPanModeChanged
         mapView.viewpointChangedHandler = viewpointChangedHandler
         channel.setMethodCallHandler(handle)
+        locationDisplayController.locationTapHandler = sendUserLocationTap
         initWithArgs(args: args)
     }
 
     deinit {
+        locationDisplayController.locationTapHandler = nil
         timeExtentObservation?.invalidate()
         timeExtentObservation = nil
         clearSymbolsControllers()
         symbolVisibilityFilterController.clear()
-        mapView.locationDisplay.locationChangedHandler = nil
-        mapView.locationDisplay.autoPanModeChangedHandler = nil
         mapView.viewpointChangedHandler = nil
     }
 
@@ -166,16 +167,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         case "map#setLayersChangedListener":
             if let val = call.arguments as? Bool {
                 layersChangedController.trackLayersChange = val
-            }
-            result(nil)
-            break
-        case "map#setLocationChangedListener":
-            if let _ = call.arguments as? Bool {
-                mapView.locationDisplay.locationChangedHandler = { [weak self] location in
-                    self?.onLocationChangeListener(location: location)
-                }
-            } else {
-                mapView.locationDisplay.locationChangedHandler = nil
             }
             result(nil)
             break
@@ -263,21 +254,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         case "map#setViewpointRotation":
             if let angleDegrees = call.arguments as? Double {
                 mapView.setViewpointRotation(angleDegrees)
-            }
-            result(nil)
-            break
-        case "map#isLocationDisplayStarted":
-            result(mapView.locationDisplay.started)
-            break
-        case "map#setLocationDisplay":
-            if let started = call.arguments as? Bool {
-                if mapView.locationDisplay.started != started {
-                    if started {
-                        mapView.locationDisplay.start()
-                    } else {
-                        mapView.locationDisplay.stop()
-                    }
-                }
             }
             result(nil)
             break
@@ -422,22 +398,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         channel.invokeMethod("map#timeExtentChanged", arguments: timeExtent?.toJSONFlutter())
     }
 
-    private func onLocationChangeListener(location: AGSLocation) {
-        channel.invokeMethod("map#locationChangeListener", arguments: location.toJSONFlutter())
-    }
-
-    private func onAutoPanModeChanged(autoPanMode: AGSLocationDisplayAutoPanMode) {
-        channel.invokeMethod("map#autoPanModeChanged", arguments: autoPanMode.rawValue)
-    }
-
     private func viewpointChangedHandler() {
-
         if trackViewpointChangedListenerEvent {
             channel.invokeMethod("map#viewpointChanged", arguments: nil)
-        }
-
-        if trackCameraPosition {
-            channel.invokeMethod("camera#onMove", arguments: nil)
         }
     }
 
@@ -477,18 +440,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             self.trackIdentityLayers = trackIdentityLayers
         }
 
-        if let trackCameraPosition = mapOptions["trackCameraPosition"] as? Bool {
-            self.trackCameraPosition = trackCameraPosition
-        }
-
-        if let autoPanMode = mapOptions["autoPanMode"] as? Int {
-            mapView.locationDisplay.autoPanMode = AGSLocationDisplayAutoPanMode(rawValue: autoPanMode) ?? .off
-        }
-
-        if let wanderExtentFactor = mapOptions["wanderExtentFactor"] as? Double {
-            mapView.locationDisplay.wanderExtentFactor = Float(wanderExtentFactor)
-        }
-
         if let insetsContentInsetFromSafeArea = mapOptions["insetsContentInsetFromSafeArea"] as? Bool {
             mapView.insetsContentInsetFromSafeArea = insetsContentInsetFromSafeArea
         }
@@ -513,6 +464,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             scaleBarController.interpretConfiguration(args: scalebarConfiguration)
         }
 
+        if let trackUserLocationTap = mapOptions["trackUserLocationTap"] as? Bool {
+            locationDisplayController.trackUserLocationTap = trackUserLocationTap
+        }
     }
 
     private func updateInteractionOptions(interactionOptions: Dictionary<String, Any>) {
@@ -677,6 +631,10 @@ extension ArcgisMapController: AGSGeoViewTouchDelegate {
     private func sendOnMapLongPress(screenPoint: CGPoint) {
         let json = mapView.screen(toLocation: screenPoint).toJSONFlutter()
         channel.invokeMethod("map#onLongPress", arguments: ["screenPoint": screenPoint.toJSON(), "position": json])
+    }
+
+    private func sendUserLocationTap() {
+        channel.invokeMethod("map#onUserLocationTap", arguments: nil)
     }
 }
 

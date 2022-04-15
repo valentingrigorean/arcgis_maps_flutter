@@ -47,7 +47,7 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.platform.PlatformView;
 
-final class ArcgisMapController implements DefaultLifecycleObserver, PlatformView, MethodChannel.MethodCallHandler, ViewpointChangedListener, LocationDisplay.AutoPanModeChangedListener, TimeExtentChangedListener, LocationDisplay.LocationChangedListener {
+final class ArcgisMapController implements DefaultLifecycleObserver, PlatformView, MethodChannel.MethodCallHandler, ViewpointChangedListener, TimeExtentChangedListener, LocationDisplayController.LocationDisplayControllerDelegate {
 
     private static final String TAG = "ArcgisMapController";
 
@@ -73,6 +73,8 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     private final SymbolVisibilityFilterController symbolVisibilityFilterController;
 
     private final LayersChangedController layersChangedController;
+
+    private final LocationDisplayController locationDisplayController;
 
     @Nullable
     private MapView mapView;
@@ -135,6 +137,10 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         polylinesController = new PolylinesController(methodChannel, graphicsOverlay);
         symbolControllers.add(polylinesController);
 
+        final MethodChannel locationDisplayChannel = new MethodChannel(binaryMessenger, "plugins.flutter.io/arcgis_maps_" + id + "_location_display");
+        locationDisplayController = new LocationDisplayController(locationDisplayChannel, mapView);
+        locationDisplayController.setLocationDisplayControllerDelegate(this);
+
         initSymbolsControllers();
 
 
@@ -142,11 +148,11 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         mapViewOnTouchListener.addGraphicDelegate(markersController);
         mapViewOnTouchListener.addGraphicDelegate(polygonsController);
         mapViewOnTouchListener.addGraphicDelegate(polylinesController);
+        mapViewOnTouchListener.addGraphicDelegate(locationDisplayController);
 
         mapView.getGraphicsOverlays().add(graphicsOverlay);
         mapView.setOnTouchListener(mapViewOnTouchListener);
         mapView.addViewpointChangedListener(this);
-        mapView.getLocationDisplay().addAutoPanModeChangedListener(this);
 
 
         lifecycleProvider.getLifecycle().addObserver(this);
@@ -193,10 +199,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         }
     }
 
-    @Override
-    public void onAutoPanModeChanged(LocationDisplay.AutoPanModeChangedEvent autoPanModeChangedEvent) {
-        methodChannel.invokeMethod("map#autoPanModeChanged", autoPanModeChangedEvent.getAutoPanMode().ordinal());
-    }
 
     @Override
     public void timeExtentChanged(TimeExtentChangedEvent timeExtentChangedEvent) {
@@ -204,8 +206,8 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     }
 
     @Override
-    public void onLocationChanged(LocationDisplay.LocationChangedEvent locationChangedEvent) {
-        methodChannel.invokeMethod("map#locationChangeListener", Convert.locationToJson(locationChangedEvent.getLocation()));
+    public void onUserLocationTap() {
+        methodChannel.invokeMethod("map#onUserLocationTap", null);
     }
 
     @Override
@@ -213,24 +215,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         switch (call.method) {
             case "map#waitForMap": {
                 result.success(null);
-            }
-            break;
-            case "map#getLocation": {
-                final LocationDataSource.Location location = mapView.getLocationDisplay().getLocation();
-                if (location != null) {
-                    result.success(Convert.locationToJson(location));
-                } else {
-                    result.success(null);
-                }
-            }
-            break;
-            case "map#getMapLocation": {
-                final Point mapLocation = mapView.getLocationDisplay().getMapLocation();
-                if (mapLocation != null) {
-                    result.success(Convert.geometryToJson(mapLocation));
-                } else {
-                    result.success(null);
-                }
             }
             break;
             case "map#update": {
@@ -262,15 +246,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 result.success(null);
             }
             break;
-            case "map#setLocationChangedListener": {
-                final boolean val = call.arguments();
-                if (val) {
-                    mapView.getLocationDisplay().addLocationChangedListener(this);
-                } else {
-                    mapView.getLocationDisplay().removeLocationChangedListener(this);
-                }
-            }
-            break;
             case "map#setLayersChangedListener": {
                 layersChangedController.setTrackLayersChange(call.arguments());
                 result.success(null);
@@ -295,22 +270,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             break;
             case "map#setTimeExtent": {
                 mapView.setTimeExtent(Convert.toTimeExtent(call.arguments));
-                result.success(null);
-            }
-            break;
-            case "map#isLocationDisplayStarted": {
-                result.success(mapView.getLocationDisplay().isStarted());
-            }
-            break;
-            case "map#setLocationDisplay": {
-                final Boolean started = Convert.toBoolean(call.arguments);
-                if (started != mapView.getLocationDisplay().isStarted()) {
-                    if (started) {
-                        mapView.getLocationDisplay().startAsync();
-                    } else {
-                        mapView.getLocationDisplay().stop();
-                    }
-                }
                 result.success(null);
             }
             break;
@@ -514,11 +473,11 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             return;
         }
         trackTimeExtentEvents = false;
+        locationDisplayController.setLocationDisplayControllerDelegate(null);
         mapView.removeTimeExtentChangedListener(this);
         mapViewOnTouchListener.clearAllDelegates();
         mapViewOnTouchListener = null;
         trackViewpointChangedListenerEvents = false;
-        mapView.getLocationDisplay().removeLocationChangedListener(this);
         mapView.removeViewpointChangedListener(this);
         mapView.dispose();
         mapView = null;
@@ -611,6 +570,11 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         final Object trackCameraPosition = data.get("trackCameraPosition");
         if (trackCameraPosition != null) {
             this.trackCameraPositionEvents = Convert.toBoolean(trackCameraPosition);
+        }
+
+        final Object trackUserLocationTap = data.get("trackUserLocationTap");
+        if (trackUserLocationTap != null) {
+            locationDisplayController.setTrackUserLocationTap(Convert.toBoolean(trackUserLocationTap));
         }
 
         final Object trackIdentifyLayers = data.get("trackIdentifyLayers");
