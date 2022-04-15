@@ -147,6 +147,7 @@ public class LocationDisplayController implements MapTouchGraphicDelegate, Locat
                 } else {
                     result.success(null);
                 }
+                break;
             case "getHeading":
                 result.success(locationDisplay.getHeading());
                 break;
