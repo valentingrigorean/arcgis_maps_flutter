@@ -193,10 +193,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         if (trackViewpointChangedListenerEvents) {
             methodChannel.invokeMethod("map#viewpointChanged", null);
         }
-
-        if (trackCameraPositionEvents) {
-            methodChannel.invokeMethod("camera#onMove", null);
-        }
     }
 
 
@@ -262,6 +258,10 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                     }
                 }
                 result.success(null);
+            }
+            break;
+            case "map#setViewpointChangedListenerEvents": {
+                trackViewpointChangedListenerEvents = call.arguments();
             }
             break;
             case "map#getTimeExtent": {
