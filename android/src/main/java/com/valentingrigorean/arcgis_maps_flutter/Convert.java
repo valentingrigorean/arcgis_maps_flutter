@@ -141,6 +141,16 @@ public class Convert {
         return json;
     }
 
+    public static  Object viewpointToJson(Viewpoint viewpoint) {
+        final String json = viewpoint.toJson();
+        try {
+            return objectMapper.readValue(json, Map.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static Geometry toGeometry(Object o) {
         final Map<?, ?> data = toMap(o);
         if (data == null) {

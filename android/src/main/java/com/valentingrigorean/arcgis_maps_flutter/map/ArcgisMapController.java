@@ -286,8 +286,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 break;
             case "map#getCurrentViewpoint": {
                 final Viewpoint currentViewPoint = mapView.getCurrentViewpoint(Convert.toViewpointType(call.arguments));
-                final String json = currentViewPoint.toJson();
-                result.success(json);
+                result.success(Convert.viewpointToJson(currentViewPoint));
             }
             break;
             case "map#setViewpoint": {
