@@ -124,15 +124,19 @@ public class LocationDisplayController implements MapTouchGraphicDelegate, Locat
                 break;
             case "setAutoPanMode":
                 locationDisplay.setAutoPanMode(Convert.toAutoPanMode(call.arguments));
+                result.success(null);
                 break;
             case "setInitialZoomScale":
                 locationDisplay.setInitialZoomScale(call.arguments());
+                result.success(null);
                 break;
             case "setNavigationPointHeightFactor":
                 locationDisplay.setNavigationPointHeightFactor(call.arguments());
+                result.success(null);
                 break;
             case "setWanderExtentFactor":
                 locationDisplay.setWanderExtentFactor(call.arguments());
+                result.success(null);
                 break;
             case "getLocation":
                 if (locationDisplay.getLocation() != null) {
@@ -153,18 +157,22 @@ public class LocationDisplayController implements MapTouchGraphicDelegate, Locat
                 break;
             case "setUseCourseSymbolOnMovement":
                 locationDisplay.setUseCourseSymbolOnMovement(call.arguments());
+                result.success(null);
                 break;
             case "setOpacity":
                 locationDisplay.setOpacity(call.arguments());
+                result.success(null);
                 break;
             case "setShowAccuracy":
                 locationDisplay.setShowAccuracy(call.arguments());
+                result.success(null);
                 break;
             case "setShowLocation":
                 locationDisplay.setShowLocation(call.arguments());
                 break;
             case "setShowPingAnimationSymbol":
                 locationDisplay.setShowPingAnimation(call.arguments());
+                result.success(null);
                 break;
             case "start":
                 startResult = result;
