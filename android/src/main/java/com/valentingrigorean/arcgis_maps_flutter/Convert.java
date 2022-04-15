@@ -865,7 +865,7 @@ public class Convert {
         }
     }
 
-    private static LocationDisplay.AutoPanMode toAutoPanMode(Object rawValue) {
+    public static LocationDisplay.AutoPanMode toAutoPanMode(Object rawValue) {
         final int intValue = toInt(rawValue);
         switch (intValue) {
             case 0:

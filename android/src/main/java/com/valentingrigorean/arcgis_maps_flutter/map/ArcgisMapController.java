@@ -47,7 +47,7 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.platform.PlatformView;
 
-final class ArcgisMapController implements DefaultLifecycleObserver, PlatformView, MethodChannel.MethodCallHandler, ViewpointChangedListener,  TimeExtentChangedListener{
+final class ArcgisMapController implements DefaultLifecycleObserver, PlatformView, MethodChannel.MethodCallHandler, ViewpointChangedListener, TimeExtentChangedListener, LocationDisplayController.LocationDisplayControllerDelegate {
 
     private static final String TAG = "ArcgisMapController";
 
@@ -73,6 +73,8 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     private final SymbolVisibilityFilterController symbolVisibilityFilterController;
 
     private final LayersChangedController layersChangedController;
+
+    private final LocationDisplayController locationDisplayController;
 
     @Nullable
     private MapView mapView;
@@ -135,6 +137,10 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         polylinesController = new PolylinesController(methodChannel, graphicsOverlay);
         symbolControllers.add(polylinesController);
 
+        final MethodChannel locationDisplayChannel = new MethodChannel(binaryMessenger, "plugins.flutter.io/arcgis_maps_" + id + "_location_display");
+        locationDisplayController = new LocationDisplayController(locationDisplayChannel, mapView);
+        locationDisplayController.setLocationDisplayControllerDelegate(this);
+
         initSymbolsControllers();
 
 
@@ -142,6 +148,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         mapViewOnTouchListener.addGraphicDelegate(markersController);
         mapViewOnTouchListener.addGraphicDelegate(polygonsController);
         mapViewOnTouchListener.addGraphicDelegate(polylinesController);
+        mapViewOnTouchListener.addGraphicDelegate(locationDisplayController);
 
         mapView.getGraphicsOverlays().add(graphicsOverlay);
         mapView.setOnTouchListener(mapViewOnTouchListener);
@@ -193,37 +200,21 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     }
 
 
-
     @Override
     public void timeExtentChanged(TimeExtentChangedEvent timeExtentChangedEvent) {
         methodChannel.invokeMethod("map#timeExtentChanged", Convert.timeExtentToJson(timeExtentChangedEvent.getTimeExtent()));
     }
 
-
+    @Override
+    public void onUserLocationTap() {
+        methodChannel.invokeMethod("map#onUserLocationTap", null);
+    }
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
         switch (call.method) {
             case "map#waitForMap": {
                 result.success(null);
-            }
-            break;
-            case "map#getLocation": {
-                final LocationDataSource.Location location = mapView.getLocationDisplay().getLocation();
-                if (location != null) {
-                    result.success(Convert.locationToJson(location));
-                } else {
-                    result.success(null);
-                }
-            }
-            break;
-            case "map#getMapLocation": {
-                final Point mapLocation = mapView.getLocationDisplay().getMapLocation();
-                if (mapLocation != null) {
-                    result.success(Convert.geometryToJson(mapLocation));
-                } else {
-                    result.success(null);
-                }
             }
             break;
             case "map#update": {
@@ -482,11 +473,11 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             return;
         }
         trackTimeExtentEvents = false;
+        locationDisplayController.setLocationDisplayControllerDelegate(null);
         mapView.removeTimeExtentChangedListener(this);
         mapViewOnTouchListener.clearAllDelegates();
         mapViewOnTouchListener = null;
         trackViewpointChangedListenerEvents = false;
-        mapView.getLocationDisplay().removeLocationChangedListener(this);
         mapView.removeViewpointChangedListener(this);
         mapView.dispose();
         mapView = null;
@@ -579,6 +570,11 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         final Object trackCameraPosition = data.get("trackCameraPosition");
         if (trackCameraPosition != null) {
             this.trackCameraPositionEvents = Convert.toBoolean(trackCameraPosition);
+        }
+
+        final Object trackUserLocationTap = data.get("trackUserLocationTap");
+        if (trackUserLocationTap != null) {
+            locationDisplayController.setTrackUserLocationTap(Convert.toBoolean(trackUserLocationTap));
         }
 
         final Object trackIdentifyLayers = data.get("trackIdentifyLayers");

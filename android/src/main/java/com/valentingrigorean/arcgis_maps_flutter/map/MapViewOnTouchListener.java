@@ -159,14 +159,11 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
     }
 
     private boolean canConsumeGraphics() {
-        boolean result = false;
-
         for (final MapTouchGraphicDelegate touchDelegate : mapTouchGraphicDelegates) {
             if (touchDelegate.canConsumeTaps()) {
-                result = true;
-                break;
+                return true;
             }
         }
-        return result;
+        return false;
     }
 }
