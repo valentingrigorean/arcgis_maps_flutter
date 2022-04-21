@@ -253,6 +253,9 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   Future<Viewpoint?> getCurrentViewpoint(int mapId, ViewpointType type) async {
     final result = await channel(mapId).invokeMapMethod<String, dynamic>(
         "map#getCurrentViewpoint", type.index);
+    if (result == null) {
+      return null;
+    }
     return Viewpoint.fromJson(result);
   }
 
