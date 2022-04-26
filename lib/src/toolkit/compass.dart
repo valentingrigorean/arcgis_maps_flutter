@@ -80,12 +80,19 @@ class Compass extends StatefulWidget {
 }
 
 class _CompassState extends State<Compass> with SingleTickerProviderStateMixin {
-  late final CompassController _compassController = widget.controller
-    ..addListener(_handleRotationChange);
+  late final CompassController _compassController;
 
-  late double _rotation = _degreesToRadians(_compassController.rotation);
+  late double _rotation;
 
-  late bool _visible = _compassController.rotation != 0;
+  late bool _visible;
+
+  @override
+  void initState() {
+    super.initState();
+    _compassController = widget.controller..addListener(_handleRotationChange);
+    _visible = _compassController.rotation != 0;
+    _rotation = _degreesToRadians(_compassController.rotation);
+  }
 
   @override
   void dispose() {
