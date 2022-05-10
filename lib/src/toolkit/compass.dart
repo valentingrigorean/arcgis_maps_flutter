@@ -14,6 +14,7 @@ class CompassController extends ChangeNotifier
   CompassController({
     double rotation = 0,
   })  : _rotation = rotation,
+        _initialRotation = rotation,
         _mapController = null;
 
   factory CompassController.fromMapController(
