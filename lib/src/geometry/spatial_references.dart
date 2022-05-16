@@ -33,7 +33,10 @@ class SpatialReference {
       case 3857:
         return _webMercator;
     }
-    return SpatialReference._(wkId: wkId);
+    return SpatialReference._(
+      wkId: wkId,
+      wkText: json['wktext'],
+    );
   }
 
   Object toJson() {
