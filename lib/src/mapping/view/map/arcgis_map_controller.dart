@@ -148,6 +148,15 @@ class ArcgisMapController {
     );
   }
 
+  Future<void> setInitialViewpoint(){
+    return ArcgisMapsFlutterPlatform.instance
+        .setInitialViewpoint(mapId);
+  }
+
+  Future<void> recenter(){
+    return ArcgisMapsFlutterPlatform.instance
+        .recenter(mapId);
+  }
   /// The current scale of the map. Will return 0 if it cannot be calculated. To change the scale see
   Future<double> getMapScale() =>
       ArcgisMapsFlutterPlatform.instance.getMapScale(mapId);

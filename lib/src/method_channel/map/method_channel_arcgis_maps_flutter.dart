@@ -429,6 +429,16 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
     return _events(mapId).whereType<TimeExtentChangedEvent>();
   }
 
+  @override
+  Future<void> setInitialViewpoint(int mapId) {
+    return channel(mapId).invokeMethod<void>("map#setInitialViewpoint");
+  }
+
+  @override
+  Future<void> recenter(int mapId) {
+    return channel(mapId).invokeMethod<void>("map#recenter");
+  }
+
   // Returns a filtered view of the events in the _controller, by mapId.
   Stream<MapEvent> _events(int mapId) =>
       _mapEventStreamController.stream.where((event) => event.mapId == mapId);

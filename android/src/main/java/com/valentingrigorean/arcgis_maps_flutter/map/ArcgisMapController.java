@@ -410,6 +410,39 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 result.success(null);
                 break;
             }
+            case "map#setInitialViewpoint": {
+                //added by Jarvanmo
+                if (mapView == null) {
+                    result.success(null);
+                    return;
+                }
+                ArcGISMap arcMap = mapView.getMap();
+                if (arcMap == null) {
+                    result.success(null);
+                    return;
+                }
+                Viewpoint initialViewPoint = arcMap.getInitialViewpoint();
+                if (initialViewPoint != null) {
+                    mapView.setViewpointAsync(initialViewPoint).addDoneListener(() -> result.success(null));
+                } else {
+                    mapView.setViewpointAsync(mapView.getCurrentViewpoint(Viewpoint.Type.BOUNDING_GEOMETRY)).addDoneListener(() -> result.success(null));
+                }
+            }
+            break;
+            case "map#recenter": {
+                //added by Jarvanmo
+                if (mapView == null) {
+                    result.success(null);
+                    return;
+                }
+                LocationDisplay locationDisplay = mapView.getLocationDisplay();
+                if (!locationDisplay.isStarted()) {
+                    locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
+                    locationDisplay.startAsync();
+                    result.success(null);
+                }
+            }
+            break;
             default:
                 result.notImplemented();
                 break;

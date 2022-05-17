@@ -51,6 +51,16 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('buildView() has not been implemented.');
   }
 
+  Future<void> setInitialViewpoint(int mapId) {
+    throw UnimplementedError(
+        'setInitialViewpoint() has not been implemented.');
+  }
+
+  Future<void> recenter(int mapId) {
+    throw UnimplementedError(
+        'recenter() has not been implemented.');
+  }
+
   Future<Location?> getLocation(int mapId) {
     throw UnimplementedError('getLocation() has not been implemented.');
   }
