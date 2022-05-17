@@ -116,8 +116,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         //added by Jarvanmo
         mapView.setBackgroundGrid(new BackgroundGrid(0xFFF5F5F5, 0xFFF5F5F5, 0F, 10F));
         mapView.getSelectionProperties().setColor(Color.BLACK);
-        mapContainer.addView(mapView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
 
         mapContainer.addView(mapView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
