@@ -90,8 +90,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
     private boolean trackViewpointChangedListenerEvents = false;
 
-    private boolean trackCameraPositionEvents = false;
-
     private boolean trackTimeExtentEvents = false;
 
     private boolean disposed = false;
@@ -213,6 +211,10 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
+        if (disposed) {
+            result.notImplemented();
+            return;
+        }
         switch (call.method) {
             case "map#waitForMap": {
                 result.success(null);
@@ -220,8 +222,9 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             break;
             case "map#update": {
                 Map<?, ?> data = call.argument("options");
-                if (data != null)
+                if (data != null) {
                     updateMapOptions(data);
+                }
                 result.success(null);
             }
             break;
@@ -607,11 +610,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         }
         final Map<?, ?> data = (Map<?, ?>) args;
         Convert.interpretMapViewOptions(data, mapView);
-
-        final Object trackCameraPosition = data.get("trackCameraPosition");
-        if (trackCameraPosition != null) {
-            this.trackCameraPositionEvents = Convert.toBoolean(trackCameraPosition);
-        }
 
         final Object trackUserLocationTap = data.get("trackUserLocationTap");
         if (trackUserLocationTap != null) {
