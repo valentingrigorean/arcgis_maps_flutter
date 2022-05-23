@@ -52,7 +52,7 @@ public class PolygonsController extends BaseSymbolController implements MapTouch
             return;
         }
 
-        executor.execute(() -> {
+        execute(() -> {
             for (Object polygon : polygonsToAdd) {
                 final Map<?, ?> data = (Map<?, ?>) polygon;
                 if (data == null) {
@@ -72,7 +72,7 @@ public class PolygonsController extends BaseSymbolController implements MapTouch
         if (polygonsToChange == null) {
             return;
         }
-        executor.execute(() -> {
+        execute(() -> {
             for (Object polygon : polygonsToChange) {
                 final Map<?, ?> data = (Map<?, ?>) polygon;
                 if (data == null) {
@@ -92,7 +92,7 @@ public class PolygonsController extends BaseSymbolController implements MapTouch
         if (polygonIdsToRemove == null) {
             return;
         }
-        executor.execute(() -> {
+        execute(() -> {
             for (Object rawPolygonId : polygonIdsToRemove) {
                 if (rawPolygonId == null) {
                     continue;

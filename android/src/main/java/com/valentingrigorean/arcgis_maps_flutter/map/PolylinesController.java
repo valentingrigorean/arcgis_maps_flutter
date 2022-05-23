@@ -52,7 +52,7 @@ public class PolylinesController extends BaseSymbolController implements MapTouc
             return;
         }
 
-        executor.execute(() -> {
+        execute(() -> {
             for (Object polyline : polylinesToAdd) {
                 final Map<?, ?> data = (Map<?, ?>) polyline;
                 if (data == null) {
@@ -73,7 +73,7 @@ public class PolylinesController extends BaseSymbolController implements MapTouc
             return;
         }
 
-        executor.execute(() -> {
+        execute(() -> {
             for (Object polyline : polylinesToChange) {
                 final Map<?, ?> data = (Map<?, ?>) polyline;
                 if (data == null) {
@@ -93,7 +93,7 @@ public class PolylinesController extends BaseSymbolController implements MapTouc
             return;
         }
 
-        executor.execute(() -> {
+        execute(() -> {
             for (Object rawPolylineId : polylineIdsToRemove) {
                 if (rawPolylineId == null) {
                     continue;

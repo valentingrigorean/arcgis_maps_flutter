@@ -64,7 +64,7 @@ public class MarkersController extends BaseSymbolController implements MapTouchG
         if (markersToAdd == null) {
             return;
         }
-        executor.execute(() -> {
+        execute(() -> {
             for (Object marker : markersToAdd) {
                 final Map<?, ?> data = (Map<?, ?>) marker;
                 if (data == null) {
@@ -84,7 +84,7 @@ public class MarkersController extends BaseSymbolController implements MapTouchG
         if (markersToChange == null) {
             return;
         }
-        executor.execute(() -> {
+        execute(() -> {
             for (Object marker : markersToChange) {
                 final Map<?, ?> data = (Map<?, ?>) marker;
                 if (data == null) {
@@ -104,7 +104,7 @@ public class MarkersController extends BaseSymbolController implements MapTouchG
         if (markerIdsToRemove == null) {
             return;
         }
-        executor.execute(() -> {
+        execute(() -> {
             for (Object rawMarkerId : markerIdsToRemove) {
                 if (rawMarkerId == null) {
                     continue;

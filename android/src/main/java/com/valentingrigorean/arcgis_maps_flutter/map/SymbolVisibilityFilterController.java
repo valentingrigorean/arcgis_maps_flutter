@@ -22,7 +22,7 @@ public class SymbolVisibilityFilterController extends BaseSymbolWorkerController
         mapView.removeMapScaleChangedListener(this);
         isRegister = false;
 
-        executor.execute(() -> {
+        execute(() -> {
             for (Map.Entry<GraphicControllerSink, SymbolVisibilityFilter> entry :
                     graphicControllers.entrySet()) {
                 entry.getKey().setVisible(initialValues.remove(entry.getKey()));
@@ -69,7 +69,7 @@ public class SymbolVisibilityFilterController extends BaseSymbolWorkerController
     }
 
     public void removeGraphicsController(GraphicControllerSink graphicController) {
-        executor.execute(() -> {
+        execute(() -> {
             if (!containsGraphicsController(graphicController)) {
                 return;
             }
@@ -81,7 +81,7 @@ public class SymbolVisibilityFilterController extends BaseSymbolWorkerController
 
     @Override
     public void mapScaleChanged(MapScaleChangedEvent mapScaleChangedEvent) {
-        executor.execute(() -> {
+        execute(() -> {
             final double currentZoom = mapScaleChangedEvent.getSource().getMapScale();
             for (Map.Entry<GraphicControllerSink, SymbolVisibilityFilter> entry :
                     graphicControllers.entrySet()) {
