@@ -361,6 +361,17 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 result(nil)
             })
             break
+        case "map#recenter":
+            let locationDisplay = mapView.locationDisplay
+            if (!locationDisplay.started){
+                locationDisplay.autoPanMode = AGSLocationDisplayAutoPanMode.recenter
+                locationDisplay.start { (error: Error?) in
+                    result(nil)
+                }
+            }else{
+                result(nil)
+            }
+            break
         default:
             result(FlutterMethodNotImplemented)
             break
