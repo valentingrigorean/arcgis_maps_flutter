@@ -448,6 +448,8 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                     locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
                     locationDisplay.startAsync();
                     result.success(null);
+                } else {
+                    result.success(null);
                 }
             }
             break;
