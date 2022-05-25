@@ -180,15 +180,46 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         }
 
         disposed = true;
-        symbolVisibilityFilterController.clear();
+
+        trackTimeExtentEvents = false;
+        trackViewpointChangedListenerEvents = false;
 
         methodChannel.setMethodCallHandler(null);
-        destroyMapViewIfNecessary();
 
         Lifecycle lifecycle = lifecycleProvider.getLifecycle();
         if (lifecycle != null) {
             lifecycle.removeObserver(this);
         }
+
+
+        if (mapView != null) {
+            mapView.removeTimeExtentChangedListener(this);
+            mapView.removeViewpointChangedListener(this);
+        }
+
+        if (scaleBarController != null) {
+            scaleBarController.dispose();
+            scaleBarController = null;
+        }
+
+
+        mapViewOnTouchListener.clearAllDelegates();
+        mapViewOnTouchListener = null;
+
+        BaseSymbolWorkerController.clear(() -> {
+            symbolVisibilityFilterController.setWorkerIsActive(false);
+            symbolVisibilityFilterController.clear();
+
+            clearSymbolsControllers();
+            clearMapAwareControllers();
+
+            locationDisplayController.setLocationDisplayControllerDelegate(null);
+            locationDisplayController.dispose();
+
+            if (mapContainer != null) {
+                mapContainer.post(() -> destroyMapViewIfNecessary());
+            }
+        });
     }
 
     @Override
@@ -211,10 +242,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
-        if (disposed) {
-            result.notImplemented();
-            return;
-        }
         switch (call.method) {
             case "map#waitForMap": {
                 result.success(null);
@@ -504,27 +531,14 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     }
 
     private void destroyMapViewIfNecessary() {
-
-        if (scaleBarController != null) {
-            scaleBarController.dispose();
-            scaleBarController = null;
+        if (mapContainer != null) {
+            mapContainer.removeAllViews();
+            mapContainer = null;
         }
-
-        clearSymbolsControllers();
-        clearMapAwareControllers();
-
-        if (mapView == null) {
-            return;
+        if (mapView != null) {
+            mapView.dispose();
+            mapView = null;
         }
-        trackTimeExtentEvents = false;
-        locationDisplayController.setLocationDisplayControllerDelegate(null);
-        mapView.removeTimeExtentChangedListener(this);
-        mapViewOnTouchListener.clearAllDelegates();
-        mapViewOnTouchListener = null;
-        trackViewpointChangedListenerEvents = false;
-        mapView.removeViewpointChangedListener(this);
-        mapView.dispose();
-        mapView = null;
     }
 
     private void handleTimeAwareLayerInfos(MethodChannel.Result result) {
@@ -564,6 +578,9 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     private void clearSymbolsControllers() {
         for (final SymbolsController controller :
                 symbolControllers) {
+            if (controller instanceof BaseSymbolWorkerController) {
+                ((BaseSymbolWorkerController) controller).setWorkerIsActive(false);
+            }
             controller.setSymbolVisibilityFilterController(null);
             controller.setSelectionPropertiesHandler(null);
         }
@@ -680,6 +697,4 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             polylinesController.addPolylines((List<Object>) polylinesToAdd);
         }
     }
-
-
 }

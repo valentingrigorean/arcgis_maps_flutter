@@ -47,13 +47,12 @@ public class LocationDisplayController implements MapTouchGraphicDelegate, Locat
         locationDisplay.addLocationChangedListener(this);
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        locationDisplay.removeLocationChangedListener(this);
+    public void dispose() {
+        locationDisplay.removeDataSourceStatusChangedListener(this);
         locationDisplay.removeAutoPanModeChangedListener(this);
+        locationDisplay.removeLocationChangedListener(this);
 
         channel.setMethodCallHandler(null);
-        super.finalize();
     }
 
     public void setTrackUserLocationTap(boolean trackUserLocationTap) {
@@ -70,7 +69,6 @@ public class LocationDisplayController implements MapTouchGraphicDelegate, Locat
     public void setLocationDisplayControllerDelegate(LocationDisplayControllerDelegate delegate) {
         this.delegate = delegate;
     }
-
 
     @Override
     public boolean canConsumeTaps() {
@@ -114,7 +112,6 @@ public class LocationDisplayController implements MapTouchGraphicDelegate, Locat
         locationGraphic.setGeometry(locationDisplay.getMapLocation());
         channel.invokeMethod("onLocationChanged", Convert.locationToJson(locationChangedEvent.getLocation()));
     }
-
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
