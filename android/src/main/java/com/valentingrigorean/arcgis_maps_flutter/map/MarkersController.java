@@ -64,59 +64,52 @@ public class MarkersController extends BaseSymbolController implements MapTouchG
         if (markersToAdd == null) {
             return;
         }
-        execute(() -> {
-            for (Object marker : markersToAdd) {
-                final Map<?, ?> data = (Map<?, ?>) marker;
-                if (data == null) {
-                    continue;
-                }
-                final String markerId = (String) data.get("markerId");
-                final MarkerController markerController = new MarkerController(context, markerId);
-                markerController.setSelectionPropertiesHandler(getSelectionPropertiesHandler());
-                markerIdToController.put(markerId, markerController);
-                Convert.interpretMarkerController(data, markerController, getSymbolVisibilityFilterController());
-                markerController.add(graphicsOverlay);
+        for (Object marker : markersToAdd) {
+            final Map<?, ?> data = (Map<?, ?>) marker;
+            if (data == null) {
+                continue;
             }
-        });
+            final String markerId = (String) data.get("markerId");
+            final MarkerController markerController = new MarkerController(context, markerId);
+            markerController.setSelectionPropertiesHandler(getSelectionPropertiesHandler());
+            markerIdToController.put(markerId, markerController);
+            Convert.interpretMarkerController(data, markerController, getSymbolVisibilityFilterController());
+            markerController.add(graphicsOverlay);
+        }
     }
 
     public void changeMarkers(List<Object> markersToChange) {
         if (markersToChange == null) {
             return;
         }
-        execute(() -> {
-            for (Object marker : markersToChange) {
-                final Map<?, ?> data = (Map<?, ?>) marker;
-                if (data == null) {
-                    continue;
-                }
-                final String markerId = (String) data.get("markerId");
-                final MarkerController markerController = markerIdToController.get(markerId);
-                if (markerController != null) {
-                    Convert.interpretMarkerController(data, markerController, getSymbolVisibilityFilterController());
-                }
+        for (Object marker : markersToChange) {
+            final Map<?, ?> data = (Map<?, ?>) marker;
+            if (data == null) {
+                continue;
             }
-        });
-
+            final String markerId = (String) data.get("markerId");
+            final MarkerController markerController = markerIdToController.get(markerId);
+            if (markerController != null) {
+                Convert.interpretMarkerController(data, markerController, getSymbolVisibilityFilterController());
+            }
+        }
     }
 
     public void removeMarkers(List<Object> markerIdsToRemove) {
         if (markerIdsToRemove == null) {
             return;
         }
-        execute(() -> {
-            for (Object rawMarkerId : markerIdsToRemove) {
-                if (rawMarkerId == null) {
-                    continue;
-                }
-                final String markerId = (String) rawMarkerId;
-                final MarkerController markerController = markerIdToController.remove(markerId);
-                if (markerController != null) {
-                    onSymbolRemoval(markerController);
-                    markerController.remove(graphicsOverlay);
-                }
+        for (Object rawMarkerId : markerIdsToRemove) {
+            if (rawMarkerId == null) {
+                continue;
             }
-        });
+            final String markerId = (String) rawMarkerId;
+            final MarkerController markerController = markerIdToController.remove(markerId);
+            if (markerController != null) {
+                onSymbolRemoval(markerController);
+                markerController.remove(graphicsOverlay);
+            }
+        }
     }
 
     public void clearSelectedMarker() {

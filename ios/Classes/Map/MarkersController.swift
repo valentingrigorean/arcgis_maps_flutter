@@ -7,7 +7,6 @@ import ArcGIS
 
 class MarkersController: NSObject, SymbolsController {
 
-    private let workerQueue: DispatchQueue
     private var markerIdToController = Dictionary<String, MarkerController>()
     private let graphicsOverlays: AGSGraphicsOverlay
 
@@ -20,50 +19,41 @@ class MarkersController: NSObject, SymbolsController {
     var symbolVisibilityFilterController: SymbolVisibilityFilterController?
 
     init(methodChannel: FlutterMethodChannel,
-         graphicsOverlays: AGSGraphicsOverlay,
-         workerQueue: DispatchQueue
+         graphicsOverlays: AGSGraphicsOverlay
     ) {
         self.methodChannel = methodChannel
         self.graphicsOverlays = graphicsOverlays
-        self.workerQueue = workerQueue
     }
 
-
     func addMarkers(markersToAdd: [Dictionary<String, Any>]) {
-        workerQueue.async { [self] in
-            for marker in markersToAdd {
-                let markerId = marker["markerId"] as! String
-                let controller = MarkerController(markerId: markerId)
-                controller.selectionPropertiesHandler = selectionPropertiesHandler
-                markerIdToController[markerId] = controller
-                updateMarker(data: marker, controller: controller)
-                controller.add(graphicsOverlay: graphicsOverlays)
-            }
+        for marker in markersToAdd {
+            let markerId = marker["markerId"] as! String
+            let controller = MarkerController(markerId: markerId)
+            controller.selectionPropertiesHandler = selectionPropertiesHandler
+            markerIdToController[markerId] = controller
+            updateMarker(data: marker, controller: controller)
+            controller.add(graphicsOverlay: graphicsOverlays)
         }
     }
 
     func changeMarkers(markersToChange: [Dictionary<String, Any>]) {
-        workerQueue.async { [self] in
-            for marker in markersToChange {
-                let markerId = marker["markerId"] as! String
-                guard let controller = markerIdToController[markerId] else {
-                    continue
-                }
-                updateMarker(data: marker, controller: controller)
+        for marker in markersToChange {
+            let markerId = marker["markerId"] as! String
+            guard let controller = markerIdToController[markerId] else {
+                continue
             }
+            updateMarker(data: marker, controller: controller)
         }
     }
 
     func removeMarkers(markerIdsToRemove: [String]) {
-        workerQueue.async { [self] in
-            for markerId in markerIdsToRemove {
-                guard let controller = markerIdToController[markerId] else {
-                    continue
-                }
-                symbolVisibilityFilterController?.removeGraphicsController(graphicController: controller)
-                controller.remove(graphicsOverlay: graphicsOverlays)
-                markerIdToController.removeValue(forKey: markerId)
+        for markerId in markerIdsToRemove {
+            guard let controller = markerIdToController[markerId] else {
+                continue
             }
+            symbolVisibilityFilterController?.removeGraphicsController(graphicController: controller)
+            controller.remove(graphicsOverlay: graphicsOverlays)
+            markerIdToController.removeValue(forKey: markerId)
         }
     }
 

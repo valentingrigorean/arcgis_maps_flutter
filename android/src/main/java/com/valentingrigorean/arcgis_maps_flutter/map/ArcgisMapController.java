@@ -201,20 +201,17 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         mapViewOnTouchListener.clearAllDelegates();
         mapViewOnTouchListener = null;
 
-        BaseSymbolWorkerController.clear(() -> {
-            symbolVisibilityFilterController.setWorkerIsActive(false);
-            symbolVisibilityFilterController.clear();
+        symbolVisibilityFilterController.clear();
 
-            clearSymbolsControllers();
-            clearMapAwareControllers();
+        clearSymbolsControllers();
+        clearMapAwareControllers();
 
-            locationDisplayController.setLocationDisplayControllerDelegate(null);
-            locationDisplayController.dispose();
+        locationDisplayController.setLocationDisplayControllerDelegate(null);
+        locationDisplayController.dispose();
 
-            if (mapContainer != null) {
-                mapContainer.post(() -> destroyMapViewIfNecessary());
-            }
-        });
+        if (mapContainer != null) {
+            destroyMapViewIfNecessary();
+        }
     }
 
     @Override
@@ -540,9 +537,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     private void clearSymbolsControllers() {
         for (final SymbolsController controller :
                 symbolControllers) {
-            if (controller instanceof BaseSymbolWorkerController) {
-                ((BaseSymbolWorkerController) controller).setWorkerIsActive(false);
-            }
             controller.setSymbolVisibilityFilterController(null);
             controller.setSelectionPropertiesHandler(null);
         }

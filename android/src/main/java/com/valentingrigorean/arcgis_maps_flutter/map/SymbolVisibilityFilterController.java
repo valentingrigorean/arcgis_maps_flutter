@@ -7,7 +7,7 @@ import com.esri.arcgisruntime.mapping.view.MapView;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SymbolVisibilityFilterController extends BaseSymbolWorkerController implements MapScaleChangedListener {
+public class SymbolVisibilityFilterController implements MapScaleChangedListener {
     private final Map<GraphicControllerSink, SymbolVisibilityFilter> graphicControllers = new HashMap<>();
     private final Map<GraphicControllerSink, Boolean> initialValues = new HashMap<>();
     private final MapView mapView;
@@ -22,13 +22,11 @@ public class SymbolVisibilityFilterController extends BaseSymbolWorkerController
         mapView.removeMapScaleChangedListener(this);
         isRegister = false;
 
-        execute(() -> {
-            for (Map.Entry<GraphicControllerSink, SymbolVisibilityFilter> entry :
-                    graphicControllers.entrySet()) {
-                entry.getKey().setVisible(initialValues.remove(entry.getKey()));
-            }
-            graphicControllers.clear();
-        });
+        for (Map.Entry<GraphicControllerSink, SymbolVisibilityFilter> entry :
+                graphicControllers.entrySet()) {
+            entry.getKey().setVisible(initialValues.remove(entry.getKey()));
+        }
+        graphicControllers.clear();
     }
 
 
@@ -69,25 +67,21 @@ public class SymbolVisibilityFilterController extends BaseSymbolWorkerController
     }
 
     public void removeGraphicsController(GraphicControllerSink graphicController) {
-        execute(() -> {
-            if (!containsGraphicsController(graphicController)) {
-                return;
-            }
-            graphicController.setVisible(initialValues.remove(graphicController));
-            graphicControllers.remove(graphicController);
-            handleRegistrationToScaleChanged();
-        });
+        if (!containsGraphicsController(graphicController)) {
+            return;
+        }
+        graphicController.setVisible(initialValues.remove(graphicController));
+        graphicControllers.remove(graphicController);
+        handleRegistrationToScaleChanged();
     }
 
     @Override
     public void mapScaleChanged(MapScaleChangedEvent mapScaleChangedEvent) {
-        execute(() -> {
-            final double currentZoom = mapScaleChangedEvent.getSource().getMapScale();
-            for (Map.Entry<GraphicControllerSink, SymbolVisibilityFilter> entry :
-                    graphicControllers.entrySet()) {
-                handleGraphicsFilterZoom(entry.getKey(), entry.getValue(), currentZoom);
-            }
-        });
+        final double currentZoom = mapScaleChangedEvent.getSource().getMapScale();
+        for (Map.Entry<GraphicControllerSink, SymbolVisibilityFilter> entry :
+                graphicControllers.entrySet()) {
+            handleGraphicsFilterZoom(entry.getKey(), entry.getValue(), currentZoom);
+        }
     }
 
 

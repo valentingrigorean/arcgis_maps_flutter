@@ -52,58 +52,52 @@ public class PolygonsController extends BaseSymbolController implements MapTouch
             return;
         }
 
-        execute(() -> {
-            for (Object polygon : polygonsToAdd) {
-                final Map<?, ?> data = (Map<?, ?>) polygon;
-                if (data == null) {
-                    continue;
-                }
-                final String polygonId = (String) data.get("polygonId");
-                final PolygonController controller = new PolygonController(polygonId);
-                controller.setSelectionPropertiesHandler(getSelectionPropertiesHandler());
-                polygonIdToController.put(polygonId, controller);
-                Convert.interpretPolygonController(data, controller,getSymbolVisibilityFilterController());
-                controller.add(graphicsOverlay);
+        for (Object polygon : polygonsToAdd) {
+            final Map<?, ?> data = (Map<?, ?>) polygon;
+            if (data == null) {
+                continue;
             }
-        });
+            final String polygonId = (String) data.get("polygonId");
+            final PolygonController controller = new PolygonController(polygonId);
+            controller.setSelectionPropertiesHandler(getSelectionPropertiesHandler());
+            polygonIdToController.put(polygonId, controller);
+            Convert.interpretPolygonController(data, controller,getSymbolVisibilityFilterController());
+            controller.add(graphicsOverlay);
+        }
     }
 
     public void changePolygons(List<Object> polygonsToChange) {
         if (polygonsToChange == null) {
             return;
         }
-        execute(() -> {
-            for (Object polygon : polygonsToChange) {
-                final Map<?, ?> data = (Map<?, ?>) polygon;
-                if (data == null) {
-                    continue;
-                }
-                final String polygonId = (String) data.get("polygonId");
-                final PolygonController controller = polygonIdToController.get(polygonId);
-                if (controller == null) {
-                    continue;
-                }
-                Convert.interpretPolygonController(data, controller,getSymbolVisibilityFilterController());
+        for (Object polygon : polygonsToChange) {
+            final Map<?, ?> data = (Map<?, ?>) polygon;
+            if (data == null) {
+                continue;
             }
-        });
+            final String polygonId = (String) data.get("polygonId");
+            final PolygonController controller = polygonIdToController.get(polygonId);
+            if (controller == null) {
+                continue;
+            }
+            Convert.interpretPolygonController(data, controller,getSymbolVisibilityFilterController());
+        }
     }
 
     public void removePolygons(List<Object> polygonIdsToRemove) {
         if (polygonIdsToRemove == null) {
             return;
         }
-        execute(() -> {
-            for (Object rawPolygonId : polygonIdsToRemove) {
-                if (rawPolygonId == null) {
-                    continue;
-                }
-                final String polygonId = (String) rawPolygonId;
-                final PolygonController controller = polygonIdToController.remove(polygonId);
-                if (controller != null) {
-                    onSymbolRemoval(controller);
-                    controller.remove(graphicsOverlay);
-                }
+        for (Object rawPolygonId : polygonIdsToRemove) {
+            if (rawPolygonId == null) {
+                continue;
             }
-        });
+            final String polygonId = (String) rawPolygonId;
+            final PolygonController controller = polygonIdToController.remove(polygonId);
+            if (controller != null) {
+                onSymbolRemoval(controller);
+                controller.remove(graphicsOverlay);
+            }
+        }
     }
 }

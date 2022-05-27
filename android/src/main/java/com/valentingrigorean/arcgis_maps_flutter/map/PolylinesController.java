@@ -52,20 +52,18 @@ public class PolylinesController extends BaseSymbolController implements MapTouc
             return;
         }
 
-        execute(() -> {
-            for (Object polyline : polylinesToAdd) {
-                final Map<?, ?> data = (Map<?, ?>) polyline;
-                if (data == null) {
-                    continue;
-                }
-                final String polylineId = (String) data.get("polylineId");
-                final PolylineController controller = new PolylineController(polylineId);
-                controller.setSelectionPropertiesHandler(getSelectionPropertiesHandler());
-                polylineIdToController.put(polylineId, controller);
-                Convert.interpretPolylineController(data, controller, getSymbolVisibilityFilterController());
-                controller.add(graphicsOverlay);
+        for (Object polyline : polylinesToAdd) {
+            final Map<?, ?> data = (Map<?, ?>) polyline;
+            if (data == null) {
+                continue;
             }
-        });
+            final String polylineId = (String) data.get("polylineId");
+            final PolylineController controller = new PolylineController(polylineId);
+            controller.setSelectionPropertiesHandler(getSelectionPropertiesHandler());
+            polylineIdToController.put(polylineId, controller);
+            Convert.interpretPolylineController(data, controller, getSymbolVisibilityFilterController());
+            controller.add(graphicsOverlay);
+        }
     }
 
     public void changePolylines(List<Object> polylinesToChange) {
@@ -73,19 +71,17 @@ public class PolylinesController extends BaseSymbolController implements MapTouc
             return;
         }
 
-        execute(() -> {
-            for (Object polyline : polylinesToChange) {
-                final Map<?, ?> data = (Map<?, ?>) polyline;
-                if (data == null) {
-                    continue;
-                }
-                final String polylineId = (String) data.get("polylineId");
-                final PolylineController controller = polylineIdToController.get(polylineId);
-                if (controller != null) {
-                    Convert.interpretPolylineController(data, controller, getSymbolVisibilityFilterController());
-                }
+        for (Object polyline : polylinesToChange) {
+            final Map<?, ?> data = (Map<?, ?>) polyline;
+            if (data == null) {
+                continue;
             }
-        });
+            final String polylineId = (String) data.get("polylineId");
+            final PolylineController controller = polylineIdToController.get(polylineId);
+            if (controller != null) {
+                Convert.interpretPolylineController(data, controller, getSymbolVisibilityFilterController());
+            }
+        }
     }
 
     public void removePolylines(List<Object> polylineIdsToRemove) {
@@ -93,18 +89,16 @@ public class PolylinesController extends BaseSymbolController implements MapTouc
             return;
         }
 
-        execute(() -> {
-            for (Object rawPolylineId : polylineIdsToRemove) {
-                if (rawPolylineId == null) {
-                    continue;
-                }
-                final String polylineId = (String) rawPolylineId;
-                final PolylineController controller = polylineIdToController.remove(polylineId);
-                if (controller != null) {
-                    onSymbolRemoval(controller);
-                    controller.remove(graphicsOverlay);
-                }
+        for (Object rawPolylineId : polylineIdsToRemove) {
+            if (rawPolylineId == null) {
+                continue;
             }
-        });
+            final String polylineId = (String) rawPolylineId;
+            final PolylineController controller = polylineIdToController.remove(polylineId);
+            if (controller != null) {
+                onSymbolRemoval(controller);
+                controller.remove(graphicsOverlay);
+            }
+        }
     }
 }
