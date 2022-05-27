@@ -6,6 +6,8 @@ part of arcgis_maps_flutter;
 /// map is created.
 typedef MapCreatedCallback = void Function(ArcgisMapController controller);
 
+typedef MapErrorCallback = void Function(Object? error, StackTrace? stackTrace);
+
 typedef MapLoadedCallback = void Function(ArcgisError? error);
 
 typedef LayerLoadedCallback = void Function(Layer layer, ArcgisError? error);
@@ -73,6 +75,7 @@ class ArcgisMapView extends StatefulWidget {
     this.polygons = const <Polygon>{},
     this.polylines = const <Polyline>{},
     this.myLocationEnabled = false,
+    this.failedToStartMyLocation,
     this.insetsContentInsetFromSafeArea = true,
     this.isAttributionTextVisible = true,
     this.contentInsets = EdgeInsets.zero,
@@ -161,6 +164,8 @@ class ArcgisMapView extends StatefulWidget {
   /// `Info.plist` file. This will automatically prompt the user for permissions
   /// when the map tries to turn on the My Location layer.
   final bool myLocationEnabled;
+
+  final MapErrorCallback? failedToStartMyLocation;
 
   /// Indicates whether the content inset is relative to the safe area.
   /// When [true], the content inset is interpreted as a value relative to the safe area.
@@ -285,7 +290,11 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     _controller.complete(controller);
 
     if (widget.myLocationEnabled) {
-      await controller.locationDisplay.start();
+      try {
+        await controller.locationDisplay.start();
+      } catch (ex, stackTrace) {
+        widget.failedToStartMyLocation?.call(ex, stackTrace);
+      }
     }
 
     final MapCreatedCallback? onMapCreated = widget.onMapCreated;
@@ -294,7 +303,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     }
   }
 
-  void onUserLocationTap(){
+  void onUserLocationTap() {
     final callback = widget.onUserLocationTap;
     if (callback != null) {
       callback();
@@ -406,10 +415,14 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     if (updates.containsKey('myLocationEnabled')) {
       final ArcgisMapController controller = await _controller.future;
       final bool isStarted = await controller.locationDisplay.started;
-      if (updates['myLocationEnabled'] && !isStarted) {
-        await controller.locationDisplay.start();
-      } else if (isStarted) {
-        await controller.locationDisplay.stop();
+      try {
+        if (updates['myLocationEnabled'] && !isStarted) {
+          await controller.locationDisplay.start();
+        } else if (isStarted) {
+          await controller.locationDisplay.stop();
+        }
+      } catch (ex, stackTrace) {
+        widget.failedToStartMyLocation?.call(ex, stackTrace);
       }
     }
     final ArcgisMapController controller = await _controller.future;
