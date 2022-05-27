@@ -287,6 +287,10 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     final ArcgisMapController controller =
         await ArcgisMapController.init(id, this);
 
+    if (!mounted) {
+      return;
+    }
+
     _controller.complete(controller);
 
     if (widget.myLocationEnabled) {
@@ -295,6 +299,10 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
       } catch (ex, stackTrace) {
         widget.failedToStartMyLocation?.call(ex, stackTrace);
       }
+    }
+
+    if (!mounted) {
+      return;
     }
 
     final MapCreatedCallback? onMapCreated = widget.onMapCreated;
@@ -415,14 +423,16 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     if (updates.containsKey('myLocationEnabled')) {
       final ArcgisMapController controller = await _controller.future;
       final bool isStarted = await controller.locationDisplay.started;
-      try {
-        if (updates['myLocationEnabled'] && !isStarted) {
-          await controller.locationDisplay.start();
-        } else if (isStarted) {
-          await controller.locationDisplay.stop();
+      if (mounted) {
+        try {
+          if (updates['myLocationEnabled'] && !isStarted) {
+            await controller.locationDisplay.start();
+          } else if (isStarted) {
+            await controller.locationDisplay.stop();
+          }
+        } catch (ex, stackTrace) {
+          widget.failedToStartMyLocation?.call(ex, stackTrace);
         }
-      } catch (ex, stackTrace) {
-        widget.failedToStartMyLocation?.call(ex, stackTrace);
       }
     }
     final ArcgisMapController controller = await _controller.future;
