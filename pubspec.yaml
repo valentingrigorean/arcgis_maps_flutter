@@ -16,10 +16,7 @@ dependencies:
   fluster: ^1.2.0
   equatable: ^2.0.3
   http: ^0.13.3
-  xml2json:
-    git:
-      url: https://github.com/valentingrigorean/xml2json
-      ref: master
+  xml2json: ^5.3.3
   jiffy: ^4.1.0
 
 dev_dependencies:
