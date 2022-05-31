@@ -143,6 +143,9 @@ part 'src/tasks/network_analysis/route_types.dart';
 part 'src/tasks/network_analysis/stop.dart';
 part 'src/tasks/network_analysis/travel_mode.dart';
 
+part 'src/tasks/offline_map/generate_offline_map_parameters.dart';
+part 'src/tasks/offline_map/offline_map_task.dart';
+
 part 'src/toolkit/compass.dart';
 part 'src/toolkit/time_slider/time_slider.dart';
 part 'src/toolkit/time_slider/time_slider_data_provider.dart';
