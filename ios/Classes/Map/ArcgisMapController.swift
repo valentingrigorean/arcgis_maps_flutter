@@ -7,7 +7,6 @@ import ArcGIS
 
 public class ArcgisMapController: NSObject, FlutterPlatformView {
 
-    private let mapWorkerQueue = DispatchQueue(label: "mapWorkerQueue")
     private let mapView: AGSMapView
     private let selectionPropertiesHandler: SelectionPropertiesHandler
 
@@ -62,12 +61,12 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         selectionPropertiesHandler = SelectionPropertiesHandler(selectionProperties: mapView.selectionProperties)
 
-        symbolVisibilityFilterController = SymbolVisibilityFilterController(workerQueue: mapWorkerQueue, mapView: mapView)
+        symbolVisibilityFilterController = SymbolVisibilityFilterController(mapView: mapView)
 
         let graphicsOverlay = AGSGraphicsOverlay()
-        polygonsController = PolygonsController(methodChannel: channel, graphicsOverlays: graphicsOverlay, workerQueue: mapWorkerQueue)
-        polylinesController = PolylinesController(methodChannel: channel, graphicsOverlays: graphicsOverlay, workerQueue: mapWorkerQueue)
-        markersController = MarkersController(methodChannel: channel, graphicsOverlays: graphicsOverlay, workerQueue: mapWorkerQueue)
+        polygonsController = PolygonsController(methodChannel: channel, graphicsOverlays: graphicsOverlay)
+        polylinesController = PolylinesController(methodChannel: channel, graphicsOverlays: graphicsOverlay)
+        markersController = MarkersController(methodChannel: channel, graphicsOverlays: graphicsOverlay)
 
         symbolsControllers = [polygonsController, polylinesController, markersController]
 

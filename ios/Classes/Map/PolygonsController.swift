@@ -7,8 +7,6 @@ import ArcGIS
 
 class PolygonsController: NSObject, SymbolsController {
 
-    private let workerQueue: DispatchQueue
-
     private var polygonIdToController = Dictionary<String, PolygonController>()
 
     private let graphicsOverlays: AGSGraphicsOverlay
@@ -20,48 +18,40 @@ class PolygonsController: NSObject, SymbolsController {
     var symbolVisibilityFilterController: SymbolVisibilityFilterController?
 
     init(methodChannel: FlutterMethodChannel,
-         graphicsOverlays: AGSGraphicsOverlay,
-         workerQueue: DispatchQueue
+         graphicsOverlays: AGSGraphicsOverlay
     ) {
         self.methodChannel = methodChannel
         self.graphicsOverlays = graphicsOverlays
-        self.workerQueue = workerQueue
     }
 
     func addPolygons(polygonsToAdd: [Dictionary<String, Any>]) {
-        workerQueue.async { [self] in
-            for polygon in polygonsToAdd {
-                let polygonId = polygon["polygonId"] as! String
-                let controller = PolygonController(polygonId: polygonId)
-                polygonIdToController[polygonId] = controller
-                updatePolygon(data: polygon, controller: controller)
-                controller.add(graphicsOverlay: graphicsOverlays)
-            }
+        for polygon in polygonsToAdd {
+            let polygonId = polygon["polygonId"] as! String
+            let controller = PolygonController(polygonId: polygonId)
+            polygonIdToController[polygonId] = controller
+            updatePolygon(data: polygon, controller: controller)
+            controller.add(graphicsOverlay: graphicsOverlays)
         }
     }
 
     func changePolygons(polygonsToChange: [Dictionary<String, Any>]) {
-        workerQueue.async { [self] in
-            for polygon in polygonsToChange {
-                let polygonId = polygon["polygonId"] as! String
-                guard let controller = polygonIdToController[polygonId] else {
-                    continue
-                }
-                updatePolygon(data: polygon, controller: controller)
+        for polygon in polygonsToChange {
+            let polygonId = polygon["polygonId"] as! String
+            guard let controller = polygonIdToController[polygonId] else {
+                continue
             }
+            updatePolygon(data: polygon, controller: controller)
         }
     }
 
     func removePolygons(polygonIdsToRemove: [String]) {
-        workerQueue.async { [self] in
-            for polygonId in polygonIdsToRemove {
-                guard let controller = polygonIdToController[polygonId] else {
-                    continue
-                }
-                symbolVisibilityFilterController?.removeGraphicsController(graphicController: controller)
-                controller.remove(graphicsOverlay: graphicsOverlays)
-                polygonIdToController.removeValue(forKey: polygonId)
+        for polygonId in polygonIdsToRemove {
+            guard let controller = polygonIdToController[polygonId] else {
+                continue
             }
+            symbolVisibilityFilterController?.removeGraphicsController(graphicController: controller)
+            controller.remove(graphicsOverlay: graphicsOverlays)
+            polygonIdToController.removeValue(forKey: polygonId)
         }
     }
 

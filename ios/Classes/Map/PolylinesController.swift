@@ -7,7 +7,6 @@ import ArcGIS
 
 class PolylinesController: NSObject, SymbolsController {
 
-    private let workerQueue: DispatchQueue
 
     private var polylineIdToController = Dictionary<String, PolylineController>()
 
@@ -20,47 +19,38 @@ class PolylinesController: NSObject, SymbolsController {
     var symbolVisibilityFilterController: SymbolVisibilityFilterController?
 
     init(methodChannel: FlutterMethodChannel,
-         graphicsOverlays: AGSGraphicsOverlay,
-         workerQueue: DispatchQueue) {
+         graphicsOverlays: AGSGraphicsOverlay) {
         self.methodChannel = methodChannel
         self.graphicsOverlays = graphicsOverlays
-        self.workerQueue = workerQueue
     }
 
     func addPolylines(polylinesToAdd: [Dictionary<String, Any>]) {
-        workerQueue.async { [self] in
-            for polyline in polylinesToAdd {
-                let polylineId = polyline["polylineId"] as! String
-                let controller = PolylineController(polylineId: polylineId)
-                polylineIdToController[polylineId] = controller
-                updatePolyline(data: polyline, controller: controller)
-                controller.add(graphicsOverlay: graphicsOverlays)
-            }
+        for polyline in polylinesToAdd {
+            let polylineId = polyline["polylineId"] as! String
+            let controller = PolylineController(polylineId: polylineId)
+            polylineIdToController[polylineId] = controller
+            updatePolyline(data: polyline, controller: controller)
+            controller.add(graphicsOverlay: graphicsOverlays)
         }
-
     }
 
     func changePolylines(polylinesToChange: [Dictionary<String, Any>]) {
-        workerQueue.async { [self] in
-            for polyline in polylinesToChange {
-                let polylineId = polyline["polylineId"] as! String
-                guard let controller = polylineIdToController[polylineId] else {
-                    continue
-                }
-                updatePolyline(data: polyline, controller: controller)
+        for polyline in polylinesToChange {
+            let polylineId = polyline["polylineId"] as! String
+            guard let controller = polylineIdToController[polylineId] else {
+                continue
             }
+            updatePolyline(data: polyline, controller: controller)
         }
     }
 
     func removePolylines(polylineIdsToRemove: [String]) {
-        workerQueue.async { [self] in
-            for polylineId in polylineIdsToRemove {
-                guard let controller = polylineIdToController[polylineId] else {
-                    continue
-                }
-                controller.remove(graphicsOverlay: graphicsOverlays)
-                polylineIdToController.removeValue(forKey: polylineId)
+        for polylineId in polylineIdsToRemove {
+            guard let controller = polylineIdToController[polylineId] else {
+                continue
             }
+            controller.remove(graphicsOverlay: graphicsOverlays)
+            polylineIdToController.removeValue(forKey: polylineId)
         }
     }
 

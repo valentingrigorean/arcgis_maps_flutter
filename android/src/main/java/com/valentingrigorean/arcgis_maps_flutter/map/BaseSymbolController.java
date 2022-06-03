@@ -1,6 +1,6 @@
 package com.valentingrigorean.arcgis_maps_flutter.map;
 
-public abstract class BaseSymbolController extends BaseSymbolWorkerController  implements SymbolsController{
+public abstract class BaseSymbolController implements SymbolsController{
 
     private SymbolVisibilityFilterController symbolVisibilityFilterController;
     private SelectionPropertiesHandler selectionPropertiesHandler;

@@ -20,16 +20,13 @@ class SymbolVisibilityFilterController {
     private var graphicControllers = Dictionary<UInt, GraphicControllerInfo>()
     private var initialValues = Dictionary<UInt, Bool>()
 
-    private let workerQueue: DispatchQueue
     private weak var mapView: AGSMapView?
     private var scaleObservation: NSKeyValueObservation?
 
     private var mapScale: Double
 
 
-    init(workerQueue: DispatchQueue,
-         mapView: AGSMapView) {
-        self.workerQueue = workerQueue
+    init(mapView: AGSMapView) {
         self.mapView = mapView
         mapScale = mapView.mapScale
     }
@@ -41,14 +38,12 @@ class SymbolVisibilityFilterController {
     func clear() {
         unbindFromMapView(mapView: mapView)
 
-        workerQueue.async { [self] in
-            for item in (graphicControllers.values) {
-                item.graphicController.isVisible = initialValues[objectIdentifierFor(item.graphicController)]!
-            }
-
-            initialValues.removeAll()
-            graphicControllers.removeAll()
+        for item in (graphicControllers.values) {
+            item.graphicController.isVisible = initialValues[objectIdentifierFor(item.graphicController)]!
         }
+
+        initialValues.removeAll()
+        graphicControllers.removeAll()
     }
 
 
@@ -99,16 +94,14 @@ class SymbolVisibilityFilterController {
     }
 
     func removeGraphicsController(graphicController: BaseGraphicController) {
-        workerQueue.async { [self] in
-            let id = objectIdentifierFor(graphicController)
+        let id = objectIdentifierFor(graphicController)
 
-            guard let graphicControllerInfo = graphicControllers.removeValue(forKey: id) else {
-                return
-            }
-
-            graphicControllerInfo.graphicController.isVisible = initialValues[id]!
-            handleRegistrationToScaleChanged()
+        guard let graphicControllerInfo = graphicControllers.removeValue(forKey: id) else {
+            return
         }
+
+        graphicControllerInfo.graphicController.isVisible = initialValues[id]!
+        handleRegistrationToScaleChanged()
     }
 
 
@@ -117,10 +110,8 @@ class SymbolVisibilityFilterController {
             return
         }
         mapScale = currentZoom
-        workerQueue.async { [self] in
-            for item in (graphicControllers.values) {
-                handleGraphicsFilterZoom(graphicControllerInfo: item, currentZoom: mapScale)
-            }
+        for item in (graphicControllers.values) {
+            handleGraphicsFilterZoom(graphicControllerInfo: item, currentZoom: mapScale)
         }
     }
 

@@ -226,7 +226,8 @@ class ArcgisMapController {
 
   /// Disposes of the platform resources
   void dispose() {
-    ///ArcgisMapsFlutterPlatform.instance.dispose(mapId);
+    locationDisplay.dispose();
+    ArcgisMapsFlutterPlatform.instance.dispose(mapId);
   }
 
   void _connectStream(int mapId) {
