@@ -1,4 +1,5 @@
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class MapPageLocator extends StatefulWidget {
@@ -19,7 +20,11 @@ class _MapPageLocatorState extends State<MapPageLocator> {
   @override
   void initState() {
     super.initState();
-    _locatorTask.getLocatorInfo().then((value) => print(value));
+    _locatorTask.getLocatorInfo().then((value) {
+      if(kDebugMode){
+        print(value);
+      }
+    });
   }
 
   @override
@@ -52,7 +57,9 @@ class _MapPageLocatorState extends State<MapPageLocator> {
                     _isLoading = false;
                   });
                 } catch (ex) {
-                  print(ex);
+                  if (kDebugMode) {
+                    print(ex);
+                  }
                   setState(() {
                     _isLoading = false;
                   });
