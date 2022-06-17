@@ -436,6 +436,9 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
       }
     }
     final ArcgisMapController controller = await _controller.future;
+    if (!mounted) {
+      return;
+    }
     controller._updateMapOptions(updates);
     _arcgisMapOptions = newOptions;
   }
