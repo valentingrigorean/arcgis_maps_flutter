@@ -57,7 +57,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)", binaryMessenger: registrar.messenger())
 
         mapView = AGSMapView(frame: frame)
-        mapView.selectionProperties = AGSSelectionProperties(color: UIColor.cyan)
+        mapView.selectionProperties = AGSSelectionProperties(color: UIColor.black)
+        mapView.backgroundGrid = AGSBackgroundGrid(color: UIColor(red: 245, green: 245, blue: 245, alpha: 0), gridLineColor: UIColor(red: 245, green: 245, blue: 245, alpha: 1), gridLineWidth: 0, gridSize: 10)
+//        mapView.backgroundColor = UIColor.white
 
         selectionPropertiesHandler = SelectionPropertiesHandler(selectionProperties: mapView.selectionProperties)
 
@@ -335,6 +337,39 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         case "layer#setTimeOffset":
             layersController.setTimeOffset(arguments: call.arguments)
             result(nil)
+            break
+//            add by JarvanMo
+        case "map#setInitialViewpoint":
+            guard  let map = mapView.map else {
+                result(nil)
+                return
+            }
+
+            guard let initialViewPoint = map.initialViewpoint else {
+                guard let currentViewPoint = mapView.currentViewpoint(with: AGSViewpointType.boundingGeometry) else {
+                    result(nil)
+                    return
+                }
+                mapView.setViewpoint(currentViewPoint, completion: { (r) -> Void in
+                    result(nil)
+                })
+                return
+            }
+
+            mapView.setViewpoint(initialViewPoint, completion: { (r) -> Void in
+                result(nil)
+            })
+            break
+        case "map#recenter":
+            let locationDisplay = mapView.locationDisplay
+            if (!locationDisplay.started){
+                locationDisplay.autoPanMode = AGSLocationDisplayAutoPanMode.recenter
+                locationDisplay.start { (error: Error?) in
+                    result(nil)
+                }
+            }else{
+                result(nil)
+            }
             break
         default:
             result(FlutterMethodNotImplemented)
