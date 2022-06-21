@@ -620,7 +620,9 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             return;
         }
         final Map<?, ?> data = (Map<?, ?>) args;
-        Convert.interpretMapViewOptions(data, mapView);
+        if (mapView != null) {
+            Convert.interpretMapViewOptions(data, mapView);
+        }
 
         final Object trackUserLocationTap = data.get("trackUserLocationTap");
         if (trackUserLocationTap != null) {
@@ -639,12 +641,12 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         }
 
         final Object isAttributionTextVisible = data.get("isAttributionTextVisible");
-        if (isAttributionTextVisible != null) {
+        if (isAttributionTextVisible != null && mapView != null) {
             mapView.setAttributionTextVisible(Convert.toBoolean(isAttributionTextVisible));
         }
 
         final Object contentInsets = data.get("contentInsets");
-        if (contentInsets != null) {
+        if (contentInsets != null && mapView != null) {
             // order is left,top,right,bottom
             final List<?> rect = Convert.toList(contentInsets);
             mapView.setViewInsets(Convert.toDouble(rect.get(0)), Convert.toDouble(rect.get(1)), Convert.toDouble(rect.get(2)), Convert.toDouble(rect.get(3)));

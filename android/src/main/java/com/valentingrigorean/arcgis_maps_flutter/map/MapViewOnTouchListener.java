@@ -134,6 +134,9 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
 
     private void sendOnMapTap(android.graphics.Point screenPoint) {
         final Point mapPoint = mMapView.screenToLocation(screenPoint);
+        if (mapPoint == null) {
+            return;
+        }
         final HashMap<String, Object> data = new HashMap<>(1);
         data.put("position", Convert.geometryToJson(mapPoint));
         methodChannel.invokeMethod("map#onTap", data);
@@ -141,6 +144,9 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
 
     private void sendOnMapLongPress(android.graphics.Point screenPoint) {
         final Point mapPoint = mMapView.screenToLocation(screenPoint);
+        if (mapPoint == null) {
+            return;
+        }
 
         final HashMap<String, Object> data = new HashMap<>(1);
         data.put("position", Convert.geometryToJson(mapPoint));

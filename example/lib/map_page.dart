@@ -113,6 +113,7 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
     );
   }
 
+  // ignore: unused_element
   Widget _buildMapsTypes(ScrollController scrollController) {
     var items = BasemapType.values;
 
