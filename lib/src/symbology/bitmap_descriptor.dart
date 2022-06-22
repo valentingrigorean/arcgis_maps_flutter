@@ -50,6 +50,29 @@ class BitmapDescriptor {
     return BitmapDescriptor._(_BitmapDescriptorRaw(byteData: byteData));
   }
 
+  static Future<BitmapDescriptor> fromWidget({
+    required BuildContext context,
+    required WidgetBuilder builder,
+  }) async {
+    final completer = Completer<BitmapDescriptor>();
+    late final OverlayEntry overlayEntry;
+    overlayEntry = OverlayEntry(builder: (context) {
+      return _MarkerInfo(
+        child: builder(context),
+        onBitmapCreated: (bitmap) {
+          overlayEntry.remove();
+          completer.complete(fromBytes(bitmap));
+        },
+      );
+    });
+
+    final overlay = Overlay.of(context)!;
+
+    overlay.insert(overlayEntry);
+
+    return completer.future;
+  }
+
   Object toJson() => _bitmapDescriptorBase.toJson();
 
   @override
@@ -185,4 +208,57 @@ class _SimpleStyleMarkerBitmapDescriptor implements _BitmapDescriptorBase {
 
   @override
   int get hashCode => style.hashCode ^ color.hashCode ^ size.hashCode;
+}
+
+class _MarkerInfo extends StatefulWidget {
+  const _MarkerInfo({
+    Key? key,
+    required this.child,
+    required this.onBitmapCreated,
+  }) : super(key: key);
+
+  final Widget child;
+
+  final ValueChanged<Uint8List> onBitmapCreated;
+
+  @override
+  State<_MarkerInfo> createState() => _MarkerInfoState();
+}
+
+class _MarkerInfoState extends State<_MarkerInfo> {
+  final _markerKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => getUint8List(_markerKey)
+        .then((markerBitmap) => widget.onBitmapCreated(markerBitmap)));
+  }
+
+  Future<Uint8List> getUint8List(GlobalKey markerKey) async {
+    RenderRepaintBoundary boundary =
+        _markerKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    final image = await boundary.toImage();
+    final byteData = await image.toByteData(format: ImageByteFormat.png);
+    return byteData!.buffer.asUint8List();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform.translate(
+      offset: Offset(MediaQuery.of(context).size.width, 0),
+      child: Material(
+        type: MaterialType.transparency,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RepaintBoundary(
+              key: _markerKey,
+              child: widget.child,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
