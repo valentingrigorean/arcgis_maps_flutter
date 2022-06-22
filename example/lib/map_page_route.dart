@@ -1,4 +1,5 @@
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class MapPageRoute extends StatefulWidget {
@@ -94,6 +95,7 @@ class _MapPageRouteState extends State<MapPageRoute> {
   }
 
   void _testRoute() async {
+    // ignore: unused_local_variable
     final routeTaskInfo = await _routeTask.getRouteTaskInfo();
     final defaultParam = (await _routeTask.createDefaultParameters())
         .copyWith(returnDirections: true, stops: [
@@ -118,7 +120,9 @@ class _MapPageRouteState extends State<MapPageRoute> {
       if (route.routeGeometry != null) {
         final didSetViewPoint = await _mapController.setViewpointGeometry(route.routeGeometry!,
             padding: 50);
-        print('didSetViewPoint: $didSetViewPoint');
+        if (kDebugMode) {
+          print('didSetViewPoint: $didSetViewPoint');
+        }
       }
       _routeLines.clear();
       _routeLines.add(

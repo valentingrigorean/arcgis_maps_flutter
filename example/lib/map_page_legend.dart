@@ -11,6 +11,7 @@ class MapPageLegend extends StatefulWidget {
 }
 
 class _MapPageLegendState extends State<MapPageLegend> {
+  // ignore: unused_field
   final Layer _layer = WmsLayer.fromUrl(
       'https://wms.geonorge.no/skwms1/wms.dybdedata2?service=WMS&request=GetCapabilities',
       layersName: [
