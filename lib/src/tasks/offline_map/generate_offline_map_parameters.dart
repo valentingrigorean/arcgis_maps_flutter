@@ -12,6 +12,13 @@ enum AttachmentSyncDirection {
 
   const AttachmentSyncDirection(this.value);
 
+  factory AttachmentSyncDirection.fromValue(int value) {
+    return AttachmentSyncDirection.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => AttachmentSyncDirection.none,
+    );
+  }
+
   final int value;
 }
 
@@ -29,6 +36,13 @@ enum SyncDirection {
   birectional(3);
 
   const SyncDirection(this.value);
+
+  factory SyncDirection.fromValue(int value) {
+    return SyncDirection.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => SyncDirection.none,
+    );
+  }
 
   final int value;
 }
@@ -50,6 +64,13 @@ enum SyncModel {
 
   const SyncModel(this.value);
 
+  factory SyncModel.fromValue(int value) {
+    return SyncModel.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => SyncModel.none,
+    );
+  }
+
   final int value;
 }
 
@@ -67,6 +88,13 @@ enum OnlineOnlyServicesOption {
   useAuthoredSettings(2);
 
   const OnlineOnlyServicesOption(this.value);
+
+  factory OnlineOnlyServicesOption.fromValue(int value) {
+    return OnlineOnlyServicesOption.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => OnlineOnlyServicesOption.exclude,
+    );
+  }
 
   final int value;
 }
@@ -93,6 +121,13 @@ enum ReturnLayerAttachmentOption {
 
   const ReturnLayerAttachmentOption(this.value);
 
+  factory ReturnLayerAttachmentOption.fromValue(int value) {
+    return ReturnLayerAttachmentOption.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => ReturnLayerAttachmentOption.none,
+    );
+  }
+
   final int value;
 }
 
@@ -106,6 +141,13 @@ enum GenerateOfflineMapUpdateMode {
 
   const GenerateOfflineMapUpdateMode(this.value);
 
+  factory GenerateOfflineMapUpdateMode.fromValue(int value) {
+    return GenerateOfflineMapUpdateMode.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => GenerateOfflineMapUpdateMode.syncWithFeatureServices,
+    );
+  }
+
   final int value;
 }
 
@@ -118,6 +160,13 @@ enum DestinationTableRowFilter {
   relatedOnly(1);
 
   const DestinationTableRowFilter(this.value);
+
+  factory DestinationTableRowFilter.fromValue(int value) {
+    return DestinationTableRowFilter.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => DestinationTableRowFilter.all,
+    );
+  }
 
   final int value;
 }
@@ -133,6 +182,13 @@ enum EsriVectorTilesDownloadOption {
 
   const EsriVectorTilesDownloadOption(this.value);
 
+  factory EsriVectorTilesDownloadOption.fromValue(int value) {
+    return EsriVectorTilesDownloadOption.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => EsriVectorTilesDownloadOption.useOriginalService,
+    );
+  }
+
   final int value;
 }
 
@@ -142,6 +198,7 @@ class GenerateOfflineMapParameters {
     this.minScale = 0,
     this.maxScale = 0,
     this.onlineOnlyServicesOption = OnlineOnlyServicesOption.exclude,
+    this.itemInfo,
     this.attachmentSyncDirection = AttachmentSyncDirection.birectional,
     this.continueOnErrors = true,
     this.includeBasemap = true,
@@ -155,6 +212,38 @@ class GenerateOfflineMapParameters {
     this.referenceBasemapDirectory = '',
     this.referenceBasemapFilename = '',
   });
+
+  factory GenerateOfflineMapParameters.fromJson(Map<dynamic, dynamic> json) {
+    return GenerateOfflineMapParameters(
+      areaOfInterest: Geometry.fromJson(json['areaOfInterest'])!,
+      minScale: (json['minScale'] as num).toDouble(),
+      maxScale: (json['maxScale'] as num).toDouble(),
+      onlineOnlyServicesOption: OnlineOnlyServicesOption.fromValue(
+          (json['onlineOnlyServicesOption'] as num).toInt()),
+      itemInfo: json.containsKey('itemInfo')
+          ? OfflineMapItemInfo.fromJson(
+              json['itemInfo'] as Map<dynamic, dynamic>)
+          : null,
+      attachmentSyncDirection: AttachmentSyncDirection.fromValue(
+          (json['attachmentSyncDirection'] as num).toInt()),
+      continueOnErrors: json['continueOnErrors'] as bool,
+      includeBasemap: json['includeBasemap'] as bool,
+      isDefinitionExpressionFilterEnabled:
+          json['isDefinitionExpressionFilterEnabled'] as bool,
+      returnLayerAttachmentOption: ReturnLayerAttachmentOption.fromValue(
+          (json['returnLayerAttachmentOption'] as num).toInt()),
+      returnSchemaOnlyForEditableLayers:
+          json['returnSchemaOnlyForEditableLayers'] as bool,
+      updateMode: GenerateOfflineMapUpdateMode.fromValue(
+          (json['updateMode'] as num).toInt()),
+      destinationTableRowFilter: DestinationTableRowFilter.fromValue(
+          (json['destinationTableRowFilter'] as num).toInt()),
+      esriVectorTilesDownloadOption: EsriVectorTilesDownloadOption.fromValue(
+          (json['esriVectorTilesDownloadOption'] as num).toInt()),
+      referenceBasemapDirectory: json['referenceBasemapDirectory'] as String,
+      referenceBasemapFilename: json['referenceBasemapFilename'] as String,
+    );
+  }
 
   /// An [AGSPolygon] or [AGSEnvelope] geometry that defines the geographic area
   /// for which the map data (features and tiles) should be taken offline.
@@ -176,6 +265,12 @@ class GenerateOfflineMapParameters {
   /// Describes how data that requires an online service will be handled
   /// when taking a map offline.
   final OnlineOnlyServicesOption onlineOnlyServicesOption;
+
+  /// Metadata about the map that should be persisted when it is taken offline.
+  /// hen using the convenience method
+  /// [OfflineMapTask.defaultGenerateOfflineMapParameters] to get the
+  /// default parameters, this metadata is initialized based on the map's portal item.
+  final OfflineMapItemInfo? itemInfo;
 
   /// Specifies how sync-enabled feature layers in the offline map should be
   /// configured to sync attachment data with their originating service.
