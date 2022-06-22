@@ -124,7 +124,8 @@ class BitmapDescriptor: Hashable {
     }
 
     private static func createFlutterBitmapDescriptor(data: Dictionary<String, Any>) -> FlutterBitmapDescriptor {
-        if let fromBytes = data["fromBytes"] as? Data {
+        print(data)
+        if let fromBytes = data["fromBytes"] as? FlutterStandardTypedData {
             return RawBitmapDescriptor(rawData: fromBytes)
         }
         if (data["fromNativeAsset"] as? String) != nil {
@@ -179,14 +180,14 @@ fileprivate class FlutterBitmapDescriptor: Hashable {
 
 fileprivate class RawBitmapDescriptor: FlutterBitmapDescriptor {
 
-    private let rawData: Data
+    private let rawData: FlutterStandardTypedData
 
-    init(rawData: Data) {
+    init(rawData: FlutterStandardTypedData) {
         self.rawData = rawData
     }
 
     override func createSymbol() -> AGSSymbol {
-        AGSPictureMarkerSymbol(image: UIImage(data: rawData)!)
+        AGSPictureMarkerSymbol(image: UIImage(data: rawData.data)!)
     }
 
     override func hash(into hasher: inout Hasher) {

@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
@@ -39,7 +38,7 @@ class _MapPageMarkersState extends State<MapPageMarkers> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Visibility Filter'),
+        title: const Text('Markers'),
       ),
       body: ArcgisMapView(
         map: ArcGISMap.imagery(),
@@ -76,3 +75,5 @@ class _MapPageMarkersState extends State<MapPageMarkers> {
     }
   }
 }
+
+
