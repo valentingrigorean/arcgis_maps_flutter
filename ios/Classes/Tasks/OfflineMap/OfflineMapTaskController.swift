@@ -10,7 +10,7 @@ class OfflineMapTaskController {
     private var offlineMapTasks: [Int: AGSOfflineMapTask] = [:]
 
     init(messenger: FlutterBinaryMessenger) {
-        channel = FlutterMethodChannel(name: "plugins.flutter.io/offline_map_task", binaryMessenger: messenger)
+        channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel/offline_map_task", binaryMessenger: messenger)
         channel.setMethodCallHandler(handle)
     }
 
@@ -39,7 +39,7 @@ class OfflineMapTaskController {
         let minScale = data["minScale"] as? Double
         let maxScale = data["maxScale"] as? Double
 
-        if minScale != nil {
+        if minScale == nil {
             offlineMapTask.defaultGenerateOfflineMapParameters(withAreaOfInterest: areaOfInterest, completion: { (parameters, error) in
                 if let error = error {
                     result(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))

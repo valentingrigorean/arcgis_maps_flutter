@@ -16,7 +16,7 @@ class OfflineMapItemInfo {
       accessInformation: json['accessInformation'] as String,
       itemDescription: json['itemDescription'] as String,
       snippet: json['snippet'] as String,
-      tags: json['tags'] as List<String>,
+      tags: (json['tags'] as List<dynamic>).cast<String>(),
       termsOfUse: json['termsOfUse'] as String,
       thumbnail: json['thumbnail'] as Uint8List?,
       title: json['title'] as String,
@@ -44,4 +44,9 @@ class OfflineMapItemInfo {
 
   /// Title of the item.
   final String title;
+
+  @override
+  String toString() {
+    return 'OfflineMapItemInfo{accessInformation: $accessInformation, itemDescription: $itemDescription, snippet: $snippet, tags: $tags, termsOfUse: $termsOfUse, thumbnail: ${thumbnail != null ? 'true' : 'false'}, title: $title}';
+  }
 }

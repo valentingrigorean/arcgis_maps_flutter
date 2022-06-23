@@ -240,7 +240,8 @@ class GenerateOfflineMapParameters {
           (json['destinationTableRowFilter'] as num).toInt()),
       esriVectorTilesDownloadOption: EsriVectorTilesDownloadOption.fromValue(
           (json['esriVectorTilesDownloadOption'] as num).toInt()),
-      referenceBasemapDirectory: json['referenceBasemapDirectory'] as String,
+      referenceBasemapDirectory:
+          (json['referenceBasemapDirectory'] as String?) ?? '',
       referenceBasemapFilename: json['referenceBasemapFilename'] as String,
     );
   }
@@ -382,4 +383,9 @@ class GenerateOfflineMapParameters {
   /// The spatial reference of the reference basemap is used for the offline map when it is different to the online map's spatial reference.
   /// Note that this property is ignored if @c AGSGenerateOfflineMapParameters#includeBasemap is [false].
   final String referenceBasemapFilename;
+
+  @override
+  String toString() {
+    return 'GenerateOfflineMapParameters{areaOfInterest: $areaOfInterest, minScale: $minScale, maxScale: $maxScale, onlineOnlyServicesOption: $onlineOnlyServicesOption, itemInfo: $itemInfo, attachmentSyncDirection: $attachmentSyncDirection, continueOnErrors: $continueOnErrors, includeBasemap: $includeBasemap, isDefinitionExpressionFilterEnabled: $isDefinitionExpressionFilterEnabled, returnLayerAttachmentOption: $returnLayerAttachmentOption, returnSchemaOnlyForEditableLayers: $returnSchemaOnlyForEditableLayers, updateMode: $updateMode, destinationTableRowFilter: $destinationTableRowFilter, esriVectorTilesDownloadOption: $esriVectorTilesDownloadOption, referenceBasemapDirectory: $referenceBasemapDirectory, referenceBasemapFilename: $referenceBasemapFilename}';
+  }
 }

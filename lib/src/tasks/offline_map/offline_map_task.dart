@@ -46,8 +46,8 @@ class OfflineMapTask {
     double? maxScale,
   }) async {
     assert(
-        (minScale != null && maxScale == null) ||
-            (minScale == null && maxScale != null),
+        !((minScale != null && maxScale == null) ||
+            (minScale == null && maxScale != null)),
         'minScale and maxScale both need to be specified');
     await _ensureCreated();
     return await OfflineMapTaskFlutterPlatform.instance
