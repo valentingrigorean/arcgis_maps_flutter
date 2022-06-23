@@ -10,6 +10,7 @@ import 'package:arcgis_maps_flutter/src/layers/layer_updates.dart';
 import 'package:arcgis_maps_flutter/src/mapping/basemap_type_options.dart';
 import 'package:arcgis_maps_flutter/src/mapping/view/location_display_impl.dart';
 import 'package:arcgis_maps_flutter/src/maps_object.dart';
+import 'package:arcgis_maps_flutter/src/method_channel/tasks/offline_map/offline_map_task_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/symbology/marker_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polygon_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polyline_updates.dart';

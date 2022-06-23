@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 
 class MethodChannelLocatorTaskFlutter extends LocatorTaskFlutterPlatform {
   final MethodChannel _channel =
-      const MethodChannel("plugins.flutter.io/locator_task");
+      const MethodChannel("plugins.flutter.io/arcgis_channel/locator_task");
 
   @override
   Future<void> createLocatorTask(int id, String url, Credential? credential) {

@@ -33,7 +33,7 @@ public class RouteTaskController implements MethodChannel.MethodCallHandler {
 
     public RouteTaskController(Context context, BinaryMessenger messenger) {
         this.context = context;
-        channel = new MethodChannel(messenger, "plugins.flutter.io/route_task");
+        channel = new MethodChannel(messenger, "plugins.flutter.io/arcgis_channel/route_task");
         channel.setMethodCallHandler(this);
     }
 

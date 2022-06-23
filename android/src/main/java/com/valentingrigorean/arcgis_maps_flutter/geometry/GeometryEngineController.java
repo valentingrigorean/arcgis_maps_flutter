@@ -29,7 +29,7 @@ public class GeometryEngineController implements MethodChannel.MethodCallHandler
     private final MethodChannel channel;
 
     public GeometryEngineController(BinaryMessenger messenger) {
-        channel = new MethodChannel(messenger, "plugins.flutter.io/geometry_engine");
+        channel = new MethodChannel(messenger, "plugins.flutter.io/arcgis_channel/geometry_engine");
         channel.setMethodCallHandler(this);
     }
 

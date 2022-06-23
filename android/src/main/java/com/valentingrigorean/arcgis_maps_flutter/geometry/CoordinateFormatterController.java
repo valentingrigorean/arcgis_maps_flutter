@@ -18,7 +18,7 @@ public class CoordinateFormatterController implements MethodChannel.MethodCallHa
     private final MethodChannel channel;
 
     public CoordinateFormatterController(BinaryMessenger messenger) {
-        channel = new MethodChannel(messenger, "plugins.flutter.io/coordinate_formatter");
+        channel = new MethodChannel(messenger, "plugins.flutter.io/arcgis_channel/coordinate_formatter");
         channel.setMethodCallHandler(this);
     }
 
