@@ -72,4 +72,6 @@ class OfflineMapTask {
         .createOfflineMapTask(_id, map: map, portalItem: portalItem);
     _completer.complete(_id);
   }
+
+  Future<GenerateOfflineMapJob> 
 }

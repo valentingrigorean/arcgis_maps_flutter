@@ -42,4 +42,5 @@ abstract class OfflineMapTaskFlutterPlatform extends PlatformInterface {
     throw UnimplementedError(
         'defaultGenerateOfflineMapParameters() has not been implemented.');
   }
+
 }

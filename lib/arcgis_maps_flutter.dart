@@ -81,6 +81,7 @@ part 'src/mapping/viewpoint.dart';
 part 'src/mapping/camera.dart';
 part 'src/mapping/elevation_source.dart';
 part 'src/mapping/geo_element.dart';
+part 'src/mapping/mobile_map_package.dart';
 part 'src/mapping/surface.dart';
 part 'src/mapping/arcgis_tiled_elevation_source.dart';
 part 'src/mapping/time_extent.dart';
@@ -146,7 +147,9 @@ part 'src/tasks/network_analysis/route_types.dart';
 part 'src/tasks/network_analysis/stop.dart';
 part 'src/tasks/network_analysis/travel_mode.dart';
 
+part 'src/tasks/offline_map/generate_offline_map_job.dart';
 part 'src/tasks/offline_map/generate_offline_map_parameters.dart';
+part 'src/tasks/offline_map/generate_offline_map_result.dart';
 part 'src/tasks/offline_map/offline_map_item_info.dart';
 part 'src/tasks/offline_map/offline_map_task.dart';
 
