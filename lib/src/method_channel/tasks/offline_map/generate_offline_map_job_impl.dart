@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/services.dart';
@@ -26,12 +27,29 @@ class GenerateOfflineMapJobImpl extends GenerateOfflineMapJob {
   final GenerateOfflineMapJobConfig _config;
   final MethodChannel _channel;
 
+  final VoidCallback? _onDispose;
+
+  bool _isDisposed = false;
+
   GenerateOfflineMapJobImpl({
-    required MethodChannel channel,
     required GenerateOfflineMapJobConfig config,
+    VoidCallback? onDispose,
   })  : _id = config.jobId,
         _config = config,
-        _channel = channel;
+        _onDispose = onDispose,
+        _channel = MethodChannel(
+            'plugins.flutter.io/arcgis_channel/offline_map_task/job_${config.jobId}') {
+    _channel.setMethodCallHandler(_handleMethodCall);
+  }
+
+  void dispose() {
+    if (_isDisposed) {
+      return;
+    }
+    _isDisposed = true;
+    _channel.setMethodCallHandler(null);
+    _progressController.close();
+  }
 
   @override
   String? get downloadDirectory => _config.downloadDirectory;
@@ -56,6 +74,7 @@ class GenerateOfflineMapJobImpl extends GenerateOfflineMapJob {
 
   @override
   Future<bool> start() async {
+    [1,2,3].indexOf(2);
     final result = await _channel.invokeMethod<bool>('startJob', _id);
     return result ?? false;
   }
@@ -70,5 +89,16 @@ class GenerateOfflineMapJobImpl extends GenerateOfflineMapJob {
   Future<bool> pause() async {
     final result = await _channel.invokeMethod<bool>('pauseJob', _id);
     return result ?? false;
+  }
+
+  Future<dynamic> _handleMethodCall(MethodCall call) async {
+    switch (call.method) {
+      case 'onProgressChanged':
+        final double progress = call.arguments;
+        _progressController.add(progress);
+        break;
+      default:
+        throw UnsupportedError('Unrecognized method ${call.method}');
+    }
   }
 }

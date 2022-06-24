@@ -6,22 +6,24 @@ class OfflineMapTask {
   final Completer<int> _completer = Completer<int>();
 
   final int _id;
-
+  final Credential? _credential;
   bool _isDisposed = false;
   bool _created = false;
 
   /// Creates a task with the provided map to take offline.
   /// The map must be a web map either on ArcGIS Online
   /// or an on-premises ArcGIS Portal.
-  OfflineMapTask.onlineMap({required this.map})
+  OfflineMapTask.onlineMap({required this.map, Credential? credential})
       : portalItem = null,
+        _credential = credential,
         _id = _offlineMapTaskHandlerId++;
 
   /// Creates a task with the provided portal item.
   /// The item must represent a web map (item type should be
   /// @c AGSPortalItemTypeWebMap)
-  OfflineMapTask.portalItem({required this.portalItem})
+  OfflineMapTask.portalItem({required this.portalItem, Credential? credential})
       : map = null,
+        _credential = credential,
         _id = _offlineMapTaskHandlerId++;
 
   /// The map to take offline. The map must be a web map either on
@@ -59,6 +61,14 @@ class OfflineMapTask {
     );
   }
 
+  Future<GenerateOfflineMapJob> generateOfflineMap({
+    required GenerateOfflineMapParameters parameters,
+    required String downloadDirectory
+  }) async {
+    await _ensureCreated();
+    throw UnimplementedError();
+  }
+
   Future<void> _ensureCreated() async {
     if (_isDisposed) {
       throw Exception('OfflineMapTask is disposed');
@@ -68,10 +78,12 @@ class OfflineMapTask {
       return;
     }
     _created = true;
-    await OfflineMapTaskFlutterPlatform.instance
-        .createOfflineMapTask(_id, map: map, portalItem: portalItem);
+    await OfflineMapTaskFlutterPlatform.instance.createOfflineMapTask(
+      _id,
+      map: map,
+      portalItem: portalItem,
+      credential: _credential,
+    );
     _completer.complete(_id);
   }
-
-  Future<GenerateOfflineMapJob> 
 }

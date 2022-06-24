@@ -384,6 +384,29 @@ class GenerateOfflineMapParameters {
   /// Note that this property is ignored if @c AGSGenerateOfflineMapParameters#includeBasemap is [false].
   final String referenceBasemapFilename;
 
+  Object toJson() {
+    final Map<String, dynamic> json = {};
+    json['areaOfInterest'] = areaOfInterest.toJson();
+    json['minScale'] = minScale;
+    json['maxScale'] = maxScale;
+    json['onlineOnlyServicesOption'] = onlineOnlyServicesOption.value;
+    if(itemInfo != null){
+      json['itemInfo'] = itemInfo!.toJson();
+    }
+    json['attachmentSyncDirection'] = attachmentSyncDirection.value;
+    json['continueOnErrors'] = continueOnErrors;
+    json['includeBasemap'] = includeBasemap;
+    json['isDefinitionExpressionFilterEnabled'] = isDefinitionExpressionFilterEnabled;
+    json['returnLayerAttachmentOption'] = returnLayerAttachmentOption.value;
+    json['returnSchemaOnlyForEditableLayers'] = returnSchemaOnlyForEditableLayers;
+    json['updateMode'] = updateMode.value;
+    json['destinationTableRowFilter'] = destinationTableRowFilter.value;
+    json['esriVectorTilesDownloadOption'] = esriVectorTilesDownloadOption.value;
+    json['referenceBasemapDirectory'] = referenceBasemapDirectory;
+    json['referenceBasemapFilename'] = referenceBasemapFilename;
+    return json;
+  }
+
   @override
   String toString() {
     return 'GenerateOfflineMapParameters{areaOfInterest: $areaOfInterest, minScale: $minScale, maxScale: $maxScale, onlineOnlyServicesOption: $onlineOnlyServicesOption, itemInfo: $itemInfo, attachmentSyncDirection: $attachmentSyncDirection, continueOnErrors: $continueOnErrors, includeBasemap: $includeBasemap, isDefinitionExpressionFilterEnabled: $isDefinitionExpressionFilterEnabled, returnLayerAttachmentOption: $returnLayerAttachmentOption, returnSchemaOnlyForEditableLayers: $returnSchemaOnlyForEditableLayers, updateMode: $updateMode, destinationTableRowFilter: $destinationTableRowFilter, esriVectorTilesDownloadOption: $esriVectorTilesDownloadOption, referenceBasemapDirectory: $referenceBasemapDirectory, referenceBasemapFilename: $referenceBasemapFilename}';

@@ -45,8 +45,23 @@ class OfflineMapItemInfo {
   /// Title of the item.
   final String title;
 
+  Object toJson(){
+    return {
+      'accessInformation': accessInformation,
+      'itemDescription': itemDescription,
+      'snippet': snippet,
+      'tags': tags,
+      'termsOfUse': termsOfUse,
+      'thumbnail': thumbnail,
+      'title': title,
+    };
+  }
+
   @override
   String toString() {
     return 'OfflineMapItemInfo{accessInformation: $accessInformation, itemDescription: $itemDescription, snippet: $snippet, tags: $tags, termsOfUse: $termsOfUse, thumbnail: ${thumbnail != null ? 'true' : 'false'}, title: $title}';
   }
 }
+
+
+

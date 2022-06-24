@@ -23,6 +23,7 @@ abstract class OfflineMapTaskFlutterPlatform extends PlatformInterface {
     int id, {
     ArcGISMap? map,
     PortalItem? portalItem,
+    Credential? credential,
   }) {
     throw UnimplementedError(
         'createOfflineMapTask() has not been implemented.');
@@ -43,4 +44,11 @@ abstract class OfflineMapTaskFlutterPlatform extends PlatformInterface {
         'defaultGenerateOfflineMapParameters() has not been implemented.');
   }
 
+  Future<GenerateOfflineMapJob> generateOfflineMap(
+    int id, {
+    required GenerateOfflineMapParameters parameters,
+    required String downloadDirectory,
+  }) async {
+    throw UnimplementedError('generateOfflineMap() has not been implemented.');
+  }
 }
