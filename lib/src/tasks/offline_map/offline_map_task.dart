@@ -63,10 +63,14 @@ class OfflineMapTask {
 
   Future<GenerateOfflineMapJob> generateOfflineMap({
     required GenerateOfflineMapParameters parameters,
-    required String downloadDirectory
+    required String downloadDirectory,
   }) async {
     await _ensureCreated();
-    throw UnimplementedError();
+    return await OfflineMapTaskFlutterPlatform.instance.generateOfflineMap(
+      _id,
+      parameters: parameters,
+      downloadDirectory: downloadDirectory,
+    );
   }
 
   Future<void> _ensureCreated() async {

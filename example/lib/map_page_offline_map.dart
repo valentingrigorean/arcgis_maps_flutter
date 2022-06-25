@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 
 class MapPageofflineMap extends StatefulWidget {
   const MapPageofflineMap({Key? key}) : super(key: key);
@@ -20,6 +23,9 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
   late final OfflineMapTask _offlineMapTask =
       OfflineMapTask.onlineMap(map: _map);
 
+  bool _isDownloading = false;
+  double _progress = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,8 +36,13 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
         map: _map,
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _downloadMap,
-        child: const Icon(Icons.download),
+        onPressed: _isDownloading ? null : _downloadMap,
+        child: _isDownloading
+            ? CircularProgressIndicator(
+                value: _progress,
+                color: Colors.white,
+              )
+            : const Icon(Icons.download),
       ),
     );
   }
@@ -48,9 +59,52 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
           spatialReference: SpatialReference.wgs84(),
         ),
       );
+      if (defaultParams == null) {
+        return;
+      }
+
       if (kDebugMode) {
         print(defaultParams);
       }
+
+      Directory appDocDir = await getApplicationDocumentsDirectory();
+      String appDocPath = appDocDir.path + '/offline_map';
+
+      if (kDebugMode) {
+        print('Downloading map to $appDocPath');
+      }
+
+      final job = await _offlineMapTask.generateOfflineMap(
+        parameters: defaultParams,
+        downloadDirectory: appDocPath,
+      );
+      job.onStatusChanged.listen((event) {
+        if (kDebugMode) {
+          print(event);
+        }
+        if (event == JobStatus.succeeded) {
+          setState(() {
+            _isDownloading = false;
+          });
+        }
+      });
+
+      job.onProgressChanged.listen((event) {
+        if (kDebugMode) {
+          print('Progress: $event');
+        }
+        if (mounted) {
+          setState(() {
+            _progress = event;
+          });
+        }
+      });
+
+      _isDownloading = await job.start();
+      if (!mounted) {
+        return;
+      }
+      setState(() {});
     } catch (e) {
       if (kDebugMode) {
         print(e);

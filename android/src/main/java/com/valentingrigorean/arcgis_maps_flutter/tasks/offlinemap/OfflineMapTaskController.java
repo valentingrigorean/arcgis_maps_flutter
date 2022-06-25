@@ -15,6 +15,7 @@ public class OfflineMapTaskController {
         GenerateOfflineMapResult result;
         MobileMapPackage mobileMapPackage;
         GenerateOfflineMapJob job;
+        job.start();
 
         OfflineMapTask task;
     }

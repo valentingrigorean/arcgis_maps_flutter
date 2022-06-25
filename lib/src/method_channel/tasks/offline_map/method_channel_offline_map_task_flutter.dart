@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
+import 'package:arcgis_maps_flutter/src/method_channel/tasks/offline_map/generate_offline_map_job_impl.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/tasks/offline_map/offline_map_task_flutter_platform.dart';
 import 'package:flutter/services.dart';
 
@@ -55,11 +56,23 @@ class MethodChannelOfflineMapTaskFlutter extends OfflineMapTaskFlutterPlatform {
     required String downloadDirectory,
   }) async {
     final jobId = _jobHandlerId++;
-    final result = await _channel.invokeMethod('generateOfflineMap', {
+    await _channel.invokeMethod('generateOfflineMap', {
       'id': id,
       'jobId': jobId,
       'parameters': parameters.toJson(),
       'downloadDirectory': downloadDirectory,
     });
+    return GenerateOfflineMapJobImpl(
+      config: GenerateOfflineMapJobConfig(
+        jobId: jobId,
+        downloadDirectory: downloadDirectory,
+        onlineMap: null,
+        parameters: parameters,
+        result: null,
+      ),
+      onDispose: () {
+        _channel.invokeMethod('destroyGenerateOfflineMapJob', jobId);
+      },
+    );
   }
 }

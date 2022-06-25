@@ -49,6 +49,8 @@ part 'src/arcgis_runtime_environment.dart';
 part 'src/arcgisservices/level_of_detail.dart';
 part 'src/arcgisservices/tile_info.dart';
 
+part 'src/concurrent/job_status.dart';
+
 part 'src/data/tile_key.dart';
 
 part 'src/geometry/ags_polygon.dart';

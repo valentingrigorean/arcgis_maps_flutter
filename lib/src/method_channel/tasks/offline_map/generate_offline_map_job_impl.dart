@@ -24,6 +24,8 @@ class GenerateOfflineMapJobImpl extends GenerateOfflineMapJob {
   final int _id;
   final StreamController<double> _progressController =
       StreamController<double>.broadcast();
+  final StreamController<JobStatus> _statusController =
+      StreamController<JobStatus>.broadcast();
   final GenerateOfflineMapJobConfig _config;
   final MethodChannel _channel;
 
@@ -42,6 +44,7 @@ class GenerateOfflineMapJobImpl extends GenerateOfflineMapJob {
     _channel.setMethodCallHandler(_handleMethodCall);
   }
 
+  @override
   void dispose() {
     if (_isDisposed) {
       return;
@@ -70,11 +73,19 @@ class GenerateOfflineMapJobImpl extends GenerateOfflineMapJob {
   Stream<double> get onProgressChanged => _progressController.stream;
 
   @override
+  Future<JobStatus> get status async {
+    final result = await _channel.invokeMethod<int>('getJobStatus', _id);
+    return JobStatus.fromValue(result ?? JobStatus.notStarted.value);
+  }
+
+  @override
+  Stream<JobStatus> get onStatusChanged => _statusController.stream;
+
+  @override
   GenerateOfflineMapResult? get result => _config.result;
 
   @override
   Future<bool> start() async {
-    [1,2,3].indexOf(2);
     final result = await _channel.invokeMethod<bool>('startJob', _id);
     return result ?? false;
   }
@@ -96,6 +107,10 @@ class GenerateOfflineMapJobImpl extends GenerateOfflineMapJob {
       case 'onProgressChanged':
         final double progress = call.arguments;
         _progressController.add(progress);
+        break;
+      case 'onStatusChanged':
+        final int status = call.arguments;
+        _statusController.add(JobStatus.fromValue(status));
         break;
       default:
         throw UnsupportedError('Unrecognized method ${call.method}');

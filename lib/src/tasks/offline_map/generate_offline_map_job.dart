@@ -13,9 +13,15 @@ abstract class GenerateOfflineMapJob {
 
   Stream<double> get onProgressChanged;
 
+  Future<JobStatus> get status;
+
+  Stream<JobStatus> get onStatusChanged;
+
   Future<bool> start();
 
   Future<bool> cancel();
 
   Future<bool> pause();
+
+  void dispose();
 }

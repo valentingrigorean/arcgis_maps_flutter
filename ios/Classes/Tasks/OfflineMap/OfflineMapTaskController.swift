@@ -64,8 +64,6 @@ class OfflineMapTaskController {
         let minScale = data["minScale"] as? Double
         let maxScale = data["maxScale"] as? Double
 
-        offlineMapTask.generateOfflineMapJob(with: <#T##AGSGenerateOfflineMapParameters##ArcGIS.AGSGenerateOfflineMapParameters#>, downloadDirectory: <#T##URL##Foundation.URL#>)
-
         if minScale == nil {
             offlineMapTask.defaultGenerateOfflineMapParameters(withAreaOfInterest: areaOfInterest, completion: { (parameters, error) in
                 if let error = error {
