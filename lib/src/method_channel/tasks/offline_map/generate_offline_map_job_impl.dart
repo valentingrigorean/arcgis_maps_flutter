@@ -50,6 +50,7 @@ class GenerateOfflineMapJobImpl extends GenerateOfflineMapJob {
       return;
     }
     _isDisposed = true;
+    _onDispose?.call();
     _channel.setMethodCallHandler(null);
     _progressController.close();
   }

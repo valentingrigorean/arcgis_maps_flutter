@@ -83,6 +83,7 @@ part 'src/mapping/viewpoint.dart';
 part 'src/mapping/camera.dart';
 part 'src/mapping/elevation_source.dart';
 part 'src/mapping/geo_element.dart';
+part 'src/mapping/layer_list.dart';
 part 'src/mapping/mobile_map_package.dart';
 part 'src/mapping/surface.dart';
 part 'src/mapping/arcgis_tiled_elevation_source.dart';
