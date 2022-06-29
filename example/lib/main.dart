@@ -48,7 +48,10 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key, required this.apiVersion}) : super(key: key);
+  const MyApp({
+    Key? key,
+    required this.apiVersion,
+  }) : super(key: key);
 
   final String apiVersion;
 
@@ -133,8 +136,6 @@ class MainPage extends StatelessWidget {
                   );
                 },
               ),
-
-
               ElevatedButton(
                 child: const Text('Map Gestures'),
                 onPressed: () {

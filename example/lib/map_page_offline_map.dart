@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
+import 'package:arcgis_maps_flutter_example/utils/arcgis_maps_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -13,12 +14,23 @@ class MapPageofflineMap extends StatefulWidget {
 }
 
 class _MapPageofflineMapState extends State<MapPageofflineMap> {
+  // final _map = ArcgisMapsUtils.createMap(
+  //   ArcgisMapsUtils.defaultMap,
+  //   Brightness.light,
+  // );
+
   final _map = ArcGISMap.fromPortalItem(
     PortalItem(
       portal: Portal.arcGISOnline(withLoginRequired: false),
       itemId: 'acc027394bc84c2fb04d1ed317aac674',
     ),
   );
+
+  final Set<Layer> _baseLayers = {
+    ...ArcgisMapsUtils.getAvalancheLayers(),
+  };
+
+  late final ArcgisMapController _mapController;
 
   late final OfflineMapTask _offlineMapTask =
       OfflineMapTask.onlineMap(map: _map);
@@ -34,6 +46,10 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
       ),
       body: ArcgisMapView(
         map: _map,
+        baseLayers: _baseLayers,
+        onMapCreated: (controller) {
+          _mapController = controller;
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _isDownloading ? null : _downloadMap,
@@ -49,15 +65,15 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
 
   void _downloadMap() async {
     try {
+      final areaOfInterest = await _mapController
+          .getCurrentViewpoint(ViewpointType.boundingGeometry);
+      if (areaOfInterest == null) {
+        return;
+      }
+
       final defaultParams =
           await _offlineMapTask.defaultGenerateOfflineMapParameters(
-        areaOfInterest: AGSEnvelope(
-          xMin: -88.1526,
-          yMin: -88.1490,
-          xMax: 41.7694,
-          yMax: 41.7714,
-          spatialReference: SpatialReference.wgs84(),
-        ),
+        areaOfInterest: areaOfInterest.targetGeometry,
       );
       if (defaultParams == null) {
         return;
@@ -67,8 +83,11 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
         print(defaultParams);
       }
 
+      final sw = Stopwatch();
+      sw.start();
+
       Directory appDocDir = await getApplicationDocumentsDirectory();
-      String appDocPath = appDocDir.path + '/offline_map';
+      String appDocPath = appDocDir.path + '/offline_map_example';
 
       if (kDebugMode) {
         print('Downloading map to $appDocPath');
@@ -83,6 +102,10 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
           print(event);
         }
         if (event == JobStatus.succeeded) {
+          sw.stop();
+          if(kDebugMode){
+            print('Downloaded map in ${sw.elapsedMilliseconds}ms');
+          }
           setState(() {
             _isDownloading = false;
           });
