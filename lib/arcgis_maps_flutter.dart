@@ -25,6 +25,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/arcgis_flutter_platform.dart';
+import 'package:arcgis_maps_flutter/src/method_channel/authentication/authentication_manager_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/arcgis_maps_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/scene/arcgis_scene_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/geometry/geometry_engine_flutter_platform.dart';
@@ -44,6 +45,7 @@ part 'src/unit_system.dart';
 
 part 'src/arcgis_error.dart';
 part 'src/arcgis_runtime_environment.dart';
+part 'src/arcgis_authentication_manager.dart';
 
 part 'src/arcgisservices/level_of_detail.dart';
 part 'src/arcgisservices/tile_info.dart';

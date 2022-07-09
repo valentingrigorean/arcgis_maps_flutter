@@ -8,6 +8,7 @@ import androidx.lifecycle.Lifecycle;
 
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
 import com.esri.arcgisruntime.LicenseResult;
+import com.valentingrigorean.arcgis_maps_flutter.authentication.AuthenticationManagerController;
 import com.valentingrigorean.arcgis_maps_flutter.geometry.CoordinateFormatterController;
 import com.valentingrigorean.arcgis_maps_flutter.geometry.GeometryEngineController;
 import com.valentingrigorean.arcgis_maps_flutter.map.ArcgisMapFactory;
@@ -34,6 +35,7 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
 
     private GeometryEngineController geometryEngineController;
     private CoordinateFormatterController coordinateFormatterController;
+    private AuthenticationManagerController authenticationManagerController;
     private LocatorTaskController locatorTaskController;
     private RouteTaskController routeTaskController;
     private MethodChannel channel;
@@ -57,6 +59,8 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
 
         coordinateFormatterController = new CoordinateFormatterController(binding.getBinaryMessenger());
 
+        authenticationManagerController = new AuthenticationManagerController(binding.getBinaryMessenger(), binding.getApplicationContext());
+
         locatorTaskController = new LocatorTaskController(binding.getBinaryMessenger());
 
         routeTaskController = new RouteTaskController(binding.getApplicationContext(), binding.getBinaryMessenger());
@@ -70,6 +74,9 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
 
         coordinateFormatterController.dispose();
         coordinateFormatterController = null;
+
+        authenticationManagerController.dispose();
+        authenticationManagerController = null;
 
         locatorTaskController.dispose();
         locatorTaskController = null;
