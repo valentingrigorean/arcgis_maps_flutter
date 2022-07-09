@@ -269,6 +269,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 }
                 result.success(null);
             }
+            break;
             case "map#setViewpointChangedEvents": {
                 trackViewpointChangedListenerEvents = call.arguments();
                 result.success(null);
@@ -393,9 +394,10 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 }
             }
             break;
-            case "map#getMapScale":
+            case "map#getMapScale": {
                 result.success(mapView.getMapScale());
-                break;
+            }
+            break;
             case "layers#update": {
                 layersController.updateFromArgs(call.arguments);
                 result.success(null);
@@ -435,8 +437,8 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 List<Object> polylineIdsToRemove = call.argument("polylineIdsToRemove");
                 polylinesController.removePolylines(polylineIdsToRemove);
                 result.success(null);
-                break;
             }
+            break;
             case "layer#setTimeOffset": {
                 layersController.setTimeOffset(call.arguments);
                 result.success(null);
