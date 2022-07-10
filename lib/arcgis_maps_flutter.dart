@@ -150,3 +150,7 @@ part 'src/tasks/network_analysis/travel_mode.dart';
 part 'src/toolkit/compass.dart';
 part 'src/toolkit/time_slider/time_slider.dart';
 part 'src/toolkit/time_slider/time_slider_data_provider.dart';
+
+part 'src/data/query/query_parmeters.dart';
+part 'src/feature/feature.dart';
+part 'src/service_table/service_table.dart';
