@@ -41,6 +41,7 @@ import com.valentingrigorean.arcgis_maps_flutter.utils.AGSLoadObjects;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
@@ -437,6 +438,25 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             case "layer#setTimeOffset": {
                 layersController.setTimeOffset(call.arguments);
                 result.success(null);
+                break;
+            }
+            case "map#setViewpointScaleAsync": {
+                final Map<?, ?> data = call.arguments();
+                if (mapView != null && data != null) {
+                    double scale = (double) data.get("scale");
+                    ListenableFuture<Boolean> future = mapView.setViewpointScaleAsync(scale);
+                    future.addDoneListener(() -> {
+                        boolean scaled = false;
+                        try {
+                            scaled = future.get();
+                            result.success(scaled);
+                        } catch (ExecutionException | InterruptedException e) {
+                            result.success(false);
+                        }
+                    });
+                } else {
+                    result.success(false);
+                }
                 break;
             }
             default:
