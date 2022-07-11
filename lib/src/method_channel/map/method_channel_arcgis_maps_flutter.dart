@@ -298,6 +298,16 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
+  Future<bool> setViewpointScale(int mapId, double scale) async{
+    final result = await channel(mapId).invokeMethod<bool>(
+      'map#setViewpointScaleAsync',
+      {
+        'scale': scale,
+      },
+    );
+    return result ?? false;
+  }
+  @override
   Future<Offset?> locationToScreen(int mapId, AGSPoint mapPoint) async {
     final result = await channel(mapId)
         .invokeListMethod<double>('map#locationToScreen', mapPoint.toJson());

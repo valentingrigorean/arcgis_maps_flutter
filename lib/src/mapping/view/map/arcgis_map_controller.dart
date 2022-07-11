@@ -131,6 +131,18 @@ class ArcgisMapController {
         .setViewpointRotation(mapId, angleDegrees);
   }
 
+  /// Asynchronously zooms the map, with animation, to the given scale.
+  /// The map center point does not change.
+  /// The map scale is the number of map units per unit of physical device size.
+  /// It expresses the relationship between a distance in the MapView and the corresponding distance on the ground.
+  /// A smaller value will zoom the map in and produce a larger map display area (features appear larger).
+  /// A larger value will zoom the map out and produce a smaller map display area (features appear smaller).
+  Future<bool> setViewpointScale(double scale) async {
+    assert(scale >= 0);
+    return await ArcgisMapsFlutterPlatform.instance
+        .setViewpointScale(mapId, scale);
+  }
+
   Future<Viewpoint?> getCurrentViewpoint(ViewpointType type) {
     return ArcgisMapsFlutterPlatform.instance.getCurrentViewpoint(mapId, type);
   }
