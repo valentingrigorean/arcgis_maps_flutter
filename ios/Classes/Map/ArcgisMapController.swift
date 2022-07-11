@@ -371,6 +371,16 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 result(nil)
             }
             break
+        case "map#setViewpointScaleAsync":
+            if let data = call.arguments as? Dictionary<String, Any> {
+                let scale = data["scale"] as! Double
+                mapView.setViewpointScale(scale, completion: { finished in
+                    result(finished)
+                })
+            } else {
+                result(false)
+            }
+            break
         default:
             result(FlutterMethodNotImplemented)
             break
