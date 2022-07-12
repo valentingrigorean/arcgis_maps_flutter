@@ -499,6 +499,25 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 }
                 break;
             }
+            case "map#setViewpointScaleAsync": {
+                final Map<?, ?> data = call.arguments();
+                if (mapView != null && data != null) {
+                    double scale = (double) data.get("scale");
+                    ListenableFuture<Boolean> future = mapView.setViewpointScaleAsync(scale);
+                    future.addDoneListener(() -> {
+                        boolean scaled = false;
+                        try {
+                            scaled = future.get();
+                            result.success(scaled);
+                        } catch (ExecutionException | InterruptedException e) {
+                            result.success(false);
+                        }
+                    });
+                } else {
+                    result.success(false);
+                }
+                break;
+            }
             default:
                 result.notImplemented();
                 break;
