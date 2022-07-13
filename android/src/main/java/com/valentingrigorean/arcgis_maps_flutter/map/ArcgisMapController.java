@@ -34,6 +34,7 @@ import com.esri.arcgisruntime.mapping.view.ViewpointChangedEvent;
 import com.esri.arcgisruntime.mapping.view.ViewpointChangedListener;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
 import com.valentingrigorean.arcgis_maps_flutter.LifecycleProvider;
+import com.valentingrigorean.arcgis_maps_flutter.layer_content.LayerContentHelper;
 import com.valentingrigorean.arcgis_maps_flutter.layers.LayersChangedController;
 import com.valentingrigorean.arcgis_maps_flutter.layers.LayersController;
 import com.valentingrigorean.arcgis_maps_flutter.layers.LegendInfoController;
@@ -497,6 +498,14 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 } else {
                     result.success(false);
                 }
+                break;
+            }
+            case "map#getSecondaryLayers": {
+                LayerContentHelper.INSTANCE.requireLayers(call, result, layersController);
+                break;
+            }
+            case "map#updateSecondaryLayerVisibility": {
+                LayerContentHelper.INSTANCE.updateLayerVisibility(call, result);
                 break;
             }
             default:

@@ -30,7 +30,7 @@ class QueryParameters {
       : assert(maxFeatures >= 0),
         _maxFeatures = maxFeatures;
 
-  QueryParameters.fromJson(Map<String, dynamic> json)
+  QueryParameters.fromJson(Map<dynamic, dynamic> json)
       : this.named(
             isReturnGeometry: json["isReturnGeometry"],
             geometry: json["geometry"],

@@ -298,7 +298,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<bool> setViewpointScale(int mapId, double scale) async{
+  Future<bool> setViewpointScale(int mapId, double scale) async {
     final result = await channel(mapId).invokeMethod<bool>(
       'map#setViewpointScaleAsync',
       {
@@ -307,6 +307,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
     );
     return result ?? false;
   }
+
   @override
   Future<Offset?> locationToScreen(int mapId, AGSPoint mapPoint) async {
     final result = await channel(mapId)
@@ -321,6 +322,28 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   Future<double> getMapScale(int mapId) async {
     final result = await channel(mapId).invokeMethod<double>('map#getMapScale');
     return result ?? 0;
+  }
+
+  @override
+  Future<List<SecondaryLayerContent>> getSecondaryLayers(
+      int mapId, String layerId) async {
+    final List<dynamic> result = await channel(mapId)
+            .invokeMethod<List<dynamic>>(
+                "map#getSecondaryLayers", {"layerId": layerId}) ??
+        [];
+    return result.map((e) => SecondaryLayerContent.fromJson(e)).toList();
+  }
+
+  @override
+  Future<bool> updateSecondaryLayerVisibility(int mapId, String layerId,
+      SecondaryLayerContent secondaryLayerContent) async {
+    return await channel(mapId)
+            .invokeMethod<bool>('map#updateSecondaryLayerVisibility', {
+          "layerId": layerId,
+          "visible": secondaryLayerContent.visible,
+          "id": secondaryLayerContent.id
+        }) ??
+        false;
   }
 
   @override

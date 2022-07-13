@@ -126,6 +126,16 @@ class ArcgisMapController {
         .setViewpointCenter(mapId, center, scale);
   }
 
+  Future<List<SecondaryLayerContent>> getSecondaryLayers(String layerId) async {
+    return ArcgisMapsFlutterPlatform.instance.getSecondaryLayers(mapId,layerId);
+  }
+
+  Future<bool> updateSecondaryLayerVisibility(
+      String layerId, SecondaryLayerContent secondaryLayerContent) async {
+    return ArcgisMapsFlutterPlatform.instance
+        .updateSecondaryLayerVisibility(mapId, secondaryLayerContent);
+  }
+
   Future<void> setViewpointRotation(double angleDegrees) {
     return ArcgisMapsFlutterPlatform.instance
         .setViewpointRotation(mapId, angleDegrees);
@@ -160,15 +170,14 @@ class ArcgisMapController {
     );
   }
 
-  Future<void> setInitialViewpoint(){
-    return ArcgisMapsFlutterPlatform.instance
-        .setInitialViewpoint(mapId);
+  Future<void> setInitialViewpoint() {
+    return ArcgisMapsFlutterPlatform.instance.setInitialViewpoint(mapId);
   }
 
-  Future<void> recenter(){
-    return ArcgisMapsFlutterPlatform.instance
-        .recenter(mapId);
+  Future<void> recenter() {
+    return ArcgisMapsFlutterPlatform.instance.recenter(mapId);
   }
+
   /// The current scale of the map. Will return 0 if it cannot be calculated. To change the scale see
   Future<double> getMapScale() =>
       ArcgisMapsFlutterPlatform.instance.getMapScale(mapId);

@@ -381,6 +381,12 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 result(false)
             }
             break
+        case "map#getSecondaryLayers":
+            LayerContentHelper.shareManager().requireLayers(call, result: result, layersController: layersController)
+            break
+        case "map#updateSecondaryLayerVisibility":
+            LayerContentHelper.shareManager().updateLayerVisibility(call, result: result)
+            break
         default:
             result(FlutterMethodNotImplemented)
             break

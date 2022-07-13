@@ -52,13 +52,11 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
   }
 
   Future<void> setInitialViewpoint(int mapId) {
-    throw UnimplementedError(
-        'setInitialViewpoint() has not been implemented.');
+    throw UnimplementedError('setInitialViewpoint() has not been implemented.');
   }
 
   Future<void> recenter(int mapId) {
-    throw UnimplementedError(
-        'recenter() has not been implemented.');
+    throw UnimplementedError('recenter() has not been implemented.');
   }
 
   Future<Location?> getLocation(int mapId) {
@@ -128,8 +126,10 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('setViewpoint() has not been implemented.');
   }
 
-  Future<bool> setViewpointGeometry(int mapId, Geometry geometry,double? padding) {
-    throw UnimplementedError('setViewpointGeometry() has not been implemented.');
+  Future<bool> setViewpointGeometry(
+      int mapId, Geometry geometry, double? padding) {
+    throw UnimplementedError(
+        'setViewpointGeometry() has not been implemented.');
   }
 
   Future<bool> setViewpointCenter(int mapId, AGSPoint center, double scale) {
@@ -146,8 +146,7 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
   }
 
   Future<bool> setViewpointScale(int mapId, double scale) {
-    throw UnimplementedError(
-        'setViewpointScale() has not been implemented.');
+    throw UnimplementedError('setViewpointScale() has not been implemented.');
   }
 
   Future<Offset?> locationToScreen(int mapId, AGSPoint mapPoint) {
@@ -161,6 +160,17 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
 
   Future<double> getMapScale(int mapId) {
     throw UnimplementedError('getMapScale() has not been implemented.');
+  }
+
+  Future<List<SecondaryLayerContent>> getSecondaryLayers(
+      int mapId, String layerId) {
+    throw UnimplementedError('getSecondaryLayers() has not been implemented.');
+  }
+
+  Future<bool> updateSecondaryLayerVisibility(
+      int mapId, String layerId, SecondaryLayerContent secondaryLayerContent) {
+    throw UnimplementedError(
+        'updateSecondaryLayerVisibility() has not been implemented.');
   }
 
   Future<void> updateLayers(int mapId, LayerUpdates layerUpdates) {
