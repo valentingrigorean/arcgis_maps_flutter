@@ -133,7 +133,7 @@ class ArcgisMapController {
   Future<bool> updateSecondaryLayerVisibility(
       String layerId, SecondaryLayerContent secondaryLayerContent) async {
     return ArcgisMapsFlutterPlatform.instance
-        .updateSecondaryLayerVisibility(mapId, secondaryLayerContent);
+        .updateSecondaryLayerVisibility(mapId,layerId, secondaryLayerContent);
   }
 
   Future<void> setViewpointRotation(double angleDegrees) {
