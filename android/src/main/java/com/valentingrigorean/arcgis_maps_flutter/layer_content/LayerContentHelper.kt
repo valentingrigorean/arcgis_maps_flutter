@@ -2,7 +2,6 @@ package com.valentingrigorean.arcgis_maps_flutter.layer_content
 
 import com.esri.arcgisruntime.layers.ArcGISMapImageLayer
 import com.esri.arcgisruntime.layers.ArcGISMapImageSublayer
-import com.esri.arcgisruntime.layers.LayerContent
 import com.valentingrigorean.arcgis_maps_flutter.layers.LayersController
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -96,5 +95,3 @@ object LayerContentHelper {
 
     }
 }
-
-private data class SecondaryLayer(val id: String, val layerContent: LayerContent)
