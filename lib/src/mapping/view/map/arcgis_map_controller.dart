@@ -127,13 +127,14 @@ class ArcgisMapController {
   }
 
   Future<List<SecondaryLayerContent>> getSecondaryLayers(String layerId) async {
-    return ArcgisMapsFlutterPlatform.instance.getSecondaryLayers(mapId,layerId);
+    return ArcgisMapsFlutterPlatform.instance
+        .getSecondaryLayers(mapId, layerId);
   }
 
   Future<bool> updateSecondaryLayerVisibility(
       String layerId, SecondaryLayerContent secondaryLayerContent) async {
     return ArcgisMapsFlutterPlatform.instance
-        .updateSecondaryLayerVisibility(mapId,layerId, secondaryLayerContent);
+        .updateSecondaryLayerVisibility(mapId, layerId, secondaryLayerContent);
   }
 
   Future<void> setViewpointRotation(double angleDegrees) {
@@ -170,13 +171,11 @@ class ArcgisMapController {
     );
   }
 
-  Future<void> setInitialViewpoint() {
+  Future<void> setInitialViewpoint() async {
     return ArcgisMapsFlutterPlatform.instance.setInitialViewpoint(mapId);
   }
 
-  Future<void> recenter() {
-    return ArcgisMapsFlutterPlatform.instance.recenter(mapId);
-  Future<void> recenter() {
+  Future<void> recenter() async {
     return ArcgisMapsFlutterPlatform.instance.recenter(mapId);
   }
 

@@ -463,12 +463,12 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<void> setInitialViewpoint(int mapId) {
+  Future<void> setInitialViewpoint(int mapId) async{
     return channel(mapId).invokeMethod<void>("map#setInitialViewpoint");
   }
 
   @override
-  Future<void> recenter(int mapId) {
+  Future<void> recenter(int mapId) async{
     return channel(mapId).invokeMethod<void>("map#recenter");
   }
 
