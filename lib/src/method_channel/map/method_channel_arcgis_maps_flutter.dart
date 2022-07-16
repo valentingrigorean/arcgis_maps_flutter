@@ -472,6 +472,19 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
     return channel(mapId).invokeMethod<void>("map#recenter");
   }
 
+  @override
+  Future<num?> sendMeasureDistanceAction(
+      int mapId, MeasureAction action) async {
+    return channel(mapId).invokeMethod<num?>(
+        "map#sendMeasureDistanceAction", {"action": action.name});
+  }
+
+  @override
+  Future<num?> sendMeasureAreaAction(int mapId, MeasureAction action) async {
+    return channel(mapId).invokeMethod<num?>(
+        "map#sendMeasureAreaAction", {"action": action.name});
+  }
+
   // Returns a filtered view of the events in the _controller, by mapId.
   Stream<MapEvent> _events(int mapId) =>
       _mapEventStreamController.stream.where((event) => event.mapId == mapId);

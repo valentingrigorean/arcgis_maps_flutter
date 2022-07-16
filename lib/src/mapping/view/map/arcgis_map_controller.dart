@@ -176,6 +176,18 @@ class ArcgisMapController {
 
   Future<void> recenter() {
     return ArcgisMapsFlutterPlatform.instance.recenter(mapId);
+  Future<void> recenter() {
+    return ArcgisMapsFlutterPlatform.instance.recenter(mapId);
+  }
+
+  Future<num?> sendMeasureDistanceAction(MeasureAction action) async {
+    return ArcgisMapsFlutterPlatform.instance
+        .sendMeasureDistanceAction(mapId, action);
+  }
+
+  Future<num?> sendMeasureAreaAction(MeasureAction action) async {
+    return ArcgisMapsFlutterPlatform.instance
+        .sendMeasureAreaAction(mapId, action);
   }
 
   /// The current scale of the map. Will return 0 if it cannot be calculated. To change the scale see

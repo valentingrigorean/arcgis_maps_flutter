@@ -39,6 +39,7 @@ import com.valentingrigorean.arcgis_maps_flutter.layers.LayersChangedController;
 import com.valentingrigorean.arcgis_maps_flutter.layers.LayersController;
 import com.valentingrigorean.arcgis_maps_flutter.layers.LegendInfoController;
 import com.valentingrigorean.arcgis_maps_flutter.layers.MapChangeAware;
+import com.valentingrigorean.arcgis_maps_flutter.measure.MeasureController;
 import com.valentingrigorean.arcgis_maps_flutter.utils.AGSLoadObjects;
 
 import java.util.ArrayList;
@@ -96,6 +97,8 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
     private boolean disposed = false;
 
+    private MeasureController measureController;
+
     ArcgisMapController(
             int id,
             Context context,
@@ -116,6 +119,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         //added by Jarvanmo
         mapView.setBackgroundGrid(new BackgroundGrid(0xFFF5F5F5, 0xFFF5F5F5, 0F, 10F));
         mapView.getSelectionProperties().setColor(Color.BLACK);
+        measureController = new MeasureController(mapView);
 
         mapContainer.addView(mapView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
@@ -506,6 +510,16 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             }
             case "map#updateSecondaryLayerVisibility": {
                 LayerContentHelper.INSTANCE.updateLayerVisibility(call, result);
+                break;
+            }
+            case "map#sendMeasureDistanceAction": {
+                final Map<?, ?> data = call.arguments();
+                 measureController.onDistanceMeasure((String) data.get("action"),result);
+                break;
+            }
+            case "map#sendMeasureAreaAction": {
+                final Map<?, ?> data = call.arguments();
+                measureController.onAreaMeasure((String) data.get("action"),result);
                 break;
             }
             default:
