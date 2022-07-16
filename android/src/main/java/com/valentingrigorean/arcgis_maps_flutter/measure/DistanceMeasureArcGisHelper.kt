@@ -54,9 +54,7 @@ class DistanceMeasureArcGisHelper(
     }
 
     private fun updateCenterMarker(){
-        var viewCenterPoint = arcMapView.visibleArea.extent.center
-        centerLocationMarker.geometry = viewCenterPoint
-        viewCenterPoint = arcMapView.visibleArea.extent.center
+        val viewCenterPoint = arcMapView.visibleArea.extent.center
         centerLocationMarker.geometry = viewCenterPoint
     }
 
@@ -135,6 +133,7 @@ class DistanceMeasureArcGisHelper(
         }
         measureEnabled = true
         arcMapView.addViewpointChangedListener(viewPointChangedListener)
+        updateCenterMarker()
     }
 
     override fun revoke(): Double {
