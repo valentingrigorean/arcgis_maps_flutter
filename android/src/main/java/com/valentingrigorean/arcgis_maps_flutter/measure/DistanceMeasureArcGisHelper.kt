@@ -47,6 +47,13 @@ class DistanceMeasureArcGisHelper(
     }
 
     private val viewPointChangedListener: ViewpointChangedListener = ViewpointChangedListener {
+        if(!measureEnabled){
+            return@ViewpointChangedListener
+        }
+        updateCenterMarker()
+    }
+
+    private fun updateCenterMarker(){
         var viewCenterPoint = arcMapView.visibleArea.extent.center
         centerLocationMarker.geometry = viewCenterPoint
         viewCenterPoint = arcMapView.visibleArea.extent.center
@@ -122,12 +129,12 @@ class DistanceMeasureArcGisHelper(
     override fun initMeasure() {
         measureEnabled = true
         arcMapView.graphicsOverlays?.add(graphicOverlay)
+        updateCenterMarker()
         graphicOverlay.graphics.apply {
             add(centerLocationMarker)
-//            add(endLocation)
-//            add(path)
         }
-
+        measureEnabled = true
+        arcMapView.addViewpointChangedListener(viewPointChangedListener)
     }
 
     override fun revoke(): Double {
@@ -160,8 +167,10 @@ class DistanceMeasureArcGisHelper(
         arcMapView.graphicsOverlays?.remove(graphicOverlay)
         graphicOverlay.graphics.removeAll(polylineGraphicList)
         graphicOverlay.graphics.removeAll(locationPointGraphicList)
+        graphicOverlay.graphics.remove(centerLocationMarker)
         polylineGraphicList.clear()
         locationPoints.clear()
+        arcMapView.removeViewpointChangedListener(viewPointChangedListener)
     }
 }
 

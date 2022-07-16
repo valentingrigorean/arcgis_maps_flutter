@@ -57,11 +57,19 @@ class AreaMeasureHelper(
     }
 
     private val viewPointChangedListener: ViewpointChangedListener = ViewpointChangedListener {
+        if (!measureEnabled){
+            return@ViewpointChangedListener
+        }
+        updateCenterMarker()
+    }
+
+    private fun updateCenterMarker(){
         var viewCenterPoint = arcMapView.visibleArea.extent.center
         centerLocationMarker.geometry = viewCenterPoint
         viewCenterPoint = arcMapView.visibleArea.extent.center
         centerLocationMarker.geometry = viewCenterPoint
     }
+
 
     override fun makePoint(): Double {
         graphicOverlay.graphics.removeAll(polygonGraphicList)
@@ -125,10 +133,11 @@ class AreaMeasureHelper(
 
     override fun initMeasure() {
         arcMapView.graphicsOverlays?.add(graphicOverlay)
+        updateCenterMarker()
         graphicOverlay.graphics.apply {
             add(centerLocationMarker)
-
         }
+        measureEnabled = true
         arcMapView.addViewpointChangedListener(viewPointChangedListener)
     }
 
@@ -138,6 +147,7 @@ class AreaMeasureHelper(
         arcMapView.callout?.dismiss()
         graphicOverlay.graphics.removeAll(polygonGraphicList)
         graphicOverlay.graphics.removeAll(locationPointGraphicList)
+        graphicOverlay.graphics.remove(centerLocationMarker)
         arcMapView.graphicsOverlays?.remove(graphicOverlay)
         polygonGraphicList.clear()
         locationPoints.clear()
@@ -160,12 +170,11 @@ class AreaMeasureHelper(
         graphicOverlay.graphics.removeAll(polygonGraphicList)
         graphicOverlay.graphics.removeAll(locationPointGraphicList)
         polygonGraphicList.clear()
-        var tmp = locationPoints.removeLastOrNull()
+        val tmp = locationPoints.removeLastOrNull()
         return if (tmp == null) {
             0.0
         } else {
             drawPolygon(locationPoints)
-
         }
     }
 
