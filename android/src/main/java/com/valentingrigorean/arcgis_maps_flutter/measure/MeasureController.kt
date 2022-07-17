@@ -26,7 +26,7 @@ class MeasureController(arcMapView: MapView) {
         measureHelper: ArcgisMeasureHelper, action: String,
         result: MethodChannel.Result
     ) {
-        when (action) {
+         when (action) {
             "enter" -> {
                 measureHelper.initMeasure()
                 result.success(0.0)

@@ -38,9 +38,9 @@ class AreaMeasureHelper(
         SimpleFillSymbol(SimpleFillSymbol.Style.SOLID, 0x7f00FF00, polygonOutlineSymbol)
     private val polygonGeometry = PolygonBuilder(SpatialReferences.getWebMercator())
     private val graphic = Graphic(polygonGeometry.toGeometry(), polygonSymbol)
-    private val graphics = graphicOverlay.graphics.apply {
-        add(graphic)
-    }
+//    private val graphics = graphicOverlay.graphics.apply {
+//        add(graphic)
+//    }
 
     private val allGraphics: MutableList<Graphic> = mutableListOf()
     private val polygonPoints = PointCollection(SpatialReferences.getWgs84())
@@ -143,10 +143,10 @@ class AreaMeasureHelper(
         measureEnabled = false
         path.geometry = null
         arcMapView.callout?.dismiss()
+        arcMapView.graphicsOverlays?.remove(graphicOverlay)
         graphicOverlay.graphics.removeAll(polygonGraphicList)
         graphicOverlay.graphics.removeAll(locationPointGraphicList)
         graphicOverlay.graphics.remove(centerLocationMarker)
-        arcMapView.graphicsOverlays?.remove(graphicOverlay)
         polygonGraphicList.clear()
         locationPoints.clear()
         arcMapView.removeViewpointChangedListener(viewPointChangedListener)

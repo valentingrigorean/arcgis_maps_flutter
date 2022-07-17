@@ -3,6 +3,7 @@ package com.valentingrigorean.arcgis_maps_flutter.measure
 import android.annotation.SuppressLint
 import android.util.Log
 import android.view.MotionEvent
+import android.view.View
 import com.esri.arcgisruntime.geometry.*
 import com.esri.arcgisruntime.mapping.view.*
 import com.esri.arcgisruntime.symbology.SimpleLineSymbol
@@ -126,7 +127,6 @@ class DistanceMeasureArcGisHelper(
     @SuppressLint("ClickableViewAccessibility")
     override fun initMeasure() {
         measureEnabled = true
-        arcMapView.graphicsOverlays?.add(graphicOverlay)
         updateCenterMarker()
         graphicOverlay.graphics.apply {
             add(centerLocationMarker)
