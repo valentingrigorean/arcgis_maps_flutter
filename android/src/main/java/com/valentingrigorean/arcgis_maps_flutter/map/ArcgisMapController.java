@@ -416,8 +416,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 markersController.changeMarkers(markersToChange);
                 List<Object> markerIdsToRemove = call.argument("markerIdsToRemove");
                 markersController.removeMarkers(markerIdsToRemove);
-                mapView.invalidate();
-                mapView.requestLayout();
                 result.success(null);
             }
             break;
