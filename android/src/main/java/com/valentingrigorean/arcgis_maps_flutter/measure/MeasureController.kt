@@ -33,24 +33,24 @@ class MeasureController(
             "enter" -> {
                 measureHelper.initMeasure()
                 result.success(0.0)
-                measureHelper.forcePostFrame()
+//                measureHelper.forcePostFrame()
             }
             "makePoint" -> {
                 result.success(measureHelper.makePoint())
-                measureHelper.forcePostFrame()
+//                measureHelper.forcePostFrame()
             }
             "revoke" -> {
                 result.success(measureHelper.revoke())
-                measureHelper.forcePostFrame()
+//                measureHelper.forcePostFrame()
             }
             "clear" -> {
                 result.success(measureHelper.clear())
-                measureHelper.forcePostFrame()
+//                measureHelper.forcePostFrame()
             }
             "exit" -> {
                 measureHelper.reset()
                 result.success(0.0)
-                measureHelper.forcePostFrame()
+//                measureHelper.forcePostFrame()
             }
             else -> {
                 result.notImplemented()
