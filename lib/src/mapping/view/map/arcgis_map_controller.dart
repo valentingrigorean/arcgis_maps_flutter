@@ -189,16 +189,6 @@ class ArcgisMapController {
         .sendMeasureAreaAction(mapId, action);
   }
 
-  Future<void> invalidatePlatformView() async {
-    if (Platform.isAndroid) {
-      return ArcgisMapsFlutterPlatform.instance.init(
-        mapId
-      );
-    } else {
-      return Future.value();
-    }
-  }
-
   /// The current scale of the map. Will return 0 if it cannot be calculated. To change the scale see
   Future<double> getMapScale() =>
       ArcgisMapsFlutterPlatform.instance.getMapScale(mapId);

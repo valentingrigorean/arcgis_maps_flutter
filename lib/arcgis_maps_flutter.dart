@@ -2,7 +2,6 @@ library arcgis_maps_flutter;
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
 import 'package:arcgis_maps_flutter/src/data/field_type.dart';

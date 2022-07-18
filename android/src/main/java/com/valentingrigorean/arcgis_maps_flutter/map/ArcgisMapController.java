@@ -3,7 +3,6 @@ package com.valentingrigorean.arcgis_maps_flutter.map;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
-import android.view.Choreographer;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -521,12 +520,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             case "map#sendMeasureAreaAction": {
                 final Map<?, ?> data = call.arguments();
                 measureController.onAreaMeasure((String) data.get("action"),result);
-                break;
-            }
-            case "map#invalidatePlatformView": {
-                Choreographer.getInstance().postFrameCallback(frameTimeNanos -> {
-                    mapContainer.invalidate();
-                });
                 break;
             }
             default:

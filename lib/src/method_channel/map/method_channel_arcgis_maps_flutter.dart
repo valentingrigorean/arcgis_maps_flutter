@@ -485,11 +485,6 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
         "map#sendMeasureAreaAction", {"action": action.name});
   }
 
-  @override
-  Future<void> invalidatePlatformView(int mapId){
-    return channel(mapId).invokeMethod(
-        "map#invalidatePlatformView");
-  }
   // Returns a filtered view of the events in the _controller, by mapId.
   Stream<MapEvent> _events(int mapId) =>
       _mapEventStreamController.stream.where((event) => event.mapId == mapId);
