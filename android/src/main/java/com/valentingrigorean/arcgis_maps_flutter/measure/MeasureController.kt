@@ -1,12 +1,15 @@
 package com.valentingrigorean.arcgis_maps_flutter.measure
 
+import android.view.View
 import com.esri.arcgisruntime.mapping.view.MapView
 import io.flutter.plugin.common.MethodChannel
 
-class MeasureController(arcMapView: MapView) {
+class MeasureController(
+    arcMapView: MapView, containerView: View
+) {
 
-    private val distanceMeasure: ArcgisMeasureHelper = DistanceMeasureArcGisHelper(arcMapView)
-    private val areaMeasure: ArcgisMeasureHelper = AreaMeasureHelper(arcMapView)
+    private val distanceMeasure: ArcgisMeasureHelper = DistanceMeasureArcGisHelper(arcMapView,containerView)
+    private val areaMeasure: ArcgisMeasureHelper = AreaMeasureHelper(arcMapView,containerView)
 
     fun onAreaMeasure(
         action: String,
@@ -26,23 +29,28 @@ class MeasureController(arcMapView: MapView) {
         measureHelper: ArcgisMeasureHelper, action: String,
         result: MethodChannel.Result
     ) {
-         when (action) {
+        when (action) {
             "enter" -> {
                 measureHelper.initMeasure()
                 result.success(0.0)
+                measureHelper.forcePostFrame()
             }
             "makePoint" -> {
                 result.success(measureHelper.makePoint())
+                measureHelper.forcePostFrame()
             }
             "revoke" -> {
                 result.success(measureHelper.revoke())
+                measureHelper.forcePostFrame()
             }
             "clear" -> {
                 result.success(measureHelper.clear())
+                measureHelper.forcePostFrame()
             }
             "exit" -> {
                 measureHelper.reset()
                 result.success(0.0)
+                measureHelper.forcePostFrame()
             }
             else -> {
                 result.notImplemented()

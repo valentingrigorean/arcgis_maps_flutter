@@ -1,5 +1,8 @@
 package com.valentingrigorean.arcgis_maps_flutter.measure
 
+import android.os.Handler
+import android.view.Choreographer
+import android.view.View
 import com.esri.arcgisruntime.geometry.*
 import com.esri.arcgisruntime.mapping.view.*
 import com.esri.arcgisruntime.symbology.SimpleFillSymbol
@@ -8,6 +11,7 @@ import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol
 
 class AreaMeasureHelper(
     private val arcMapView: MapView,
+    override val containerView: View
 ) : ArcgisMeasureHelper {
     private var measureMode = MeasureMode.CENTER
     private var measureEnabled = false
@@ -57,13 +61,13 @@ class AreaMeasureHelper(
     }
 
     private val viewPointChangedListener: ViewpointChangedListener = ViewpointChangedListener {
-        if (!measureEnabled){
+        if (!measureEnabled) {
             return@ViewpointChangedListener
         }
         updateCenterMarker()
     }
 
-    private fun updateCenterMarker(){
+    private fun updateCenterMarker() {
         val viewCenterPoint = arcMapView.visibleArea.extent.center
         centerLocationMarker.geometry = viewCenterPoint
     }

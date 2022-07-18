@@ -1,7 +1,9 @@
 package com.valentingrigorean.arcgis_maps_flutter.measure
 
 import android.annotation.SuppressLint
+import android.os.Handler
 import android.util.Log
+import android.view.Choreographer
 import android.view.MotionEvent
 import android.view.View
 import com.esri.arcgisruntime.geometry.*
@@ -11,6 +13,7 @@ import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol
 
 class DistanceMeasureArcGisHelper(
     private val arcMapView: MapView,
+    override val containerView: View
 ) : ArcgisMeasureHelper {
     private var measureMode = MeasureMode.CENTER
     private var measureEnabled = false
@@ -131,9 +134,9 @@ class DistanceMeasureArcGisHelper(
         graphicOverlay.graphics.apply {
             add(centerLocationMarker)
         }
+        arcMapView.graphicsOverlays?.add(graphicOverlay)
         measureEnabled = true
         arcMapView.addViewpointChangedListener(viewPointChangedListener)
-        updateCenterMarker()
     }
 
     override fun revoke(): Double {
