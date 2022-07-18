@@ -191,7 +191,7 @@ class ArcgisMapController {
 
   Future<void> invalidatePlatformView() async {
     if (Platform.isAndroid) {
-      return ArcgisMapsFlutterPlatform.instance.init(
+      return await ArcgisMapsFlutterPlatform.instance.invalidatePlatformView(
         mapId
       );
     } else {
