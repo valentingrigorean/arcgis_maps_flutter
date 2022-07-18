@@ -12,6 +12,6 @@ interface FlutterWorkAround {
                 containerView.invalidate()
                 containerView.requestLayout()
             }
-        }, 60)
+        }, 100)
     }
 }
