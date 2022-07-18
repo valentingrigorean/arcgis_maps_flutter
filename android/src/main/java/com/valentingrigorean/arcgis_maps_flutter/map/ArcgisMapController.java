@@ -526,6 +526,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             case "map#invalidatePlatformView": {
                 Choreographer.getInstance().postFrameCallback(frameTimeNanos -> {
                     mapContainer.invalidate();
+                    mapContainer.requestLayout();
                 });
                 break;
             }
