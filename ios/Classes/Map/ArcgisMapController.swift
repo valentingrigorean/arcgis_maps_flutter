@@ -59,7 +59,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         mapView = AGSMapView(frame: frame)
         mapView.selectionProperties = AGSSelectionProperties(color: UIColor.black)
-        mapView.backgroundGrid = AGSBackgroundGrid(color: UIColor(hex: "#FFF5F5F5"), gridLineColor: UIColor(hex: "#FFF5F5F5"), gridLineWidth: 0, gridSize: 10)
+        mapView.backgroundGrid = AGSBackgroundGrid(color: UIColor(red: 0.96, green: 0.96, blue: 0.96, alpha: 1), gridLineColor: UIColor(red: 0.96, green: 0.96, blue: 0.96, alpha: 1), gridLineWidth: 0, gridSize: 10)
 //        mapView.backgroundColor = UIColor.white
         measureController = ArcGisMapMeasureController(mapView: mapView)
         selectionPropertiesHandler = SelectionPropertiesHandler(selectionProperties: mapView.selectionProperties)
