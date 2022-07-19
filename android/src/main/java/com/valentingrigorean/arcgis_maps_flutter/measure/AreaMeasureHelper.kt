@@ -61,10 +61,10 @@ class AreaMeasureHelper(
     }
 
     private val viewPointChangedListener: ViewpointChangedListener = ViewpointChangedListener {
-        if (!measureEnabled) {
-            return@ViewpointChangedListener
-        }
-        updateCenterMarker()
+//        if (!measureEnabled) {
+//            return@ViewpointChangedListener
+//        }
+//        updateCenterMarker()
     }
 
     private fun updateCenterMarker() {
@@ -136,9 +136,9 @@ class AreaMeasureHelper(
     override fun initMeasure() {
         arcMapView.graphicsOverlays?.add(graphicOverlay)
         updateCenterMarker()
-        graphicOverlay.graphics.apply {
-            add(centerLocationMarker)
-        }
+//        graphicOverlay.graphics.apply {
+//            add(centerLocationMarker)
+//        }
         measureEnabled = true
         arcMapView.addViewpointChangedListener(viewPointChangedListener)
     }
