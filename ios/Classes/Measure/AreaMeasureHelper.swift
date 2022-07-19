@@ -86,6 +86,8 @@ class AreaMeasureHelperImpl: ArcGisMeasureHelper {
             return graphic
         }
 
+        graphicOverlay.graphics.addObjects(from: graphicPoints)
+
         if (graphicPoints.count > 1) {
             let polygon = AGSPolygon(points: points)
             let polylineGraphic = AGSGraphic(geometry: polygon, symbol: polygonFillSymbol)
