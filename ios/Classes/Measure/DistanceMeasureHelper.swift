@@ -11,7 +11,7 @@ import ArcGIS
 class DistanceMeasureHelperImpl: ArcGisMeasureHelper {
     init(mapView: AGSMapView) {
         self.mapView = mapView
-        path.symbol = AGSSimpleLineSymbol(style: AGSSimpleLineSymbolStyle.dash, color: UIColor(hex: "#FF0000FF"), width: 5)
+        path.symbol = AGSSimpleLineSymbol(style: AGSSimpleLineSymbolStyle.dash, color: UIColor(red: 0, green: 0, blue: 255, alpha: 1), width: 5)
     }
 
 
@@ -19,11 +19,11 @@ class DistanceMeasureHelperImpl: ArcGisMeasureHelper {
 
     private let unitOfMeasurement = AGSLinearUnit(unitID: .meters)
 
-    private let centerMarker = AGSSimpleMarkerSymbol(style: .cross, color: UIColor(hex: "#FF9c27b0"), size: 10)
+    private let centerMarker = AGSSimpleMarkerSymbol(style: .cross, color: UIColor(red: 0.61, green: 0.15, blue: 0.69, alpha: 1), size: 10)
 
     private let graphicOverlay = AGSGraphicsOverlay()
 
-    private let locationMaker = AGSSimpleMarkerSymbol(style: .circle, color: .blue, size: 8)
+    private let locationMaker = AGSSimpleMarkerSymbol(style: .circle, color: UIColor(red: 0.21, green: 0, blue: 0.70, alpha: 1), size: 8)
 
     private let path = AGSGraphic()
 
@@ -97,7 +97,7 @@ class DistanceMeasureHelperImpl: ArcGisMeasureHelper {
 
         graphicOverlay.graphics.addObjects(from: graphicPoints)
 
-        let polylineSymbol = AGSSimpleLineSymbol(style: .solid, color: UIColor(hex: "#FF3700b3"), width: 3)
+        let polylineSymbol = AGSSimpleLineSymbol(style: .solid, color: UIColor(red: 0.21, green: 0, blue: 0.70, alpha: 1), width: 3)
         if graphicPoints.count > 1 {
             let polyline = AGSPolyline(points: polylinePoints)
             let polylineGraphic = AGSGraphic(geometry: polyline, symbol: polylineSymbol)
