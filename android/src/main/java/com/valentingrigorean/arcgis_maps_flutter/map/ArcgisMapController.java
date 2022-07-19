@@ -520,15 +520,18 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 break;
             }
             case "map#updateSecondaryLayerVisibility": {
+                invalidateMapIfNeeded();
                 LayerContentHelper.INSTANCE.updateLayerVisibility(call, result);
                 break;
             }
             case "map#sendMeasureDistanceAction": {
+                invalidateMapIfNeeded();
                 final Map<?, ?> data = call.arguments();
                  measureController.onDistanceMeasure((String) data.get("action"),result);
                 break;
             }
             case "map#sendMeasureAreaAction": {
+                invalidateMapIfNeeded();
                 final Map<?, ?> data = call.arguments();
                 measureController.onAreaMeasure((String) data.get("action"),result);
                 break;
