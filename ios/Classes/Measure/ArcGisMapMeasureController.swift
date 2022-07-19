@@ -26,7 +26,7 @@ class ArcGisMapMeasureController {
 
 
     func onAreaMeasure(action: String, result: @escaping FlutterResult) {
-        onMeasure(measureHelper: distanceMeasure, action: action, result: result)
+        onMeasure(measureHelper: areaMeasure, action: action, result: result)
     }
 
     private func onMeasure(measureHelper: ArcGisMeasureHelper, action: String, result: @escaping FlutterResult) {
