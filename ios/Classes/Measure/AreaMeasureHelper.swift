@@ -11,17 +11,17 @@ import ArcGIS
 class AreaMeasureHelperImpl: ArcGisMeasureHelper {
     init(mapView: AGSMapView) {
         self.mapView = mapView
-        path.symbol = AGSSimpleLineSymbol(style: .dash, color: UIColor(red: 0, green: 0, blue: 255, alpha: 0), width: 5)
+        path.symbol = AGSSimpleLineSymbol(style: .dash, color: UIColor(red: 0, green: 0, blue: 255, alpha: 1), width: 5)
     }
 
     private let graphicOverlay = AGSGraphicsOverlay()
 
-    private let locationMaker = AGSSimpleMarkerSymbol(style: .circle, color: UIColor(red: 55, green: 0, blue: 179, alpha: 0), size: 8)
+    private let locationMaker = AGSSimpleMarkerSymbol(style: .circle, color: UIColor(red: 55, green: 0, blue: 179, alpha: 1), size: 8)
 
     private let path = AGSGraphic()
 
-    private let polygonSymbol = AGSSimpleLineSymbol(style: .dash, color: UIColor(red: 0, green: 0, blue: 255, alpha: 0), width: 5)
-    private let polygonOutlineSymbol = AGSSimpleLineSymbol(style: .dash, color: UIColor(red: 55, green: 0, blue: 179, alpha: 0), width: 2)
+    private let polygonSymbol = AGSSimpleLineSymbol(style: .dash, color: UIColor(red: 0, green: 0, blue: 255, alpha: 1), width: 5)
+    private let polygonOutlineSymbol = AGSSimpleLineSymbol(style: .dash, color: UIColor(red: 55, green: 0, blue: 179, alpha: 1), width: 2)
     private let polygonFillSymbol = AGSSimpleLineSymbol(style: .solid, color: UIColor(red: 0, green: 255, blue: 0, alpha: 0.5), width: 2)
     private let polygonGeometry = AGSPolygonBuilder(spatialReference: .webMercator())
 
