@@ -12,6 +12,7 @@ class AreaMeasureHelperImpl: ArcGisMeasureHelper {
     init(mapView: AGSMapView) {
         self.mapView = mapView
         path.symbol = AGSSimpleLineSymbol(style: .dash, color: UIColor(red: 0, green: 0, blue: 1, alpha: 1), width: 5)
+        polygonFillSymbol = AGSSimpleFillSymbol(style: .solid, color: UIColor(red: 0, green: 1, blue: 0, alpha: 0.5), outline: polygonOutlineSymbol)
     }
 
     private let graphicOverlay = AGSGraphicsOverlay()
@@ -21,8 +22,8 @@ class AreaMeasureHelperImpl: ArcGisMeasureHelper {
     private let path = AGSGraphic()
 
     private let polygonSymbol = AGSSimpleLineSymbol(style: .dash, color: UIColor(red: 0, green: 0, blue: 1, alpha: 1), width: 5)
-    private let polygonOutlineSymbol = AGSSimpleLineSymbol(style: .dash, color: UIColor(red: 0.21, green: 0, blue: 0.70, alpha: 1), width: 2)
-    private let polygonFillSymbol = AGSSimpleLineSymbol(style: .solid, color: UIColor(red: 0, green: 1, blue: 0, alpha: 0.5), width: 2)
+    private let polygonOutlineSymbol = AGSSimpleLineSymbol(style: .solid, color: UIColor(red: 0.21, green: 0, blue: 0.70, alpha: 1), width: 2)
+    private let polygonFillSymbol: AGSSimpleFillSymbol
     private let polygonGeometry = AGSPolygonBuilder(spatialReference: .webMercator())
 
     private var polygonPoints: [AGSPoint] = []
