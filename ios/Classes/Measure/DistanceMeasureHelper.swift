@@ -23,7 +23,7 @@ class DistanceMeasureHelperImpl: ArcGisMeasureHelper {
 
     private let graphicOverlay = AGSGraphicsOverlay()
 
-    private let locationMaker = AGSSimpleMarkerSymbol(style: .circle, color: UIColor(red: 55, green: 0, blue: 179, alpha: 1), size: 8)
+    private let locationMaker = AGSSimpleMarkerSymbol(style: .circle, color: .blue, size: 8)
 
     private let path = AGSGraphic()
 
@@ -97,7 +97,7 @@ class DistanceMeasureHelperImpl: ArcGisMeasureHelper {
 
         graphicOverlay.graphics.addObjects(from: graphicPoints)
 
-        let polylineSymbol = AGSSimpleLineSymbol(style: .solid, color: .yellow, width: 3)
+        let polylineSymbol = AGSSimpleLineSymbol(style: .solid, color: .blue, width: 3)
         if graphicPoints.count > 1 {
             let polyline = AGSPolyline(points: polylinePoints)
             let polylineGraphic = AGSGraphic(geometry: polyline, symbol: polylineSymbol)
