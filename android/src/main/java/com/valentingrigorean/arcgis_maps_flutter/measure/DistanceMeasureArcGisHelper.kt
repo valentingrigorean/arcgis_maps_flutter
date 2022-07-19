@@ -51,10 +51,10 @@ class DistanceMeasureArcGisHelper(
     }
 
     private val viewPointChangedListener: ViewpointChangedListener = ViewpointChangedListener {
-        if(!measureEnabled){
-            return@ViewpointChangedListener
-        }
-        updateCenterMarker()
+//        if(!measureEnabled){
+//            return@ViewpointChangedListener
+//        }
+//        updateCenterMarker()
     }
 
     private fun updateCenterMarker(){
@@ -130,10 +130,10 @@ class DistanceMeasureArcGisHelper(
     @SuppressLint("ClickableViewAccessibility")
     override fun initMeasure() {
         measureEnabled = true
-        updateCenterMarker()
-        graphicOverlay.graphics.apply {
-            add(centerLocationMarker)
-        }
+//        updateCenterMarker()
+//        graphicOverlay.graphics.apply {
+//            add(centerLocationMarker)
+//        }
         arcMapView.graphicsOverlays?.add(graphicOverlay)
         measureEnabled = true
         arcMapView.addViewpointChangedListener(viewPointChangedListener)
