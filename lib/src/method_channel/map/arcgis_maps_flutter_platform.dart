@@ -59,6 +59,23 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('recenter() has not been implemented.');
   }
 
+  Future<num?> sendMeasureDistanceAction(int mapId, MeasureAction action ){
+    throw UnimplementedError(
+        'sendMeasureDistanceAction() has not been implemented.');
+  }
+
+  Future<num?> sendMeasureAreaAction(int mapId, MeasureAction action ){
+    throw UnimplementedError(
+        'sendMeasureAreaAction() has not been implemented.');
+  }
+
+  ///workaround to force update Android platform view.
+
+  Future<void> invalidatePlatformView(int mapId){
+    throw UnimplementedError(
+        'invalidatePlatformView() has not been implemented.');
+  }
+
   Future<Location?> getLocation(int mapId) {
     throw UnimplementedError('getLocation() has not been implemented.');
   }

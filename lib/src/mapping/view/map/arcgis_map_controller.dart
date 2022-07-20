@@ -127,13 +127,14 @@ class ArcgisMapController {
   }
 
   Future<List<SecondaryLayerContent>> getSecondaryLayers(String layerId) async {
-    return ArcgisMapsFlutterPlatform.instance.getSecondaryLayers(mapId,layerId);
+    return ArcgisMapsFlutterPlatform.instance
+        .getSecondaryLayers(mapId, layerId);
   }
 
   Future<bool> updateSecondaryLayerVisibility(
       String layerId, SecondaryLayerContent secondaryLayerContent) async {
     return ArcgisMapsFlutterPlatform.instance
-        .updateSecondaryLayerVisibility(mapId,layerId, secondaryLayerContent);
+        .updateSecondaryLayerVisibility(mapId, layerId, secondaryLayerContent);
   }
 
   Future<void> setViewpointRotation(double angleDegrees) {
@@ -170,12 +171,32 @@ class ArcgisMapController {
     );
   }
 
-  Future<void> setInitialViewpoint() {
+  Future<void> setInitialViewpoint() async {
     return ArcgisMapsFlutterPlatform.instance.setInitialViewpoint(mapId);
   }
 
-  Future<void> recenter() {
+  Future<void> recenter() async {
     return ArcgisMapsFlutterPlatform.instance.recenter(mapId);
+  }
+
+  Future<num?> sendMeasureDistanceAction(MeasureAction action) async {
+    return ArcgisMapsFlutterPlatform.instance
+        .sendMeasureDistanceAction(mapId, action);
+  }
+
+  Future<num?> sendMeasureAreaAction(MeasureAction action) async {
+    return ArcgisMapsFlutterPlatform.instance
+        .sendMeasureAreaAction(mapId, action);
+  }
+
+  Future<void> invalidatePlatformView() async {
+    if (Platform.isAndroid) {
+      return await ArcgisMapsFlutterPlatform.instance.invalidatePlatformView(
+        mapId
+      );
+    } else {
+      return Future.value();
+    }
   }
 
   /// The current scale of the map. Will return 0 if it cannot be calculated. To change the scale see

@@ -2,6 +2,7 @@ library arcgis_maps_flutter;
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
 import 'package:arcgis_maps_flutter/src/data/field_type.dart';
@@ -155,5 +156,6 @@ part 'src/toolkit/time_slider/time_slider_data_provider.dart';
 
 part 'src/data/query/query_parmeters.dart';
 part 'src/data/layer/layer_content.dart';
+part 'src/data/measure/measure_actions.dart';
 part 'src/feature/feature.dart';
 part 'src/service_table/service_table.dart';

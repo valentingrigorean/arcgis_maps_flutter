@@ -3,6 +3,7 @@ package com.valentingrigorean.arcgis_maps_flutter.map;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
+import android.view.Choreographer;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -20,6 +21,8 @@ import com.esri.arcgisruntime.geometry.Geometry;
 import com.esri.arcgisruntime.geometry.GeometryEngine;
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.layers.Layer;
+import com.esri.arcgisruntime.loadable.LoadStatusChangedEvent;
+import com.esri.arcgisruntime.loadable.LoadStatusChangedListener;
 import com.esri.arcgisruntime.location.LocationDataSource;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.LayerList;
@@ -39,6 +42,7 @@ import com.valentingrigorean.arcgis_maps_flutter.layers.LayersChangedController;
 import com.valentingrigorean.arcgis_maps_flutter.layers.LayersController;
 import com.valentingrigorean.arcgis_maps_flutter.layers.LegendInfoController;
 import com.valentingrigorean.arcgis_maps_flutter.layers.MapChangeAware;
+import com.valentingrigorean.arcgis_maps_flutter.measure.MeasureController;
 import com.valentingrigorean.arcgis_maps_flutter.utils.AGSLoadObjects;
 
 import java.util.ArrayList;
@@ -96,6 +100,10 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
     private boolean disposed = false;
 
+    private MeasureController measureController;
+
+    private boolean loadedCallbackPending = false;
+
     ArcgisMapController(
             int id,
             Context context,
@@ -116,6 +124,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         //added by Jarvanmo
         mapView.setBackgroundGrid(new BackgroundGrid(0xFFF5F5F5, 0xFFF5F5F5, 0F, 10F));
         mapView.getSelectionProperties().setColor(Color.BLACK);
+        measureController = new MeasureController(mapView,mapContainer);
 
         mapContainer.addView(mapView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
@@ -264,6 +273,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             }
             break;
             case "map#setMap": {
+                invalidateMapIfNeeded();
                 final Viewpoint viewpoint = mapView.getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE);
                 changeMapType(call.arguments);
                 if (viewpoint != null) {
@@ -401,11 +411,13 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             }
             break;
             case "layers#update": {
+                invalidateMapIfNeeded();
                 layersController.updateFromArgs(call.arguments);
                 result.success(null);
             }
             break;
             case "markers#update": {
+                invalidateMapIfNeeded();
                 List<Object> markersToAdd = call.argument("markersToAdd");
                 markersController.addMarkers(markersToAdd);
                 List<Object> markersToChange = call.argument("markersToChange");
@@ -416,12 +428,14 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             }
             break;
             case "map#clearMarkerSelection": {
+                invalidateMapIfNeeded();
                 selectionPropertiesHandler.reset();
                 markersController.clearSelectedMarker();
                 result.success(null);
             }
             break;
             case "polygons#update": {
+                invalidateMapIfNeeded();
                 List<Object> polygonsToAdd = call.argument("polygonsToAdd");
                 polygonsController.addPolygons(polygonsToAdd);
                 List<Object> polygonsToChange = call.argument("polygonsToChange");
@@ -432,6 +446,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             }
             break;
             case "polylines#update": {
+                invalidateMapIfNeeded();
                 List<Object> polylinesToAdd = call.argument("polylinesToAdd");
                 polylinesController.addPolylines(polylinesToAdd);
                 List<Object> polylinesToChange = call.argument("polylinesToChange");
@@ -505,7 +520,27 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 break;
             }
             case "map#updateSecondaryLayerVisibility": {
+                invalidateMapIfNeeded();
                 LayerContentHelper.INSTANCE.updateLayerVisibility(call, result);
+                break;
+            }
+            case "map#sendMeasureDistanceAction": {
+                invalidateMapIfNeeded();
+                final Map<?, ?> data = call.arguments();
+                 measureController.onDistanceMeasure((String) data.get("action"),result);
+                break;
+            }
+            case "map#sendMeasureAreaAction": {
+                invalidateMapIfNeeded();
+                final Map<?, ?> data = call.arguments();
+                measureController.onAreaMeasure((String) data.get("action"),result);
+                break;
+            }
+            case "map#invalidatePlatformView": {
+                Choreographer.getInstance().postFrameCallback(frameTimeNanos -> {
+                    mapContainer.invalidate();
+                    mapContainer.requestLayout();
+                });
                 break;
             }
             default:
@@ -570,6 +605,42 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             mapView = null;
         }
     }
+
+    /**
+     * Invalidates the map view after the map has finished rendering.
+     *
+     * <p>gmscore GL renderer uses a {@link android.view.TextureView}. Android platform views that are
+     * displayed as a texture after Flutter v3.0.0. require that the view hierarchy is notified after
+     * all drawing operations have been flushed.
+     *
+     * <p>Since the GL renderer doesn't use standard Android views, and instead uses GL directly, we
+     * notify the view hierarchy by invalidating the view.
+     *
+     * <p>To workaround this limitation, wait two frames. This ensures that at least the frame budget
+     * (16.66ms at 60hz) have passed since the drawing operation was issued.
+     */
+    private void invalidateMapIfNeeded() {
+        if (mapView == null || mapView.getMap() == null || loadedCallbackPending) {
+            return;
+        }
+
+        loadedCallbackPending = true;
+        mapView.getMap().addDoneLoadingListener(() -> {
+            loadedCallbackPending = false;
+            postFrameCallback(() -> postFrameCallback(
+                    () -> {
+                        if (mapView != null) {
+                            mapView.invalidate();
+                        }
+                    }));
+        });
+    }
+
+    private static void postFrameCallback(Runnable f) {
+        Choreographer.getInstance()
+                .postFrameCallback(frameTimeNanos -> f.run());
+    }
+
 
     private void handleTimeAwareLayerInfos(MethodChannel.Result result) {
         final ArcGISMap map = mapView.getMap();
