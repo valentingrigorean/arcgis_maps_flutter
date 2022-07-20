@@ -47,6 +47,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private var timeExtentObservation: NSKeyValueObservation?
 
+    private let measureController: ArcGisMapMeasureController
 
     public init(
             withRegistrar registrar: FlutterPluginRegistrar,
@@ -58,9 +59,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         mapView = AGSMapView(frame: frame)
         mapView.selectionProperties = AGSSelectionProperties(color: UIColor.black)
-        mapView.backgroundGrid = AGSBackgroundGrid(color: UIColor(red: 245, green: 245, blue: 245, alpha: 0), gridLineColor: UIColor(red: 245, green: 245, blue: 245, alpha: 1), gridLineWidth: 0, gridSize: 10)
+        mapView.backgroundGrid = AGSBackgroundGrid(color: UIColor(red: 0.96, green: 0.96, blue: 0.96, alpha: 1), gridLineColor: UIColor(red: 0.96, green: 0.96, blue: 0.96, alpha: 1), gridLineWidth: 0, gridSize: 10)
 //        mapView.backgroundColor = UIColor.white
-
+        measureController = ArcGisMapMeasureController(mapView: mapView)
         selectionPropertiesHandler = SelectionPropertiesHandler(selectionProperties: mapView.selectionProperties)
 
         symbolVisibilityFilterController = SymbolVisibilityFilterController(mapView: mapView)
@@ -362,12 +363,12 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             break
         case "map#recenter":
             let locationDisplay = mapView.locationDisplay
-            if (!locationDisplay.started){
+            if (!locationDisplay.started) {
                 locationDisplay.autoPanMode = AGSLocationDisplayAutoPanMode.recenter
                 locationDisplay.start { (error: Error?) in
                     result(nil)
                 }
-            }else{
+            } else {
                 result(nil)
             }
             break
@@ -387,11 +388,39 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         case "map#updateSecondaryLayerVisibility":
             LayerContentHelper.shareManager().updateLayerVisibility(call, result: result)
             break
+        case "map#sendMeasureDistanceAction":
+            if let data = call.arguments as? Dictionary<String, Any> {
+                let action = data["action"] as! String
+                measureController.onDistanceMeasure(action: action, result: result)
+            } else {
+                result(0.0)
+            }
+            break
+        case "map#sendMeasureAreaAction":
+            if let data = call.arguments as? Dictionary<String, Any> {
+                let action = data["action"] as! String
+                measureController.onAreaMeasure(action: action, result: result)
+            } else {
+                result(0.0)
+            }
+            break
         default:
             result(FlutterMethodNotImplemented)
             break
         }
     }
+
+
+//    case "map#sendMeasureDistanceAction": {
+//    final Map<?, ?> data = call.arguments();
+//        measureController.onDistanceMeasure((String) data.get("action"),result);
+//break;
+//}
+//case "map#sendMeasureAreaAction": {
+//    final Map<?, ?> data = call.arguments();
+//    measureController.onAreaMeasure((String) data.get("action"),result);
+//    break;
+//}
 
     private func handleTimeAwareLayerInfos(result: @escaping FlutterResult) {
         guard  let layers = mapView.map?.operationalLayers as AnyObject as? [AGSLayer], layers.count > 0 else {
