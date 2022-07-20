@@ -3,11 +3,11 @@ part of arcgis_maps_flutter;
 class Feature {
   Geometry? geometry;
   FeatureTable featureTable;
-  final Map<Object?, Object?> _attributes;
+  final Map<dynamic, dynamic> _attributes;
 
-  Map<Object?, Object?> get attributes => _attributes;
+  Map<dynamic, dynamic> get attributes => _attributes;
 
-  set attributes(Map<Object?, Object?> value) {
+  set attributes(Map<dynamic, dynamic> value) {
     _attributes
       ..clear()
       ..addAll(value);
