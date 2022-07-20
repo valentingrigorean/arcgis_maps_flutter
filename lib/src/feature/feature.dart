@@ -1,13 +1,12 @@
 part of arcgis_maps_flutter;
 
 class Feature {
-  Geometry? geometry;
   FeatureTable featureTable;
-  final Map<dynamic, dynamic> _attributes;
+  final Map<String, dynamic> _attributes;
 
-  Map<dynamic, dynamic> get attributes => _attributes;
+  Map<String, dynamic> get attributes => _attributes;
 
-  set attributes(Map<dynamic, dynamic> value) {
+  set attributes(Map<String, dynamic> value) {
     _attributes
       ..clear()
       ..addAll(value);
@@ -15,20 +14,16 @@ class Feature {
 
   Feature.named(
       {Map<String, dynamic> attributes = const {},
-      this.geometry,
       required this.featureTable})
       : _attributes = attributes;
-
   Feature.fromJson(Map<String, dynamic> json)
       : this.named(
-          geometry: json["geometry"],
-          featureTable: json["featureTable"],
+          featureTable:  FeatureTable.fromJson(json["featureTable"]),
           attributes: json["attributes"],
         );
 
-  Map<String, dynamic> toJson() {
+  Map<dynamic, dynamic> toJson() {
     return {
-      "geometry": geometry?.toJson(),
       "featureTable": featureTable.toJson(),
       "attributes": attributes,
     };
