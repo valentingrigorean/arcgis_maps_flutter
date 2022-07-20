@@ -2,7 +2,7 @@ part of arcgis_maps_flutter;
 
 class QueryParameters {
   final bool isReturnGeometry;
-  final Geometry? geometry;
+  final String? geometryJson;
   int _maxFeatures = 0;
 
   int get maxFeatures => _maxFeatures;
@@ -22,7 +22,7 @@ class QueryParameters {
 
   QueryParameters.named(
       {this.isReturnGeometry = false,
-      this.geometry,
+      this.geometryJson,
       this.resultOffset = 0,
       this.spatialRelationship,
       this.whereClause,
@@ -33,7 +33,7 @@ class QueryParameters {
   QueryParameters.fromJson(Map<dynamic, dynamic> json)
       : this.named(
             isReturnGeometry: json["isReturnGeometry"],
-            geometry: json["geometry"],
+            geometryJson: json["geometry"],
             resultOffset: json["resultOffset"],
             maxFeatures: json["maxFeatures"],
             spatialRelationship: json["spatialRelationship"],
@@ -42,7 +42,7 @@ class QueryParameters {
   Map<String, dynamic> toJson() {
     return {
       "isReturnGeometry": isReturnGeometry,
-      "geometry": geometry?.toJson(),
+      "geometry": geometryJson,
       "resultOffset": resultOffset,
       "maxFeatures": maxFeatures,
       "spatialRelationship": spatialRelationship?.name,

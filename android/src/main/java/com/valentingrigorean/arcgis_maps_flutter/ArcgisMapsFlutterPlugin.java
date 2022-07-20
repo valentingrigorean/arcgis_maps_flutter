@@ -13,6 +13,7 @@ import com.valentingrigorean.arcgis_maps_flutter.geometry.CoordinateFormatterCon
 import com.valentingrigorean.arcgis_maps_flutter.geometry.GeometryEngineController;
 import com.valentingrigorean.arcgis_maps_flutter.map.ArcgisMapFactory;
 import com.valentingrigorean.arcgis_maps_flutter.scene.ArcgisSceneViewFactory;
+import com.valentingrigorean.arcgis_maps_flutter.service_table.ServiceTableController;
 import com.valentingrigorean.arcgis_maps_flutter.tasks.geocode.LocatorTaskController;
 import com.valentingrigorean.arcgis_maps_flutter.tasks.networkanalysis.RouteTaskController;
 
@@ -38,6 +39,7 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
     private AuthenticationManagerController authenticationManagerController;
     private LocatorTaskController locatorTaskController;
     private RouteTaskController routeTaskController;
+    private ServiceTableController serviceTableController;
     private MethodChannel channel;
 
     @Nullable
@@ -64,6 +66,8 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
         locatorTaskController = new LocatorTaskController(binding.getBinaryMessenger());
 
         routeTaskController = new RouteTaskController(binding.getApplicationContext(), binding.getBinaryMessenger());
+
+        serviceTableController = new ServiceTableController(binding.getBinaryMessenger());
     }
 
     @Override
@@ -83,6 +87,9 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
 
         routeTaskController.dispose();
         routeTaskController = null;
+
+        serviceTableController.dispose();
+        serviceTableController = null;
     }
 
     @Override

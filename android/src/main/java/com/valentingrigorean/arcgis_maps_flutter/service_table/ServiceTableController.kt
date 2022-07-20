@@ -1,6 +1,7 @@
 package com.valentingrigorean.arcgis_maps_flutter.service_table
 
 import com.esri.arcgisruntime.data.*
+import com.esri.arcgisruntime.geometry.Geometry
 import com.esri.arcgisruntime.internal.jni.CoreFeature
 import com.valentingrigorean.arcgis_maps_flutter.Convert
 import com.valentingrigorean.arcgis_maps_flutter.data.FieldTypeFlutter
@@ -54,12 +55,16 @@ class ServiceTableController(private val messenger: BinaryMessenger) :
                 else -> null
             }
 
-        val geometryParamMap: Map<Any, Any>? = queryParametersMap["geometry"] as Map<Any, Any>?
+        val geometryParamJson: String? = queryParametersMap["geometry"] as String?
 
-        val geometryParam = Convert.toGeometry(geometryParamMap)
+        var geometryParam:Geometry? = null
+        if (geometryParamJson != null){
+            geometryParam = Geometry.fromJson(geometryParamJson)
+        }
 
         val query = QueryParameters().apply {
             isReturnGeometry = queryParametersMap["isReturnGeometry"] as Boolean
+
             if (geometryParam != null) {
                 geometry = geometryParam
             }
