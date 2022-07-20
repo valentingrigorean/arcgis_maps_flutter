@@ -62,7 +62,7 @@ class FeatureTable {
       : _fields = fields,
         _featureTypes = featureTypes;
 
-  FeatureTable.fromJson(Map<String, dynamic> json)
+  FeatureTable.fromJson(Map<dynamic, dynamic> json)
       : this.named(
             fields: (json["fields"] as List<dynamic>)
                 .map((e) => FeatureTableField.fromJson(e))
