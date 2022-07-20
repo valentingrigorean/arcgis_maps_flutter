@@ -40,6 +40,8 @@ import 'package:http/http.dart' as http;
 import 'package:xml2json/xml2json.dart';
 import 'package:jiffy/jiffy.dart';
 
+import 'src/method_channel/service_table/method_channel_service_table_flutter.dart';
+
 
 part 'src/unit_system.dart';
 
