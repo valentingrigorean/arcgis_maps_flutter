@@ -68,7 +68,7 @@ class ServiceTableController(private val messenger: BinaryMessenger) :
             if (geometryParam != null) {
                 geometry = geometryParam
             }
-            maxFeatures = 50
+            maxFeatures = queryParametersMap["maxFeatures"] as Int
             if (whereClauseParam != null) {
                 whereClause = whereClauseParam
             }
@@ -89,9 +89,10 @@ class ServiceTableController(private val messenger: BinaryMessenger) :
 
             val features = future.get().map {
                 it.toMap()
-            }
+            }.toList()
+
             result.success(
-                mapOf<String, Any>(
+                mapOf<String, List<Any>>(
                     "features" to features
                 )
             )
@@ -102,6 +103,10 @@ class ServiceTableController(private val messenger: BinaryMessenger) :
     private fun Feature.toMap(): Map<String, Any> {
         val resultMap: MutableMap<String, Any> = mutableMapOf()
         resultMap["geometry"] = Convert.geometryToJson(this.geometry)
+        resultMap["centerPoint"] = mapOf(
+            "x" to this.geometry?.extent?.center?.x,
+            "y" to this.geometry?.extent?.center?.y
+        )
         val featureTableMap: MutableMap<String, Any> = mutableMapOf()
 
         featureTableMap["displayName"] = this.featureTable.displayName

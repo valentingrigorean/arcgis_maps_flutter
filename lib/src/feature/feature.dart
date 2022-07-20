@@ -1,26 +1,35 @@
 part of arcgis_maps_flutter;
 
 class Feature {
+  Geometry? geometry;
+  CenterPoint? centerPoint;
   FeatureTable featureTable;
-  final Map<String, dynamic> _attributes;
+  final Map<Object?, Object?> _attributes;
 
-  Map<String, dynamic> get attributes => _attributes;
+  Map<Object?, Object?> get attributes => _attributes;
 
-  set attributes(Map<String, dynamic> value) {
+  set attributes(Map<Object?, Object?> value) {
     _attributes
       ..clear()
       ..addAll(value);
   }
 
   Feature.named(
-      {Map<String, dynamic> attributes = const {},
-      required this.featureTable})
+      {Map<Object?, Object?> attributes = const {},
+      required this.featureTable,
+      this.geometry,
+      this.centerPoint})
       : _attributes = attributes;
-  Feature.fromJson(Map<dynamic, dynamic> json)
+
+  Feature.fromJson(Map<Object?, Object?> json)
       : this.named(
-          featureTable:  FeatureTable.fromJson(json["featureTable"]),
-          attributes: json["attributes"],
-        );
+            featureTable: FeatureTable.fromJson(
+                json["featureTable"] as Map<Object?, Object?>),
+            attributes: json["attributes"] as Map<Object?, Object?>,
+            geometry:
+                Geometry.fromJson(json["geometry"] as Map<dynamic, dynamic>?),
+            centerPoint: CenterPoint.fromJson(
+                json['centerPoint'] as Map<Object?, Object?>));
 
   Map<dynamic, dynamic> toJson() {
     return {
@@ -62,16 +71,12 @@ class FeatureTable {
       : _fields = fields,
         _featureTypes = featureTypes;
 
-  FeatureTable.fromJson(Map<dynamic, dynamic> json)
+  FeatureTable.fromJson(Map<Object?, Object?> json)
       : this.named(
-            fields: (json["fields"] as List<dynamic>)
-                .map((e) => FeatureTableField.fromJson(e))
-                .toList(),
-            tableName: json["tableName"],
-            displayName: json["displayName"],
-            featureTypes: (json["featureTypes"] as List<dynamic>)
-                .map((e) => FeatureType.fromJson(e))
-                .toList());
+            fields: [],
+            tableName: json["tableName"] as String?,
+            displayName: json["displayName"] as String?,
+            featureTypes: []);
 
   Map<String, dynamic> toJson() {
     return {
@@ -118,6 +123,20 @@ class FeatureTableField {
   static FeatureTableFieldType _createFieldTypeFromString(String name) {
     return FeatureTableFieldType.values
         .firstWhere((element) => element.name == name);
+  }
+}
+
+class CenterPoint {
+  final num? x;
+  final num? y;
+
+  CenterPoint({required this.x, required this.y});
+
+  CenterPoint.fromJson(Map<Object?, Object?>? json)
+      : this(x: json?['x'] as num?, y: json?['y'] as num?);
+
+  Map<String, dynamic> toJson() {
+    return {"x": x, "y": y};
   }
 }
 
