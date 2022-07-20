@@ -16,7 +16,7 @@ class Feature {
       {Map<String, dynamic> attributes = const {},
       required this.featureTable})
       : _attributes = attributes;
-  Feature.fromJson(Map<String, dynamic> json)
+  Feature.fromJson(Map<dynamic, dynamic> json)
       : this.named(
           featureTable:  FeatureTable.fromJson(json["featureTable"]),
           attributes: json["attributes"],
