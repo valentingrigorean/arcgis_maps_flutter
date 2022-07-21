@@ -2,15 +2,13 @@ package com.valentingrigorean.arcgis_maps_flutter.service_table
 
 import com.esri.arcgisruntime.data.*
 import com.esri.arcgisruntime.geometry.Geometry
-import com.esri.arcgisruntime.internal.jni.CoreFeature
 import com.valentingrigorean.arcgis_maps_flutter.Convert
-import com.valentingrigorean.arcgis_maps_flutter.data.FieldTypeFlutter
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import java.util.*
 
-class ServiceTableController(private val messenger: BinaryMessenger) :
+class ServiceTableController(messenger: BinaryMessenger) :
     MethodChannel.MethodCallHandler {
 
     private var channel: MethodChannel =
