@@ -103,6 +103,9 @@ class ServiceTableController(private val messenger: BinaryMessenger) :
     private fun Feature.toMap(): Map<String, Any> {
         val resultMap: MutableMap<String, Any> = mutableMapOf()
         resultMap["geometry"] = Convert.geometryToJson(this.geometry)
+        if (this.geometry != null){
+            resultMap["geometryJson"] = this.geometry.toJson()
+        }
         resultMap["centerPoint"] = mapOf(
             "x" to this.geometry?.extent?.center?.x,
             "y" to this.geometry?.extent?.center?.y

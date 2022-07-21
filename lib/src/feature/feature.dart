@@ -2,6 +2,7 @@ part of arcgis_maps_flutter;
 
 class Feature {
   Geometry? geometry;
+  String? geometryJson;
   CenterPoint? centerPoint;
   FeatureTable featureTable;
   final Map<Object?, Object?> _attributes;
@@ -18,7 +19,8 @@ class Feature {
       {Map<Object?, Object?> attributes = const {},
       required this.featureTable,
       this.geometry,
-      this.centerPoint})
+      this.centerPoint,
+      this.geometryJson})
       : _attributes = attributes;
 
   Feature.fromJson(Map<Object?, Object?> json)
@@ -29,12 +31,15 @@ class Feature {
             geometry:
                 Geometry.fromJson(json["geometry"] as Map<dynamic, dynamic>?),
             centerPoint: CenterPoint.fromJson(
-                json['centerPoint'] as Map<Object?, Object?>));
+                json['centerPoint'] as Map<Object?, Object?>),
+            geometryJson: json["geometryJson"] as String?);
 
   Map<dynamic, dynamic> toJson() {
     return {
       "featureTable": featureTable.toJson(),
       "attributes": attributes,
+      "geometryJson": geometryJson,
+      "geometry": geometry?.toJson()
     };
   }
 }
