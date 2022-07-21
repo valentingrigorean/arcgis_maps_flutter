@@ -19,13 +19,17 @@ import com.esri.arcgisruntime.concurrent.ListenableFuture;
 import com.esri.arcgisruntime.geometry.Geometry;
 import com.esri.arcgisruntime.geometry.GeometryEngine;
 import com.esri.arcgisruntime.geometry.Point;
+import com.esri.arcgisruntime.layers.ArcGISMapImageLayer;
 import com.esri.arcgisruntime.layers.Layer;
+import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.loadable.LoadStatusChangedEvent;
 import com.esri.arcgisruntime.loadable.LoadStatusChangedListener;
 import com.esri.arcgisruntime.location.LocationDataSource;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.LayerList;
 import com.esri.arcgisruntime.mapping.Viewpoint;
+import com.esri.arcgisruntime.mapping.view.DrawStatusChangedEvent;
+import com.esri.arcgisruntime.mapping.view.DrawStatusChangedListener;
 import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
 import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
@@ -87,6 +91,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     private FrameLayout mapContainer;
     private Viewpoint viewpoint;
     private ScaleBarController scaleBarController;
+    private InvalidateMapHelper invalidateMapHelper;
 
     private boolean haveScaleBar;
 
@@ -95,8 +100,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     private boolean trackTimeExtentEvents = false;
 
     private boolean disposed = false;
-
-    private boolean loadedCallbackPending = false;
 
     ArcgisMapController(
             int id,
@@ -158,6 +161,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         mapView.setOnTouchListener(mapViewOnTouchListener);
         mapView.addViewpointChangedListener(this);
 
+        invalidateMapHelper = new InvalidateMapHelper(mapView);
 
         lifecycleProvider.getLifecycle().addObserver(this);
 
@@ -181,6 +185,8 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         }
 
         disposed = true;
+
+        invalidateMapHelper.dispose();
 
         trackTimeExtentEvents = false;
         trackViewpointChangedListenerEvents = false;
@@ -215,9 +221,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         locationDisplayController.setLocationDisplayControllerDelegate(null);
         locationDisplayController.dispose();
 
-        if (mapContainer != null) {
-            destroyMapViewIfNecessary();
-        }
+        destroyMapViewIfNecessary();
     }
 
     @Override
@@ -263,7 +267,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             }
             break;
             case "map#setMap": {
-                invalidateMapIfNeeded();
+                invalidateMapHelper.invalidateMapIfNeeded();
                 final Viewpoint viewpoint = mapView.getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE);
                 changeMapType(call.arguments);
                 if (viewpoint != null) {
@@ -401,13 +405,13 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             }
             break;
             case "layers#update": {
-                invalidateMapIfNeeded();
+                invalidateMapHelper.invalidateMapIfNeeded();
                 layersController.updateFromArgs(call.arguments);
                 result.success(null);
             }
             break;
             case "markers#update": {
-                invalidateMapIfNeeded();
+                invalidateMapHelper.invalidateMapIfNeeded();
                 List<Object> markersToAdd = call.argument("markersToAdd");
                 markersController.addMarkers(markersToAdd);
                 List<Object> markersToChange = call.argument("markersToChange");
@@ -418,14 +422,14 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             }
             break;
             case "map#clearMarkerSelection": {
-                invalidateMapIfNeeded();
+                invalidateMapHelper.invalidateMapIfNeeded();
                 selectionPropertiesHandler.reset();
                 markersController.clearSelectedMarker();
                 result.success(null);
             }
             break;
             case "polygons#update": {
-                invalidateMapIfNeeded();
+                invalidateMapHelper.invalidateMapIfNeeded();
                 List<Object> polygonsToAdd = call.argument("polygonsToAdd");
                 polygonsController.addPolygons(polygonsToAdd);
                 List<Object> polygonsToChange = call.argument("polygonsToChange");
@@ -436,7 +440,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             }
             break;
             case "polylines#update": {
-                invalidateMapIfNeeded();
+                invalidateMapHelper.invalidateMapIfNeeded();
                 List<Object> polylinesToAdd = call.argument("polylinesToAdd");
                 polylinesController.addPolylines(polylinesToAdd);
                 List<Object> polylinesToChange = call.argument("polylinesToChange");
@@ -533,41 +537,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         }
     }
 
-    /**
-     * Invalidates the map view after the map has finished rendering.
-     *
-     * <p>gmscore GL renderer uses a {@link android.view.TextureView}. Android platform views that are
-     * displayed as a texture after Flutter v3.0.0. require that the view hierarchy is notified after
-     * all drawing operations have been flushed.
-     *
-     * <p>Since the GL renderer doesn't use standard Android views, and instead uses GL directly, we
-     * notify the view hierarchy by invalidating the view.
-     *
-     * <p>To workaround this limitation, wait two frames. This ensures that at least the frame budget
-     * (16.66ms at 60hz) have passed since the drawing operation was issued.
-     */
-    private void invalidateMapIfNeeded() {
-        if (mapView == null || mapView.getMap() == null || loadedCallbackPending) {
-            return;
-        }
-
-        loadedCallbackPending = true;
-        mapView.getMap().addDoneLoadingListener(() -> {
-            loadedCallbackPending = false;
-            postFrameCallback(() -> postFrameCallback(
-                    () -> {
-                        if (mapView != null) {
-                            mapView.invalidate();
-                        }
-                    }));
-        });
-    }
-
-    private static void postFrameCallback(Runnable f) {
-        Choreographer.getInstance()
-                .postFrameCallback(frameTimeNanos -> f.run());
-    }
-
 
     private void handleTimeAwareLayerInfos(MethodChannel.Result result) {
         final ArcGISMap map = mapView.getMap();
@@ -638,6 +607,14 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         final ArcGISMap map = Convert.toArcGISMap(args);
         map.addDoneLoadingListener(() -> {
             methodChannel.invokeMethod("map#loaded", null);
+        });
+        map.addLoadStatusChangedListener(event -> {
+            if (event.getNewLoadStatus() == LoadStatus.FAILED_TO_LOAD) {
+                Log.w(TAG, "changeMapType:  Failed to load map." + map.getLoadError().getMessage());
+                if (map.getLoadError().getCause() != null) {
+                    Log.w(TAG, "changeMapType: Failed to load map." + map.getLoadError().getCause().getMessage());
+                }
+            }
         });
         mapView.setMap(map);
         for (final MapChangeAware mapChangeAware :
@@ -724,4 +701,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             polylinesController.addPolylines((List<Object>) polylinesToAdd);
         }
     }
+
+
 }

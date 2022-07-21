@@ -53,11 +53,6 @@ class GenerateOfflineMapJobController: NSObject {
                 self.channel.invokeMethod("onStatusChanged", arguments: status.rawValue)
             }, completion: { [weak self]result, error in
                 NSLog("\(String(describing: error))")
-//                if let error = error {
-//                    self?.channel.invokeMethod("onError", arguments: error.localizedDescription)
-//                } else {
-//                    self?.channel.invokeMethod("onJobCompleted", arguments: result)
-//                }
             })
             result(true)
             break

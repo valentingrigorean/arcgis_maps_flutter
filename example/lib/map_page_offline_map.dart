@@ -4,6 +4,7 @@ import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:arcgis_maps_flutter_example/utils/arcgis_maps_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:path_provider/path_provider.dart';
 
 class MapPageofflineMap extends StatefulWidget {
@@ -21,12 +22,19 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
 
   final _map = ArcGISMap.fromPortalItem(
     PortalItem(
-      portal: Portal.arcGISOnline(withLoginRequired: false),
-      itemId: 'acc027394bc84c2fb04d1ed317aac674',
+      portal: Portal(
+        postalUrl: 'https://snla.maps.arcgis.com/',
+        loginRequired: false,
+        credential: Credential.creteUserCredential(
+          username: dotenv.env['snla_maps_arcgis_username'] ?? '',
+          password: dotenv.env['snla_maps_arcgis_password'] ?? '',
+        ),
+      ),
+      itemId: '81a73308a0a449a4b8549a0c294fc544',
     ),
   );
 
-  final Set<Layer> _baseLayers = {
+  final Set<Layer> _operationalLayers = {
     ...ArcgisMapsUtils.getAvalancheLayers(),
   };
 
@@ -46,7 +54,7 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
       ),
       body: ArcgisMapView(
         map: _map,
-        baseLayers: _baseLayers,
+        //baseLayers: _baseLayers,
         onMapCreated: (controller) {
           _mapController = controller;
         },
@@ -61,6 +69,12 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
             : const Icon(Icons.download),
       ),
     );
+  }
+
+  Future<void> _loadOfflineMap() async{
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String appDocPath = appDocDir.path + '/offline_map_example';
+    final MobileMapPackage package = await MobileMapPackage.fromPath(appDocPath);
   }
 
   void _downloadMap() async {
@@ -103,7 +117,7 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
         }
         if (event == JobStatus.succeeded) {
           sw.stop();
-          if(kDebugMode){
+          if (kDebugMode) {
             print('Downloaded map in ${sw.elapsedMilliseconds}ms');
           }
           setState(() {
