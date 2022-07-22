@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 
 class MethodChannelRouteTaskFlutter extends RouteTaskFlutterPlatform {
   final MethodChannel _channel =
-      const MethodChannel("plugins.flutter.io/route_task");
+      const MethodChannel("plugins.flutter.io/arcgis_channel/route_task");
 
   @override
   Future<void> createRouteTask(int id, String url, Credential? credential) {

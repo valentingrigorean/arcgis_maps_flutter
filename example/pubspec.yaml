@@ -30,6 +30,8 @@ dependencies:
 
   another_xlider: ^1.1.1
 
+  path_provider: ^2.0.11
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

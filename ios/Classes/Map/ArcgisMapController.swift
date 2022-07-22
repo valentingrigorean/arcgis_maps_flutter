@@ -150,11 +150,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             legendInfoControllers.append(legendInfoController)
             break
         case "map#setMap":
-            let viewPoint = mapView.currentViewpoint(with: AGSViewpointType.centerAndScale)
             changeMapType(args: call.arguments)
-            if viewPoint != nil {
-                mapView.setViewpoint(viewPoint!, duration: 0)
-            }
+
             result(nil)
             break
         case "map#setViewpointChangedListenerEvents":
@@ -418,7 +415,43 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             return
         }
 
+        if dict["offlinePath"] != nil {
+            loadOfflineMap(args: dict)
+            return
+        }
+
         let map = AGSMap(data: dict)
+        changeMap(map: map)
+    }
+
+    private func loadOfflineMap(args: Dictionary<String, Any>) {
+        let offlinePath = args["offlinePath"] as! String
+        let mapIndex = args["offlineMapIndex"] as! Int
+
+        let mobileMapPackage = AGSMobileMapPackage(fileURL: URL(string: offlinePath)!)
+        mobileMapPackage.load { [weak self] error in
+            guard let self = self else {
+                return
+            }
+
+            if error != nil {
+                print(error.debugDescription)
+                self.channel.invokeMethod("map#loaded", arguments: error?.toJSON())
+                return
+            }
+
+            if mobileMapPackage.maps.isEmpty {
+                print("No maps in the package")
+                return
+            }
+
+            let map = mobileMapPackage.maps[mapIndex]
+            self.changeMap(map: map)
+        }
+    }
+
+    private func changeMap(map: AGSMap) {
+        let viewPoint = mapView.currentViewpoint(with: AGSViewpointType.centerAndScale)
         map.load { [weak self]  error in
             guard let channel = self?.channel else {
                 return
@@ -428,6 +461,10 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         }
         mapView.map = map
         layersController.setMap(map)
+
+        if viewPoint != nil {
+            mapView.setViewpoint(viewPoint!, duration: 0)
+        }
     }
 
     private func updateMapOptions(mapOptions: Dictionary<String, Any>) {

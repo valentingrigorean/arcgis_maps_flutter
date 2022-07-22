@@ -1,5 +1,6 @@
 part of arcgis_maps_flutter;
 
+// ignore_for_file: library_private_types_in_public_api
 class ArcgisSceneController {
   // ignore: unused_field
   final _ArcgisSceneViewState _arcgisSceneViewState;
@@ -22,6 +23,7 @@ class ArcgisSceneController {
   }
 
   Future<void> setViewpointCamera(Camera camera) {
-    return ArcgisSceneFlutterPlatform.instance.setViewpointCamera(sceneId, camera);
+    return ArcgisSceneFlutterPlatform.instance
+        .setViewpointCamera(sceneId, camera);
   }
 }

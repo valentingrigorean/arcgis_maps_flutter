@@ -63,21 +63,21 @@ class Compass extends StatefulWidget {
     required this.controller,
     this.width = 50,
     this.height = 50,
-    this.autohide = true,
+    this.autoHide = true,
     this.child,
   }) : super(key: key);
 
   final double width;
   final double height;
 
-  final bool autohide;
+  final bool autoHide;
 
   final CompassController controller;
 
   final Widget? child;
 
   @override
-  _CompassState createState() => _CompassState();
+  State<Compass>  createState() => _CompassState();
 }
 
 class _CompassState extends State<Compass> with SingleTickerProviderStateMixin {
@@ -130,7 +130,7 @@ class _CompassState extends State<Compass> with SingleTickerProviderStateMixin {
       );
     }
 
-    if (widget.autohide) {
+    if (widget.autoHide) {
       child = AnimatedOpacity(
         opacity: _visible ? 1.0 : 0.0,
         duration: const Duration(milliseconds: 250),

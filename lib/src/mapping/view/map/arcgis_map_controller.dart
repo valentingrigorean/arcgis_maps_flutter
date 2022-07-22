@@ -1,5 +1,6 @@
 part of arcgis_maps_flutter;
 
+// ignore_for_file: library_private_types_in_public_api
 class ArcgisMapController {
   final _ArcgisMapViewState _arcgisMapState;
   late final _EventBaseHandler<ViewpointChangedListener>

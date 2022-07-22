@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 
 class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
   final MethodChannel _channel =
-      const MethodChannel("plugins.flutter.io/geometry_engine");
+      const MethodChannel("plugins.flutter.io/arcgis_channel/geometry_engine");
 
   @override
   Future<Geometry?> project(

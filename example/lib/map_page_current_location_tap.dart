@@ -31,6 +31,9 @@ class _MapPageCurrentLocationTapState extends State<MapPageCurrentLocationTap> {
         myLocationEnabled: true,
         onUserLocationTap: () async {
           final point = await _locationDisplay.mapLocation;
+          if(!mounted){
+            return;
+          }
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Column(

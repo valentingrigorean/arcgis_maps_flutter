@@ -9,7 +9,7 @@ class GeometryEngineController {
     private let channel: FlutterMethodChannel
 
     init(messenger: FlutterBinaryMessenger) {
-        channel = FlutterMethodChannel(name: "plugins.flutter.io/geometry_engine", binaryMessenger: messenger)
+        channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel/geometry_engine", binaryMessenger: messenger)
         channel.setMethodCallHandler(handle)
     }
 

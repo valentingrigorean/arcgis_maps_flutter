@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 class MethodChannelCoordinateFormatterFlutter
     extends CoordinateFormatterFlutterPlatform {
   final MethodChannel _channel =
-      const MethodChannel("plugins.flutter.io/coordinate_formatter");
+      const MethodChannel("plugins.flutter.io/arcgis_channel/coordinate_formatter");
 
   @override
   Future<String?> latitudeLongitudeString({

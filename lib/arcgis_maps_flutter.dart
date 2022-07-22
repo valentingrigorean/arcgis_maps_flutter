@@ -10,6 +10,7 @@ import 'package:arcgis_maps_flutter/src/layers/layer_updates.dart';
 import 'package:arcgis_maps_flutter/src/mapping/basemap_type_options.dart';
 import 'package:arcgis_maps_flutter/src/mapping/view/location_display_impl.dart';
 import 'package:arcgis_maps_flutter/src/maps_object.dart';
+import 'package:arcgis_maps_flutter/src/method_channel/tasks/offline_map/offline_map_task_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/symbology/marker_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polygon_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polyline_updates.dart';
@@ -48,6 +49,8 @@ part 'src/arcgis_runtime_environment.dart';
 part 'src/arcgisservices/level_of_detail.dart';
 part 'src/arcgisservices/tile_info.dart';
 
+part 'src/concurrent/job_status.dart';
+
 part 'src/data/tile_key.dart';
 
 part 'src/geometry/ags_polygon.dart';
@@ -80,6 +83,8 @@ part 'src/mapping/viewpoint.dart';
 part 'src/mapping/camera.dart';
 part 'src/mapping/elevation_source.dart';
 part 'src/mapping/geo_element.dart';
+part 'src/mapping/layer_list.dart';
+part 'src/mapping/mobile_map_package.dart';
 part 'src/mapping/surface.dart';
 part 'src/mapping/arcgis_tiled_elevation_source.dart';
 part 'src/mapping/time_extent.dart';
@@ -144,6 +149,12 @@ part 'src/tasks/network_analysis/route_task_info.dart';
 part 'src/tasks/network_analysis/route_types.dart';
 part 'src/tasks/network_analysis/stop.dart';
 part 'src/tasks/network_analysis/travel_mode.dart';
+
+part 'src/tasks/offline_map/generate_offline_map_job.dart';
+part 'src/tasks/offline_map/generate_offline_map_parameters.dart';
+part 'src/tasks/offline_map/generate_offline_map_result.dart';
+part 'src/tasks/offline_map/offline_map_item_info.dart';
+part 'src/tasks/offline_map/offline_map_task.dart';
 
 part 'src/toolkit/compass.dart';
 part 'src/toolkit/time_slider/time_slider.dart';

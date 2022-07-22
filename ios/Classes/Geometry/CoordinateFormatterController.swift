@@ -10,7 +10,7 @@ class CoordinateFormatterController {
     private let channel: FlutterMethodChannel
 
     init(messenger: FlutterBinaryMessenger) {
-        channel = FlutterMethodChannel(name: "plugins.flutter.io/coordinate_formatter", binaryMessenger: messenger)
+        channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel/coordinate_formatter", binaryMessenger: messenger)
         channel.setMethodCallHandler(handle)
     }
 

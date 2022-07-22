@@ -10,7 +10,7 @@ class LocatorTaskController {
     private var locatorTasks: [Int: AGSLocatorTask] = [:]
 
     init(messenger: FlutterBinaryMessenger) {
-        channel = FlutterMethodChannel(name: "plugins.flutter.io/locator_task", binaryMessenger: messenger)
+        channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel/locator_task", binaryMessenger: messenger)
         channel.setMethodCallHandler(handle)
     }
 
