@@ -50,4 +50,14 @@ abstract class GeometryEngineFlutterPlatform extends PlatformInterface {
     throw UnimplementedError(
         'geodeticBufferGeometry() has not been implemented.');
   }
+
+  Future<Geometry?> intersection(Geometry first, Geometry second){
+    throw UnimplementedError(
+        'intersections() has not been implemented.');
+  }
+
+  Future<List<Geometry>> intersections(Geometry first, Geometry second){
+    throw UnimplementedError(
+        'intersections() has not been implemented.');
+  }
 }
