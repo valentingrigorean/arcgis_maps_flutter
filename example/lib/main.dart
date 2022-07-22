@@ -18,6 +18,7 @@ import 'package:arcgis_maps_flutter_example/map_page_marker_from_widget.dart';
 import 'package:arcgis_maps_flutter_example/map_page_marker_rotation.dart';
 import 'package:arcgis_maps_flutter_example/map_page_markers.dart';
 import 'package:arcgis_maps_flutter_example/map_page_markers_visibility_filter.dart';
+import 'package:arcgis_maps_flutter_example/map_page_offline_map.dart';
 import 'package:arcgis_maps_flutter_example/map_page_polygon.dart';
 import 'package:arcgis_maps_flutter_example/map_page_portal.dart';
 import 'package:arcgis_maps_flutter_example/map_page_route.dart';
@@ -33,7 +34,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  await ArcGISRuntimeEnvironment.setApiKey(dotenv.env['apiKey'] ?? 'apiKey');
+  //await ArcGISRuntimeEnvironment.setApiKey(dotenv.env['apiKey'] ?? 'apiKey');
   final result = await ArcGISRuntimeEnvironment.setLicense(
       dotenv.env['licenseKey'] ?? 'licenseKey');
   final apiVersion = await ArcGISRuntimeEnvironment.getAPIVersion();
@@ -47,7 +48,10 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key, required this.apiVersion}) : super(key: key);
+  const MyApp({
+    Key? key,
+    required this.apiVersion,
+  }) : super(key: key);
 
   final String apiVersion;
 
@@ -110,7 +114,17 @@ class MainPage extends StatelessWidget {
                   );
                 },
               ),
-
+              ElevatedButton(
+                child: const Text('Offline map'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MapPageofflineMap(),
+                    ),
+                  );
+                },
+              ),
               ElevatedButton(
                 child: const Text('Marker generatered from widget'),
                 onPressed: () {
@@ -122,8 +136,6 @@ class MainPage extends StatelessWidget {
                   );
                 },
               ),
-
-
               ElevatedButton(
                 child: const Text('Map Gestures'),
                 onPressed: () {

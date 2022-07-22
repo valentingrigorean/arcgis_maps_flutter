@@ -28,7 +28,7 @@ public class LocatorTaskController implements MethodChannel.MethodCallHandler {
     private final MethodChannel channel;
 
     public LocatorTaskController(BinaryMessenger messenger) {
-        channel = new MethodChannel(messenger, "plugins.flutter.io/locator_task");
+        channel = new MethodChannel(messenger, "plugins.flutter.io/arcgis_channel/locator_task");
         channel.setMethodCallHandler(this);
     }
 

@@ -6,7 +6,7 @@ class MapPageMarkersVisibilityFilter extends StatefulWidget {
   const MapPageMarkersVisibilityFilter({Key? key}) : super(key: key);
 
   @override
-  _MapPageMarkersVisibilityFilterState createState() =>
+  State<MapPageMarkersVisibilityFilter> createState() =>
       _MapPageMarkersVisibilityFilterState();
 }
 

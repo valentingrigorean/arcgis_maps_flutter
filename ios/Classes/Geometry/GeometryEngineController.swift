@@ -9,7 +9,7 @@ class GeometryEngineController {
     private let channel: FlutterMethodChannel
 
     init(messenger: FlutterBinaryMessenger) {
-        channel = FlutterMethodChannel(name: "plugins.flutter.io/geometry_engine", binaryMessenger: messenger)
+        channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel/geometry_engine", binaryMessenger: messenger)
         channel.setMethodCallHandler(handle)
     }
 
@@ -76,6 +76,36 @@ class GeometryEngineController {
                     maxDeviation: maxDeviation,
                     curveType: curveType)
             result(polygon?.toJSONFlutter())
+            break
+        case "intersection":
+            guard let data = call.arguments as? Dictionary<String, Any> else {
+                result(nil)
+                return
+            }
+            let firstGeometry = AGSGeometry.fromFlutter(data: data["firstGeometry"] as! Dictionary<String, Any>)!
+            let secondGeometry = AGSGeometry.fromFlutter(data: data["secondGeometry"] as! Dictionary<String, Any>)!
+            let geometry = AGSGeometryEngine.intersection(ofGeometry1: firstGeometry, geometry2: secondGeometry)
+            result(geometry?.toJSONFlutter())
+            break
+        case "intersections":
+            guard let data = call.arguments as? Dictionary<String, Any> else {
+                result([])
+                return
+            }
+            let firstGeometry = AGSGeometry.fromFlutter(data: data["firstGeometry"] as! Dictionary<String, Any>)!
+            let secondGeometry = AGSGeometry.fromFlutter(data: data["secondGeometry"] as! Dictionary<String, Any>)!
+            guard let geometryList  = AGSGeometryEngine.intersections(ofGeometry1: firstGeometry, geometry2: secondGeometry) else {
+                result([])
+                return
+            }
+            var geometryResults :[Any] = []
+            geometryList.forEach { any in
+                if let geometry = any as? AGSGeometry {
+                    let json = geometry.toJSONFlutter()
+                    geometryResults.append(json)
+                }
+            }
+            result(geometryResults)
             break
         default:
             result(FlutterMethodNotImplemented)

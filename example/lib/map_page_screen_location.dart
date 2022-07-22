@@ -7,7 +7,7 @@ class MapPageScreenLocation extends StatefulWidget {
   const MapPageScreenLocation({Key? key}) : super(key: key);
 
   @override
-  _MapPageScreenLocationState createState() => _MapPageScreenLocationState();
+  State<MapPageScreenLocation> createState() => _MapPageScreenLocationState();
 }
 
 class _MapPageScreenLocationState extends State<MapPageScreenLocation> {

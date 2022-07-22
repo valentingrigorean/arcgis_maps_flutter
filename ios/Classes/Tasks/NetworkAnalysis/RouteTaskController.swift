@@ -10,7 +10,7 @@ class RouteTaskController {
     private var routeTasks: [Int: AGSRouteTask] = [:]
 
     init(messenger: FlutterBinaryMessenger) {
-        channel = FlutterMethodChannel(name: "plugins.flutter.io/route_task", binaryMessenger: messenger)
+        channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel/route_task", binaryMessenger: messenger)
         channel.setMethodCallHandler(handle)
     }
 

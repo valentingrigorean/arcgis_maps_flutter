@@ -10,7 +10,7 @@ class MapPageAutoPanMode extends StatefulWidget {
   const MapPageAutoPanMode({Key? key}) : super(key: key);
 
   @override
-  _MapPageAutoPanModeState createState() => _MapPageAutoPanModeState();
+  State<MapPageAutoPanMode> createState() => _MapPageAutoPanModeState();
 }
 
 class _MapPageAutoPanModeState extends State<MapPageAutoPanMode> {

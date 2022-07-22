@@ -8,7 +8,7 @@ class MapPageGeodeticDistance extends StatefulWidget {
   const MapPageGeodeticDistance({Key? key}) : super(key: key);
 
   @override
-  _MapPageGeodeticDistanceState createState() =>
+  State<MapPageGeodeticDistance>  createState() =>
       _MapPageGeodeticDistanceState();
 }
 
@@ -76,6 +76,9 @@ class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance> {
             msg = 'Distance is null';
           } else {
             msg = 'Distance: ${result.distance.toStringAsFixed(2)} meters';
+          }
+          if(!mounted){
+            return;
           }
           ScaffoldMessenger.of(context).clearSnackBars();
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(

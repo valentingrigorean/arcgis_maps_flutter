@@ -27,7 +27,13 @@ class AGSEnvelope extends Geometry {
 
   static AGSEnvelope? fromJson(Map<dynamic, dynamic>? json) {
     if (json == null) return null;
-    final bbox = json['bbox'] as List<dynamic>;
+    late List<dynamic>? bbox;
+    if (json.containsKey('bbox')) {
+      bbox = json['bbox'];
+    } else if (json.containsKey('xmax')) {
+      bbox = [json['xmin'], json['ymin'], json['xmax'], json['ymax']];
+    }
+    if (bbox == null) return null;
     return AGSEnvelope(
       xMin: bbox[0].toDouble(),
       yMin: bbox[1].toDouble(),

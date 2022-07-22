@@ -328,7 +328,7 @@ class TimeSlider extends StatefulWidget {
   final Decoration? backgroundDecoration;
 
   @override
-  _TimeSliderState createState() => _TimeSliderState();
+  State<TimeSlider> createState() => _TimeSliderState();
 }
 
 class _TimeSliderState extends State<TimeSlider> {

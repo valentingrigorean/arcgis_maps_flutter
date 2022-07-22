@@ -5,7 +5,7 @@ class MapPageGesture extends StatefulWidget {
   const MapPageGesture({Key? key}) : super(key: key);
 
   @override
-  _MapPageGestureState createState() => _MapPageGestureState();
+  State<MapPageGesture> createState() => _MapPageGestureState();
 }
 
 class _MapPageGestureState extends State<MapPageGesture> {
