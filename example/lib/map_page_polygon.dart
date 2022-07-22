@@ -7,7 +7,7 @@ class MapPagePolygon extends StatefulWidget {
   const MapPagePolygon({Key? key}) : super(key: key);
 
   @override
-  _MapPagePolygonState createState() => _MapPagePolygonState();
+  State<MapPagePolygon> createState() => _MapPagePolygonState();
 }
 
 class _MapPagePolygonState extends State<MapPagePolygon> {

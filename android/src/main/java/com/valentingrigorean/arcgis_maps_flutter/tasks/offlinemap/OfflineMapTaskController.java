@@ -118,10 +118,11 @@ public class OfflineMapTaskController implements MethodChannel.MethodCallHandler
 
     private void createOfflineMapTask(Map<?, ?> data) {
         OfflineMapTask offlineMapTask;
-        final Object map = data.get("map");
-        final Object portalItem = data.get("portalItem");
-        if (map != null) {
-            ArcGISMap arcGISMap = Convert.toArcGISMap(map);
+        final Map<?,?> map = Convert.toMap(data.get("map"));
+        final Object arcgisMap = map.get("map");
+        final Object portalItem = map.get("portalItem");
+        if (arcgisMap != null) {
+            ArcGISMap arcGISMap = Convert.toArcGISMap(arcgisMap);
             offlineMapTask = new OfflineMapTask(arcGISMap);
         } else if (portalItem != null) {
             final PortalItem nativePortalItem = Convert.toPortalItem(portalItem);

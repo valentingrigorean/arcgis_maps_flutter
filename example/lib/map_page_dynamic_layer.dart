@@ -5,7 +5,7 @@ class MapPageDynamicLayer extends StatefulWidget {
   const MapPageDynamicLayer({Key? key}) : super(key: key);
 
   @override
-  _MapPageDynamicLayerState createState() => _MapPageDynamicLayerState();
+  State<MapPageDynamicLayer> createState() => _MapPageDynamicLayerState();
 }
 
 class _MapPageDynamicLayerState extends State<MapPageDynamicLayer> {

@@ -210,7 +210,7 @@ class ArcgisMapView extends StatefulWidget {
   final VoidCallback? onUserLocationTap;
 
   @override
-  _ArcgisMapViewState createState() => _ArcgisMapViewState();
+  State<ArcgisMapView> createState() => _ArcgisMapViewState();
 }
 
 class _ArcgisMapViewState extends State<ArcgisMapView> {

@@ -27,6 +27,7 @@ import com.esri.arcgisruntime.loadable.LoadStatusChangedListener;
 import com.esri.arcgisruntime.location.LocationDataSource;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.LayerList;
+import com.esri.arcgisruntime.mapping.MobileMapPackage;
 import com.esri.arcgisruntime.mapping.Viewpoint;
 import com.esri.arcgisruntime.mapping.view.DrawStatusChangedEvent;
 import com.esri.arcgisruntime.mapping.view.DrawStatusChangedListener;
@@ -267,12 +268,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             }
             break;
             case "map#setMap": {
-                invalidateMapHelper.invalidateMapIfNeeded();
-                final Viewpoint viewpoint = mapView.getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE);
                 changeMapType(call.arguments);
-                if (viewpoint != null) {
-                    mapView.setViewpointAsync(viewpoint, 0);
-                }
                 result.success(null);
             }
             break;
@@ -604,6 +600,13 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         if (args == null) {
             return;
         }
+        final Map<?, ?> data = Convert.toMap(args);
+
+        if (data.containsKey("offlinePath")) {
+            loadOfflineMap(data);
+            return;
+        }
+
         final ArcGISMap map = Convert.toArcGISMap(args);
         map.addDoneLoadingListener(() -> {
             methodChannel.invokeMethod("map#loaded", null);
@@ -616,10 +619,61 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 }
             }
         });
+        changeMap(map);
+    }
+
+    private void loadOfflineMap(Map<?, ?> data) {
+        final String offlinePath = (String) data.get("offlinePath");
+        final int mapIndex = (int) data.get("offlineMapIndex");
+
+        final MobileMapPackage mobileMapPackage = new MobileMapPackage(offlinePath);
+        mobileMapPackage.addDoneLoadingListener(() -> {
+            if (mobileMapPackage.getLoadStatus() == LoadStatus.LOADED) {
+                final ArcGISMap map = mobileMapPackage.getMaps().get(mapIndex);
+                changeMap(map);
+            } else {
+                Log.w(TAG, "loadOfflineMap: Failed to load map." + mobileMapPackage.getLoadError().getMessage());
+                if (mobileMapPackage.getLoadError().getCause() != null) {
+                    Log.w(TAG, "loadOfflineMap: Failed to load map." + mobileMapPackage.getLoadError().getCause().getMessage());
+                    methodChannel.invokeMethod("map#loaded", mobileMapPackage.getLoadError().getCause().getMessage());
+                } else {
+                    methodChannel.invokeMethod("map#loaded", mobileMapPackage.getLoadError().getMessage());
+                }
+            }
+        });
+
+        mobileMapPackage.loadAsync();
+    }
+
+    private void changeMap(ArcGISMap map) {
+        final Viewpoint viewpoint = mapView.getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE);
         mapView.setMap(map);
+        if (map != null) {
+            map.addDoneLoadingListener(() -> {
+                if (map.getLoadStatus() == LoadStatus.LOADED) {
+                    methodChannel.invokeMethod("map#loaded", null);
+                } else {
+                    Log.w(TAG, "changeMap: Failed to load map." + map.getLoadError().getMessage());
+                    if (map.getLoadError().getCause() != null) {
+                        Log.w(TAG, "changeMap: Failed to load map." + map.getLoadError().getCause().getMessage());
+                        methodChannel.invokeMethod("map#loaded", map.getLoadError().getCause().getMessage());
+                    } else {
+                        methodChannel.invokeMethod("map#loaded", map.getLoadError().getMessage());
+                    }
+                }
+            });
+        }
+
         for (final MapChangeAware mapChangeAware :
                 mapChangeAwares) {
             mapChangeAware.onMapChange(map);
+        }
+
+        if (viewpoint != null) {
+            ListenableFuture<Boolean> future = mapView.setViewpointAsync(viewpoint);
+            future.addDoneListener(() -> {
+                invalidateMapHelper.invalidateMapIfNeeded();
+            });
         }
     }
 

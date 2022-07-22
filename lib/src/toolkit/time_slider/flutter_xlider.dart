@@ -120,7 +120,7 @@ class FlutterSlider extends StatefulWidget {
         super(key: key);
 
   @override
-  _FlutterSliderState createState() => _FlutterSliderState();
+  State<FlutterSlider> createState() => _FlutterSliderState();
 }
 
 class _FlutterSliderState extends State<FlutterSlider>
@@ -307,12 +307,12 @@ class _FlutterSliderState extends State<FlutterSlider>
                 key: containerKey,
                 height: _containerHeight,
                 width: _containerWidth,
+                foregroundDecoration: widget.foregroundDecoration,
+                decoration: widget.decoration,
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: drawHandlers(),
                 ),
-                foregroundDecoration: widget.foregroundDecoration,
-                decoration: widget.decoration,
               ),
             ],
           );
@@ -1489,6 +1489,7 @@ class _FlutterSliderState extends State<FlutterSlider>
       child: Listener(
         child: Draggable(
             axis: widget.axis,
+            feedback: Container(),
             child: Stack(
               clipBehavior: Clip.none,
               children: [
@@ -1499,8 +1500,7 @@ class _FlutterSliderState extends State<FlutterSlider>
                     animation: _leftTooltipAnimation),
                 leftHandler,
               ],
-            ),
-            feedback: Container()),
+            )),
         onPointerMove: (_) {
           __dragging = true;
 
@@ -1610,6 +1610,11 @@ class _FlutterSliderState extends State<FlutterSlider>
       child: Listener(
         child: Draggable(
             axis: Axis.horizontal,
+            feedback: Container(
+//                            width: 20,
+//                            height: 20,
+//                            color: Colors.blue.withOpacity(0.7),
+                ),
             child: Stack(
               clipBehavior: Clip.none,
               children: ([
@@ -1620,12 +1625,7 @@ class _FlutterSliderState extends State<FlutterSlider>
                     animation: _rightTooltipAnimation),
                 rightHandler,
               ]),
-            ),
-            feedback: Container(
-//                            width: 20,
-//                            height: 20,
-//                            color: Colors.blue.withOpacity(0.7),
-                )),
+            )),
         onPointerMove: (_) {
           __dragging = true;
 
@@ -2013,12 +2013,12 @@ class _FlutterSliderState extends State<FlutterSlider>
       suffix,
     ];
 
-    Widget _tooltipHolderWidget = Column(
+    Widget tooltipHolderWidget = Column(
       mainAxisSize: MainAxisSize.min,
       children: children,
     );
     if (_tooltipData.direction == FlutterSliderTooltipDirection.top) {
-      _tooltipHolderWidget = Row(
+      tooltipHolderWidget = Row(
         mainAxisSize: MainAxisSize.max,
         children: children,
       );
@@ -2040,7 +2040,7 @@ class _FlutterSliderState extends State<FlutterSlider>
                   foregroundDecoration:
                       _tooltipData.boxStyle!.foregroundDecoration,
                   transform: _tooltipData.boxStyle!.transform,
-                  child: _tooltipHolderWidget),
+                  child: tooltipHolderWidget),
         ),
       ),
     ));
@@ -2435,17 +2435,7 @@ class FlutterSliderHandler {
 
   @override
   String toString() {
-    return child.toString() +
-        '-' +
-        disabled.toString() +
-        '-' +
-        decoration.toString() +
-        '-' +
-        foregroundDecoration.toString() +
-        '-' +
-        transform.toString() +
-        '-' +
-        opacity.toString();
+    return '$child-$disabled-$decoration-$foregroundDecoration-$transform-$opacity';
   }
 }
 
@@ -2482,27 +2472,7 @@ class FlutterSliderTooltip {
 
   @override
   String toString() {
-    return textStyle.toString() +
-        '-' +
-        boxStyle.toString() +
-        '-' +
-        leftPrefix.toString() +
-        '-' +
-        leftSuffix.toString() +
-        '-' +
-        rightPrefix.toString() +
-        '-' +
-        rightSuffix.toString() +
-        '-' +
-        alwaysShowTooltip.toString() +
-        '-' +
-        disabled.toString() +
-        '-' +
-        disableAnimation.toString() +
-        '-' +
-        direction.toString() +
-        '-' +
-        positionOffset.toString();
+    return '$textStyle-$boxStyle-$leftPrefix-$leftSuffix-$rightPrefix-$rightSuffix-$alwaysShowTooltip-$disabled-$disableAnimation-$direction-$positionOffset';
   }
 }
 
@@ -2517,13 +2487,7 @@ class FlutterSliderTooltipPositionOffset {
 
   @override
   String toString() {
-    return top.toString() +
-        '-' +
-        left.toString() +
-        '-' +
-        bottom.toString() +
-        '-' +
-        right.toString();
+    return '$top-$left-$bottom-$right';
   }
 }
 
@@ -2537,11 +2501,7 @@ class FlutterSliderTooltipBox {
 
   @override
   String toString() {
-    return decoration.toString() +
-        '-' +
-        foregroundDecoration.toString() +
-        '-' +
-        transform.toString();
+    return '$decoration-$foregroundDecoration-$transform';
   }
 }
 
@@ -2568,19 +2528,7 @@ class FlutterSliderTrackBar {
 
   @override
   String toString() {
-    return inactiveTrackBar.toString() +
-        '-' +
-        activeTrackBar.toString() +
-        '-' +
-        activeDisabledTrackBarColor.toString() +
-        '-' +
-        inactiveDisabledTrackBarColor.toString() +
-        '-' +
-        activeTrackBarHeight.toString() +
-        '-' +
-        inactiveTrackBarHeight.toString() +
-        '-' +
-        centralWidget.toString();
+    return '$inactiveTrackBar-$activeTrackBar-$activeDisabledTrackBarColor-$inactiveDisabledTrackBarColor-$activeTrackBarHeight-$inactiveTrackBarHeight-$centralWidget';
   }
 }
 
@@ -2593,7 +2541,7 @@ class FlutterSliderIgnoreSteps {
 
   @override
   String toString() {
-    return from.toString() + '-' + to.toString();
+    return '$from-$to';
   }
 }
 
@@ -2607,7 +2555,7 @@ class FlutterSliderFixedValue {
 
   @override
   String toString() {
-    return percent.toString() + '-' + value.toString();
+    return '$percent-$value';
   }
 }
 
@@ -2625,13 +2573,7 @@ class FlutterSliderHandlerAnimation {
 
   @override
   String toString() {
-    return curve.toString() +
-        '-' +
-        reverseCurve.toString() +
-        '-' +
-        duration.toString() +
-        '-' +
-        scale.toString();
+    return '$curve-$reverseCurve-$duration-$scale';
   }
 }
 
@@ -2662,25 +2604,7 @@ class FlutterSliderHatchMark {
 
   @override
   String toString() {
-    return disabled.toString() +
-        '-' +
-        density.toString() +
-        '-' +
-        linesDistanceFromTrackBar.toString() +
-        '-' +
-        labelsDistanceFromTrackBar.toString() +
-        '-' +
-        labels.toString() +
-        '-' +
-        smallLine.toString() +
-        '-' +
-        bigLine.toString() +
-        '-' +
-        labelBox.toString() +
-        '-' +
-        linesAlignment.toString() +
-        '-' +
-        displayLines.toString();
+    return '$disabled-$density-$linesDistanceFromTrackBar-$labelsDistanceFromTrackBar-$labels-$smallLine-$bigLine-$labelBox-$linesAlignment-$displayLines';
   }
 }
 
@@ -2696,7 +2620,7 @@ class FlutterSliderHatchMarkLabel {
 
   @override
   String toString() {
-    return percent.toString() + '-' + label.toString();
+    return '$percent-$label';
   }
 }
 
@@ -2717,15 +2641,7 @@ class FlutterSliderSizedBox {
 
   @override
   String toString() {
-    return width.toString() +
-        '-' +
-        height.toString() +
-        '-' +
-        decoration.toString() +
-        '-' +
-        foregroundDecoration.toString() +
-        '-' +
-        transform.toString();
+    return '$width-$height-$decoration-$foregroundDecoration-$transform';
   }
 }
 
@@ -2742,11 +2658,7 @@ class FlutterSliderStep {
 
   @override
   String toString() {
-    return step.toString() +
-        '-' +
-        isPercentRange.toString() +
-        '-' +
-        rangeList.toString();
+    return '$step-$isPercentRange-$rangeList';
   }
 }
 
@@ -2763,7 +2675,7 @@ class FlutterSliderRangeStep {
 
   @override
   String toString() {
-    return from.toString() + '-' + to.toString() + '-' + step.toString();
+    return '$from-$to-$step';
   }
 }
 

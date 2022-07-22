@@ -7,7 +7,7 @@ class MapPageASsetsMarker extends StatefulWidget {
   const MapPageASsetsMarker({Key? key}) : super(key: key);
 
   @override
-  _MapPageASsetsMarkerState createState() => _MapPageASsetsMarkerState();
+  State<MapPageASsetsMarker> createState() => _MapPageASsetsMarkerState();
 }
 
 class _MapPageASsetsMarkerState extends State<MapPageASsetsMarker> {

@@ -66,6 +66,9 @@ class GenerateOfflineMapJobController: NSObject {
             offlineMapJob.progress.pause()
             result(true)
             break
+        case "getError":
+            result(offlineMapJob.error?.toJSON())
+            break
         default:
             result(FlutterMethodNotImplemented)
         }

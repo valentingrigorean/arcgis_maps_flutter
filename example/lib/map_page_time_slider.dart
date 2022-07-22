@@ -5,7 +5,7 @@ class MapPageTimeSlider extends StatefulWidget {
   const MapPageTimeSlider({Key? key}) : super(key: key);
 
   @override
-  _MapPageTimeSliderState createState() => _MapPageTimeSliderState();
+  State<MapPageTimeSlider>  createState() => _MapPageTimeSliderState();
 }
 
 class _MapPageTimeSliderState extends State<MapPageTimeSlider> {

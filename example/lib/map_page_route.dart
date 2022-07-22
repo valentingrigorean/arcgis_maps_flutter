@@ -6,7 +6,7 @@ class MapPageRoute extends StatefulWidget {
   const MapPageRoute({Key? key}) : super(key: key);
 
   @override
-  _MapPageRouteState createState() => _MapPageRouteState();
+  State<MapPageRoute>  createState() => _MapPageRouteState();
 }
 
 class _MapPageRouteState extends State<MapPageRoute> {
@@ -76,8 +76,8 @@ class _MapPageRouteState extends State<MapPageRoute> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.alt_route),
         onPressed: _testRoute,
+        child: const Icon(Icons.alt_route),
       ),
     );
   }

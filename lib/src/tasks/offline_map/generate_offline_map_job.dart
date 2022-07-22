@@ -17,6 +17,8 @@ abstract class GenerateOfflineMapJob {
 
   Stream<JobStatus> get onStatusChanged;
 
+  Future<ArcgisError?> get error;
+
   Future<bool> start();
 
   Future<bool> cancel();

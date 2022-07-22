@@ -65,6 +65,15 @@ class GenerateOfflineMapJobImpl extends GenerateOfflineMapJob {
   GenerateOfflineMapParameters? get parameters => _config.parameters;
 
   @override
+  Future<ArcgisError?> get error async{
+    final result = await _channel.invokeMethod('getError');
+    if (result == null) {
+      return null;
+    }
+    return ArcgisError.fromJson(result);
+  }
+
+  @override
   Future<double> get progress async {
     final result = await _channel.invokeMethod<double>('getJobProgress', _id);
     return result ?? 0.0;
@@ -82,8 +91,8 @@ class GenerateOfflineMapJobImpl extends GenerateOfflineMapJob {
   @override
   Stream<JobStatus> get onStatusChanged => _statusController.stream;
 
-  @override
-  GenerateOfflineMapResult? get result => _config.result;
+  // @override
+  // GenerateOfflineMapResult? get result => _config.result;
 
   @override
   Future<bool> start() async {

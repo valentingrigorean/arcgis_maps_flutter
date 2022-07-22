@@ -33,7 +33,7 @@ class ArcgisSceneView extends StatefulWidget {
   final Surface surface;
 
   @override
-  _ArcgisSceneViewState createState() => _ArcgisSceneViewState();
+  State<ArcgisSceneView> createState() => _ArcgisSceneViewState();
 }
 
 class _ArcgisSceneViewState extends State<ArcgisSceneView> {

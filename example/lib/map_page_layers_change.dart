@@ -7,7 +7,7 @@ class MapPageLayersChange extends StatefulWidget {
   const MapPageLayersChange({Key? key}) : super(key: key);
 
   @override
-  _MapPageLayersChangeState createState() => _MapPageLayersChangeState();
+  State<MapPageLayersChange> createState() => _MapPageLayersChangeState();
 }
 
 class _MapPageLayersChangeState extends State<MapPageLayersChange> {
