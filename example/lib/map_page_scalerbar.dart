@@ -7,7 +7,7 @@ class MapPageScaleBar extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _MapPageScaleBarState createState() => _MapPageScaleBarState();
+  State<MapPageScaleBar> createState() => _MapPageScaleBarState();
 }
 
 class _MapPageScaleBarState extends State<MapPageScaleBar> {

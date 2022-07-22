@@ -7,7 +7,7 @@ class MapPageMarkerRotation extends StatefulWidget {
   const MapPageMarkerRotation({Key? key}) : super(key: key);
 
   @override
-  _MapPageMarkerRotationState createState() => _MapPageMarkerRotationState();
+  State<MapPageMarkerRotation> createState() => _MapPageMarkerRotationState();
 }
 
 class _MapPageMarkerRotationState extends State<MapPageMarkerRotation> {

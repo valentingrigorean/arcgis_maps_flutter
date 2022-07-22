@@ -78,4 +78,32 @@ class GeometryEngine {
       curveType: curveType,
     );
   }
+
+  /// Constructs the set-theoretic intersection between two geometries.
+  /// Supports true curves.
+  static Future<Geometry?> intersection(Geometry first, Geometry second) {
+    return GeometryEngineFlutterPlatform.instance.intersection(first, second);
+  }
+
+  /// Calculates the intersection of two geometries.
+  /// The returned array contains one geometry of each dimension for which there are intersections. For example,
+  /// if both inputs are polylines, the array will contain at most two geometries: the first a multipoint containing the
+  /// points at which the lines cross, and the second a polyline containing the lines of overlap. If a crossing point lies
+  /// within a line of overlap, only the line of overlap is present -- the result set is not self-intersecting. If there are no
+  /// crossing points or there are no lines of overlap, the respective geometry will not be present in the returned
+  /// array. If the input geometries do not intersect, the resulting array will be empty. The table below shows, for each
+  /// combination of pairs of input geometry types, the types of geometry that will be contained within the returned array if there are
+  /// intersections of that type.
+  /// Set of potential output geometry types for pairs of input geometry types
+  /// Input type          Point/Multipoint    Polyline                Polygon/Envelope
+  /// Point/Multipoint    Multipoint          Multipoint              Multipoint
+  /// Polyline            Multipoint          Multipoint, Polyline    Multipoint, Polyline
+  /// Polygon/Envelope    Multipoint          Multipoint, Polyline    Multipoint, Polyline,Polygon
+  /// The geometries in the returned array are sorted by ascending dimensionality,
+  /// e.g. multipoint (dimension 0) then polyline (dimension 1) then polygon
+  /// (dimension 2) for the intersection of two geometries with area that have
+  /// intersections of those types. Returns @c nil on error. Supports true curves.
+  static Future<List<Geometry>> intersections(Geometry first, Geometry second) {
+    return GeometryEngineFlutterPlatform.instance.intersections(first, second);
+  }
 }

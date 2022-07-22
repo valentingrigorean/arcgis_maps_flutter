@@ -12,6 +12,7 @@ import android.util.TypedValue;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.esri.arcgisruntime.ArcGISRuntimeException;
 import com.esri.arcgisruntime.UnitSystem;
 import com.esri.arcgisruntime.arcgisservices.LevelOfDetail;
 import com.esri.arcgisruntime.arcgisservices.TileInfo;
@@ -28,6 +29,9 @@ import com.esri.arcgisruntime.geometry.PointCollection;
 import com.esri.arcgisruntime.geometry.Polygon;
 import com.esri.arcgisruntime.geometry.Polyline;
 import com.esri.arcgisruntime.geometry.SpatialReference;
+import com.esri.arcgisruntime.layers.Layer;
+import com.esri.arcgisruntime.loadable.LoadStatus;
+import com.esri.arcgisruntime.loadable.Loadable;
 import com.esri.arcgisruntime.location.LocationDataSource;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.ArcGISScene;
@@ -66,6 +70,7 @@ import com.valentingrigorean.arcgis_maps_flutter.map.SymbolVisibilityFilter;
 import com.valentingrigorean.arcgis_maps_flutter.map.SymbolVisibilityFilterController;
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.Scalebar;
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.Style;
+import com.valentingrigorean.arcgis_maps_flutter.utils.LoadStatusChangedListenerLogger;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -82,6 +87,24 @@ public class Convert {
 
     private static final SimpleDateFormat ISO8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
     private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    public static Object arcGISRuntimeExceptionToJson(@Nullable ArcGISRuntimeException ex) {
+        if (ex == null) {
+            return null;
+        }
+
+        final HashMap<String, Object> map = new HashMap<>();
+
+        map.put("code", ex.getErrorCode());
+        map.put("message", ex.getMessage());
+        map.put("additionalMessage", ex.getAdditionalMessage());
+        if (ex.getCause() != null) {
+            map.put("innerErrorMessage", ex.getCause().getMessage());
+        }
+        map.put("errorDomain", ex.getErrorDomain().ordinal());
+
+        return map;
+    }
 
 
     public static Scalebar.Alignment toScaleBarAlignment(int rawValue) {
@@ -141,7 +164,7 @@ public class Convert {
         return json;
     }
 
-    public static  Object viewpointToJson(Viewpoint viewpoint) {
+    public static Object viewpointToJson(Viewpoint viewpoint) {
         final String json = viewpoint.toJson();
         try {
             return objectMapper.readValue(json, Map.class);
@@ -163,6 +186,7 @@ public class Convert {
             case UNKNOWN:
                 return null;
             case ENVELOPE:
+                return toEnvelope(data);
             case POLYLINE:
             case POLYGON:
             case MULTIPOINT:
@@ -230,6 +254,23 @@ public class Convert {
         if (spatialReference != null && z == null)
             return new Point(x, y, spatialReference);
         return new Point(x, y, z, spatialReference);
+    }
+
+    public static Envelope toEnvelope(Object o) {
+        final Map<?, ?> data = toMap(o);
+        final SpatialReference spatialReference = toSpatialReference(data.get("spatialReference"));
+        if (data.containsKey("xmin")) {
+            final double xmin = toDouble(data.get("xmin"));
+            final double ymin = toDouble(data.get("ymin"));
+            final double xmax = toDouble(data.get("xmax"));
+            final double ymax = toDouble(data.get("ymax"));
+            return new Envelope(xmin, ymin, xmax, ymax, spatialReference);
+        }
+        if (data.containsKey("bbox")) {
+            final double[] bbox = toDoubleArray(data.get("bbox"));
+            return new Envelope(bbox[0], bbox[1], bbox[2], bbox[3], spatialReference);
+        }
+        return null;
     }
 
     public static Viewpoint toViewPoint(Object o) {
@@ -320,18 +361,25 @@ public class Convert {
     public static ArcGISMap toArcGISMap(Object o) {
         final Map<?, ?> data = toMap(o);
         final Object baseMap = data.get("baseMap");
+        ArcGISMap arcGISMap = null;
         if (baseMap != null) {
-            return new ArcGISMap(createBasemapFromType((String) baseMap));
+            final Basemap basemap = createBasemapFromType((String) baseMap);
+            attachLoadableLogger("BASEMAP", basemap);
+            arcGISMap = new ArcGISMap(basemap);
         }
         final Object baseLayer = data.get("baseLayer");
         if (baseLayer != null) {
             final FlutterLayer layer = new FlutterLayer(toMap(baseLayer));
-            return new ArcGISMap(new Basemap(layer.createLayer()));
+            final Layer nativeLayer = layer.createLayer();
+            attachLoadableLogger("BASE_LAYER:" + layer.getLayerId(), nativeLayer);
+            arcGISMap = new ArcGISMap(new Basemap());
         }
 
         final Object portalItem = data.get("portalItem");
         if (portalItem != null) {
-            return new ArcGISMap(toPortalItem(portalItem));
+            final Basemap basemap = new Basemap(toPortalItem(portalItem));
+            attachLoadableLogger("BASEMAP", basemap);
+            arcGISMap = new ArcGISMap(basemap);
         }
 
         final Map<?, ?> basemapTypeOptions = toMap(data.get("basemapTypeOptions"));
@@ -340,11 +388,16 @@ public class Convert {
             final Double latitude = toDouble(basemapTypeOptions.get("latitude"));
             final Double longitude = toDouble(basemapTypeOptions.get("longitude"));
             final int levelOfDetail = toInt(basemapTypeOptions.get("levelOfDetail"));
-            return new ArcGISMap(type, latitude, longitude, levelOfDetail);
+            arcGISMap = new ArcGISMap(type, latitude, longitude, levelOfDetail);
         }
 
+        if (arcGISMap == null) {
+            arcGISMap = new ArcGISMap();
+        }
 
-        return new ArcGISMap();
+        attachLoadableLogger("MAP", arcGISMap);
+
+        return arcGISMap;
     }
 
     public static FlutterLayer.ServiceImageTiledLayerOptions toServiceImageTiledLayerOptions(Object o) {
@@ -900,6 +953,7 @@ public class Convert {
         if (credentials != null) {
             portal.setCredential(toCredentials(credentials));
         }
+        attachLoadableLogger("PORTAL", portal);
         return portal;
     }
 
@@ -907,7 +961,9 @@ public class Convert {
         final Map<?, ?> data = toMap(o);
         final Portal portal = toPortal(data.get("portal"));
         final String itemId = (String) data.get("itemId");
-        return new PortalItem(portal, itemId);
+        final PortalItem portalItem = new PortalItem(portal, itemId);
+        attachLoadableLogger("PORTAL_ITEM:" + portalItem.getItemId(), portalItem);
+        return portalItem;
     }
 
 
@@ -1066,6 +1122,17 @@ public class Convert {
         return (List<?>) o;
     }
 
+    public static <T> List<T> toListOf(Object o) {
+        return (List<T>) o;
+    }
+
+    public static double[] toDoubleArray(Object o) {
+        if (o instanceof ArrayList) {
+            return ((ArrayList<Double>) o).stream().mapToDouble(Double::doubleValue).toArray();
+        }
+        return (double[]) o;
+    }
+
     public static double toDouble(Object o) {
         return ((Number) o).doubleValue();
     }
@@ -1118,6 +1185,15 @@ public class Convert {
 
     public static int spToPixels(Context context, int sp) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, context.getResources().getDisplayMetrics());
+    }
+
+
+    private static void attachLoadableLogger(String tag, @NonNull Loadable loadable) {
+        if (!BuildConfig.DEBUG) {
+            return;
+        }
+        final LoadStatusChangedListenerLogger logger = new LoadStatusChangedListenerLogger(tag, loadable);
+        logger.attach();
     }
 
 }

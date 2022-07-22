@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 
 class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
   final MethodChannel _channel =
-      const MethodChannel("plugins.flutter.io/geometry_engine");
+      const MethodChannel("plugins.flutter.io/arcgis_channel/geometry_engine");
 
   @override
   Future<Geometry?> project(
@@ -76,5 +76,27 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
       }
       return AGSPolygon.fromJson(result);
     });
+  }
+
+  @override
+  Future<Geometry?> intersection(Geometry first, Geometry second) async{
+    var result = await _channel.invokeMethod("intersection",
+        {"firstGeometry": first.toJson(), "secondGeometry": second.toJson()});
+    return Geometry.fromJson(result);
+  }
+
+  @override
+  Future<List<Geometry>> intersections(Geometry first, Geometry second) async{
+    var result = await _channel.invokeMethod("intersections",
+        {"firstGeometry": first.toJson(), "secondGeometry": second.toJson()});
+    List<dynamic> list = result;
+    List<Geometry> geometryList = [];
+    for(var json in list){
+      Geometry? geometry = Geometry.fromJson(json);
+      if(geometry != null){
+        geometryList.add(geometry);
+      }
+    }
+    return geometryList;
   }
 }

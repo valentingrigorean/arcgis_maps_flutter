@@ -6,7 +6,7 @@ class MapPageLocator extends StatefulWidget {
   const MapPageLocator({Key? key}) : super(key: key);
 
   @override
-  _MapPageLocatorState createState() => _MapPageLocatorState();
+  State<MapPageLocator> createState() => _MapPageLocatorState();
 }
 
 class _MapPageLocatorState extends State<MapPageLocator> {

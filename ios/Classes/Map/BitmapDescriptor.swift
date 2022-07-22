@@ -124,7 +124,6 @@ class BitmapDescriptor: Hashable {
     }
 
     private static func createFlutterBitmapDescriptor(data: Dictionary<String, Any>) -> FlutterBitmapDescriptor {
-        print(data)
         if let fromBytes = data["fromBytes"] as? FlutterStandardTypedData {
             return RawBitmapDescriptor(rawData: fromBytes)
         }

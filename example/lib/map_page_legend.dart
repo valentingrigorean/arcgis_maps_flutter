@@ -7,7 +7,7 @@ class MapPageLegend extends StatefulWidget {
   const MapPageLegend({Key? key}) : super(key: key);
 
   @override
-  _MapPageLegendState createState() => _MapPageLegendState();
+  State<MapPageLegend> createState() => _MapPageLegendState();
 }
 
 class _MapPageLegendState extends State<MapPageLegend> {

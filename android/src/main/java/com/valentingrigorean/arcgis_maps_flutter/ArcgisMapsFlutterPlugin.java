@@ -16,6 +16,7 @@ import com.valentingrigorean.arcgis_maps_flutter.scene.ArcgisSceneViewFactory;
 import com.valentingrigorean.arcgis_maps_flutter.service_table.ServiceTableController;
 import com.valentingrigorean.arcgis_maps_flutter.tasks.geocode.LocatorTaskController;
 import com.valentingrigorean.arcgis_maps_flutter.tasks.networkanalysis.RouteTaskController;
+import com.valentingrigorean.arcgis_maps_flutter.tasks.offlinemap.OfflineMapTaskController;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -40,6 +41,7 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
     private LocatorTaskController locatorTaskController;
     private RouteTaskController routeTaskController;
     private ServiceTableController serviceTableController;
+    private OfflineMapTaskController offlineMapTaskController;
     private MethodChannel channel;
 
     @Nullable
@@ -67,6 +69,8 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
 
         routeTaskController = new RouteTaskController(binding.getApplicationContext(), binding.getBinaryMessenger());
 
+        offlineMapTaskController = new OfflineMapTaskController(binding.getBinaryMessenger());
+
         serviceTableController = new ServiceTableController(binding.getBinaryMessenger());
     }
 
@@ -87,6 +91,9 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
 
         routeTaskController.dispose();
         routeTaskController = null;
+
+        offlineMapTaskController.dispose();
+        offlineMapTaskController = null;
 
         serviceTableController.dispose();
         serviceTableController = null;
