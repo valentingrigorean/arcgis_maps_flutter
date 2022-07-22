@@ -17,7 +17,9 @@ import com.esri.arcgisruntime.geometry.Polygon;
 import com.esri.arcgisruntime.geometry.SpatialReference;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.BinaryMessenger;
@@ -82,6 +84,26 @@ public class GeometryEngineController implements MethodChannel.MethodCallHandler
                 } else {
                     result.success(Convert.geometryToJson(polygon));
                 }
+            }
+            break;
+            case "intersection": {
+                final Map<?, ?> data = Convert.toMap(call.arguments);
+                final Geometry firstGeometry = Convert.toGeometry(data.get("firstGeometry"));
+                final Geometry secondGeometry = Convert.toGeometry(data.get("secondGeometry"));
+                Geometry geometry = GeometryEngine.intersection(firstGeometry,secondGeometry);
+                result.success(Convert.geometryToJson(geometry));
+            }
+            break;
+            case "intersections": {
+                final Map<?, ?> data = Convert.toMap(call.arguments);
+                final Geometry firstGeometry = Convert.toGeometry(data.get("firstGeometry"));
+                final Geometry secondGeometry = Convert.toGeometry(data.get("secondGeometry"));
+                List<Geometry> geometryList = GeometryEngine.intersections(firstGeometry,secondGeometry);
+                ArrayList<Object> resultList = new ArrayList<>();
+                for (Geometry geometry : geometryList) {
+                    resultList.add(Convert.geometryToJson(geometry));
+                }
+                result.success(resultList);
             }
             break;
             default:
