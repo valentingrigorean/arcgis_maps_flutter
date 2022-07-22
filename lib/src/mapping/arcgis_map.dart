@@ -28,7 +28,8 @@ class ArcGISMap {
   final String? _baseMap;
   final Layer? _baseLayer;
   final PortalItem? _portalItem;
-
+  final String? _offlinePath;
+  final int _offlineMapIndex;
   final int _id;
 
   bool _isDisposed = false;
@@ -38,10 +39,14 @@ class ArcGISMap {
     String? baseMap,
     Layer? baseLayer,
     PortalItem? portalItem,
+    String? offlinePath,
+    int offlineMapIndex = 0,
   })  : _basemapTypeOptions = basemapTypeOptions,
         _baseMap = baseMap,
         _baseLayer = baseLayer,
         _portalItem = portalItem,
+        _offlinePath = offlinePath,
+        _offlineMapIndex = offlineMapIndex,
         _id = _arcgisMapHandlerId++;
 
   factory ArcGISMap.fromPortalItem(PortalItem portalItem) =>
@@ -132,7 +137,8 @@ class ArcGISMap {
   factory ArcGISMap.terrainWithLabels() =>
       ArcGISMap._(baseMap: 'terrainWithLabels');
 
-
+  factory ArcGISMap.offlineMap(String path, {int mapIndex = 0}) =>
+      ArcGISMap._(offlinePath: path, offlineMapIndex: mapIndex);
 
   void dispose() {
     if (_isDisposed) {
@@ -154,6 +160,10 @@ class ArcGISMap {
     }
     if (_portalItem != null) {
       json['portalItem'] = _portalItem!.toJson();
+    }
+    if (_offlinePath != null) {
+      json['offlinePath'] = _offlinePath!;
+      json['offlineMapIndex'] = _offlineMapIndex;
     }
     return json;
   }

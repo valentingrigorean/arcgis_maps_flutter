@@ -1,7 +1,7 @@
 part of arcgis_maps_flutter;
 
-class MobileMapPackage {
-  MobileMapPackage({
+abstract class MobileMapPackage {
+  const MobileMapPackage({
     required this.path,
   });
 

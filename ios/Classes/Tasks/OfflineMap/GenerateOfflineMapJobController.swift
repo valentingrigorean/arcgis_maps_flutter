@@ -45,7 +45,9 @@ class GenerateOfflineMapJobController: NSObject {
             break
         case "startJob":
             offlineMapJob.start(statusHandler: { [weak self]status in
-                guard let self = self else { return }
+                guard let self = self else {
+                    return
+                }
                 if status == self.status {
                     return
                 }

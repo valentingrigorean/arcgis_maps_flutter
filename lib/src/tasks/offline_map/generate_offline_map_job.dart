@@ -3,7 +3,7 @@ part of arcgis_maps_flutter;
 abstract class GenerateOfflineMapJob {
   String? get downloadDirectory;
 
-  GenerateOfflineMapResult? get result;
+  // GenerateOfflineMapResult? get result;
 
   ArcGISMap? get onlineMap;
 

@@ -42,6 +42,12 @@ public class RouteTaskController implements MethodChannel.MethodCallHandler {
     }
 
     @Override
+    protected void finalize() throws Throwable {
+        dispose();
+        super.finalize();
+    }
+
+    @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
 
         switch (call.method) {

@@ -14,6 +14,7 @@ import com.valentingrigorean.arcgis_maps_flutter.map.ArcgisMapFactory;
 import com.valentingrigorean.arcgis_maps_flutter.scene.ArcgisSceneViewFactory;
 import com.valentingrigorean.arcgis_maps_flutter.tasks.geocode.LocatorTaskController;
 import com.valentingrigorean.arcgis_maps_flutter.tasks.networkanalysis.RouteTaskController;
+import com.valentingrigorean.arcgis_maps_flutter.tasks.offlinemap.OfflineMapTaskController;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -36,6 +37,7 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
     private CoordinateFormatterController coordinateFormatterController;
     private LocatorTaskController locatorTaskController;
     private RouteTaskController routeTaskController;
+    private OfflineMapTaskController offlineMapTaskController;
     private MethodChannel channel;
 
     @Nullable
@@ -60,6 +62,8 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
         locatorTaskController = new LocatorTaskController(binding.getBinaryMessenger());
 
         routeTaskController = new RouteTaskController(binding.getApplicationContext(), binding.getBinaryMessenger());
+
+        offlineMapTaskController = new OfflineMapTaskController(binding.getBinaryMessenger());
     }
 
     @Override
@@ -76,6 +80,9 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
 
         routeTaskController.dispose();
         routeTaskController = null;
+
+        offlineMapTaskController.dispose();
+        offlineMapTaskController = null;
     }
 
     @Override

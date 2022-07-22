@@ -20,23 +20,30 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
   //   Brightness.light,
   // );
 
+  // final _map = ArcGISMap.fromPortalItem(
+  //   PortalItem(
+  //     portal: Portal(
+  //       postalUrl: 'https://snla.maps.arcgis.com/',
+  //       loginRequired: false,
+  //       credential: Credential.creteUserCredential(
+  //         username: dotenv.env['snla_maps_arcgis_username'] ?? '',
+  //         password: dotenv.env['snla_maps_arcgis_password'] ?? '',
+  //       ),
+  //     ),
+  //     itemId: '81a73308a0a449a4b8549a0c294fc544',
+  //   ),
+  // );
+
   final _map = ArcGISMap.fromPortalItem(
     PortalItem(
-      portal: Portal(
-        postalUrl: 'https://snla.maps.arcgis.com/',
-        loginRequired: false,
-        credential: Credential.creteUserCredential(
-          username: dotenv.env['snla_maps_arcgis_username'] ?? '',
-          password: dotenv.env['snla_maps_arcgis_password'] ?? '',
-        ),
+      portal: Portal.arcGISOnline(
+        withLoginRequired: false,
       ),
-      itemId: '81a73308a0a449a4b8549a0c294fc544',
+      itemId: 'acc027394bc84c2fb04d1ed317aac674',
     ),
   );
 
-  final Set<Layer> _operationalLayers = {
-    ...ArcgisMapsUtils.getAvalancheLayers(),
-  };
+  ArcGISMap? _offlineMap;
 
   late final ArcgisMapController _mapController;
 
@@ -45,6 +52,12 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
 
   bool _isDownloading = false;
   double _progress = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOfflineMap();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,22 +72,44 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
           _mapController = controller;
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _isDownloading ? null : _downloadMap,
-        child: _isDownloading
-            ? CircularProgressIndicator(
-                value: _progress,
-                color: Colors.white,
-              )
-            : const Icon(Icons.download),
-      ),
+      floatingActionButton: _offlineMap != null
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        MapDownloadedOfflineMap(map: _offlineMap!),
+                  ),
+                );
+              },
+              child: const Icon(Icons.download_for_offline),
+            )
+          : FloatingActionButton(
+              onPressed: _isDownloading ? null : _downloadMap,
+              child: _isDownloading
+                  ? CircularProgressIndicator(
+                      value: _progress,
+                      color: Colors.white,
+                    )
+                  : const Icon(Icons.download),
+            ),
     );
   }
 
-  Future<void> _loadOfflineMap() async{
+  Future<void> _loadOfflineMap() async {
     Directory appDocDir = await getApplicationDocumentsDirectory();
-    String appDocPath = appDocDir.path + '/offline_map_example';
-    final MobileMapPackage package = await MobileMapPackage.fromPath(appDocPath);
+    String appDocPath = '${appDocDir.path}/offline_map_example';
+    String packageInfo = '$appDocPath/package.info';
+    final File file = File(packageInfo);
+    if (!await file.exists()) {
+      return;
+    }
+
+    if (mounted) {
+      setState(() {
+        _offlineMap = ArcGISMap.offlineMap(appDocPath);
+      });
+    }
   }
 
   void _downloadMap() async {
@@ -101,7 +136,7 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
       sw.start();
 
       Directory appDocDir = await getApplicationDocumentsDirectory();
-      String appDocPath = appDocDir.path + '/offline_map_example';
+      String appDocPath = '${appDocDir.path}/offline_map_example';
 
       if (kDebugMode) {
         print('Downloading map to $appDocPath');
@@ -116,6 +151,7 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
           print(event);
         }
         if (event == JobStatus.succeeded) {
+          _loadOfflineMap();
           sw.stop();
           if (kDebugMode) {
             print('Downloaded map in ${sw.elapsedMilliseconds}ms');
@@ -147,5 +183,26 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
         print(e);
       }
     }
+  }
+}
+
+class MapDownloadedOfflineMap extends StatelessWidget {
+  const MapDownloadedOfflineMap({
+    Key? key,
+    required this.map,
+  }) : super(key: key);
+
+  final ArcGISMap map;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Downloaded map'),
+      ),
+      body: ArcgisMapView(
+        map: map,
+      ),
+    );
   }
 }
