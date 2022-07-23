@@ -20,7 +20,7 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
         coordinateFormatterController = CoordinateFormatterController(messenger: registrar.messenger())
         routeTaskController = RouteTaskController(messenger: registrar.messenger())
         offlineMapTaskController = OfflineMapTaskController(messenger: registrar.messenger())
-        serviceTableController = ArcGisServiceTableController(methodChannel: registrar.messenger())
+        serviceTableController = ArcGisServiceTableController(messenger: registrar.messenger())
 
         super.init()
 
