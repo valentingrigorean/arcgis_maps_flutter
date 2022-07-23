@@ -150,7 +150,7 @@ extension AGSFieldType {
         case .int32:
             return "number"
         case .GUID:
-            <#code#>
+            return "ignore"
         case .float:
             return "number"
         case .double:
