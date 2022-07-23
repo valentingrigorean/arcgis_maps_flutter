@@ -10,8 +10,11 @@ import ArcGIS
 
 
 class ArcGisServiceTableController {
-    init(methodChannel: FlutterMethodChannel) {
-        self.methodChannel = methodChannel
+    private let messenger: FlutterBinaryMessenger
+
+    init(messenger: FlutterBinaryMessenger) {
+        self.messenger = messenger
+        methodChannel = FlutterMethodChannel(name: "plugins.flutter.io/service_table", binaryMessenger: messenger)
         methodChannel.setMethodCallHandler(handle)
     }
 
