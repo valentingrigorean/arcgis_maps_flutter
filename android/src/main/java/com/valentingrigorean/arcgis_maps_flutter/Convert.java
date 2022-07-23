@@ -373,7 +373,7 @@ public class Convert {
             final FlutterLayer layer = new FlutterLayer(toMap(baseLayer));
             final Layer nativeLayer = layer.createLayer();
             attachLoadableLogger("BASE_LAYER:" + layer.getLayerId(), nativeLayer);
-            arcGISMap = new ArcGISMap(new Basemap());
+            arcGISMap = new ArcGISMap(new Basemap(nativeLayer));
         }
 
         final Object portalItem = data.get("portalItem");
