@@ -53,11 +53,11 @@ class ServiceTableController(messenger: BinaryMessenger) :
                 else -> null
             }
 
-        val geometryParamJson: String? = queryParametersMap["geometry"] as String?
+        val geometryParamJson = queryParametersMap["geometry"]
 
-        var geometryParam:Geometry? = null
-        if (geometryParamJson != null){
-            geometryParam = Geometry.fromJson(geometryParamJson)
+        var geometryParam: Geometry? = null
+        if (geometryParamJson != null) {
+            geometryParam = Convert.toGeometry(geometryParamJson)
         }
 
         val query = QueryParameters().apply {
@@ -77,7 +77,7 @@ class ServiceTableController(messenger: BinaryMessenger) :
         }
 
         val queryFields = when (call.argument<String?>("queryFields")) {
-            "IDS_ONLY" -> ServiceFeatureTable.QueryFeatureFields.LOAD_ALL
+            "IDS_ONLY" -> ServiceFeatureTable.QueryFeatureFields.IDS_ONLY
             "MINIMUM" -> ServiceFeatureTable.QueryFeatureFields.MINIMUM
             "LOAD_ALL" -> ServiceFeatureTable.QueryFeatureFields.LOAD_ALL
             else -> ServiceFeatureTable.QueryFeatureFields.LOAD_ALL
@@ -101,7 +101,7 @@ class ServiceTableController(messenger: BinaryMessenger) :
     private fun Feature.toMap(): Map<String, Any> {
         val resultMap: MutableMap<String, Any> = mutableMapOf()
         resultMap["geometry"] = Convert.geometryToJson(this.geometry)
-        if (this.geometry != null){
+        if (this.geometry != null) {
             resultMap["geometryJson"] = this.geometry.toJson()
         }
         resultMap["centerPoint"] = mapOf(
@@ -128,7 +128,7 @@ class ServiceTableController(messenger: BinaryMessenger) :
             this.featureTable.featureTypes.forEach { ft ->
                 val featureTypeMap: MutableMap<String, Any> = mutableMapOf()
 
-                if (ft.id is String || ft.id is Int || ft.id is Short || ft.id is Double) {
+                if (ft.id is String || ft.id is Int || ft.id is Short || ft.id is Double || ft.id is Float) {
                     featureTypeMap["id"] = ft.id
                     featureTypeMap["name"] = ft.name
                     featureTypesList.add(featureTypeMap)
