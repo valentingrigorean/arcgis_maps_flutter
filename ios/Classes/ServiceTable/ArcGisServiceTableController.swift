@@ -153,8 +153,4 @@ class ArcGisServiceTableController {
         return spatialRelationShipParam
 
     }
-
-    private func featureQueryResultToMap(queryResult: AGSFeatureQueryResult) -> Dictionary<String, Any> {
-
-    }
 }
