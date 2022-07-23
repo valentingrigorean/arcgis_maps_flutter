@@ -98,11 +98,11 @@ class ArcGisServiceTableController {
                     result(emptyResult)
                     return
                 }
-                let featuresJson = features.map { feature -> T in
+                let featuresJson = features.map { feature -> Any in
                     feature.toJSONFlutter()
                 }
 
-                result(["features": features])
+                result(["features": featuresJson])
             }
         }
     }
