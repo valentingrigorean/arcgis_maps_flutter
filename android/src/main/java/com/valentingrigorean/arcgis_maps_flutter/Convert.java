@@ -37,6 +37,7 @@ import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.ArcGISScene;
 import com.esri.arcgisruntime.mapping.ArcGISTiledElevationSource;
 import com.esri.arcgisruntime.mapping.Basemap;
+import com.esri.arcgisruntime.mapping.BasemapStyle;
 import com.esri.arcgisruntime.mapping.ElevationSource;
 import com.esri.arcgisruntime.mapping.GeoElement;
 import com.esri.arcgisruntime.mapping.Surface;
@@ -372,7 +373,7 @@ public class Convert {
             final FlutterLayer layer = new FlutterLayer(toMap(baseLayer));
             final Layer nativeLayer = layer.createLayer();
             attachLoadableLogger("BASE_LAYER:" + layer.getLayerId(), nativeLayer);
-            arcGISMap = new ArcGISMap(new Basemap());
+            arcGISMap = new ArcGISMap(new Basemap(nativeLayer));
         }
 
         final Object portalItem = data.get("portalItem");
@@ -970,41 +971,36 @@ public class Convert {
     private static Basemap createBasemapFromType(String type) {
         switch (type) {
             case "streets":
-                return Basemap.createStreets();
-            case "topographic":
-                return Basemap.createTopographic();
-            case "imagery":
-                return Basemap.createImagery();
-            case "darkGrayCanvasVector":
-                return Basemap.createDarkGrayCanvasVector();
-            case "imageryWithLabelsVector":
-                return Basemap.createImageryWithLabelsVector();
-            case "lightGrayCanvasVector":
-                return Basemap.createLightGrayCanvasVector();
-            case "navigationVector":
-                return Basemap.createNavigationVector();
-            case "openStreetMap":
-                return Basemap.createOpenStreetMap();
-            case "streetsNightVector":
-                return Basemap.createStreetsNightVector();
             case "streetsVector":
-                return Basemap.createStreetsVector();
-            case "streetsWithReliefVector":
-                return Basemap.createStreetsWithReliefVector();
-            case "terrainWithLabelsVector":
-                return Basemap.createTerrainWithLabelsVector();
+                return new Basemap(BasemapStyle.ARCGIS_STREETS);
+            case "topographic":
             case "topographicVector":
-                return Basemap.createTopographicVector();
+                return new Basemap(BasemapStyle.ARCGIS_TOPOGRAPHIC);
+            case "imagery":
+                return new Basemap(BasemapStyle.ARCGIS_IMAGERY_STANDARD);
+            case "darkGrayCanvasVector":
+                return new Basemap(BasemapStyle.ARCGIS_DARK_GRAY);
+            case "imageryWithLabelsVector":
+            case "imageryWithLabels":
+                return new Basemap(BasemapStyle.ARCGIS_IMAGERY);
+            case "lightGrayCanvasVector":
             case "lightGrayCanvas":
-                return Basemap.createLightGrayCanvas();
+                return new Basemap(BasemapStyle.ARCGIS_LIGHT_GRAY);
+            case "navigationVector":
+                return new Basemap(BasemapStyle.ARCGIS_NAVIGATION);
+            case "openStreetMap":
+                return new Basemap(BasemapStyle.OSM_STANDARD);
+            case "streetsNightVector":
+                return new Basemap(BasemapStyle.ARCGIS_STREETS_NIGHT);
+            case "streetsWithReliefVector":
+                return new Basemap(BasemapStyle.ARCGIS_STREETS_RELIEF);
+            case "terrainWithLabelsVector":
+            case "terrainWithLabels":
+                return new Basemap(BasemapStyle.ARCGIS_TERRAIN);
             case "oceans":
-                return Basemap.createOceans();
+                return new Basemap(BasemapStyle.ARCGIS_OCEANS);
             case "nationalGeographic":
                 return Basemap.createNationalGeographic();
-            case "imageryWithLabels":
-                return Basemap.createImageryWithLabels();
-            case "terrainWithLabels":
-                return Basemap.createTerrainWithLabels();
             default:
                 throw new IllegalStateException("Unexpected value: " + type);
         }
