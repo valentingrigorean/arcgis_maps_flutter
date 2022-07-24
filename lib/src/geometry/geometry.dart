@@ -34,6 +34,7 @@ abstract class Geometry {
         case GeometryType.polygon:
           return AGSPolygon.fromJson(json);
         case GeometryType.multipoint:
+          return AGSMultipoint.fromJson(json);
         case GeometryType.unknown:
           break;
       }
