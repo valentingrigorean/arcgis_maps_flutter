@@ -85,7 +85,7 @@ class AGSMultipoint extends Geometry {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is AGSPolyline &&
+          other is AGSMultipoint &&
               runtimeType == other.runtimeType &&
               hasZ == other.hasZ &&
               hasM == other.hasM &&
