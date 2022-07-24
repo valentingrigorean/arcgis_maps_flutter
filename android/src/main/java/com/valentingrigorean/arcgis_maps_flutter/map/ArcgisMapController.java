@@ -683,17 +683,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         }
 
         final ArcGISMap map = Convert.toArcGISMap(args);
-        map.addDoneLoadingListener(() -> {
-            methodChannel.invokeMethod("map#loaded", null);
-        });
-        map.addLoadStatusChangedListener(event -> {
-            if (event.getNewLoadStatus() == LoadStatus.FAILED_TO_LOAD) {
-                Log.w(TAG, "changeMapType:  Failed to load map." + map.getLoadError().getMessage());
-                if (map.getLoadError().getCause() != null) {
-                    Log.w(TAG, "changeMapType: Failed to load map." + map.getLoadError().getCause().getMessage());
-                }
-            }
-        });
         changeMap(map);
     }
 
@@ -731,10 +720,8 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                     Log.w(TAG, "changeMap: Failed to load map." + map.getLoadError().getMessage());
                     if (map.getLoadError().getCause() != null) {
                         Log.w(TAG, "changeMap: Failed to load map." + map.getLoadError().getCause().getMessage());
-                        methodChannel.invokeMethod("map#loaded", map.getLoadError().getCause().getMessage());
-                    } else {
-                        methodChannel.invokeMethod("map#loaded", map.getLoadError().getMessage());
                     }
+                    methodChannel.invokeMethod("map#loaded", Convert.arcGISRuntimeExceptionToJson(map.getLoadError()));
                 }
             });
         }
