@@ -12,6 +12,7 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
     private let offlineMapTaskController: OfflineMapTaskController
     private let coordinateFormatterController: CoordinateFormatterController
     private let serviceTableController: ArcGisServiceTableController
+    private let authenticationManager: ArcGisAuthenticationManager
 
     init(with registrar: FlutterPluginRegistrar) {
         channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel", binaryMessenger: registrar.messenger())
@@ -21,9 +22,10 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
         routeTaskController = RouteTaskController(messenger: registrar.messenger())
         offlineMapTaskController = OfflineMapTaskController(messenger: registrar.messenger())
         serviceTableController = ArcGisServiceTableController(messenger: registrar.messenger())
+        authenticationManager = ArcGisAuthenticationManager(messenger: registrar.messenger())
 
         super.init()
-
+        authenticationManager.setMethodCallHandler()
         registrar.addMethodCallDelegate(self, channel: channel)
     }
 

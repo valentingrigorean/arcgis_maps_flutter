@@ -8,9 +8,10 @@
 import Flutter
 import ArcGIS
 
-
 class ArcGisServiceTableController {
     private let messenger: FlutterBinaryMessenger
+    private let methodChannel: FlutterMethodChannel
+    private var serviceTables: [AGSServiceFeatureTable] = []
 
     init(messenger: FlutterBinaryMessenger) {
         self.messenger = messenger
@@ -22,18 +23,19 @@ class ArcGisServiceTableController {
         methodChannel.setMethodCallHandler(nil)
     }
 
-    private let methodChannel: FlutterMethodChannel
 
     private func handle(_ call: FlutterMethodCall,
                         result: @escaping FlutterResult) -> Void {
-        switch (call.method) {
+        switch call.method {
         case "queryFeatures":
             queryFeatures(call, result: result)
             break
         default:
+            result(FlutterMethodNotImplemented)
             break
         }
     }
+
 
     private func queryFeatures(_ call: FlutterMethodCall,
                                result: @escaping FlutterResult) {
@@ -48,12 +50,14 @@ class ArcGisServiceTableController {
             return
         }
 
-        let whereClause: String? = data["whereClause"] as? String
 
         guard let queryParameterMap = data["queryParameters"] as? Dictionary<String, Any> else {
             result(emptyResult)
             return
         }
+
+        let whereClause: String? = queryParameterMap["whereClause"] as? String
+
 
         let geometryParam: Dictionary<String, Any>? = queryParameterMap["geometry"] as? Dictionary<String, Any>
         let spatialRelationShipParam: AGSSpatialRelationship? = strToSpatialRelationShip(string: queryParameterMap["spatialRelationship"] as? String)
@@ -91,9 +95,14 @@ class ArcGisServiceTableController {
         default:
             break;
         }
-        let serviceTable = AGSServiceFeatureTable(url: url)
+
 //        [weak self]
-        serviceTable.queryFeatures(with: query, queryFeatureFields: queryFeatureFields) { queryResult, error in
+        let serviceTable : AGSServiceFeatureTable = AGSServiceFeatureTable(url: url)
+        serviceTables.append(serviceTable)
+        serviceTable.queryFeatures(with: query, queryFeatureFields: queryFeatureFields) { [weak self](queryResult, error) in
+            if let index = self?.serviceTables.firstIndex(of: serviceTable) {
+                self?.serviceTables.remove(at: index)
+            }
             if error != nil {
                 result(emptyResult)
             } else {
@@ -104,7 +113,6 @@ class ArcGisServiceTableController {
                 let featuresJson = features.map { feature -> Any in
                     feature.toJSONFlutter()
                 }
-
                 result(["features": featuresJson])
             }
         }
