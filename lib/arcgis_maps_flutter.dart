@@ -58,6 +58,7 @@ part 'src/data/tile_key.dart';
 part 'src/geometry/ags_polygon.dart';
 part 'src/geometry/ags_polyline.dart';
 part 'src/geometry/ags_envelope.dart';
+part 'src/geometry/ags_multipoint.dart';
 part 'src/geometry/ags_point.dart';
 part 'src/geometry/coordinate_formatter.dart';
 part 'src/geometry/spatial_references.dart';
