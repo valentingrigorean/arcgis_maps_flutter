@@ -17,11 +17,18 @@ abstract class ArcgisNativeObject {
   @protected
   String get type;
 
-  void dispose() async {
+  @nonVirtual
+  void dispose() {
     if (_isDisposed) {
       return;
     }
     _isDisposed = true;
+    disposeInternal();
+  }
+
+  @protected
+  @mustCallSuper
+  void disposeInternal() async {
     _messageSubscription?.cancel();
     _messageSubscription = null;
     await ArcgisNativeFlutterPlatform.instance
@@ -42,7 +49,7 @@ abstract class ArcgisNativeObject {
       await ArcgisNativeFlutterPlatform.instance.createNativeObject(
         objectId: _id,
         type: type,
-        data: getCreateArguments(),
+        arguments: getCreateArguments(),
       );
       _isCreated = true;
     }

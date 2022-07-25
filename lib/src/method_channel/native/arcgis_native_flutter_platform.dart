@@ -26,7 +26,7 @@ abstract class ArcgisNativeFlutterPlatform extends PlatformInterface {
   Future<void> createNativeObject({
     required int objectId,
     required String type,
-    Map<String, dynamic>? data,
+    dynamic arguments,
   }) {
     throw UnimplementedError('createNativeObject() has not been implemented.');
   }

@@ -37,7 +37,6 @@ public class LoadableNativeObject implements ArcgisNativeObjectController.Native
         this.messageSink = messageSink;
     }
 
-
     @Override
     public boolean onMethodCall(@NonNull String method, @Nullable Object args, @NonNull MethodChannel.Result result) {
         switch (method) {

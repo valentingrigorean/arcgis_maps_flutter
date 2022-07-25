@@ -31,12 +31,10 @@ public class ArcgisNativeObjectsController implements MethodChannel.MethodCallHa
             case "createNativeObject": {
                 final Map<?, ?> args = call.arguments();
                 final int objectId = (int) args.get("objectId");
-                final ArcgisNativeObjectController nativeObject = factory.createNativeObject(args,this);
+                final String type = (String) args.get("type");
+                final Object arguments = args.get("arguments");
+                final ArcgisNativeObjectController nativeObject = factory.createNativeObject(objectId, type, arguments, this);
                 nativeObject.setMessageSink(this);
-                nativeObject.setDisposeRunnable(() -> {
-                    nativeObjects.remove(objectId);
-                    nativeObject.setMessageSink(null);
-                });
                 nativeObjects.put(objectId, nativeObject);
                 result.success(null);
             }
@@ -52,14 +50,14 @@ public class ArcgisNativeObjectsController implements MethodChannel.MethodCallHa
                 result.success(null);
             }
             break;
-            case "messageNativeObject": {
+            case "sendMessage": {
                 final Map<?, ?> args = call.arguments();
                 final int objectId = (int) args.get("objectId");
                 final String method = (String) args.get("method");
-                final Object data = args.get("arguments");
+                final Object arguments = args.get("arguments");
                 final ArcgisNativeObjectController nativeObject = nativeObjects.get(objectId);
                 if (nativeObject != null) {
-                    nativeObject.onMethodCall(method, data, result);
+                    nativeObject.onMethodCall(method, arguments, result);
                 } else {
                     result.error("object_not_found", "Native object not found", null);
                 }

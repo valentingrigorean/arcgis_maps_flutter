@@ -24,9 +24,9 @@ mixin Loadable on ArcgisNativeObject {
       StreamController<LoadStatus>.broadcast();
 
   @override
-  void dispose() {
+  void disposeInternal() {
     _loadStatusController.close();
-    super.dispose();
+    super.disposeInternal();
   }
 
   Future<LoadStatus> get loadStatus async {

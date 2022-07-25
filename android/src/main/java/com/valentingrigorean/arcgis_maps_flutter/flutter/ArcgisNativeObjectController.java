@@ -12,7 +12,6 @@ public abstract class ArcgisNativeObjectController implements NativeMessageSink 
     private final List<NativeHandler> nativeHandlers;
     private NativeMessageSink messageSink;
     private final int objectId;
-    private Runnable disposeRunnable;
     private boolean disposed = false;
 
     protected ArcgisNativeObjectController(int objectId, List<NativeHandler> nativeHandlers) {
@@ -36,10 +35,6 @@ public abstract class ArcgisNativeObjectController implements NativeMessageSink 
         for (NativeHandler nativeHandler : nativeHandlers) {
             nativeHandler.dispose();
         }
-
-        if (disposeRunnable != null) {
-            disposeRunnable.run();
-        }
     }
 
     public void setMessageSink(@Nullable NativeMessageSink messageSink) {
@@ -47,10 +42,6 @@ public abstract class ArcgisNativeObjectController implements NativeMessageSink 
         for (NativeHandler nativeHandler : nativeHandlers) {
             nativeHandler.setMessageSink(this);
         }
-    }
-
-    public void setDisposeRunnable(Runnable runnable) {
-        this.disposeRunnable = runnable;
     }
 
     public void onMethodCall(@NonNull String method, @Nullable Object args, @NonNull MethodChannel.Result result) {

@@ -21,12 +21,12 @@ class MethodChannelArcgisNativeFlutter extends ArcgisNativeFlutterPlatform {
   Future<void> createNativeObject({
     required int objectId,
     required String type,
-    Map<String, dynamic>? data,
+    dynamic arguments,
   }) async {
     await _channel.invokeMethod('createNativeObject', {
       'objectId': objectId,
       'type': type,
-      'data': data,
+      'arguments': arguments,
     });
   }
 

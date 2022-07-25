@@ -1,10 +1,9 @@
 package com.valentingrigorean.arcgis_maps_flutter.flutter;
 
 import androidx.annotation.NonNull;
-
-import java.util.Map;
+import androidx.annotation.Nullable;
 
 public interface ArcgisNativeObjectFactory {
     @NonNull
-    ArcgisNativeObjectController createNativeObject(Map<?,?> args,NativeMessageSink nativeMessageSink);
+    ArcgisNativeObjectController createNativeObject(@NonNull int objectId, @NonNull String type, @Nullable Object arguments, @NonNull NativeMessageSink nativeMessageSink);
 }
