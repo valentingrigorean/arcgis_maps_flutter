@@ -24,19 +24,19 @@ abstract class ArcgisNativeFlutterPlatform extends PlatformInterface {
   }
 
   Future<void> createNativeObject({
-    required int objectId,
+    required String objectId,
     required String type,
     dynamic arguments,
   }) {
     throw UnimplementedError('createNativeObject() has not been implemented.');
   }
 
-  Future<void> destroyNativeObject({required int objectId}) {
+  Future<void> destroyNativeObject({required String objectId}) {
     throw UnimplementedError('destroyNativeObject() has not been implemented.');
   }
 
   Future<T?> sendMessage<T>({
-    required int objectId,
+    required String objectId,
     required String method,
     dynamic arguments,
   }) {

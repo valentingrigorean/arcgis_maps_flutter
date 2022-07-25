@@ -13,7 +13,7 @@ import io.flutter.plugin.common.MethodChannel;
 public class ArcgisNativeObjectsController implements MethodChannel.MethodCallHandler, NativeMessageSink {
     private final MethodChannel channel;
     private final ArcgisNativeObjectFactory factory;
-    private Map<Integer, ArcgisNativeObjectController> nativeObjects = new HashMap<>();
+    private Map<String, ArcgisNativeObjectController> nativeObjects = new HashMap<>();
 
     public ArcgisNativeObjectsController(BinaryMessenger messenger, ArcgisNativeObjectFactory factory) {
         this.channel = new MethodChannel(messenger, "plugins.flutter.io/arcgis_channel/native_objects");
@@ -30,7 +30,7 @@ public class ArcgisNativeObjectsController implements MethodChannel.MethodCallHa
         switch (call.method) {
             case "createNativeObject": {
                 final Map<?, ?> args = call.arguments();
-                final int objectId = (int) args.get("objectId");
+                final String objectId = (String) args.get("objectId");
                 final String type = (String) args.get("type");
                 final Object arguments = args.get("arguments");
                 final ArcgisNativeObjectController nativeObject = factory.createNativeObject(objectId, type, arguments, this);

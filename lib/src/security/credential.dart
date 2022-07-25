@@ -1,43 +1,40 @@
 part of arcgis_maps_flutter;
 
 @immutable
-class Credential{
-  final _BaseCredentials _baseCredentials;
+abstract class Credential {
+  const Credential();
 
-  const Credential._(this._baseCredentials);
-
+  @Deprecated('Use UserCredential.createUserCredential instead')
   factory Credential.creteUserCredential({
     required String username,
     required String password,
     String? referer,
   }) =>
-      Credential._(
-        _UserCredential(
-          username: username,
-          password: password,
-          referer: referer,
-        ),
+      UserCredential.createUserCredential(
+        username: username,
+        password: password,
+        referer: referer,
       );
 
-  factory Credential.createFromToken({required String token,String? referer})
-    => Credential._(
-      _UserCredential(
+  @Deprecated('Use UserCredential instead')
+  factory Credential.createFromToken({
+    required String token,
+    String? referer,
+  }) =>
+      UserCredential.createFromToken(
         token: token,
         referer: referer,
-      ),
-    );
+      );
 
-  Object toJson() => _baseCredentials.toJson();
+  factory Credential.fromJson(Map<dynamic, dynamic> json) {
+    if (json['type'] == 'UserCredential') {
+      return UserCredential.fromJson(json);
+    } else {
+      throw Exception('Unknown credential type: ${json['type']}');
+    }
+  }
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Credential &&
-          runtimeType == other.runtimeType &&
-          _baseCredentials == other._baseCredentials;
-
-  @override
-  int get hashCode => _baseCredentials.hashCode;
+  Object toJson();
 }
 
 abstract class _BaseCredentials {

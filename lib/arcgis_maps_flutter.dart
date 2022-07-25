@@ -6,6 +6,8 @@ import 'dart:typed_data';
 import 'dart:ui';
 import 'package:arcgis_maps_flutter/src/arcgis_native_object.dart';
 import 'package:arcgis_maps_flutter/src/data/field_type.dart';
+import 'package:arcgis_maps_flutter/src/io/api_key_resource.dart';
+import 'package:arcgis_maps_flutter/src/io/remote_resource.dart';
 import 'package:arcgis_maps_flutter/src/layers/base_tile_layer.dart';
 import 'package:arcgis_maps_flutter/src/layers/layer_updates.dart';
 import 'package:arcgis_maps_flutter/src/mapping/basemap_type_options.dart';
@@ -36,7 +38,6 @@ import 'package:arcgis_maps_flutter/src/method_channel/tasks/geocode/locator_tas
 import 'package:arcgis_maps_flutter/src/method_channel/tasks/network_analysis/route_task_flutter_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'dart:math' as math;
 import 'package:http/http.dart' as http;
 import 'package:xml2json/xml2json.dart';
@@ -51,7 +52,7 @@ part 'src/arcgis_runtime_environment.dart';
 part 'src/arcgisservices/level_of_detail.dart';
 part 'src/arcgisservices/tile_info.dart';
 
-part 'src/concurrent/job_status.dart';
+part 'src/concurrent/job.dart';
 
 part 'src/data/tile_key.dart';
 
@@ -125,6 +126,7 @@ part 'src/mapping/view/scene/arcgis_scene_controller.dart';
 part 'src/mapping/view/scene/arcgis_scene_view.dart';
 
 part 'src/security/credential.dart';
+part 'src/security/user_credential.dart';
 
 part 'src/symbology/bitmap_descriptor.dart';
 part 'src/symbology/marker.dart';
@@ -158,6 +160,11 @@ part 'src/tasks/offline_map/generate_offline_map_parameters.dart';
 part 'src/tasks/offline_map/generate_offline_map_result.dart';
 part 'src/tasks/offline_map/offline_map_item_info.dart';
 part 'src/tasks/offline_map/offline_map_task.dart';
+
+part 'src/tasks/tile_cache/estimate_tile_cache_size_job.dart';
+part 'src/tasks/tile_cache/export_tile_cache_job.dart';
+part 'src/tasks/tile_cache/export_tile_cache_parameters.dart';
+part 'src/tasks/tile_cache/export_tile_cache_task.dart';
 
 part 'src/toolkit/compass.dart';
 part 'src/toolkit/time_slider/time_slider.dart';

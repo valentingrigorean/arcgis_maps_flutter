@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-class LoadableNativeObject: NativeHandler {
+class LoadableNativeHandler: NativeHandler {
     let loadable: AGSLoadable
     var loadStatus: AGSLoadStatus
 
@@ -22,17 +22,17 @@ class LoadableNativeObject: NativeHandler {
 
     func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) -> Bool {
         switch (method) {
-        case "getLoadStatus":
+        case "loadable#getLoadStatus":
             result(loadable.loadStatus.rawValue)
             return true
-        case "getLoadError":
+        case "loadable#getLoadError":
             result(loadable.loadError?.toJSON())
             return true
-        case "cancelLoad":
+        case "loadable#cancelLoad":
             loadable.cancelLoad()
             result(nil)
             return true
-        case "loadAsync":
+        case "loadable#loadAsync":
             loadable.load { [weak self] (error) in
                 guard let self = self else {
                     return
@@ -40,7 +40,7 @@ class LoadableNativeObject: NativeHandler {
                 self.onLoadCallback(error: error, result: result)
             }
             return true
-        case "retryLoadAsync":
+        case "loadable#retryLoadAsync":
             loadable.retryLoad { [weak self] (error) in
                 guard let self = self else {
                     return
@@ -58,7 +58,7 @@ class LoadableNativeObject: NativeHandler {
         let newStatus = loadable.loadStatus
         if newStatus != loadStatus {
             loadStatus = newStatus
-            messageSink?.send(method: "loadStatusChanged", arguments: loadStatus.rawValue)
+            messageSink?.send(method: "loadable#loadStatusChanged", arguments: loadStatus.rawValue)
         }
         result(nil)
     }

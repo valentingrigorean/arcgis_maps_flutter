@@ -1,4 +1,4 @@
-package com.valentingrigorean.arcgis_maps_flutter.flutter.loadable;
+package com.valentingrigorean.arcgis_maps_flutter.loadable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -40,21 +40,21 @@ public class LoadableNativeObject implements ArcgisNativeObjectController.Native
     @Override
     public boolean onMethodCall(@NonNull String method, @Nullable Object args, @NonNull MethodChannel.Result result) {
         switch (method) {
-            case "getLoadStatus":
+            case "loadable#getLoadStatus":
                 result.success(loadable.getLoadStatus().ordinal());
                 return true;
-            case "getLoadError":
+            case "loadable#getLoadError":
                 result.success(Convert.arcGISRuntimeExceptionToJson(loadable.getLoadError()));
                 return true;
-            case "cancelLoad":
+            case "loadable#cancelLoad":
                 loadable.cancelLoad();
                 result.success(null);
                 return true;
-            case "loadAsync":
+            case "loadable#loadAsync":
                 loadable.loadAsync();
                 loadable.addDoneLoadingListener(new DoneListener(result));
                 return true;
-            case "retryLoadAsync":
+            case "loadable#retryLoadAsync":
                 loadable.retryLoadAsync();
                 loadable.addDoneLoadingListener(new DoneListener(result));
                 return true;
@@ -68,7 +68,7 @@ public class LoadableNativeObject implements ArcgisNativeObjectController.Native
         if (messageSink == null) {
             return;
         }
-        messageSink.send("loadStatusChanged", loadStatusChangedEvent.getNewLoadStatus().ordinal());
+        messageSink.send("loadable#loadStatusChanged", loadStatusChangedEvent.getNewLoadStatus().ordinal());
     }
 
     private class DoneListener implements Runnable {

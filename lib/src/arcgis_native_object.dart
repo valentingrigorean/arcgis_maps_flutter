@@ -6,13 +6,17 @@ import 'package:flutter/foundation.dart';
 
 int _nativeObjectId = 0;
 
+String _getNextId() {
+  return '${_nativeObjectId++}';
+}
+
 abstract class ArcgisNativeObject {
-  final int _id;
+  final String _id;
   StreamSubscription? _messageSubscription;
   bool _isDisposed = false;
   bool _isCreated = false;
 
-  ArcgisNativeObject() : _id = _nativeObjectId++;
+  ArcgisNativeObject({String? objectId}) : _id = objectId ?? _getNextId();
 
   @protected
   String get type;
@@ -61,6 +65,7 @@ abstract class ArcgisNativeObject {
   }
 
   @protected
+  @mustCallSuper
   Future<void> handleMethodCall(String method, dynamic args) async {}
 
   void _methodCallHandler(NativeMessage message) async {

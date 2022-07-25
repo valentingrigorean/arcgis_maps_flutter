@@ -9,7 +9,7 @@ public class ArcgisNativeObjectFactoryImpl implements ArcgisNativeObjectFactory 
 
     @NonNull
     @Override
-    public ArcgisNativeObjectController createNativeObject(@NonNull int objectId, @NonNull String type, @Nullable Object arguments, @NonNull NativeMessageSink nativeMessageSink) {
+    public ArcgisNativeObjectController createNativeObject(@NonNull String objectId, @NonNull String type, @Nullable Object arguments, @NonNull NativeMessageSink nativeMessageSink) {
         return null;
     }
 }

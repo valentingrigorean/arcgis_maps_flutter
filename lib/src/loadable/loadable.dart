@@ -30,12 +30,12 @@ mixin Loadable on ArcgisNativeObject {
   }
 
   Future<LoadStatus> get loadStatus async {
-    final result = await invokeMethod('getLoadStatus');
+    final result = await invokeMethod('loadable#getLoadStatus');
     return LoadStatus.fromValue(result ?? LoadStatus.unknown.value);
   }
 
   Future<ArcgisError?> get loadError async {
-    final result = await invokeMethod('getLoadError');
+    final result = await invokeMethod('loadable#getLoadError');
     if (result == null) {
       return null;
     }
@@ -45,22 +45,22 @@ mixin Loadable on ArcgisNativeObject {
   Stream<LoadStatus> get onLoadStatusChanged => _loadStatusController.stream;
 
   Future<void> cancelLoad() async {
-    await invokeMethod('cancelLoad');
+    await invokeMethod('loadable#cancelLoad');
   }
 
   Future<void> loadAsync() async {
-    await invokeMethod('loadAsync');
+    await invokeMethod('loadable#loadAsync');
   }
 
   Future<void> retryLoadAsync() async {
-    await invokeMethod('retryLoadAsync');
+    await invokeMethod('loadable#retryLoadAsync');
   }
 
   @protected
   @override
   Future<void> handleMethodCall(String method, dynamic arguments) async {
     switch (method) {
-      case 'onLoadStatusChanged':
+      case 'loadable#onLoadStatusChanged':
         final int status = arguments;
         _loadStatusController.add(LoadStatus.fromValue(status));
         return;

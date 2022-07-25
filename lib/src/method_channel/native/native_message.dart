@@ -1,5 +1,5 @@
 class NativeMessage {
-  final int objectId;
+  final String objectId;
   final String method;
   final dynamic data;
 
@@ -11,7 +11,7 @@ class NativeMessage {
 
   factory NativeMessage.fromJson(Map<String, dynamic> json) {
     return NativeMessage(
-      objectId: json['objectId'] as int,
+      objectId: json['objectId'] as String,
       method: json['method'] as String,
       data: json['data'],
     );
