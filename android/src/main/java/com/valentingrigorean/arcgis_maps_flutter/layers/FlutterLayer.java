@@ -93,6 +93,7 @@ public class FlutterLayer {
     public Layer createLayer() {
         Layer layer;
         RemoteResource remoteResource = null;
+
         switch (layerType) {
             case "VectorTileLayer":
                 final ArcGISVectorTiledLayer vectorTiledLayer = new ArcGISVectorTiledLayer(url);

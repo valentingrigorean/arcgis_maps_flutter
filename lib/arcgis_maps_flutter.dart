@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:ui';
+import 'package:arcgis_maps_flutter/src/arcgis_native_object.dart';
 import 'package:arcgis_maps_flutter/src/data/field_type.dart';
 import 'package:arcgis_maps_flutter/src/layers/base_tile_layer.dart';
 import 'package:arcgis_maps_flutter/src/layers/layer_updates.dart';
@@ -35,6 +36,7 @@ import 'package:arcgis_maps_flutter/src/method_channel/tasks/geocode/locator_tas
 import 'package:arcgis_maps_flutter/src/method_channel/tasks/network_analysis/route_task_flutter_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'dart:math' as math;
 import 'package:http/http.dart' as http;
 import 'package:xml2json/xml2json.dart';
