@@ -25,7 +25,12 @@ extension FlutterLayer {
             setupDefaultParams(layer: featureLayer)
             return featureLayer
         case "TiledLayer":
-            let layer = AGSArcGISTiledLayer(url: url!)
+            let layer: AGSArcGISTiledLayer
+            if let tileCache = tileCache {
+                layer = AGSArcGISTiledLayer(tileCache: tileCache)
+            } else {
+                layer = AGSArcGISTiledLayer(url: url!)
+            }
             layer.credential = credential
             setupDefaultParams(layer: layer)
             return layer

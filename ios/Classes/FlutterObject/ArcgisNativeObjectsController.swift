@@ -8,7 +8,7 @@ protocol NativeMessageSink {
     func send(method: String, arguments: Any?) -> Void
 }
 
-protocol NativeObjectControllerMessageSink : NativeMessageSink {
+protocol NativeObjectControllerMessageSink: NativeMessageSink {
 
 }
 
@@ -17,9 +17,10 @@ protocol ArcgisNativeObjectFactory {
 }
 
 class ArcgisNativeObjectsController: NativeObjectControllerMessageSink {
+
+
     private let channel: FlutterMethodChannel
 
-    private var nativeObjects: [String: ArcgisNativeObjectController] = [:]
 
     private let factory: ArcgisNativeObjectFactory
 
@@ -33,12 +34,6 @@ class ArcgisNativeObjectsController: NativeObjectControllerMessageSink {
         channel.invokeMethod(method, arguments: arguments)
     }
 
-
-    func addNativeObject(objectId: String, nativeObject: ArcgisNativeObjectController) {
-        nativeObjects[objectId] = nativeObject
-        nativeObject.parent = self
-    }
-
     private func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch (call.method) {
         case "createNativeObject":
@@ -47,12 +42,12 @@ class ArcgisNativeObjectsController: NativeObjectControllerMessageSink {
             let type = args["type"] as! String
             let arguments = args["arguments"]
             let nativeObject = createNativeObject(objectId: objectId, type: type, arguments: arguments)
-            addNativeObject(objectId: objectId, nativeObject: nativeObject)
+            NativeObjectStorage.shared.addNativeObject(object: nativeObject)
             result(nil)
             break;
         case "destroyNativeObject":
             let objectId = call.arguments as! String
-            let nativeObject = nativeObjects.removeValue(forKey: objectId)
+            let nativeObject = NativeObjectStorage.shared.removeNativeObject(objectId: objectId)
             nativeObject?.dispose()
             result(nil)
             break;
@@ -61,7 +56,7 @@ class ArcgisNativeObjectsController: NativeObjectControllerMessageSink {
             let objectId = args["objectId"] as! String
             let method = args["method"] as! String
             let arguments = args["arguments"]
-            let nativeObject = nativeObjects[objectId]
+            let nativeObject = NativeObjectStorage.shared.getNativeObject(objectId: objectId)
             if let nativeObject = nativeObject {
                 nativeObject.onMethodCall(method: method, arguments: arguments, result: result)
             } else {
@@ -76,7 +71,7 @@ class ArcgisNativeObjectsController: NativeObjectControllerMessageSink {
 
     private func createNativeObject(objectId: String, type: String, arguments: Any?) -> ArcgisNativeObjectController {
         let nativeObject = factory.createNativeObject(objectId: objectId, type: type, arguments: arguments, messageSink: self)
-        addNativeObject(objectId: objectId, nativeObject: nativeObject)
+        NativeObjectStorage.shared.addNativeObject(object: nativeObject)
         return nativeObject
     }
 }

@@ -11,6 +11,7 @@ String _getNextId() {
 }
 
 abstract class ArcgisNativeObject {
+  final Completer<void> _onCreated = Completer<void>();
   final String _id;
   StreamSubscription? _messageSubscription;
   bool _isDisposed = false;
@@ -26,6 +27,18 @@ abstract class ArcgisNativeObject {
 
   @protected
   String get type;
+
+  @protected
+  bool get isCreated => _isCreated;
+
+  @protected
+  bool get isDisposed => _isDisposed;
+
+  @protected
+  String get nativeObjectId => _id;
+
+  @protected
+  dynamic getCreateArguments() => null;
 
   @mustCallSuper
   void dispose() {
@@ -46,14 +59,9 @@ abstract class ArcgisNativeObject {
     if (_isDisposed) {
       return null;
     }
-    if (!_isCreated) {
-      await ArcgisNativeFlutterPlatform.instance.createNativeObject(
-        objectId: _id,
-        type: type,
-        arguments: getCreateArguments(),
-      );
-      _isCreated = true;
-    }
+
+    await _createNativeObject();
+
     return await ArcgisNativeFlutterPlatform.instance.sendMessage(
       objectId: _id,
       method: method,
@@ -72,6 +80,21 @@ abstract class ArcgisNativeObject {
     await handleMethodCall(message.method, message.arguments);
   }
 
-  @protected
-  dynamic getCreateArguments() => null;
+  Future<void> _createNativeObject() async {
+    if (_isDisposed) {
+      return;
+    }
+
+    if (!_isCreated) {
+      _isCreated = true;
+      await ArcgisNativeFlutterPlatform.instance.createNativeObject(
+        objectId: _id,
+        type: type,
+        arguments: getCreateArguments(),
+      );
+      _onCreated.complete();
+    }
+
+    await _onCreated.future;
+  }
 }

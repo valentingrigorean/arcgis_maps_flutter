@@ -422,7 +422,7 @@ public class Convert {
         final SpatialReference spatialReference = toSpatialReference(data.get("spatialReference"));
         final int tileHeight = toInt(data.get("tileHeight"));
         final int tileWidth = toInt(data.get("tileWidth"));
-        return new TileInfo(dpi, TileInfo.ImageFormat.values()[imageFormat], levelOfDetails, origin, spatialReference, tileHeight, tileWidth);
+        return new TileInfo(dpi, imageFormat == -1 ? TileInfo.ImageFormat.UNKNOWN : TileInfo.ImageFormat.values()[imageFormat], levelOfDetails, origin, spatialReference, tileHeight, tileWidth);
     }
 
     public static LevelOfDetail toLevelOfDetail(Object o) {

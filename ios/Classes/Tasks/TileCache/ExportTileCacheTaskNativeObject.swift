@@ -53,7 +53,7 @@ class ExportTileCacheTaskNativeObject: ArcgisNativeObjectController {
         let jobId = NSUUID().uuidString
 
         let jobNativeObject = EstimateTileCacheSizeJobNativeObject(job: job, objectId: jobId, messageSink: messageSink)
-        parent?.addNativeObject(objectId: jobId, nativeObject: jobNativeObject)
+        storage.addNativeObject(object: jobNativeObject)
         result(jobId)
     }
 
@@ -65,7 +65,7 @@ class ExportTileCacheTaskNativeObject: ArcgisNativeObjectController {
         let jobId = NSUUID().uuidString
 
         let jobNativeObject = ExportTileCacheJobNativeObject(job: job, objectId: jobId, messageSink: messageSink)
-        parent?.addNativeObject(objectId: jobId, nativeObject: jobNativeObject)
+        storage.addNativeObject(object: jobNativeObject)
         result(jobId)
     }
 }

@@ -24,19 +24,25 @@ struct GroupLayerOptions: Hashable, Equatable {
 
 struct FlutterLayer: Hashable, Equatable {
 
-
     init(data: Dictionary<String, Any>) {
         layerId = data["layerId"] as! String
         layerType = data["layerType"] as! String
         if let url = data["url"] as? String {
             self.url = URL(string: url)
             portalItem = nil
-        } else if let portalItemData = data["portalItem"] as? Dictionary<String, Any>{
+            tileCache = nil
+        } else if let portalItemData = data["portalItem"] as? Dictionary<String, Any> {
             url = nil
+            tileCache = nil
             portalItem = AGSPortalItem(data: portalItemData)
-        }else{
+        } else if let tileCache = data["tileCache"] as? Dictionary<String, Any> {
             url = nil
             portalItem = nil
+            self.tileCache = AGSTileCache.createFlutter(data: tileCache)
+        } else {
+            url = nil
+            portalItem = nil
+            tileCache = nil
         }
 
         isVisible = data["isVisible"] as! Bool
@@ -90,6 +96,7 @@ struct FlutterLayer: Hashable, Equatable {
     let opacity: Float
     let isVisible: Bool
     let url: URL?
+    let tileCache: AGSTileCache?
     let layersName: [String]?
 
     let credential: AGSCredential?

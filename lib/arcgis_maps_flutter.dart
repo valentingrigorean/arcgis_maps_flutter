@@ -54,6 +54,7 @@ part 'src/arcgisservices/tile_info.dart';
 
 part 'src/concurrent/job.dart';
 
+part 'src/data/tile_cache.dart';
 part 'src/data/tile_key.dart';
 
 part 'src/geometry/ags_polygon.dart';

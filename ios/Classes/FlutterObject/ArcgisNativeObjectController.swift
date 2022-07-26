@@ -34,7 +34,11 @@ class ArcgisNativeObjectController: NativeMessageSink {
         dispose()
     }
 
-    var parent: ArcgisNativeObjectsController?
+    var storage: NativeObjectStorage {
+        get {
+            NativeObjectStorage.shared
+        }
+    }
 
     func dispose() {
         if (isDisposed) {
