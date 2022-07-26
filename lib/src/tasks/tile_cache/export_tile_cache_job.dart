@@ -1,7 +1,11 @@
 part of arcgis_maps_flutter;
 
 class ExportTileCacheJob extends ArcgisNativeObject with Job {
-  ExportTileCacheJob._({required String jobId}) : super(objectId: jobId);
+  ExportTileCacheJob._({required String jobId})
+      : super(
+          objectId: jobId,
+          isCreated: true,
+        );
 
   @override
   String get type => "ExportTileCacheJob";

@@ -47,6 +47,13 @@ mixin Job on ArcgisNativeObject {
   final StreamController<JobStatus> _statusController =
       StreamController<JobStatus>.broadcast();
 
+  @override
+  void dispose() {
+    _progressController.close();
+    _statusController.close();
+    super.dispose();
+  }
+
   Future<ArcgisError?> get error async {
     final result = await invokeMethod('job#getError');
     if (result == null) {
@@ -94,19 +101,19 @@ mixin Job on ArcgisNativeObject {
 
   @override
   @protected
-  Future<void> handleMethodCall(String method, dynamic args) async {
-    await super.handleMethodCall(method, args);
+  Future<void> handleMethodCall(String method, dynamic arguments) async {
     switch (method) {
       case 'job#onProgressChanged':
-        final double progress = args;
+        final double progress = arguments;
         _progressController.add(progress);
         break;
       case 'job#onStatusChanged':
-        final int status = args;
+        final int status = arguments;
         _statusController.add(JobStatus.fromValue(status));
         break;
       default:
-        await super.handleMethodCall(method, args);
+        await super.handleMethodCall(method, arguments);
+        break;
     }
   }
 }

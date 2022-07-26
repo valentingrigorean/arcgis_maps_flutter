@@ -7,12 +7,12 @@ import ArcGIS
 
 class EstimateTileCacheSizeJobNativeObject: ArcgisNativeObjectController {
 
-    let estimateTileCacheSizeJob: AGSEstimateTileCacheSizeJob
+    let job: AGSEstimateTileCacheSizeJob
 
-    init(estimateTileCacheSizeJob: AGSEstimateTileCacheSizeJob, objectId: String, messageSink: NativeMessageSink) {
-        self.estimateTileCacheSizeJob = estimateTileCacheSizeJob
+    init(job: AGSEstimateTileCacheSizeJob, objectId: String, messageSink: NativeObjectControllerMessageSink) {
+        self.job = job
         super.init(objectId: objectId, nativeHandlers: [
-            JobNativeHandler(job: estimateTileCacheSizeJob)
+            JobNativeHandler(job: job)
         ], messageSink: messageSink)
 
     }

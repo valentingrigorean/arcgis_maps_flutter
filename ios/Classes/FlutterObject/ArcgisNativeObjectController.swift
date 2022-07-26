@@ -14,12 +14,13 @@ protocol NativeHandler {
 
 class ArcgisNativeObjectController: NativeMessageSink {
 
-    private let objectId: String
+    private var isDisposed: Bool = false
     private let nativeHandlers: [NativeHandler]
-    private let messageSink: NativeMessageSink
-    var isDisposed: Bool = false
 
-    init(objectId: String, nativeHandlers: [NativeHandler], messageSink: NativeMessageSink) {
+    let messageSink: NativeObjectControllerMessageSink
+    let objectId: String
+
+    init(objectId: String, nativeHandlers: [NativeHandler], messageSink: NativeObjectControllerMessageSink) {
         self.objectId = objectId
         self.nativeHandlers = nativeHandlers
         self.messageSink = messageSink
@@ -46,7 +47,11 @@ class ArcgisNativeObjectController: NativeMessageSink {
     }
 
     func send(method: String, arguments: Any?) {
-        messageSink.send(method: method, arguments: [])
+        messageSink.send(method: "messageNativeObject", arguments: [
+            "objectId": objectId,
+            "method": method,
+            "arguments": arguments
+        ])
     }
 
     func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) {

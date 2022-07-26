@@ -32,9 +32,7 @@ class MethodChannelArcgisNativeFlutter extends ArcgisNativeFlutterPlatform {
 
   @override
   Future<void> destroyNativeObject({required String objectId}) async {
-    await _channel.invokeMethod('destroyNativeObject', {
-      'objectId': objectId,
-    });
+    await _channel.invokeMethod('destroyNativeObject', objectId);
   }
 
   @override

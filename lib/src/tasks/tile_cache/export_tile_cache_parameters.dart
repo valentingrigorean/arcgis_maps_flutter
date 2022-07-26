@@ -7,14 +7,18 @@ class ExportTileCacheParameters {
     this.levelIds = const [],
   });
 
+  // }) : assert(compressionQuality >= 0.0 && compressionQuality <= 1.0,
+  //           'compressionQuality must be between 0.0 and 1.0');
+
   factory ExportTileCacheParameters.fromJson(Map<dynamic, dynamic> json) {
+    final compressionQuality = json['compressionQuality'] as double;
     return ExportTileCacheParameters(
       areaOfInterest: json['areaOfInterest'] == null
           ? null
           : Geometry.fromJson(json['areaOfInterest']),
-      compressionQuality: json['compressionQuality'] as double,
-      levelIds:
-          (json['levelIds'] as List<dynamic>)?.cast<num>().toList() ?? const [],
+      compressionQuality:  compressionQuality,
+      levelIds: (json['levelIds'] as List<dynamic>?)?.cast<int>().toList() ??
+          const [],
     );
   }
 
@@ -46,12 +50,12 @@ class ExportTileCacheParameters {
   /// The values should correspond to Level IDs in the service's tiling scheme.
   /// You can specify consecutive levels (for example 1,2,3,4,5) or skip some
   /// levels (for example for the ranges 1-3 and 7-9 you would specify 1,2,3,7,8,9).
-  final List<num> levelIds;
+  final List<int> levelIds;
 
   ExportTileCacheParameters copyWith({
     Geometry? areaOfInterest,
     double? compressionQuality,
-    List<num>? levelIds,
+    List<int>? levelIds,
   }) {
     return ExportTileCacheParameters(
       areaOfInterest: areaOfInterest ?? this.areaOfInterest,

@@ -18,6 +18,7 @@ class JobNativeHandler: NSObject, NativeHandler {
     }
 
     deinit {
+        job.progress.removeObserver(self, forKeyPath: "fractionCompleted")
         dispose()
     }
 
@@ -25,7 +26,6 @@ class JobNativeHandler: NSObject, NativeHandler {
 
     func dispose() {
         messageSink = nil
-        job.progress.removeObserver(self, forKeyPath: "fractionCompleted")
     }
 
     func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) -> Bool {
@@ -55,8 +55,10 @@ class JobNativeHandler: NSObject, NativeHandler {
                 }
                 self.status = status
                 self.messageSink?.send(method: "job#onStatusChanged", arguments: status.rawValue)
-            }, completion: { [weak self]result, error in
-                NSLog("\(String(describing: error))")
+            }, completion: { result, error in
+                if let error = error {
+                    NSLog("\(String(describing: error))")
+                }
             })
             result(true)
             return true

@@ -1,19 +1,19 @@
 class NativeMessage {
   final String objectId;
   final String method;
-  final dynamic data;
+  final dynamic arguments;
 
   const NativeMessage({
     required this.objectId,
     required this.method,
-    required this.data,
+    required this.arguments,
   });
 
-  factory NativeMessage.fromJson(Map<String, dynamic> json) {
+  factory NativeMessage.fromJson(Map<dynamic, dynamic> json) {
     return NativeMessage(
       objectId: json['objectId'] as String,
       method: json['method'] as String,
-      data: json['data'],
+      arguments: json['arguments'],
     );
   }
 
@@ -24,13 +24,13 @@ class NativeMessage {
           runtimeType == other.runtimeType &&
           objectId == other.objectId &&
           method == other.method &&
-          data == other.data;
+          arguments == other.arguments;
 
   @override
-  int get hashCode => objectId.hashCode ^ method.hashCode ^ data.hashCode;
+  int get hashCode => objectId.hashCode ^ method.hashCode ^ arguments.hashCode;
 
   @override
   String toString() {
-    return 'NativeMessage{objectId: $objectId, method: $method, data: $data}';
+    return 'NativeMessage{objectId: $objectId, method: $method, arguments: $arguments}';
   }
 }

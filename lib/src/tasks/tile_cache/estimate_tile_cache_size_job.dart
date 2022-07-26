@@ -18,11 +18,17 @@ class EstimateTileCacheSizeResult {
 }
 
 class EstimateTileCacheSizeJob extends ArcgisNativeObject with Job {
-  EstimateTileCacheSizeJob._({required String jobId}) : super(objectId: jobId);
+  EstimateTileCacheSizeJob._({required String jobId})
+      : super(
+          objectId: jobId,
+          isCreated: true,
+        );
 
   Future<EstimateTileCacheSizeResult?> get result async {
     final resultJson = await invokeMethod("estimateTileCacheSizeJob#getResult");
-    return resultJson == null ? null : EstimateTileCacheSizeResult.fromJson(resultJson);
+    return resultJson == null
+        ? null
+        : EstimateTileCacheSizeResult.fromJson(resultJson);
   }
 
   @override

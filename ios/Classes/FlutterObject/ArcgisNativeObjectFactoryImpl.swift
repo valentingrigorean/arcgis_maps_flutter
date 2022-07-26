@@ -5,13 +5,11 @@
 import Foundation
 
 class ArcgisNativeObjectFactoryImpl: ArcgisNativeObjectFactory {
-    func createNativeObject(objectId: String, type: String, arguments: Any?, messageSink: NativeMessageSink) -> ArcgisNativeObjectController {
+    func createNativeObject(objectId: String, type: String, arguments: Any?, messageSink: NativeObjectControllerMessageSink) -> ArcgisNativeObjectController {
         switch (type) {
         case "ExportTileCacheTask":
             let url = arguments as! String
             return ExportTileCacheTaskNativeObject(objectId: objectId, url: url, messageSink: messageSink)
-        case "AGSExportTileCacheParameters":
-
         default:
             fatalError("Not implemented.")
         }

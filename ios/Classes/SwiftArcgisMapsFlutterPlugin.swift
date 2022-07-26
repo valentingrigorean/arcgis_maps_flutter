@@ -11,6 +11,7 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
     private let routeTaskController: RouteTaskController
     private let offlineMapTaskController: OfflineMapTaskController
     private let coordinateFormatterController: CoordinateFormatterController
+    private let arcgisNativeObjectsController: ArcgisNativeObjectsController
 
     init(with registrar: FlutterPluginRegistrar) {
         channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel", binaryMessenger: registrar.messenger())
@@ -19,6 +20,7 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
         coordinateFormatterController = CoordinateFormatterController(messenger: registrar.messenger())
         routeTaskController = RouteTaskController(messenger: registrar.messenger())
         offlineMapTaskController = OfflineMapTaskController(messenger: registrar.messenger())
+        arcgisNativeObjectsController = ArcgisNativeObjectsController(messenger: registrar.messenger(), factory: ArcgisNativeObjectFactoryImpl())
 
         super.init()
 

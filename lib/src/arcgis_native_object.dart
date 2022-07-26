@@ -16,27 +16,28 @@ abstract class ArcgisNativeObject {
   bool _isDisposed = false;
   bool _isCreated = false;
 
-  ArcgisNativeObject({String? objectId}) : _id = objectId ?? _getNextId();
+  ArcgisNativeObject({String? objectId, bool isCreated = false})
+      : _id = objectId ?? _getNextId(),
+        _isCreated = isCreated {
+    _messageSubscription = ArcgisNativeFlutterPlatform.instance.onMessage
+        .where((event) => event.objectId == _id)
+        .listen(_methodCallHandler);
+  }
 
   @protected
   String get type;
 
-  @nonVirtual
+  @mustCallSuper
   void dispose() {
     if (_isDisposed) {
       return;
     }
     _isDisposed = true;
-    disposeInternal();
-  }
-
-  @protected
-  @mustCallSuper
-  void disposeInternal() async {
     _messageSubscription?.cancel();
     _messageSubscription = null;
-    await ArcgisNativeFlutterPlatform.instance
-        .destroyNativeObject(objectId: _id);
+    if (_isCreated) {
+      ArcgisNativeFlutterPlatform.instance.destroyNativeObject(objectId: _id);
+    }
   }
 
   @optionalTypeArgs
@@ -46,10 +47,6 @@ abstract class ArcgisNativeObject {
       return null;
     }
     if (!_isCreated) {
-      _messageSubscription = ArcgisNativeFlutterPlatform.instance.onMessage
-          .where((event) => event.objectId == _id)
-          .listen(_methodCallHandler);
-
       await ArcgisNativeFlutterPlatform.instance.createNativeObject(
         objectId: _id,
         type: type,
@@ -66,13 +63,13 @@ abstract class ArcgisNativeObject {
 
   @protected
   @mustCallSuper
-  Future<void> handleMethodCall(String method, dynamic args) async {}
+  Future<void> handleMethodCall(String method, dynamic arguments) async {}
 
   void _methodCallHandler(NativeMessage message) async {
     if (_isDisposed) {
       return;
     }
-    await handleMethodCall(message.method, message.data);
+    await handleMethodCall(message.method, message.arguments);
   }
 
   @protected

@@ -43,7 +43,10 @@ class ExportTileCacheTask extends ArcgisNativeObject
   }) async {
     final jobId = await invokeMethod<String>(
       'exportTileCacheTask#exportTileCacheJob',
-      parameters.toJson(),
+      {
+        'parameters': parameters.toJson(),
+        'fileNameWithPath': fileNameWithPath,
+      },
     );
     return ExportTileCacheJob._(jobId: jobId!);
   }

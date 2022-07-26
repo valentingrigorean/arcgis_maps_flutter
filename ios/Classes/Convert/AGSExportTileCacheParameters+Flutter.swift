@@ -12,7 +12,7 @@ extension AGSExportTileCacheParameters {
             areaOfInterest = AGSGeometry.fromFlutter(data: geometry)
         }
         compressionQuality = data["compressionQuality"] as! Float
-        levelIDs = data["levelIDs"] as! [NSNumber]
+        levelIDs = (data["levelIds"] as! [Int]).map({ NSNumber(value: $0) })
     }
 
     func toJSONFlutter() -> Any {
@@ -21,7 +21,7 @@ extension AGSExportTileCacheParameters {
             json["areaOfInterest"] = areaOfInterest.toJSONFlutter()
         }
         json["compressionQuality"] = compressionQuality
-        json["levelIds"] = levelIDs
+        json["levelIds"] = levelIDs.map({ $0.intValue })
         return json
     }
 }

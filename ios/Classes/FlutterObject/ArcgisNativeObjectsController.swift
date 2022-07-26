@@ -8,11 +8,15 @@ protocol NativeMessageSink {
     func send(method: String, arguments: Any?) -> Void
 }
 
-protocol ArcgisNativeObjectFactory {
-    func createNativeObject(objectId: String, type: String, arguments: Any?, messageSink: NativeMessageSink) -> ArcgisNativeObjectController
+protocol NativeObjectControllerMessageSink : NativeMessageSink {
+
 }
 
-class ArcgisNativeObjectsController: NativeMessageSink {
+protocol ArcgisNativeObjectFactory {
+    func createNativeObject(objectId: String, type: String, arguments: Any?, messageSink: NativeObjectControllerMessageSink) -> ArcgisNativeObjectController
+}
+
+class ArcgisNativeObjectsController: NativeObjectControllerMessageSink {
     private let channel: FlutterMethodChannel
 
     private var nativeObjects: [String: ArcgisNativeObjectController] = [:]
@@ -43,6 +47,7 @@ class ArcgisNativeObjectsController: NativeMessageSink {
             let type = args["type"] as! String
             let arguments = args["arguments"]
             let nativeObject = createNativeObject(objectId: objectId, type: type, arguments: arguments)
+            addNativeObject(objectId: objectId, nativeObject: nativeObject)
             result(nil)
             break;
         case "destroyNativeObject":
@@ -74,6 +79,4 @@ class ArcgisNativeObjectsController: NativeMessageSink {
         addNativeObject(objectId: objectId, nativeObject: nativeObject)
         return nativeObject
     }
-
-
 }
