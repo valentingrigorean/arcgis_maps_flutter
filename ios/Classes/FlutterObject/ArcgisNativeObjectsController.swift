@@ -47,8 +47,7 @@ class ArcgisNativeObjectsController: NativeObjectControllerMessageSink {
             break;
         case "destroyNativeObject":
             let objectId = call.arguments as! String
-            let nativeObject = NativeObjectStorage.shared.removeNativeObject(objectId: objectId)
-            nativeObject?.dispose()
+            NativeObjectStorage.shared.removeNativeObject(objectId: objectId)
             result(nil)
             break;
         case "sendMessage":

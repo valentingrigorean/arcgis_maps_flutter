@@ -41,11 +41,19 @@ enum JobType {
   final int value;
 }
 
-mixin Job on ArcgisNativeObject {
+abstract class Job extends ArcgisNativeObject with RemoteResource {
   final StreamController<double> _progressController =
       StreamController<double>.broadcast();
   final StreamController<JobStatus> _statusController =
       StreamController<JobStatus>.broadcast();
+
+  Job({
+    String? objectId,
+    bool isCreated = false,
+  }) : super(
+          objectId: objectId,
+          isCreated: isCreated,
+        );
 
   @override
   void dispose() {

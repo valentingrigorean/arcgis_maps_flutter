@@ -23,6 +23,10 @@ abstract class ArcgisNativeObject {
     _messageSubscription = ArcgisNativeFlutterPlatform.instance.onMessage
         .where((event) => event.objectId == _id)
         .listen(_methodCallHandler);
+
+    if (_isCreated) {
+      _onCreated.complete();
+    }
   }
 
   @protected
@@ -56,11 +60,11 @@ abstract class ArcgisNativeObject {
   @optionalTypeArgs
   @protected
   Future<T?> invokeMethod<T>(String method, [dynamic arguments]) async {
+    await _createNativeObject();
+
     if (_isDisposed) {
       return null;
     }
-
-    await _createNativeObject();
 
     return await ArcgisNativeFlutterPlatform.instance.sendMessage(
       objectId: _id,

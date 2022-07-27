@@ -13,20 +13,21 @@ class NativeObjectStorage {
 
     static let shared = NativeObjectStorage()
 
-    func getNativeObject(objectId: String) -> ArcgisNativeObjectController? {
-        nativeObjects[objectId]
-    }
-
-    func removeNativeObject(objectId: String) -> ArcgisNativeObjectController? {
-        nativeObjects.removeValue(forKey: objectId)
-    }
-
     func addNativeObject(object: ArcgisNativeObjectController) {
         nativeObjects[object.objectId] = object
     }
 
-    func clear() {
-        for (objectId, nativeObject) in nativeObjects {
+    func getNativeObject(objectId: String) -> ArcgisNativeObjectController? {
+        nativeObjects[objectId]
+    }
+
+    func removeNativeObject(objectId: String) -> Void {
+        let object = nativeObjects.removeValue(forKey: objectId)
+        object?.dispose()
+    }
+
+    func clearAll() {
+        for (_, nativeObject) in nativeObjects {
             nativeObject.dispose()
         }
         nativeObjects.removeAll()

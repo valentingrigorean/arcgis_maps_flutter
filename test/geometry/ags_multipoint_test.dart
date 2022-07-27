@@ -1,5 +1,4 @@
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
-import 'package:arcgis_maps_flutter/src/layers/base_tile_layer.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

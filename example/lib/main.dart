@@ -121,7 +121,7 @@ class MainPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const MapPageofflineMap(),
+                      builder: (context) => const MapPageOfflineMap(),
                     ),
                   );
                 },

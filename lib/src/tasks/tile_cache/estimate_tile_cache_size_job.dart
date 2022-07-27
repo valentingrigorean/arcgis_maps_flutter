@@ -17,7 +17,7 @@ class EstimateTileCacheSizeResult {
   final int tileCount;
 }
 
-class EstimateTileCacheSizeJob extends ArcgisNativeObject with Job {
+class EstimateTileCacheSizeJob extends Job {
   EstimateTileCacheSizeJob._({required String jobId})
       : super(
           objectId: jobId,

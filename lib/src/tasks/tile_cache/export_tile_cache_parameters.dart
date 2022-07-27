@@ -7,9 +7,6 @@ class ExportTileCacheParameters {
     this.levelIds = const [],
   });
 
-  // }) : assert(compressionQuality >= 0.0 && compressionQuality <= 1.0,
-  //           'compressionQuality must be between 0.0 and 1.0');
-
   factory ExportTileCacheParameters.fromJson(Map<dynamic, dynamic> json) {
     final compressionQuality = json['compressionQuality'] as double;
     return ExportTileCacheParameters(

@@ -9,8 +9,8 @@ class ExportTileCacheTaskNativeObject: ArcgisNativeObjectController {
 
     let exportTileCacheTask: AGSExportTileCacheTask
 
-    init(objectId: String, url: String, messageSink: NativeObjectControllerMessageSink) {
-        exportTileCacheTask = AGSExportTileCacheTask(url: URL(string: url)!)
+    init(objectId: String, exportTileCacheTask: AGSExportTileCacheTask, messageSink: NativeObjectControllerMessageSink) {
+        self.exportTileCacheTask = exportTileCacheTask
         super.init(objectId: objectId, nativeHandlers: [
             RemoteResourceNativeHandler(remoteResource: exportTileCacheTask),
             ApiKeyResourceNativeHandler(apiKeyResource: exportTileCacheTask)

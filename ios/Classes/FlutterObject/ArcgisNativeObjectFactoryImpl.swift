@@ -10,10 +10,11 @@ class ArcgisNativeObjectFactoryImpl: ArcgisNativeObjectFactory {
         switch (type) {
         case "ExportTileCacheTask":
             let url = arguments as! String
-            return ExportTileCacheTaskNativeObject(objectId: objectId, url: url, messageSink: messageSink)
+            let exportTileCacheTask = AGSExportTileCacheTask(url: URL(string: url)!)
+            return ExportTileCacheTaskNativeObject(objectId: objectId, exportTileCacheTask: exportTileCacheTask, messageSink: messageSink)
         case "TileCache":
             let url = arguments as! String
-            return TileCacheNativeObject(tileCache: AGSTileCache(name:url), objectId: objectId, messageSink: messageSink)
+            return TileCacheNativeObject(tileCache: AGSTileCache(name: url), objectId: objectId, messageSink: messageSink)
         default:
             fatalError("Not implemented.")
         }

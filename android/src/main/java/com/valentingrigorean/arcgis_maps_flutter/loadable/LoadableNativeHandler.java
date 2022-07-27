@@ -6,19 +6,19 @@ import androidx.annotation.Nullable;
 import com.esri.arcgisruntime.loadable.LoadStatusChangedEvent;
 import com.esri.arcgisruntime.loadable.LoadStatusChangedListener;
 import com.esri.arcgisruntime.loadable.Loadable;
-import com.valentingrigorean.arcgis_maps_flutter.flutter.ArcgisNativeObjectController;
+import com.valentingrigorean.arcgis_maps_flutter.flutterobject.ArcgisNativeObjectController;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
-import com.valentingrigorean.arcgis_maps_flutter.flutter.NativeMessageSink;
+import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeMessageSink;
 
 import io.flutter.plugin.common.MethodChannel;
 
-public class LoadableNativeObject implements ArcgisNativeObjectController.NativeHandler, LoadStatusChangedListener {
+public class LoadableNativeHandler implements ArcgisNativeObjectController.NativeHandler, LoadStatusChangedListener {
 
     private final Loadable loadable;
     private NativeMessageSink messageSink;
     private boolean disposed = false;
 
-    public LoadableNativeObject(Loadable loadable) {
+    public LoadableNativeHandler(Loadable loadable) {
         this.loadable = loadable;
         this.loadable.addLoadStatusChangedListener(this);
     }
