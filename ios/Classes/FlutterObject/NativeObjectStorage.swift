@@ -5,7 +5,7 @@
 import Foundation
 
 class NativeObjectStorage {
-    private var nativeObjects: [String: ArcgisNativeObjectController] = [:]
+    private var nativeObjects: [String: NativeObject] = [:]
 
     private init() {
 
@@ -13,11 +13,11 @@ class NativeObjectStorage {
 
     static let shared = NativeObjectStorage()
 
-    func addNativeObject(object: ArcgisNativeObjectController) {
+    func addNativeObject(object: NativeObject) {
         nativeObjects[object.objectId] = object
     }
 
-    func getNativeObject(objectId: String) -> ArcgisNativeObjectController? {
+    func getNativeObject(objectId: String) -> NativeObject? {
         nativeObjects[objectId]
     }
 

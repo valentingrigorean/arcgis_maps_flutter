@@ -5,5 +5,5 @@ import androidx.annotation.Nullable;
 
 public interface ArcgisNativeObjectFactory {
     @NonNull
-    ArcgisNativeObjectController createNativeObject(@NonNull String objectId, @NonNull String type, @Nullable Object arguments, @NonNull ArcgisNativeObjectsController.NativeObjectControllerMessageSink messageSink);
+    NativeObject createNativeObject(@NonNull String objectId, @NonNull String type, @Nullable Object arguments, @NonNull ArcgisNativeObjectsController.NativeObjectControllerMessageSink messageSink);
 }

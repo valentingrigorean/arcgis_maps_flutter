@@ -5,12 +5,12 @@ import androidx.annotation.Nullable;
 
 import com.esri.arcgisruntime.concurrent.Job;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
-import com.valentingrigorean.arcgis_maps_flutter.flutterobject.ArcgisNativeObjectController;
+import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler;
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeMessageSink;
 
 import io.flutter.plugin.common.MethodChannel;
 
-public class JobNativeHandler implements ArcgisNativeObjectController.NativeHandler {
+public class JobNativeHandler implements NativeHandler {
     private final Job job;
     private final JobChangedListener jobChangedListener;
     private final ProgressChangedListener progressChangedListener;

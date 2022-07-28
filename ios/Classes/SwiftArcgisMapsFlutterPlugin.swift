@@ -66,6 +66,6 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
     }
 
     public func detachFromEngine(for registrar: FlutterPluginRegistrar) {
-        NativeObjectStorage.shared.clear()
+        NativeObjectStorage.shared.clearAll()
     }
 }

@@ -6,57 +6,44 @@ import androidx.annotation.Nullable;
 import com.esri.arcgisruntime.loadable.LoadStatusChangedEvent;
 import com.esri.arcgisruntime.loadable.LoadStatusChangedListener;
 import com.esri.arcgisruntime.loadable.Loadable;
-import com.valentingrigorean.arcgis_maps_flutter.flutterobject.ArcgisNativeObjectController;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
-import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeMessageSink;
+import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeHandler;
 
 import io.flutter.plugin.common.MethodChannel;
 
-public class LoadableNativeHandler implements ArcgisNativeObjectController.NativeHandler, LoadStatusChangedListener {
-
-    private final Loadable loadable;
-    private NativeMessageSink messageSink;
-    private boolean disposed = false;
+public class LoadableNativeHandler extends BaseNativeHandler<Loadable> implements LoadStatusChangedListener {
 
     public LoadableNativeHandler(Loadable loadable) {
-        this.loadable = loadable;
-        this.loadable.addLoadStatusChangedListener(this);
+        super(loadable);
+        loadable.addLoadStatusChangedListener(this);
     }
 
     @Override
-    public void dispose() {
-        if (disposed) {
-            return;
-        }
-        disposed = true;
-        loadable.removeLoadStatusChangedListener(this);
-    }
-
-    @Override
-    public void setMessageSink(@Nullable NativeMessageSink messageSink) {
-        this.messageSink = messageSink;
+    protected void disposeInternal() {
+        super.disposeInternal();
+        getNativeHandler().removeLoadStatusChangedListener(this);
     }
 
     @Override
     public boolean onMethodCall(@NonNull String method, @Nullable Object args, @NonNull MethodChannel.Result result) {
         switch (method) {
             case "loadable#getLoadStatus":
-                result.success(loadable.getLoadStatus().ordinal());
+                result.success(getNativeHandler().getLoadStatus().ordinal());
                 return true;
             case "loadable#getLoadError":
-                result.success(Convert.arcGISRuntimeExceptionToJson(loadable.getLoadError()));
+                result.success(Convert.arcGISRuntimeExceptionToJson(getNativeHandler().getLoadError()));
                 return true;
             case "loadable#cancelLoad":
-                loadable.cancelLoad();
+                getNativeHandler().cancelLoad();
                 result.success(null);
                 return true;
             case "loadable#loadAsync":
-                loadable.loadAsync();
-                loadable.addDoneLoadingListener(new DoneListener(result));
+                getNativeHandler().loadAsync();
+                getNativeHandler().addDoneLoadingListener(new DoneListener(result));
                 return true;
             case "loadable#retryLoadAsync":
-                loadable.retryLoadAsync();
-                loadable.addDoneLoadingListener(new DoneListener(result));
+                getNativeHandler().retryLoadAsync();
+                getNativeHandler().addDoneLoadingListener(new DoneListener(result));
                 return true;
         }
         return false;
@@ -64,11 +51,7 @@ public class LoadableNativeHandler implements ArcgisNativeObjectController.Nativ
 
     @Override
     public void loadStatusChanged(LoadStatusChangedEvent loadStatusChangedEvent) {
-        final NativeMessageSink messageSink = this.messageSink;
-        if (messageSink == null) {
-            return;
-        }
-        messageSink.send("loadable#loadStatusChanged", loadStatusChangedEvent.getNewLoadStatus().ordinal());
+        sendMessage("loadable#loadStatusChanged", loadStatusChangedEvent.getNewLoadStatus().ordinal());
     }
 
     private class DoneListener implements Runnable {
@@ -80,8 +63,8 @@ public class LoadableNativeHandler implements ArcgisNativeObjectController.Nativ
 
         @Override
         public void run() {
-            loadable.removeDoneLoadingListener(this);
-            if (!disposed) {
+            getNativeHandler().removeDoneLoadingListener(this);
+            if (!isDisposed()) {
                 result.success(null);
             }
         }

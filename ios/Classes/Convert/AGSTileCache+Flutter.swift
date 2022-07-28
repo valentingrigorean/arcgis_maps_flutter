@@ -13,9 +13,9 @@ extension AGSTileCache {
 
     static func createFlutter(data: Dictionary<String, Any>) -> AGSTileCache {
         if let nativeObjectId = data["nativeObjectId"] as? String {
-            let nativeObject = NativeObjectStorage.shared.getNativeObject(objectId: nativeObjectId) as? TileCacheNativeObject
+            let nativeObject = NativeObjectStorage.shared.getNativeObject(objectId: nativeObjectId) as? BaseNativeObject<AGSTileCache>
             if let nativeObject = nativeObject {
-                return nativeObject.tileCache
+                return nativeObject.nativeObject
             }
         }
         return AGSTileCache(data: data)

@@ -5,15 +5,10 @@
 import Foundation
 import ArcGIS
 
-class EstimateTileCacheSizeJobNativeObject: ArcgisNativeObjectController {
+class EstimateTileCacheSizeJobNativeObject: BaseNativeObject<AGSEstimateTileCacheSizeJob> {
 
-    private var status: AGSJobStatus
-    let job: AGSEstimateTileCacheSizeJob
-
-    init(job: AGSEstimateTileCacheSizeJob, objectId: String, messageSink: NativeObjectControllerMessageSink) {
-        self.job = job
-        status = job.status
-        super.init(objectId: objectId, nativeHandlers: [
+    init(objectId: String, job: AGSEstimateTileCacheSizeJob, messageSink: NativeObjectControllerMessageSink) {
+        super.init(objectId: objectId, nativeObject: job, nativeHandlers: [
             JobNativeHandler(job: job)
         ], messageSink: messageSink)
     }

@@ -13,7 +13,7 @@ protocol NativeObjectControllerMessageSink: NativeMessageSink {
 }
 
 protocol ArcgisNativeObjectFactory {
-    func createNativeObject(objectId: String, type: String, arguments: Any?, messageSink: NativeObjectControllerMessageSink) -> ArcgisNativeObjectController
+    func createNativeObject(objectId: String, type: String, arguments: Any?, messageSink: NativeObjectControllerMessageSink) -> NativeObject
 }
 
 class ArcgisNativeObjectsController: NativeObjectControllerMessageSink {
@@ -68,7 +68,7 @@ class ArcgisNativeObjectsController: NativeObjectControllerMessageSink {
         }
     }
 
-    private func createNativeObject(objectId: String, type: String, arguments: Any?) -> ArcgisNativeObjectController {
+    private func createNativeObject(objectId: String, type: String, arguments: Any?) -> NativeObject {
         let nativeObject = factory.createNativeObject(objectId: objectId, type: type, arguments: arguments, messageSink: self)
         NativeObjectStorage.shared.addNativeObject(object: nativeObject)
         return nativeObject

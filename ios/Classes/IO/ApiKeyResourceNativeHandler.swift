@@ -5,27 +5,20 @@
 import Foundation
 import ArcGIS
 
-class ApiKeyResourceNativeHandler: NativeHandler {
-    private let apiKeyResource: AGSAPIKeyResource
+class ApiKeyResourceNativeHandler: BaseNativeHandler<AGSAPIKeyResource> {
 
     init(apiKeyResource: AGSAPIKeyResource) {
-        self.apiKeyResource = apiKeyResource
+        super.init(nativeHandler: apiKeyResource)
     }
 
-    var messageSink: NativeMessageSink?
-
-    func dispose() {
-        messageSink = nil
-    }
-
-    func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) -> Bool {
+    override func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) -> Bool {
         switch (method) {
         case "apiKeyResource#getApiKey":
-            result(apiKeyResource.apiKey)
+            result(nativeHandler.apiKey)
             return true
         case "apiKeyResource#setApiKey":
             if let apiKey = arguments as? String {
-                apiKeyResource.apiKey = apiKey
+                nativeHandler.apiKey = apiKey
             }
             result(nil)
             return true

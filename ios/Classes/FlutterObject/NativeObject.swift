@@ -12,16 +12,54 @@ protocol NativeHandler {
     func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) -> Bool
 }
 
-class ArcgisNativeObjectController: NativeMessageSink {
+
+class BaseNativeHandler<T>: NativeHandler {
+
+    let nativeHandler: T
+
+    init(nativeHandler: T) {
+        self.nativeHandler = nativeHandler
+    }
+
+    var messageSink: NativeMessageSink?
+
+    func dispose() {
+
+    }
+
+    func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) -> Bool {
+        false
+    }
+
+    func sendMessage(method: String, arguments: Any?) {
+        messageSink?.send(method: method, arguments: arguments)
+    }
+}
+
+protocol NativeObject {
+    var objectId: String { get }
+
+    var messageSink: NativeObjectControllerMessageSink { get }
+
+    func dispose()
+
+    func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult)
+}
+
+
+class BaseNativeObject<T>: NativeMessageSink, NativeObject {
+    var messageSink: NativeObjectControllerMessageSink
 
     private var isDisposed: Bool = false
     private let nativeHandlers: [NativeHandler]
 
-    let messageSink: NativeObjectControllerMessageSink
     let objectId: String
 
-    init(objectId: String, nativeHandlers: [NativeHandler], messageSink: NativeObjectControllerMessageSink) {
+    let nativeObject: T
+
+    init(objectId: String, nativeObject: T, nativeHandlers: [NativeHandler], messageSink: NativeObjectControllerMessageSink) {
         self.objectId = objectId
+        self.nativeObject = nativeObject
         self.nativeHandlers = nativeHandlers
         self.messageSink = messageSink
 
@@ -51,12 +89,16 @@ class ArcgisNativeObjectController: NativeMessageSink {
     }
 
     func send(method: String, arguments: Any?) {
+        if (isDisposed) {
+            return
+        }
         messageSink.send(method: "messageNativeObject", arguments: [
             "objectId": objectId,
             "method": method,
             "arguments": arguments
         ])
     }
+
 
     func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) {
         for handler in nativeHandlers {

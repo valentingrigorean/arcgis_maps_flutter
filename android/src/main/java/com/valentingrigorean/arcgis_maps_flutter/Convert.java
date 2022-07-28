@@ -18,6 +18,7 @@ import com.esri.arcgisruntime.arcgisservices.LevelOfDetail;
 import com.esri.arcgisruntime.arcgisservices.TileInfo;
 import com.esri.arcgisruntime.arcgisservices.TimeAware;
 import com.esri.arcgisruntime.arcgisservices.TimeUnit;
+import com.esri.arcgisruntime.data.TileCache;
 import com.esri.arcgisruntime.geometry.AngularUnitId;
 import com.esri.arcgisruntime.geometry.Envelope;
 import com.esri.arcgisruntime.geometry.GeodeticCurveType;
@@ -297,6 +298,21 @@ public class Convert {
         }
     }
 
+    public static Object credentialToJson(Credential credential) {
+
+        if (credential instanceof UserCredential) {
+            final UserCredential userCredential = (UserCredential) credential;
+            final Map<String, Object> map = new HashMap<>(5);
+            map.put("type", "UserCredential");
+            map.put("username", userCredential.getUsername());
+            map.put("password", userCredential.getPassword());
+            map.put("referer", userCredential.getReferer());
+            map.put("token", userCredential.getToken());
+            return map;
+        }
+        return null;
+    }
+
     public static Camera toCamera(Object o) {
         final Map<?, ?> data = toMap(o);
 
@@ -420,6 +436,12 @@ public class Convert {
         final int tileHeight = toInt(data.get("tileHeight"));
         final int tileWidth = toInt(data.get("tileWidth"));
         return new TileInfo(dpi, imageFormat == -1 ? TileInfo.ImageFormat.UNKNOWN : TileInfo.ImageFormat.values()[imageFormat], levelOfDetails, origin, spatialReference, tileHeight, tileWidth);
+    }
+
+    public static TileCache toTileCache(Object o) {
+        final Map<?, ?> data = toMap(o);
+        final String url = data.get("url").toString();
+        return new TileCache(url);
     }
 
     public static LevelOfDetail toLevelOfDetail(Object o) {

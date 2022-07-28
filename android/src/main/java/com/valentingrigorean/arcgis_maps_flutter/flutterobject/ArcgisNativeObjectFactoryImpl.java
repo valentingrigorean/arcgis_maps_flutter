@@ -12,17 +12,21 @@ public class ArcgisNativeObjectFactoryImpl implements ArcgisNativeObjectFactory 
 
     @NonNull
     @Override
-    public ArcgisNativeObjectController createNativeObject(@NonNull String objectId, @NonNull String type, @Nullable Object arguments, @NonNull ArcgisNativeObjectsController.NativeObjectControllerMessageSink messageSink) {
+    public NativeObject createNativeObject(@NonNull String objectId, @NonNull String type, @Nullable Object arguments, @NonNull ArcgisNativeObjectsController.NativeObjectControllerMessageSink messageSink) {
         switch (type) {
             case "ExportTileCacheTask": {
                 final String url = (String) arguments;
                 final ExportTileCacheTask exportTileCacheTask = new ExportTileCacheTask(url);
-                return new ExportTileCacheTaskNativeObject(objectId, exportTileCacheTask, messageSink);
+                final NativeObject nativeObject = new ExportTileCacheTaskNativeObject(objectId, exportTileCacheTask);
+                nativeObject.setMessageSink(messageSink);
+                return nativeObject;
             }
             case "TileCache": {
                 final String url = (String) arguments;
                 final TileCache tileCache = new TileCache(url);
-                return new TileCacheNativeObject(tileCache, objectId, messageSink);
+                final NativeObject nativeObject = new TileCacheNativeObject(objectId, tileCache);
+                nativeObject.setMessageSink(messageSink);
+                return nativeObject;
             }
             default:
                 throw new RuntimeException("Not implemented");

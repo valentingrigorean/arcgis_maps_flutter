@@ -40,7 +40,7 @@ public class ArcgisNativeObjectsController implements MethodChannel.MethodCallHa
                 final String objectId = (String) args.get("objectId");
                 final String type = (String) args.get("type");
                 final Object arguments = args.get("arguments");
-                final ArcgisNativeObjectController nativeObject = factory.createNativeObject(objectId, type, arguments, messageSink);
+                final NativeObject nativeObject = factory.createNativeObject(objectId, type, arguments, messageSink);
                 storage.addNativeObject(nativeObject);
                 result.success(null);
             }
@@ -56,7 +56,7 @@ public class ArcgisNativeObjectsController implements MethodChannel.MethodCallHa
                 final String objectId = (String) args.get("objectId");
                 final String method = (String) args.get("method");
                 final Object arguments = args.get("arguments");
-                final ArcgisNativeObjectController nativeObject = storage.getNativeObject(objectId);
+                final NativeObject nativeObject = storage.getNativeObject(objectId);
                 if (nativeObject != null) {
                     nativeObject.onMethodCall(method, arguments, result);
                 } else {

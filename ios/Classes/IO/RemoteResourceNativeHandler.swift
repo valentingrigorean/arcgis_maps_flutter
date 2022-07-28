@@ -5,30 +5,23 @@
 import Foundation
 import ArcGIS
 
-class RemoteResourceNativeHandler: NativeHandler {
-    private let remoteResource: AGSRemoteResource
+class RemoteResourceNativeHandler: BaseNativeHandler<AGSRemoteResource> {
 
     init(remoteResource: AGSRemoteResource) {
-        self.remoteResource = remoteResource
+        super.init(nativeHandler: remoteResource)
     }
 
-    var messageSink: NativeMessageSink?
-
-    func dispose() {
-        messageSink = nil
-    }
-
-    func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) -> Bool {
+    override func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) -> Bool {
         switch (method) {
         case "remoteResource#getUrl":
-            result(remoteResource.url?.absoluteString)
+            result(nativeHandler.url?.absoluteString)
             return true
         case "remoteResource#getCredential":
-            result(remoteResource.credential?.toJSONFlutter())
+            result(nativeHandler.credential?.toJSONFlutter())
             return true
         case "remoteResource#setCredential":
             if let credential = arguments as? Dictionary<String, Any> {
-                remoteResource.credential = AGSCredential(data: credential)
+                nativeHandler.credential = AGSCredential(data: credential)
             }
             result(nil)
             return true

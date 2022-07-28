@@ -5,13 +5,11 @@
 import Foundation
 import ArcGIS
 
-class ExportTileCacheTaskNativeObject: ArcgisNativeObjectController {
-
-    let exportTileCacheTask: AGSExportTileCacheTask
+class ExportTileCacheTaskNativeObject: BaseNativeObject<AGSExportTileCacheTask> {
 
     init(objectId: String, exportTileCacheTask: AGSExportTileCacheTask, messageSink: NativeObjectControllerMessageSink) {
-        self.exportTileCacheTask = exportTileCacheTask
-        super.init(objectId: objectId, nativeHandlers: [
+        super.init(objectId: objectId, nativeObject: exportTileCacheTask, nativeHandlers: [
+            LoadableNativeHandler(loadable: exportTileCacheTask),
             RemoteResourceNativeHandler(remoteResource: exportTileCacheTask),
             ApiKeyResourceNativeHandler(apiKeyResource: exportTileCacheTask)
         ], messageSink: messageSink)
@@ -38,7 +36,7 @@ class ExportTileCacheTaskNativeObject: ArcgisNativeObjectController {
         let areaOfInterest = AGSGeometry.fromFlutter(data: data["areaOfInterest"] as! [String: Any])!
         let minScale = data["minScale"] as! Double
         let maxScale = data["maxScale"] as! Double
-        exportTileCacheTask.exportTileCacheParameters(withAreaOfInterest: areaOfInterest, minScale: minScale, maxScale: maxScale) { (parameters, error) in
+        nativeObject.exportTileCacheParameters(withAreaOfInterest: areaOfInterest, minScale: minScale, maxScale: maxScale) { (parameters, error) in
             if let params = parameters {
                 result(params.toJSONFlutter())
             } else {
@@ -49,10 +47,10 @@ class ExportTileCacheTaskNativeObject: ArcgisNativeObjectController {
 
     private func estimateTileCacheSizeJob(arguments: Any?, result: @escaping FlutterResult) {
         let params = AGSExportTileCacheParameters(data: arguments as! [String: Any])
-        let job = exportTileCacheTask.estimateTileCacheSizeJob(with: params)
+        let job = nativeObject.estimateTileCacheSizeJob(with: params)
         let jobId = NSUUID().uuidString
 
-        let jobNativeObject = EstimateTileCacheSizeJobNativeObject(job: job, objectId: jobId, messageSink: messageSink)
+        let jobNativeObject = EstimateTileCacheSizeJobNativeObject(objectId: jobId, job: job, messageSink: messageSink)
         storage.addNativeObject(object: jobNativeObject)
         result(jobId)
     }
@@ -61,10 +59,10 @@ class ExportTileCacheTaskNativeObject: ArcgisNativeObjectController {
         let data = arguments as! [String: Any]
         let params = AGSExportTileCacheParameters(data: data["parameters"] as! [String: Any])
         let fileNameWithPath = data["fileNameWithPath"] as! String
-        let job = exportTileCacheTask.exportTileCacheJob(with: params, downloadFileURL: URL(string: fileNameWithPath)!)
+        let job = nativeObject.exportTileCacheJob(with: params, downloadFileURL: URL(string: fileNameWithPath)!)
         let jobId = NSUUID().uuidString
 
-        let jobNativeObject = ExportTileCacheJobNativeObject(job: job, objectId: jobId, messageSink: messageSink)
+        let jobNativeObject = ExportTileCacheJobNativeObject(objectId: jobId, job: job, messageSink: messageSink)
         storage.addNativeObject(object: jobNativeObject)
         result(jobId)
     }

@@ -2,6 +2,7 @@ package com.valentingrigorean.arcgis_maps_flutter.layers;
 
 import com.esri.arcgisruntime.arcgisservices.TileInfo;
 import com.esri.arcgisruntime.data.ServiceFeatureTable;
+import com.esri.arcgisruntime.data.TileCache;
 import com.esri.arcgisruntime.geometry.Envelope;
 import com.esri.arcgisruntime.io.RemoteResource;
 import com.esri.arcgisruntime.layers.ArcGISMapImageLayer;
@@ -15,6 +16,8 @@ import com.esri.arcgisruntime.layers.WmsLayer;
 import com.esri.arcgisruntime.portal.PortalItem;
 import com.esri.arcgisruntime.security.Credential;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
+import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeObject;
+import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeObjectStorage;
 
 import java.util.Collection;
 import java.util.List;
@@ -33,6 +36,7 @@ public class FlutterLayer {
     private final ServiceImageTiledLayerOptions serviceImageTiledLayerOptions;
     private final GroupLayerOptions groupLayerOptions;
     private final PortalItem portalItem;
+    private final TileCache tileCache;
 
     private final long portalItemLayerId;
 
@@ -43,12 +47,19 @@ public class FlutterLayer {
         if (data.containsKey("url")) {
             url = (String) data.get("url");
             portalItem = null;
+            tileCache = null;
         } else if (data.containsKey("portalItem")) {
             url = null;
             portalItem = Convert.toPortalItem(data.get("portalItem"));
+            tileCache = null;
+        } else if (data.containsKey("tileCache")) {
+            url = null;
+            portalItem = null;
+            tileCache = NativeObjectStorage.getNativeObjectOrConvert(data.get("tileCache"), (o -> Convert.toTileCache(o)));
         } else {
             url = null;
             portalItem = null;
+            tileCache = null;
         }
         isVisible = Convert.toBoolean(data.get("isVisible"));
         opacity = Convert.toFloat(data.get("opacity"));
@@ -101,16 +112,16 @@ public class FlutterLayer {
                 remoteResource = vectorTiledLayer;
                 break;
             case "FeatureLayer":
-                if(url != null) {
+                if (url != null) {
                     final ServiceFeatureTable serviceFeatureTable = new ServiceFeatureTable(url);
                     remoteResource = serviceFeatureTable;
                     layer = new FeatureLayer(serviceFeatureTable);
-                }else{
-                    layer = new FeatureLayer(portalItem,portalItemLayerId);
+                } else {
+                    layer = new FeatureLayer(portalItem, portalItemLayerId);
                 }
                 break;
             case "TiledLayer":
-                final ArcGISTiledLayer tiledLayer = new ArcGISTiledLayer(url);
+                final ArcGISTiledLayer tiledLayer = tileCache != null ? new ArcGISTiledLayer(tileCache) : new ArcGISTiledLayer(url);
                 remoteResource = tiledLayer;
                 layer = tiledLayer;
                 break;

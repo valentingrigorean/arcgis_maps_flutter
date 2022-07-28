@@ -5,35 +5,28 @@
 import Foundation
 import ArcGIS
 
-class LoadableNativeHandler: NativeHandler {
-    let loadable: AGSLoadable
+class LoadableNativeHandler: BaseNativeHandler<AGSLoadable> {
     var loadStatus: AGSLoadStatus
 
     init(loadable: AGSLoadable) {
-        self.loadable = loadable
         loadStatus = loadable.loadStatus
+        super.init(nativeHandler: loadable)
     }
 
-    var messageSink: NativeMessageSink?
-
-    func dispose() {
-        messageSink = nil
-    }
-
-    func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) -> Bool {
+    override func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) -> Bool {
         switch (method) {
         case "loadable#getLoadStatus":
-            result(loadable.loadStatus.rawValue)
+            result(nativeHandler.loadStatus.rawValue)
             return true
         case "loadable#getLoadError":
-            result(loadable.loadError?.toJSON())
+            result(nativeHandler.loadError?.toJSON())
             return true
         case "loadable#cancelLoad":
-            loadable.cancelLoad()
+            nativeHandler.cancelLoad()
             result(nil)
             return true
         case "loadable#loadAsync":
-            loadable.load { [weak self] (error) in
+            nativeHandler.load { [weak self] (error) in
                 guard let self = self else {
                     return
                 }
@@ -41,7 +34,7 @@ class LoadableNativeHandler: NativeHandler {
             }
             return true
         case "loadable#retryLoadAsync":
-            loadable.retryLoad { [weak self] (error) in
+            nativeHandler.retryLoad { [weak self] (error) in
                 guard let self = self else {
                     return
                 }
@@ -55,10 +48,10 @@ class LoadableNativeHandler: NativeHandler {
 
 
     private func onLoadCallback(error: Error?, result: @escaping FlutterResult) {
-        let newStatus = loadable.loadStatus
+        let newStatus = nativeHandler.loadStatus
         if newStatus != loadStatus {
             loadStatus = newStatus
-            messageSink?.send(method: "loadable#loadStatusChanged", arguments: loadStatus.rawValue)
+            sendMessage(method: "loadable#loadStatusChanged", arguments: loadStatus.rawValue)
         }
         result(nil)
     }

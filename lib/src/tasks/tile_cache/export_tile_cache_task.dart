@@ -1,7 +1,7 @@
 part of arcgis_maps_flutter;
 
 class ExportTileCacheTask extends ArcgisNativeObject
-    with RemoteResource, ApiKeyResource {
+    with RemoteResource, ApiKeyResource,Loadable {
   final String _url;
 
   ExportTileCacheTask({required String url}) : _url = url;
