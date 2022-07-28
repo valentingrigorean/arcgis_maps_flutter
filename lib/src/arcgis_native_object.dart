@@ -77,6 +77,12 @@ abstract class ArcgisNativeObject {
   @mustCallSuper
   Future<void> handleMethodCall(String method, dynamic arguments) async {}
 
+  @protected
+  @mustCallSuper
+  Future<void> onCreate() {
+    return Future.value();
+  }
+
   void _methodCallHandler(NativeMessage message) async {
     if (_isDisposed) {
       return;
@@ -96,6 +102,7 @@ abstract class ArcgisNativeObject {
         type: type,
         arguments: getCreateArguments(),
       );
+      await onCreate();
       _onCreated.complete();
     }
 

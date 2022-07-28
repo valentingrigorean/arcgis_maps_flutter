@@ -13,7 +13,7 @@ protocol NativeHandler {
 }
 
 
-class BaseNativeHandler<T>: NativeHandler {
+class BaseNativeHandler<T>: NSObject, NativeHandler {
 
     let nativeHandler: T
 
@@ -21,10 +21,14 @@ class BaseNativeHandler<T>: NativeHandler {
         self.nativeHandler = nativeHandler
     }
 
+    deinit {
+        dispose()
+    }
+
     var messageSink: NativeMessageSink?
 
     func dispose() {
-
+        messageSink = nil
     }
 
     func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) -> Bool {

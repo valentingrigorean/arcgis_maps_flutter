@@ -2,6 +2,7 @@ import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:arcgis_maps_flutter/src/arcgis_native_object.dart';
 
 mixin RemoteResource on ArcgisNativeObject {
+
   Future<String?> get url async {
     return await invokeMethod<String>('remoteResource#getUrl');
   }

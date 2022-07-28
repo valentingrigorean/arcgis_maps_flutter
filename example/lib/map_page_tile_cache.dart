@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
+import 'package:arcgis_maps_flutter_example/utils/credentials.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -80,10 +81,16 @@ class _MapPageTileCacheState extends State<MapPageTileCache> {
       print('appDocPath: $appDocPath');
     }
 
+    await _tileCacheTask.setCredential(geodataCredentials);
+
     final viewPoint = await _mapController
         .getCurrentViewpoint(ViewpointType.boundingGeometry);
     if (viewPoint == null) {
       return;
+    }
+
+    if (kDebugMode) {
+      print('viewPoint: ${viewPoint.targetGeometry.toJson()}');
     }
 
     final params = await _tileCacheTask.createDefaultExportTileCacheParameters(
@@ -95,6 +102,12 @@ class _MapPageTileCacheState extends State<MapPageTileCache> {
       parameters: params,
       fileNameWithPath: appDocPath,
     );
+
+    job.onMessageAdded.listen((event) {
+      if (kDebugMode) {
+        print('message: $event');
+      }
+    });
 
     _exportTileCacheJob = job;
     job.onStatusChanged.listen((status) async {

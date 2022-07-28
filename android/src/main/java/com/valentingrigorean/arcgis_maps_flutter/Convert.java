@@ -82,10 +82,10 @@ import java.util.stream.Collectors;
 
 public class Convert {
 
-    private static String TAG = "ConvertRouteTask";
+    private static String TAG = "Convert";
 
-    private static final SimpleDateFormat ISO8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    protected static final SimpleDateFormat ISO8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+    protected static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static Object arcGISRuntimeExceptionToJson(@Nullable ArcGISRuntimeException ex) {
         if (ex == null) {

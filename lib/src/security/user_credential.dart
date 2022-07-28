@@ -1,6 +1,6 @@
 part of arcgis_maps_flutter;
 
-class UserCredential extends Credential {
+class UserCredential extends Credential with EquatableMixin {
   const UserCredential._({
     required this.username,
     required this.password,
@@ -66,4 +66,12 @@ class UserCredential extends Credential {
 
     return json;
   }
+
+  @override
+  List<Object?> get props => [
+        username,
+        password,
+        referer,
+        token,
+      ];
 }
