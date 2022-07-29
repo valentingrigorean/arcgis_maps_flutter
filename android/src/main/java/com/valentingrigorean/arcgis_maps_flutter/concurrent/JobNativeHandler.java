@@ -4,6 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.esri.arcgisruntime.concurrent.Job;
+import com.esri.arcgisruntime.data.Geodatabase;
+import com.esri.arcgisruntime.tasks.geodatabase.GenerateGeodatabaseParameters;
+import com.esri.arcgisruntime.tasks.geodatabase.GeodatabaseSyncTask;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeHandler;
 
@@ -18,10 +21,9 @@ public class JobNativeHandler extends BaseNativeHandler<Job> {
     private final ProgressChangedListener progressChangedListener;
     private final JobType jobType;
 
-    private int messageCount = 0;
+    private int messageCount;
 
     private Job.Status status;
-
 
     public JobNativeHandler(Job job, JobType jobType) {
         super(job);

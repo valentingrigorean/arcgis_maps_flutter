@@ -7,6 +7,7 @@ import 'package:arcgis_maps_flutter_example/map_page_auto_pan_mode.dart';
 import 'package:arcgis_maps_flutter_example/map_page_buffer.dart';
 import 'package:arcgis_maps_flutter_example/map_page_current_location_tap.dart';
 import 'package:arcgis_maps_flutter_example/map_page_dynamic_layer.dart';
+import 'package:arcgis_maps_flutter_example/map_page_feature_service_offline.dart';
 import 'package:arcgis_maps_flutter_example/map_page_geodesic_distance.dart';
 import 'package:arcgis_maps_flutter_example/map_page_geometry_engine.dart';
 import 'package:arcgis_maps_flutter_example/map_page_gesture.dart';
@@ -136,6 +137,18 @@ class MainPage extends StatelessWidget {
                     ),
                   );
                 },
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          const MapPageFeatureServiceOffline(),
+                    ),
+                  );
+                },
+                child: const Text('Feature service offline'),
               ),
               ElevatedButton(
                 child: const Text('Marker generatered from widget'),

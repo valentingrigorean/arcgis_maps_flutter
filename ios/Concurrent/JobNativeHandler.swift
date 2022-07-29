@@ -17,7 +17,6 @@ class JobNativeHandler: BaseNativeHandler<AGSJob> {
         status = job.status
         messageCount = job.messages.count
         super.init(nativeHandler: job)
-
         job.progress.addObserver(self, forKeyPath: "fractionCompleted", options: [.old, .new], context: nil)
     }
 
