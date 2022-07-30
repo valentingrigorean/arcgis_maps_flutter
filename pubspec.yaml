@@ -1,6 +1,6 @@
 name: arcgis_maps_flutter
 description: A new flutter plugin project.
-version: 0.0.5+1
+version: 0.0.5+2
 homepage:
 
 environment:
@@ -16,14 +16,14 @@ dependencies:
   fluster: ^1.2.0
   equatable: ^2.0.3
   http: ^0.13.4
-  xml2json: ^5.3.3
+  xml2json: ^5.3.4
   jiffy: ^5.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.1
-  mockito: ^5.2.0
+  mockito: ^5.3.0
   build_runner: ^2.2.0
 
 # For information on the generic Dart part of this file, see the
