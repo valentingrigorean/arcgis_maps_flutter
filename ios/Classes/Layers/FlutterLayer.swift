@@ -27,6 +27,7 @@ struct FlutterLayer: Hashable, Equatable {
     init(data: Dictionary<String, Any>) {
         layerId = data["layerId"] as! String
         layerType = data["layerType"] as! String
+        featureLayersIds = data["featureLayersIds"] as? [Int]
         if let url = data["url"] as? String {
             self.url = URL(string: url)
             portalItem = nil
@@ -99,6 +100,8 @@ struct FlutterLayer: Hashable, Equatable {
     let tileCache: AGSTileCache?
     let layersName: [String]?
 
+    let featureLayersIds: [Int]?
+
     let credential: AGSCredential?
 
     let serviceImageTiledLayerOptions: ServiceImageTiledLayerOptions?
@@ -118,4 +121,86 @@ struct FlutterLayer: Hashable, Equatable {
         return true
     }
 
+    func createNativeLayer() -> AGSLayer {
+        switch layerType {
+        case "GeodatabaseLayer":
+            let layer = AGSGroupLayer()
+            let geodatabase = AGSGeodatabase(fileURL: url!)
+            geodatabase.load { error in
+                if let error = error {
+                    print(error.localizedDescription)
+                } else {
+                    geodatabase.geodatabaseFeatureTables.forEach { table in
+                        if let featureLayersIds = featureLayersIds, featureLayersIds.contains(table.serviceLayerID) {
+                            layer.layers.add(AGSFeatureLayer(featureTable: table))
+                        } else {
+                            layer.layers.add(AGSFeatureLayer(featureTable: table))
+                        }
+                    }
+                }
+            }
+            setupDefaultParams(layer: layer)
+            return layer
+        case "VectorTileLayer":
+            let layer = AGSArcGISVectorTiledLayer(url: url!)
+            layer.credential = credential
+            setupDefaultParams(layer: layer)
+            return layer
+        case "FeatureLayer":
+            let featureLayer: AGSFeatureLayer
+            if let url = url {
+                let featureTable = AGSServiceFeatureTable(url: url)
+                featureTable.credential = credential
+                featureLayer = AGSFeatureLayer(featureTable: featureTable)
+            } else {
+                featureLayer = AGSFeatureLayer(item: portalItem!, layerID: portalItemLayerId!)
+            }
+            setupDefaultParams(layer: featureLayer)
+            return featureLayer
+        case "TiledLayer":
+            let layer: AGSArcGISTiledLayer
+            if let tileCache = tileCache {
+                layer = AGSArcGISTiledLayer(tileCache: tileCache)
+            } else {
+                layer = AGSArcGISTiledLayer(url: url!)
+            }
+            layer.credential = credential
+            setupDefaultParams(layer: layer)
+            return layer
+        case "MapImageLayer":
+            let mapImageLayer = AGSArcGISMapImageLayer(url: url!)
+            mapImageLayer.credential = credential
+            setupDefaultParams(layer: mapImageLayer)
+            return mapImageLayer
+        case "WmsLayer":
+            let wmsLayer = AGSWMSLayer(url: url!, layerNames: layersName!)
+            wmsLayer.credential = credential
+            setupDefaultParams(layer: wmsLayer)
+            return wmsLayer
+        case "ServiceImageTiledLayer":
+            let layer = FlutterServiceImageTiledLayer(
+                    tileInfo: serviceImageTiledLayerOptions!.tileInfo,
+                    fullExtent: serviceImageTiledLayerOptions!.fullExtent,
+                    urlTemplate: serviceImageTiledLayerOptions!.urlTemplate,
+                    subdomains: serviceImageTiledLayerOptions!.subdomains,
+                    additionalOptions: serviceImageTiledLayerOptions!.additionalOptions)
+            setupDefaultParams(layer: layer)
+            return layer
+        case "GroupLayer":
+            let groupLayer = AGSGroupLayer(childLayers: groupLayerOptions!.layers.map {
+                $0.createNativeLayer()
+            })
+            groupLayer.showChildrenInLegend = groupLayerOptions!.showChildrenInLegend
+            groupLayer.visibilityMode = groupLayerOptions!.visibilityMode
+            setupDefaultParams(layer: groupLayer)
+            return groupLayer
+        default:
+            fatalError("Not implemented.")
+        }
+    }
+
+    private func setupDefaultParams(layer: AGSLayer) {
+        layer.opacity = opacity
+        layer.isVisible = isVisible
+    }
 }

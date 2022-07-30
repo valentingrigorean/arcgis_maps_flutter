@@ -24,15 +24,16 @@ class _MapPageFeatureServiceOfflineState
   GenerateGeodatabaseJob? _job;
 
   late ArcgisMapController _mapController;
+  Layer? _downloadedFeatureLayer;
 
   bool _isDownloading = false;
-  bool _isDownloaded = false;
 
   double _progress = 0;
 
   @override
   void initState() {
     super.initState();
+    _downloadTileCache();
   }
 
   @override
@@ -51,52 +52,87 @@ class _MapPageFeatureServiceOfflineState
         title: const Text('Future service Cache'),
       ),
       body: ArcgisMapView(
-        map: ArcGISMap.imagery(),
+        map: ArcGISMap.topographic(),
+        viewpoint: Viewpoint.fromPoint(
+          point: AGSPoint.fromLatLng(
+            latitude: 41.774317,
+            longitude: -88.149655,
+          ),
+          scale: 18055.954822,
+        ),
+        operationalLayers: _downloadedFeatureLayer != null
+            ? {_downloadedFeatureLayer!}
+            : const {},
         onMapCreated: (controller) {
           _mapController = controller;
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _isDownloading ? null : _downloadTileCache,
-        child: _isDownloading
-            ? CircularProgressIndicator(
+      floatingActionButton: !_isDownloading
+          ? null
+          : FloatingActionButton(
+              onPressed: null,
+              child: CircularProgressIndicator(
                 value: _progress,
                 color: Colors.white,
-              )
-            : const Icon(
-                Icons.file_download,
               ),
-      ),
+            ),
     );
   }
 
   void _downloadTileCache() async {
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String appDocPath = '${appDocDir.path}/gdb.geodatabase';
+
+    if (kDebugMode) {
+      print('appDocPath: $appDocPath');
+    }
+
+    if (await File(appDocPath).exists()) {
+      _downloadedFeatureLayer = GeodatabaseLayer(
+        layerId: LayerId(appDocPath),
+        path: appDocPath,
+      );
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (mounted) {
+        setState(() {});
+      }
+      return;
+    }
+
     setState(() {
       _isDownloading = true;
       _progress = 0;
     });
 
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    String appDocPath = '${appDocDir.path}/offline_future_service.geodatabase';
-
-    if (kDebugMode) {
-      print('appDocPath: $appDocPath');
-    }
-    final viewPoint = await _mapController
-        .getCurrentViewpoint(ViewpointType.boundingGeometry);
-    if (viewPoint == null) {
-      return;
-    }
-
-    if (kDebugMode) {
-      print('viewPoint: ${viewPoint.targetGeometry.toJson()}');
-    }
-
     final params = await _task.defaultGenerateGeodatabaseParameters(
-      areaOfInterest: viewPoint.targetGeometry,
+      areaOfInterest: AGSPolygon(
+        points: [
+          [
+            AGSPoint.fromLatLng(
+              latitude: 41.778064,
+              longitude: -88.153245,
+            ),
+            AGSPoint.fromLatLng(
+              latitude: 41.778870,
+              longitude: -88.146708,
+            ),
+            AGSPoint.fromLatLng(
+              latitude: 41.769764,
+              longitude: -88.145878,
+            ),
+            AGSPoint.fromLatLng(
+              latitude: 41.770330,
+              longitude: -88.153431,
+            ),
+          ],
+        ],
+        spatialReference: SpatialReference.wgs84(),
+      ),
     );
     final job = await _task.generateJob(
-      parameters: params,
+      parameters: params.copyWith(
+        returnAttachments: false,
+      ),
       fileNameWithPath: appDocPath,
     );
 
@@ -115,8 +151,14 @@ class _MapPageFeatureServiceOfflineState
       if (status == JobStatus.succeeded) {
         if (mounted) {
           setState(() {
+            _downloadedFeatureLayer = GeodatabaseLayer(
+              layerId: LayerId(appDocPath),
+              path: appDocPath.replaceAll(
+                '.geodatabase',
+                '',
+              ),
+            );
             _isDownloading = false;
-            _isDownloaded = true;
           });
         }
       }
@@ -128,7 +170,6 @@ class _MapPageFeatureServiceOfflineState
         if (mounted) {
           setState(() {
             _isDownloading = false;
-            _isDownloaded = false;
           });
         }
       }

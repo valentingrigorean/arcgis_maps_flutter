@@ -60,7 +60,6 @@ public class ConvertGeodatabase extends Convert {
         parameters.setSyncContingentValues(toBoolean(shouldSyncContingentValues));
         parameters.setSyncModel(SyncModel.values()[toInt(syncModel)]);
         parameters.setUtilityNetworkSyncMode(UtilityNetworkSyncMode.values()[toInt(utilityNetworkSyncMode)]);
-        
         return parameters;
     }
 

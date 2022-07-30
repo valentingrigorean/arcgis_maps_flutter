@@ -1,6 +1,10 @@
 package com.valentingrigorean.arcgis_maps_flutter.layers;
 
+import android.util.Log;
+
 import com.esri.arcgisruntime.arcgisservices.TileInfo;
+import com.esri.arcgisruntime.data.Geodatabase;
+import com.esri.arcgisruntime.data.GeodatabaseFeatureTable;
 import com.esri.arcgisruntime.data.ServiceFeatureTable;
 import com.esri.arcgisruntime.data.TileCache;
 import com.esri.arcgisruntime.geometry.Envelope;
@@ -13,12 +17,14 @@ import com.esri.arcgisruntime.layers.GroupLayer;
 import com.esri.arcgisruntime.layers.GroupVisibilityMode;
 import com.esri.arcgisruntime.layers.Layer;
 import com.esri.arcgisruntime.layers.WmsLayer;
+import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.portal.PortalItem;
 import com.esri.arcgisruntime.security.Credential;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeObject;
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeObjectStorage;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -106,12 +112,43 @@ public class FlutterLayer {
         RemoteResource remoteResource = null;
 
         switch (layerType) {
-            case "VectorTileLayer":
+            case "GeodatabaseLayer": {
+                final GroupLayer groupLayer = new GroupLayer();
+                final Geodatabase geodatabase = new Geodatabase(url);
+                geodatabase.loadAsync();
+                geodatabase.addDoneLoadingListener(() -> {
+                    if (geodatabase.getLoadStatus() == LoadStatus.LOADED) {
+                        final Object featureLayersIdsRaw = data.get("featureLayersIds");
+                        final int[] featureLayersIds = Convert.toIntArray(featureLayersIdsRaw == null ? new ArrayList<Integer>() : featureLayersIdsRaw);
+
+                        for (final GeodatabaseFeatureTable table : geodatabase.getGeodatabaseFeatureTables()) {
+                            if(featureLayersIds.length == 0){
+                                groupLayer.getLayers().add(new FeatureLayer(table));
+                            } else {
+                                for (final int featureLayerId : featureLayersIds) {
+                                    if (table.getServiceLayerId() == featureLayerId) {
+                                        groupLayer.getLayers().add(new FeatureLayer(table));
+                                    }
+                                }
+                            }
+                        }
+                    } else if (geodatabase.getLoadStatus() == LoadStatus.FAILED_TO_LOAD) {
+                        Log.w("GeodatabaseLayer", "createLayer: " + geodatabase.getLoadError().getMessage());
+                        if (geodatabase.getLoadError().getCause() != null) {
+                            Log.w("GeodatabaseLayer", "createLayer: " + geodatabase.getLoadError().getCause().getMessage());
+                        }
+                    }
+                });
+                layer = groupLayer;
+            }
+            break;
+            case "VectorTileLayer": {
                 final ArcGISVectorTiledLayer vectorTiledLayer = new ArcGISVectorTiledLayer(url);
                 layer = vectorTiledLayer;
                 remoteResource = vectorTiledLayer;
-                break;
-            case "FeatureLayer":
+            }
+            break;
+            case "FeatureLayer": {
                 if (url != null) {
                     final ServiceFeatureTable serviceFeatureTable = new ServiceFeatureTable(url);
                     remoteResource = serviceFeatureTable;
@@ -119,34 +156,40 @@ public class FlutterLayer {
                 } else {
                     layer = new FeatureLayer(portalItem, portalItemLayerId);
                 }
-                break;
-            case "TiledLayer":
+            }
+            break;
+            case "TiledLayer": {
                 final ArcGISTiledLayer tiledLayer = tileCache != null ? new ArcGISTiledLayer(tileCache) : new ArcGISTiledLayer(url);
                 remoteResource = tiledLayer;
                 layer = tiledLayer;
-                break;
-            case "WmsLayer":
+            }
+            break;
+            case "WmsLayer": {
                 final Collection<String> layersNames = (Collection<String>) data.get("layersName");
                 final WmsLayer wmsLayer = new WmsLayer(url, layersNames);
                 remoteResource = wmsLayer;
                 layer = wmsLayer;
-                break;
-            case "MapImageLayer":
+            }
+            break;
+            case "MapImageLayer": {
                 final ArcGISMapImageLayer mapImageLayer = new ArcGISMapImageLayer(url);
                 remoteResource = mapImageLayer;
                 layer = mapImageLayer;
-                break;
-            case "ServiceImageTiledLayer":
+            }
+            break;
+            case "ServiceImageTiledLayer": {
                 layer = new FlutterServiceImageTiledLayer(serviceImageTiledLayerOptions.tileInfo, serviceImageTiledLayerOptions.fullExtent,
                         serviceImageTiledLayerOptions.urlTemplate, serviceImageTiledLayerOptions.subdomains,
                         serviceImageTiledLayerOptions.additionalOptions);
-                break;
-            case "GroupLayer":
+            }
+            break;
+            case "GroupLayer": {
                 final GroupLayer groupLayer = new GroupLayer(groupLayerOptions.layers.stream().map((e) -> e.createLayer()).collect(Collectors.toList()));
                 groupLayer.setVisibilityMode(groupLayerOptions.visibilityMode);
                 groupLayer.setShowChildrenInLegend(groupLayerOptions.showChildrenInLegend);
                 layer = groupLayer;
-                break;
+            }
+            break;
             default:
                 throw new UnsupportedOperationException("not implemented.");
         }

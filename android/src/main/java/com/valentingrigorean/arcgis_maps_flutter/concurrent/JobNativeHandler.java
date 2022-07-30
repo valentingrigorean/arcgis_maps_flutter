@@ -37,7 +37,7 @@ public class JobNativeHandler extends BaseNativeHandler<Job> {
     }
 
     public enum JobType {
-        GENERATE_GOO_DATABASE,
+        GENERATE_GEODATABASE,
         SYNC_GEO_DATABASE,
         EXPORT_TILE_CACHE,
         ESTIMATE_TILE_CACHE_SIZE,

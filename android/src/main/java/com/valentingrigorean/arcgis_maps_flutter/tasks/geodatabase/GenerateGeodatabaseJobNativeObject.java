@@ -10,7 +10,7 @@ public class GenerateGeodatabaseJobNativeObject extends BaseNativeObject<Generat
 
     public GenerateGeodatabaseJobNativeObject(String objectId, GenerateGeodatabaseJob job, ArcgisNativeObjectsController.NativeObjectControllerMessageSink messageSink) {
         super(objectId, job, new NativeHandler[]{
-                new JobNativeHandler(job, JobNativeHandler.JobType.GEO_PROCESSING_JOB)
+                new JobNativeHandler(job, JobNativeHandler.JobType.GENERATE_GEODATABASE)
         });
         setMessageSink(messageSink);
     }

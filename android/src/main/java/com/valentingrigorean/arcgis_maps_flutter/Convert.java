@@ -1137,15 +1137,18 @@ public class Convert {
         return (List<?>) o;
     }
 
-    public static <T> List<T> toListOf(Object o) {
-        return (List<T>) o;
-    }
-
     public static double[] toDoubleArray(Object o) {
-        if (o instanceof ArrayList) {
-            return ((ArrayList<Double>) o).stream().mapToDouble(Double::doubleValue).toArray();
+        if (o instanceof List) {
+            return ((List<Double>) o).stream().mapToDouble(Double::doubleValue).toArray();
         }
         return (double[]) o;
+    }
+
+    public static int[] toIntArray(Object o) {
+        if (o instanceof List) {
+            return ((List<Integer>) o).stream().mapToInt(Integer::intValue).toArray();
+        }
+        return (int[]) o;
     }
 
     public static double toDouble(Object o) {

@@ -43,7 +43,6 @@ class GeodatabaseSyncTaskNativeObject: BaseNativeObject<AGSGeodatabaseSyncTask> 
         let parameters = AGSGenerateGeodatabaseParameters(data: data["parameters"] as! [String: Any])
         let fileNameWithPath = data["fileNameWithPath"] as! String
         let job = nativeObject.generateJob(with: parameters, downloadFileURL: URL(string: fileNameWithPath)!)
-        print("JobType: \(job.jobType)")
         let jobId = NSUUID().uuidString
         let jobNativeObject = GenerateGeodatabaseJobNativeObject(objectId: jobId, job: job, messageSink: messageSink)
         storage.addNativeObject(object: jobNativeObject)

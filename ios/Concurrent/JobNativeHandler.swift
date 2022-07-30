@@ -10,7 +10,7 @@ class JobNativeHandler: BaseNativeHandler<AGSJob> {
     private var status: AGSJobStatus
 
     private var messageCount: Int
-    //TODO(vali): remove if manage to use KVO i tried but didn't work....
+    //TODO(vali): remove if manage to use KVO.I tried but didn't work....
     private var messageTimer: Timer?
 
     init(job: AGSJob) {
