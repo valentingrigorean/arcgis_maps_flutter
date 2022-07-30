@@ -18,6 +18,7 @@ import com.esri.arcgisruntime.arcgisservices.LevelOfDetail;
 import com.esri.arcgisruntime.arcgisservices.TileInfo;
 import com.esri.arcgisruntime.arcgisservices.TimeAware;
 import com.esri.arcgisruntime.arcgisservices.TimeUnit;
+import com.esri.arcgisruntime.data.TileCache;
 import com.esri.arcgisruntime.geometry.AngularUnitId;
 import com.esri.arcgisruntime.geometry.Envelope;
 import com.esri.arcgisruntime.geometry.GeodeticCurveType;
@@ -30,7 +31,6 @@ import com.esri.arcgisruntime.geometry.Polygon;
 import com.esri.arcgisruntime.geometry.Polyline;
 import com.esri.arcgisruntime.geometry.SpatialReference;
 import com.esri.arcgisruntime.layers.Layer;
-import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.loadable.Loadable;
 import com.esri.arcgisruntime.location.LocationDataSource;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
@@ -55,8 +55,6 @@ import com.esri.arcgisruntime.security.UserCredential;
 import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
 import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
 import com.esri.arcgisruntime.tasks.geocode.GeocodeResult;
-import com.esri.arcgisruntime.tasks.geocode.LocatorAttribute;
-import com.esri.arcgisruntime.tasks.geocode.LocatorInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.valentingrigorean.arcgis_maps_flutter.data.FieldTypeFlutter;
@@ -84,10 +82,10 @@ import java.util.stream.Collectors;
 
 public class Convert {
 
-    private static String TAG = "ConvertRouteTask";
+    private static String TAG = "Convert";
 
-    private static final SimpleDateFormat ISO8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    protected static final SimpleDateFormat ISO8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+    protected static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static Object arcGISRuntimeExceptionToJson(@Nullable ArcGISRuntimeException ex) {
         if (ex == null) {
@@ -300,6 +298,21 @@ public class Convert {
         }
     }
 
+    public static Object credentialToJson(Credential credential) {
+
+        if (credential instanceof UserCredential) {
+            final UserCredential userCredential = (UserCredential) credential;
+            final Map<String, Object> map = new HashMap<>(5);
+            map.put("type", "UserCredential");
+            map.put("username", userCredential.getUsername());
+            map.put("password", userCredential.getPassword());
+            map.put("referer", userCredential.getReferer());
+            map.put("token", userCredential.getToken());
+            return map;
+        }
+        return null;
+    }
+
     public static Camera toCamera(Object o) {
         final Map<?, ?> data = toMap(o);
 
@@ -422,7 +435,13 @@ public class Convert {
         final SpatialReference spatialReference = toSpatialReference(data.get("spatialReference"));
         final int tileHeight = toInt(data.get("tileHeight"));
         final int tileWidth = toInt(data.get("tileWidth"));
-        return new TileInfo(dpi, TileInfo.ImageFormat.values()[imageFormat], levelOfDetails, origin, spatialReference, tileHeight, tileWidth);
+        return new TileInfo(dpi, imageFormat == -1 ? TileInfo.ImageFormat.UNKNOWN : TileInfo.ImageFormat.values()[imageFormat], levelOfDetails, origin, spatialReference, tileHeight, tileWidth);
+    }
+
+    public static TileCache toTileCache(Object o) {
+        final Map<?, ?> data = toMap(o);
+        final String url = data.get("url").toString();
+        return new TileCache(url);
     }
 
     public static LevelOfDetail toLevelOfDetail(Object o) {
@@ -1118,15 +1137,18 @@ public class Convert {
         return (List<?>) o;
     }
 
-    public static <T> List<T> toListOf(Object o) {
-        return (List<T>) o;
-    }
-
     public static double[] toDoubleArray(Object o) {
-        if (o instanceof ArrayList) {
-            return ((ArrayList<Double>) o).stream().mapToDouble(Double::doubleValue).toArray();
+        if (o instanceof List) {
+            return ((List<Double>) o).stream().mapToDouble(Double::doubleValue).toArray();
         }
         return (double[]) o;
+    }
+
+    public static int[] toIntArray(Object o) {
+        if (o instanceof List) {
+            return ((List<Integer>) o).stream().mapToInt(Integer::intValue).toArray();
+        }
+        return (int[]) o;
     }
 
     public static double toDouble(Object o) {

@@ -42,7 +42,7 @@ void main() {
     var baseTileLayer = BaseTileLayerMock.fromUrl(
       layerId: const LayerId('layerId'),
       url: 'url',
-      credential: Credential.creteUserCredential(
+      credential: UserCredential.createUserCredential(
         username: 'username',
         password: 'password',
       ),

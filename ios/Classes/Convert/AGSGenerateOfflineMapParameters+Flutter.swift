@@ -31,12 +31,11 @@ extension AGSGenerateOfflineMapParameters{
     }
 
     func toJSONFlutter() -> Any {
-        [
+       var data = [
             "areaOfInterest": areaOfInterest.toJSONFlutter(),
             "minScale": minScale,
             "maxScale": maxScale,
             "onlineOnlyServicesOption": onlineOnlyServicesOption.rawValue,
-            "itemInfo": itemInfo?.toJSONFlutter(),
             "attachmentSyncDirection": attachmentSyncDirection.rawValue,
             "continueOnErrors": continueOnErrors,
             "includeBasemap": includeBasemap,
@@ -46,8 +45,17 @@ extension AGSGenerateOfflineMapParameters{
             "updateMode": updateMode.rawValue,
             "destinationTableRowFilter": destinationTableRowFilter.rawValue,
             "esriVectorTilesDownloadOption": esriVectorTilesDownloadOption.rawValue,
-            "referenceBasemapDirectory": referenceBasemapDirectory?.absoluteString,
             "referenceBasemapFilename": referenceBasemapFilename,
         ]
+        
+        if let itemInfo = itemInfo{
+            data["itemInfo"] = itemInfo.toJSONFlutter()
+        }
+        
+        if let referenceBasemapDirectory = referenceBasemapDirectory{
+            data["referenceBasemapDirectory"] = referenceBasemapDirectory.absoluteString
+        }
+        
+        return data
     }
 }

@@ -3,44 +3,40 @@ import 'dart:io';
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:path_provider/path_provider.dart';
 
-class MapPageofflineMap extends StatefulWidget {
-  const MapPageofflineMap({Key? key}) : super(key: key);
+class MapPageOfflineMap extends StatefulWidget {
+  const MapPageOfflineMap({Key? key}) : super(key: key);
 
   @override
-  State<MapPageofflineMap> createState() => _MapPageofflineMapState();
+  State<MapPageOfflineMap> createState() => _MapPageOfflineMapState();
 }
 
-class _MapPageofflineMapState extends State<MapPageofflineMap> {
+class _MapPageOfflineMapState extends State<MapPageOfflineMap> {
   // final _map = ArcgisMapsUtils.createMap(
   //   ArcgisMapsUtils.defaultMap,
   //   Brightness.light,
   // );
 
-  final _map = ArcGISMap.fromPortalItem(
-    PortalItem(
-      portal: Portal(
-        postalUrl: 'https://snla.maps.arcgis.com/',
-        loginRequired: false,
-        credential: Credential.creteUserCredential(
-          username: dotenv.env['snla_maps_arcgis_username'] ?? '',
-          password: dotenv.env['snla_maps_arcgis_password'] ?? '',
-        ),
-      ),
-      itemId: '81a73308a0a449a4b8549a0c294fc544',
-    ),
-  );
-
   // final _map = ArcGISMap.fromPortalItem(
   //   PortalItem(
-  //     portal: Portal.arcGISOnline(
-  //       withLoginRequired: false,
+  //     portal: Portal(
+  //       postalUrl: 'https://snla.maps.arcgis.com/',
+  //       loginRequired: false,
+  //       credential: snlaCredentials,
   //     ),
-  //     itemId: 'acc027394bc84c2fb04d1ed317aac674',
+  //     itemId: '81a73308a0a449a4b8549a0c294fc544',
   //   ),
   // );
+
+  final _map = ArcGISMap.fromPortalItem(
+    PortalItem(
+      portal: Portal.arcGISOnline(
+        withLoginRequired: false,
+      ),
+      itemId: 'acc027394bc84c2fb04d1ed317aac674',
+    ),
+  );
 
   ArcGISMap? _offlineMap;
 

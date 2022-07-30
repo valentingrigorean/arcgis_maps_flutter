@@ -4,9 +4,9 @@
 
 import Foundation
 
-private let format :ISO8601DateFormatter = {
+private let format: ISO8601DateFormatter = {
     let dateFormat = ISO8601DateFormatter()
-    dateFormat.formatOptions = [.withInternetDateTime,.withFractionalSeconds]
+    dateFormat.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
     return dateFormat
 }()
 

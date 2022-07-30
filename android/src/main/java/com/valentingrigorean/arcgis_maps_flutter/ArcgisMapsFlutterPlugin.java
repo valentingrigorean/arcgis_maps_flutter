@@ -8,6 +8,8 @@ import androidx.lifecycle.Lifecycle;
 
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
 import com.esri.arcgisruntime.LicenseResult;
+import com.valentingrigorean.arcgis_maps_flutter.flutterobject.ArcgisNativeObjectFactoryImpl;
+import com.valentingrigorean.arcgis_maps_flutter.flutterobject.ArcgisNativeObjectsController;
 import com.valentingrigorean.arcgis_maps_flutter.geometry.CoordinateFormatterController;
 import com.valentingrigorean.arcgis_maps_flutter.geometry.GeometryEngineController;
 import com.valentingrigorean.arcgis_maps_flutter.map.ArcgisMapFactory;
@@ -38,6 +40,7 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
     private LocatorTaskController locatorTaskController;
     private RouteTaskController routeTaskController;
     private OfflineMapTaskController offlineMapTaskController;
+    private ArcgisNativeObjectsController nativeObjectsController;
     private MethodChannel channel;
 
     @Nullable
@@ -64,6 +67,7 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
         routeTaskController = new RouteTaskController(binding.getApplicationContext(), binding.getBinaryMessenger());
 
         offlineMapTaskController = new OfflineMapTaskController(binding.getBinaryMessenger());
+        nativeObjectsController = new ArcgisNativeObjectsController(binding.getBinaryMessenger(), new ArcgisNativeObjectFactoryImpl());
     }
 
     @Override
@@ -83,6 +87,9 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
 
         offlineMapTaskController.dispose();
         offlineMapTaskController = null;
+
+        nativeObjectsController.dispose();
+        nativeObjectsController = null;
     }
 
     @Override

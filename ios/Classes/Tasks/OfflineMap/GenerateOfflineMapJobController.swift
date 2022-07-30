@@ -53,7 +53,7 @@ class GenerateOfflineMapJobController: NSObject {
                 }
                 self.status = status
                 self.channel.invokeMethod("onStatusChanged", arguments: status.rawValue)
-            }, completion: { [weak self]result, error in
+            }, completion: {result, error in
                 NSLog("\(String(describing: error))")
             })
             result(true)
