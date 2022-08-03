@@ -538,6 +538,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             mapView.dispose();
             mapView = null;
         }
+        mapLoadedListener.setMap(null);
     }
 
 
@@ -644,6 +645,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     private void changeMap(ArcGISMap map) {
         final Viewpoint viewpoint = mapView.getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE);
         mapLoadedListener.setMap(map);
+        map.loadAsync();
         mapView.setMap(map);
 
         for (final MapChangeAware mapChangeAware :
