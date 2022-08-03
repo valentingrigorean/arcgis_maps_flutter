@@ -113,6 +113,23 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         case "map#waitForMap":
             result(nil)
             break
+        case "map#update":
+            if let data = call.arguments as? Dictionary<String, Any> {
+                if let mapOptions = data["options"] as? Dictionary<String, Any> {
+                    updateMapOptions(mapOptions: mapOptions)
+                }
+            }
+            result(nil)
+            break
+        case "map#exportImage":
+            mapView.exportImage { image, error in
+                if let error = error {
+                    result(FlutterError(code: "exportImage_error", message: error.localizedDescription, details: nil))
+                } else {
+                    result(image?.toJSONFlutter())
+                }
+            }
+            break
         case "map#getLocation":
             let location = mapView.locationDisplay.location
             if location == nil {
@@ -128,13 +145,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             } else {
                 result(mapLocation!.toJSONFlutter())
             }
-        case "map#update":
-            if let data = call.arguments as? Dictionary<String, Any> {
-                if let mapOptions = data["options"] as? Dictionary<String, Any> {
-                    updateMapOptions(mapOptions: mapOptions)
-                }
-            }
-            result(nil)
             break
         case "map#getLegendInfos":
             let legendInfoController = LegendInfoController(layersController: layersController)
@@ -151,7 +161,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             break
         case "map#setMap":
             changeMapType(args: call.arguments)
-
             result(nil)
             break
         case "map#setViewpointChangedListenerEvents":

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'package:arcgis_maps_flutter/src/symbology/marker_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polygon_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polyline_updates.dart';
@@ -143,6 +144,11 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
       );
     }
     return const Text('Unsupported');
+  }
+
+  @override
+  Future<List<Uint8List>?> exportImage(int mapId) {
+    return channel(mapId).invokeMethod<List<Uint8List>>('map#exportImage');
   }
 
   @override
@@ -298,7 +304,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<bool> setViewpointScale(int mapId, double scale) async{
+  Future<bool> setViewpointScale(int mapId, double scale) async {
     final result = await channel(mapId).invokeMethod<bool>(
       'map#setViewpointScaleAsync',
       {
@@ -307,6 +313,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
     );
     return result ?? false;
   }
+
   @override
   Future<Offset?> locationToScreen(int mapId, AGSPoint mapPoint) async {
     final result = await channel(mapId)

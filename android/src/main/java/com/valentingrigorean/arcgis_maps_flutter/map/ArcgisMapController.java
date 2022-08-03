@@ -1,6 +1,7 @@
 package com.valentingrigorean.arcgis_maps_flutter.map;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.Choreographer;
 import android.view.View;
@@ -256,6 +257,18 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                     updateMapOptions(data);
                 }
                 result.success(null);
+            }
+            break;
+            case "map#exportImage": {
+                ListenableFuture<Bitmap> future = mapView.exportImageAsync();
+                future.addDoneListener(()->{
+                    try {
+                        Bitmap bitmap = future.get();
+                        result.success(Convert.bitmapToByteArray(bitmap));
+                    } catch (Exception e) {
+                        result.error("exportImage", e.getMessage(), null);
+                    }
+                });
             }
             break;
             case "map#getLegendInfos": {

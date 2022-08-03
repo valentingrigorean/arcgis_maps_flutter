@@ -71,6 +71,7 @@ import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.Scalebar;
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.Style;
 import com.valentingrigorean.arcgis_maps_flutter.utils.LoadStatusChangedListenerLogger;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -610,6 +611,12 @@ public class Convert {
         } else {
             return bitmap;
         }
+    }
+
+    public static byte[] bitmapToByteArray(Bitmap bmp) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return stream.toByteArray();
     }
 
 

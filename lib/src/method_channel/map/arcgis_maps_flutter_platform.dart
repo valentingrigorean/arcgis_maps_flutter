@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:arcgis_maps_flutter/src/layers/layer_updates.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/map_event.dart';
@@ -49,6 +51,10 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     Map<String, dynamic> mapOptions = const <String, dynamic>{},
   }) {
     throw UnimplementedError('buildView() has not been implemented.');
+  }
+
+  Future<List<Uint8List>?> exportImage(int mapId) {
+    throw UnimplementedError('exportImage() has not been implemented.');
   }
 
   Future<Location?> getLocation(int mapId) {
@@ -244,4 +250,5 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
   void dispose(int mapId) {
     throw UnimplementedError('dispose() has not been implemented.');
   }
+
 }

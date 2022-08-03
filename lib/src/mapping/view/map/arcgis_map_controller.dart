@@ -43,6 +43,12 @@ class ArcgisMapController {
         .getLegendInfos(mapId, layer);
   }
 
+
+  Future<List<Uint8List>?> exportImage(){
+    return ArcgisMapsFlutterPlatform.instance
+        .exportImage(mapId);
+  }
+
   Set<T> getLayersOfType<T extends Layer>() {
     var layers = <T>{};
     for (final pair in _arcgisMapState._baseLayers.entries) {
