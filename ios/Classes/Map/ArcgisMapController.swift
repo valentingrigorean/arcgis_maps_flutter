@@ -451,6 +451,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
             if mobileMapPackage.maps.isEmpty {
                 print("No maps in the package")
+                self.channel.invokeMethod("map#loaded", arguments: error?.toJSON())
                 return
             }
 

@@ -3,7 +3,6 @@ package com.valentingrigorean.arcgis_maps_flutter.map;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
-import android.view.Choreographer;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -20,20 +19,13 @@ import com.esri.arcgisruntime.concurrent.ListenableFuture;
 import com.esri.arcgisruntime.geometry.Geometry;
 import com.esri.arcgisruntime.geometry.GeometryEngine;
 import com.esri.arcgisruntime.geometry.Point;
-import com.esri.arcgisruntime.layers.ArcGISMapImageLayer;
 import com.esri.arcgisruntime.layers.Layer;
 import com.esri.arcgisruntime.loadable.LoadStatus;
-import com.esri.arcgisruntime.loadable.LoadStatusChangedEvent;
-import com.esri.arcgisruntime.loadable.LoadStatusChangedListener;
-import com.esri.arcgisruntime.location.LocationDataSource;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.LayerList;
 import com.esri.arcgisruntime.mapping.MobileMapPackage;
 import com.esri.arcgisruntime.mapping.Viewpoint;
-import com.esri.arcgisruntime.mapping.view.DrawStatusChangedEvent;
-import com.esri.arcgisruntime.mapping.view.DrawStatusChangedListener;
 import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
-import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.mapping.view.TimeExtentChangedEvent;
 import com.esri.arcgisruntime.mapping.view.TimeExtentChangedListener;
@@ -85,6 +77,8 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     private final LayersChangedController layersChangedController;
 
     private final LocationDisplayController locationDisplayController;
+
+    private final MapLoadedListener mapLoadedListener = new MapLoadedListener();
 
     @Nullable
     private MapView mapView;
@@ -261,7 +255,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             break;
             case "map#exportImage": {
                 ListenableFuture<Bitmap> future = mapView.exportImageAsync();
-                future.addDoneListener(()->{
+                future.addDoneListener(() -> {
                     try {
                         Bitmap bitmap = future.get();
                         result.success(Convert.bitmapToByteArray(bitmap));
@@ -649,20 +643,8 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
     private void changeMap(ArcGISMap map) {
         final Viewpoint viewpoint = mapView.getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE);
+        mapLoadedListener.setMap(map);
         mapView.setMap(map);
-        if (map != null) {
-            map.addDoneLoadingListener(() -> {
-                if (map.getLoadStatus() == LoadStatus.LOADED) {
-                    methodChannel.invokeMethod("map#loaded", null);
-                } else {
-                    Log.w(TAG, "changeMap: Failed to load map." + map.getLoadError().getMessage());
-                    if (map.getLoadError().getCause() != null) {
-                        Log.w(TAG, "changeMap: Failed to load map." + map.getLoadError().getCause().getMessage());
-                    }
-                    methodChannel.invokeMethod("map#loaded", Convert.arcGISRuntimeExceptionToJson(map.getLoadError()));
-                }
-            });
-        }
 
         for (final MapChangeAware mapChangeAware :
                 mapChangeAwares) {
@@ -756,5 +738,37 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         }
     }
 
+
+    private class MapLoadedListener implements Runnable {
+        private ArcGISMap map;
+
+        private MapLoadedListener() {
+
+        }
+
+        public void setMap(ArcGISMap map) {
+            if (this.map != null) {
+                this.map.removeDoneLoadingListener(this);
+            }
+            this.map = map;
+            if (map != null) {
+                map.addDoneLoadingListener(this);
+            }
+        }
+
+        @Override
+        public void run() {
+            map.removeDoneLoadingListener(this);
+            if (map.getLoadStatus() == LoadStatus.LOADED) {
+                methodChannel.invokeMethod("map#loaded", null);
+            } else {
+                Log.w(TAG, "changeMap: Failed to load map." + map.getLoadError().getMessage());
+                if (map.getLoadError().getCause() != null) {
+                    Log.w(TAG, "changeMap: Failed to load map." + map.getLoadError().getCause().getMessage());
+                }
+                methodChannel.invokeMethod("map#loaded", Convert.arcGISRuntimeExceptionToJson(map.getLoadError()));
+            }
+        }
+    }
 
 }
