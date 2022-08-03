@@ -8,28 +8,17 @@ class UserCredential extends Credential with EquatableMixin {
     required this.token,
   });
 
-  factory UserCredential.createUserCredential({
-    required String username,
-    required String password,
-    String? referer,
-  }) =>
-      UserCredential._(
-        username: username,
-        password: password,
-        referer: referer,
-        token: null,
-      );
+  const UserCredential.createUserCredential({
+    required this.username,
+    required this.password,
+    this.referer,
+  }) : token = null;
 
-  factory UserCredential.createFromToken({
-    required String token,
-    String? referer,
-  }) =>
-      UserCredential._(
-        username: null,
-        password: null,
-        referer: referer,
-        token: token,
-      );
+  const UserCredential.createFromToken({
+    required this.token,
+    this.referer,
+  })  : username = null,
+        password = null;
 
   factory UserCredential.fromJson(Map<dynamic, dynamic> json) {
     return UserCredential._(
