@@ -44,7 +44,7 @@ class ArcgisMapController {
   }
 
 
-  Future<List<Uint8List>?> exportImage(){
+  Future<Uint8List?> exportImage(){
     return ArcgisMapsFlutterPlatform.instance
         .exportImage(mapId);
   }

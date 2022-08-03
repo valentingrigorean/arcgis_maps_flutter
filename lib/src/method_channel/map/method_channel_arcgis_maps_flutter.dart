@@ -147,8 +147,8 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<List<Uint8List>?> exportImage(int mapId) {
-    return channel(mapId).invokeMethod<List<Uint8List>>('map#exportImage');
+  Future<Uint8List?> exportImage(int mapId) {
+    return channel(mapId).invokeMethod<Uint8List>('map#exportImage');
   }
 
   @override

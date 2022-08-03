@@ -53,7 +53,7 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('buildView() has not been implemented.');
   }
 
-  Future<List<Uint8List>?> exportImage(int mapId) {
+  Future<Uint8List?> exportImage(int mapId) {
     throw UnimplementedError('exportImage() has not been implemented.');
   }
 
