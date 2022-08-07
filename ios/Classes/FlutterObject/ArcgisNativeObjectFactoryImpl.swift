@@ -18,8 +18,23 @@ class ArcgisNativeObjectFactoryImpl: ArcgisNativeObjectFactory {
         case "GeodatabaseSyncTask":
             let url = arguments as! String
             return GeodatabaseSyncTaskNativeObject(objectId: objectId, task: AGSGeodatabaseSyncTask(url: URL(string: url)!), messageSink: messageSink)
+        case "OfflineMapTask":
+            let task = createOfflineMapTask(data: arguments as! [String: Any])
+            return OfflineMapTaskNativeObject(objectId: objectId, task: task, messageSink: messageSink)
         default:
             fatalError("Not implemented.")
         }
+    }
+
+    private func createOfflineMapTask(data: [String: Any]) -> AGSOfflineMapTask {
+        var offlineMapTask: AGSOfflineMapTask
+        if let map = data["map"] as? Dictionary<String, Any> {
+            offlineMapTask = AGSOfflineMapTask(onlineMap: AGSMap(data: map))
+        } else if let portalItem = data["portalItem"] as? Dictionary<String, Any> {
+            offlineMapTask = AGSOfflineMapTask(portalItem: AGSPortalItem(data: portalItem))
+        } else {
+            fatalError("Invalid offline map task")
+        }
+        return offlineMapTask
     }
 }

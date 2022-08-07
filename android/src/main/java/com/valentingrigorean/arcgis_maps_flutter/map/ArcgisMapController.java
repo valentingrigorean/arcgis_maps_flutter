@@ -53,8 +53,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
     private static final String TAG = "ArcgisMapController";
 
-
-    private final int id;
     private final Context context;
     private final LifecycleProvider lifecycleProvider;
     private final MethodChannel methodChannel;
@@ -85,7 +83,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     private MapViewOnTouchListener mapViewOnTouchListener;
 
     private FrameLayout mapContainer;
-    private Viewpoint viewpoint;
     private ScaleBarController scaleBarController;
     private InvalidateMapHelper invalidateMapHelper;
 
@@ -103,8 +100,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             Map<String, Object> params,
             BinaryMessenger binaryMessenger,
             LifecycleProvider lifecycleProvider) {
-
-        this.id = id;
 
         this.context = context;
         this.lifecycleProvider = lifecycleProvider;
@@ -127,7 +122,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         layersController = new LayersController(methodChannel);
         mapChangeAwares.add(layersController);
 
-        layersChangedController = new LayersChangedController(methodChannel, layersController);
+        layersChangedController = new LayersChangedController(methodChannel);
         mapChangeAwares.add(layersChangedController);
 
         final GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
@@ -336,7 +331,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             }
             break;
             case "map#setViewpoint": {
-                viewpoint = Convert.toViewPoint(call.arguments);
+                Viewpoint viewpoint = Convert.toViewPoint(call.arguments);
                 mapView.setViewpointAsync(viewpoint).addDoneListener(() -> result.success(null));
             }
             break;

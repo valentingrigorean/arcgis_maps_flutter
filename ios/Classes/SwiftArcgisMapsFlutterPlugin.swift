@@ -9,7 +9,6 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
     private let geometryController: GeometryEngineController
     private let locatorTaskController: LocatorTaskController
     private let routeTaskController: RouteTaskController
-    private let offlineMapTaskController: OfflineMapTaskController
     private let coordinateFormatterController: CoordinateFormatterController
     private let arcgisNativeObjectsController: ArcgisNativeObjectsController
 
@@ -19,7 +18,6 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
         locatorTaskController = LocatorTaskController(messenger: registrar.messenger())
         coordinateFormatterController = CoordinateFormatterController(messenger: registrar.messenger())
         routeTaskController = RouteTaskController(messenger: registrar.messenger())
-        offlineMapTaskController = OfflineMapTaskController(messenger: registrar.messenger())
         arcgisNativeObjectsController = ArcgisNativeObjectsController(messenger: registrar.messenger(), factory: ArcgisNativeObjectFactoryImpl())
 
         super.init()

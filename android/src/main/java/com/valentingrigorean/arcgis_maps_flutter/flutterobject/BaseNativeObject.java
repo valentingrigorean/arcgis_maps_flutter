@@ -26,6 +26,12 @@ public abstract class BaseNativeObject<T> implements NativeObject, NativeMessage
         }
     }
 
+    @Override
+    protected void finalize() throws Throwable {
+        dispose();
+        super.finalize();
+    }
+
     public T getNativeObject() {
         return nativeObject;
     }

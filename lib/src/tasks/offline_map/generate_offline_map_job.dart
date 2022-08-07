@@ -1,29 +1,22 @@
 part of arcgis_maps_flutter;
 
-abstract class GenerateOfflineMapJob {
-  String? get downloadDirectory;
+class GenerateOfflineMapJob extends Job {
+  GenerateOfflineMapJob._({
+    required String jobId,
+    this.onlineMap,
+    this.downloadDirectory,
+    this.parameters,
+  }) : super(
+          objectId: jobId,
+          isCreated: true,
+        );
 
-  // GenerateOfflineMapResult? get result;
+  @override
+  String get type => 'GenerateOfflineMapJob';
 
-  ArcGISMap? get onlineMap;
+  final ArcGISMap? onlineMap;
 
-  GenerateOfflineMapParameters? get parameters;
+  final GenerateOfflineMapParameters? parameters;
 
-  Future<double> get progress;
-
-  Stream<double> get onProgressChanged;
-
-  Future<JobStatus> get status;
-
-  Stream<JobStatus> get onStatusChanged;
-
-  Future<ArcgisError?> get error;
-
-  Future<bool> start();
-
-  Future<bool> cancel();
-
-  Future<bool> pause();
-
-  void dispose();
+  final String? downloadDirectory;
 }

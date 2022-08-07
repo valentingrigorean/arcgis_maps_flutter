@@ -106,8 +106,10 @@ class _MapPageOfflineMapState extends State<MapPageOfflineMap> {
                     Directory appDocDir =
                         await getApplicationDocumentsDirectory();
                     String appDocPath = '${appDocDir.path}/offline_map_example';
-                    File file = File(appDocPath);
-                    await file.delete(recursive: true);
+                    try {
+                      Directory directory = Directory(appDocPath);
+                      await directory.delete(recursive: true);
+                    } catch (_) {}
                     _mapDownloadedAlready = false;
                     _offlineMap = null;
                     if (mounted) {
