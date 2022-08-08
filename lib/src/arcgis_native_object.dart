@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/native/arcgis_native_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/native/native_message.dart';
 import 'package:flutter/foundation.dart';
@@ -66,11 +67,17 @@ abstract class ArcgisNativeObject {
       return null;
     }
 
-    return await ArcgisNativeFlutterPlatform.instance.sendMessage(
+    final response = await ArcgisNativeFlutterPlatform.instance.sendMessage(
       objectId: _id,
       method: method,
       arguments: arguments,
     );
+    
+    if(response is Map<dynamic,dynamic>  && response.containsKey('errorMessage')){
+      throw ArcgisError.fromJson(response)!;
+    }
+
+    return response;
   }
 
   @protected
