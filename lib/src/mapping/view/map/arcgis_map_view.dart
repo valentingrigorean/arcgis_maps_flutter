@@ -531,8 +531,8 @@ class _ArcgisMapOptions {
         isAttributionTextVisible = map.isAttributionTextVisible,
         contentInsets = map.contentInsets,
         scalebarConfiguration = map.scalebarConfiguration,
-        minZoomLevel = map.minZoomLevel,
-        maxZoomLevel = map.maxZoomLevel;
+        minScale = map.minScale,
+        maxScale = map.maxScale;
 
   final InteractionOptions interactionOptions;
   final bool myLocationEnabled;
@@ -540,8 +540,8 @@ class _ArcgisMapOptions {
   final bool trackUserLocationTap;
   final bool insetsContentInsetFromSafeArea;
   final bool isAttributionTextVisible;
-  final double minZoomLevel;
-  final double maxZoomLevel;
+  final double minScale;
+  final double maxScale;
   final EdgeInsets contentInsets;
   final ScalebarConfiguration? scalebarConfiguration;
 
@@ -562,8 +562,8 @@ class _ArcgisMapOptions {
       ],
       if (scalebarConfiguration != null)
         'scalebarConfiguration': scalebarConfiguration!.toJson(),
-      if (minZoomLevel != null) 'minZoomLevel': minZoomLevel,
-      if (maxZoomLevel != null) 'maxZoomLevel': maxZoomLevel,
+      'minScale': minScale,
+      'maxScale': maxScale,
     };
   }
 
