@@ -94,6 +94,9 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
     private boolean disposed = false;
 
+    private double minScale = 0;
+    private double maxScale = 0;
+
     ArcgisMapController(
             int id,
             Context context,
@@ -642,6 +645,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         mapLoadedListener.setMap(map);
         map.loadAsync();
         mapView.setMap(map);
+        updateMapScale();
 
         for (final MapChangeAware mapChangeAware :
                 mapChangeAwares) {
@@ -699,6 +703,17 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         } else if (!this.haveScaleBar) {
             scaleBarController.removeScaleBar();
         }
+
+        final Object minScale = data.get("minScale");
+        if (minScale != null) {
+            this.minScale = Convert.toDouble(minScale);
+        }
+
+        final Object maxScale = data.get("maxScale");
+        if (maxScale != null) {
+            this.maxScale = Convert.toDouble(maxScale);
+        }
+        updateMapScale();
     }
 
 
@@ -735,6 +750,13 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         }
     }
 
+
+    private void updateMapScale() {
+        if (mapView != null && mapView.getMap() != null) {
+            mapView.getMap().setMinScale(minScale);
+            mapView.getMap().setMaxScale(maxScale);
+        }
+    }
 
     private class MapLoadedListener implements Runnable {
         private ArcGISMap map;

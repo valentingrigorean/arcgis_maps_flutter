@@ -84,6 +84,8 @@ class ArcgisMapView extends StatefulWidget {
     this.onIdentifyLayer = const {},
     this.onIdentifyLayers,
     this.onUserLocationTap,
+    this.minScale = 0,
+    this.maxScale = 0,
   })  : assert(onIdentifyLayer.isNotEmpty ? onIdentifyLayers == null : true,
             'You can use only onIdentifyLayer or onIdentifyLayers'),
         assert(onIdentifyLayers != null ? onIdentifyLayer.isEmpty : true,
@@ -208,6 +210,16 @@ class ArcgisMapView extends StatefulWidget {
   final IdentifyLayersCallback? onIdentifyLayers;
 
   final VoidCallback? onUserLocationTap;
+
+  /// The minimum scale that this map will be visible at.
+  /// A value of zero indicates that there is no minimum scale and
+  /// the user can zoom out indefinitely.
+  final double minScale;
+
+  /// The maximum scale that this map will be visible at.
+  /// A value of zero indicates that there is no maximum scale and
+  /// the user can zoom in indefinitely.
+  final double maxScale;
 
   @override
   State<ArcgisMapView> createState() => _ArcgisMapViewState();
@@ -518,7 +530,9 @@ class _ArcgisMapOptions {
         insetsContentInsetFromSafeArea = map.insetsContentInsetFromSafeArea,
         isAttributionTextVisible = map.isAttributionTextVisible,
         contentInsets = map.contentInsets,
-        scalebarConfiguration = map.scalebarConfiguration;
+        scalebarConfiguration = map.scalebarConfiguration,
+        minZoomLevel = map.minZoomLevel,
+        maxZoomLevel = map.maxZoomLevel;
 
   final InteractionOptions interactionOptions;
   final bool myLocationEnabled;
@@ -526,6 +540,8 @@ class _ArcgisMapOptions {
   final bool trackUserLocationTap;
   final bool insetsContentInsetFromSafeArea;
   final bool isAttributionTextVisible;
+  final double minZoomLevel;
+  final double maxZoomLevel;
   final EdgeInsets contentInsets;
   final ScalebarConfiguration? scalebarConfiguration;
 
@@ -546,6 +562,8 @@ class _ArcgisMapOptions {
       ],
       if (scalebarConfiguration != null)
         'scalebarConfiguration': scalebarConfiguration!.toJson(),
+      if (minZoomLevel != null) 'minZoomLevel': minZoomLevel,
+      if (maxZoomLevel != null) 'maxZoomLevel': maxZoomLevel,
     };
   }
 

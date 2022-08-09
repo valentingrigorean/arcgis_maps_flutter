@@ -47,6 +47,22 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private var timeExtentObservation: NSKeyValueObservation?
 
+    private var minScale = 0.0 {
+        didSet {
+            if let map = mapView.map {
+                map.minScale = minScale
+            }
+        }
+    }
+
+    private var maxScale = 0.0 {
+        didSet {
+            if let map = mapView.map {
+                map.maxScale = maxScale
+            }
+        }
+    }
+
 
     public init(
             withRegistrar registrar: FlutterPluginRegistrar,
@@ -359,7 +375,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     private func handleTimeAwareLayerInfos(result: @escaping FlutterResult) {
-        guard  let layers = mapView.map?.operationalLayers as AnyObject as? [AGSLayer], layers.count > 0 else {
+        guard let layers = mapView.map?.operationalLayers as AnyObject as? [AGSLayer], layers.count > 0 else {
             result([])
             return
         }
@@ -420,7 +436,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     private func changeMapType(args: Any?) {
-        guard  let dict = args as? Dictionary<String, Any> else {
+        guard let dict = args as? Dictionary<String, Any> else {
             return
         }
 
@@ -469,6 +485,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
             channel.invokeMethod("map#loaded", arguments: error?.toJSON())
         }
+        map.minScale = minScale
+        map.maxScale = maxScale
         mapView.map = map
         layersController.setMap(map)
 
@@ -523,6 +541,14 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         if let trackUserLocationTap = mapOptions["trackUserLocationTap"] as? Bool {
             locationDisplayController.trackUserLocationTap = trackUserLocationTap
         }
+
+        if let minScale = mapOptions["minScale"] as? Double {
+            self.minScale = minScale
+        }
+
+        if let maxScale = mapOptions["maxScale"] as? Double {
+            self.maxScale = maxScale
+        }
     }
 
     private func updateInteractionOptions(interactionOptions: Dictionary<String, Any>) {
@@ -563,7 +589,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     private func initWithArgs(args: Any?) {
-        guard  let dict = args as? Dictionary<String, Any> else {
+        guard let dict = args as? Dictionary<String, Any> else {
             return
         }
         if let mapType = dict["map"] {
