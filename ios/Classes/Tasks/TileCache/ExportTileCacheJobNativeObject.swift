@@ -9,7 +9,8 @@ class ExportTileCacheJobNativeObject: BaseNativeObject<AGSExportTileCacheJob> {
 
     init(objectId: String, job: AGSExportTileCacheJob, messageSink: NativeObjectControllerMessageSink) {
         super.init(objectId: objectId, nativeObject: job, nativeHandlers: [
-            JobNativeHandler(job: job)
+            JobNativeHandler(job: job),
+            RemoteResourceNativeHandler(remoteResource: job)
         ], messageSink: messageSink)
 
     }

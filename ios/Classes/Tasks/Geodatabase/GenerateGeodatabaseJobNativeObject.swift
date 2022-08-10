@@ -8,7 +8,8 @@ import ArcGIS
 class GenerateGeodatabaseJobNativeObject: BaseNativeObject<AGSGenerateGeodatabaseJob> {
     init(objectId: String, job: AGSGenerateGeodatabaseJob, messageSink: NativeObjectControllerMessageSink) {
         super.init(objectId: objectId, nativeObject: job, nativeHandlers: [
-            JobNativeHandler(job: job)
+            JobNativeHandler(job: job),
+            RemoteResourceNativeHandler(remoteResource: job)
         ], messageSink: messageSink)
     }
 }

@@ -9,7 +9,8 @@ class EstimateTileCacheSizeJobNativeObject: BaseNativeObject<AGSEstimateTileCach
 
     init(objectId: String, job: AGSEstimateTileCacheSizeJob, messageSink: NativeObjectControllerMessageSink) {
         super.init(objectId: objectId, nativeObject: job, nativeHandlers: [
-            JobNativeHandler(job: job)
+            JobNativeHandler(job: job),
+            RemoteResourceNativeHandler(remoteResource: job)
         ], messageSink: messageSink)
     }
 }
