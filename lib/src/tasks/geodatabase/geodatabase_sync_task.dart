@@ -18,7 +18,7 @@ class GeodatabaseSyncTask extends ArcgisNativeObject
   }) async {
     final result = await invokeMethod(
       'geodatabaseSyncTask#defaultGenerateGeodatabaseParameters',
-      areaOfInterest.toJson(),
+      arguments: areaOfInterest.toJson(),
     );
     return GenerateGeodatabaseParameters.fromJson(result);
   }
@@ -29,7 +29,7 @@ class GeodatabaseSyncTask extends ArcgisNativeObject
   }) async {
     final jobId = await invokeMethod<String>(
       'geodatabaseSyncTask#generateJob',
-      {
+      arguments: {
         'parameters': parameters.toJson(),
         'fileNameWithPath': fileNameWithPath,
       },

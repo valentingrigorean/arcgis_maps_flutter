@@ -2,7 +2,6 @@ import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:arcgis_maps_flutter/src/arcgis_native_object.dart';
 
 mixin RemoteResource on ArcgisNativeObject {
-
   Future<String?> get url async {
     return await invokeMethod<String>('remoteResource#getUrl');
   }
@@ -16,6 +15,9 @@ mixin RemoteResource on ArcgisNativeObject {
   }
 
   Future<void> setCredential(Credential? credential) async {
-    await invokeMethod('remoteResource#setCredential', credential?.toJson());
+    await invokeMethod(
+      'remoteResource#setCredential',
+      arguments: credential?.toJson(),
+    );
   }
 }

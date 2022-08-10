@@ -1,7 +1,7 @@
 part of arcgis_maps_flutter;
 
 class ExportTileCacheTask extends ArcgisNativeObject
-    with RemoteResource, ApiKeyResource,Loadable {
+    with RemoteResource, ApiKeyResource, Loadable {
   final String _url;
 
   ExportTileCacheTask({required String url}) : _url = url;
@@ -19,11 +19,12 @@ class ExportTileCacheTask extends ArcgisNativeObject
     required double maxScale,
   }) async {
     final result = await invokeMethod(
-        'exportTileCacheTask#createDefaultExportTileCacheParameters', {
-      'areaOfInterest': areaOfInterest.toJson(),
-      'minScale': minScale,
-      'maxScale': maxScale,
-    });
+        'exportTileCacheTask#createDefaultExportTileCacheParameters',
+        arguments: {
+          'areaOfInterest': areaOfInterest.toJson(),
+          'minScale': minScale,
+          'maxScale': maxScale,
+        });
     return ExportTileCacheParameters.fromJson(result);
   }
 
@@ -32,7 +33,7 @@ class ExportTileCacheTask extends ArcgisNativeObject
   }) async {
     final jobId = await invokeMethod<String>(
       'exportTileCacheTask#estimateTileCacheSizeJob',
-      parameters.toJson(),
+      arguments: parameters.toJson(),
     );
     return EstimateTileCacheSizeJob._(jobId: jobId!);
   }
@@ -43,7 +44,7 @@ class ExportTileCacheTask extends ArcgisNativeObject
   }) async {
     final jobId = await invokeMethod<String>(
       'exportTileCacheTask#exportTileCacheJob',
-      {
+      arguments:{
         'parameters': parameters.toJson(),
         'fileNameWithPath': fileNameWithPath,
       },

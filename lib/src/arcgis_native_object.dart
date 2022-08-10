@@ -60,7 +60,7 @@ abstract class ArcgisNativeObject {
 
   @optionalTypeArgs
   @protected
-  Future<T?> invokeMethod<T>(String method, [dynamic arguments]) async {
+  Future<T?> invokeMethod<T>(String method,{dynamic arguments,bool parseErrors = true}) async {
     await _createNativeObject();
 
     if (_isDisposed) {
@@ -72,8 +72,10 @@ abstract class ArcgisNativeObject {
       method: method,
       arguments: arguments,
     );
-    
-    if(response is Map<dynamic,dynamic>  && response.containsKey('errorMessage')){
+
+    if (parseErrors &&
+        response is Map<dynamic, dynamic> &&
+        response.containsKey('errorMessage')) {
       throw ArcgisError.fromJson(response)!;
     }
 

@@ -6,6 +6,6 @@ mixin ApiKeyResource on ArcgisNativeObject {
   }
 
   Future<void> setApiKey(String apiKey) async {
-    await invokeMethod('apiKeyResource#setApiKey', apiKey);
+    await invokeMethod('apiKeyResource#setApiKey', arguments: apiKey);
   }
 }

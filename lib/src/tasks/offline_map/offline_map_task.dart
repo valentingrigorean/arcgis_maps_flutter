@@ -33,11 +33,12 @@ class OfflineMapTask extends ArcgisNativeObject with Loadable {
             (minScale == null && maxScale != null)),
         'minScale and maxScale both need to be specified');
     final parameters = await invokeMethod(
-        'offlineMapTask#defaultGenerateOfflineMapParameters', {
-      'areaOfInterest': areaOfInterest.toJson(),
-      if (minScale != null) 'minScale': minScale,
-      if (maxScale != null) 'maxScale': maxScale,
-    });
+        'offlineMapTask#defaultGenerateOfflineMapParameters',
+        arguments: {
+          'areaOfInterest': areaOfInterest.toJson(),
+          if (minScale != null) 'minScale': minScale,
+          if (maxScale != null) 'maxScale': maxScale,
+        });
 
     return parameters == null
         ? null
@@ -50,7 +51,7 @@ class OfflineMapTask extends ArcgisNativeObject with Loadable {
   }) async {
     final jobId = await invokeMethod<String>(
       'offlineMapTask#generateOfflineMap',
-      {
+      arguments: {
         'parameters': parameters.toJson(),
         'downloadDirectory': downloadDirectory,
       },

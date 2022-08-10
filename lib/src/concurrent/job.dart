@@ -143,7 +143,6 @@ abstract class Job extends ArcgisNativeObject with RemoteResource {
       StreamController<double>.broadcast();
   final StreamController<JobStatus> _statusController =
       StreamController<JobStatus>.broadcast();
-
   final StreamController<JobMessage> _messageController =
       StreamController<JobMessage>.broadcast();
 
@@ -165,7 +164,10 @@ abstract class Job extends ArcgisNativeObject with RemoteResource {
 
   /// Error encountered during job execution, if any.
   Future<ArcgisError?> get error async {
-    final result = await invokeMethod('job#getError');
+    final result = await invokeMethod(
+      'job#getError',
+      parseErrors: false,
+    );
     if (result == null) {
       return null;
     }
