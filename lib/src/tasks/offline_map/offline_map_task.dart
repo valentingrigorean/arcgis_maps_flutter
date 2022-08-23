@@ -1,6 +1,6 @@
 part of arcgis_maps_flutter;
 
-class OfflineMapTask extends ArcgisNativeObject with Loadable {
+class OfflineMapTask extends ArcgisNativeObject with Loadable,RemoteResource {
   /// Creates a task with the provided map to take offline.
   /// The map must be a web map either on ArcGIS Online
   /// or an on-premises ArcGIS Portal.

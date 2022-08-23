@@ -167,6 +167,7 @@ part 'src/tasks/offline_map/generate_offline_map_job.dart';
 part 'src/tasks/offline_map/generate_offline_map_parameters.dart';
 part 'src/tasks/offline_map/generate_offline_map_result.dart';
 part 'src/tasks/offline_map/offline_map_item_info.dart';
+part 'src/tasks/offline_map/offline_map_sync_task.dart';
 part 'src/tasks/offline_map/offline_map_task.dart';
 
 part 'src/tasks/tile_cache/estimate_tile_cache_size_job.dart';
