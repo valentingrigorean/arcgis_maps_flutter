@@ -146,6 +146,4 @@ public class ConvertOfflineMap extends Convert {
                 return 0;
         }
     }
-
-
 }
