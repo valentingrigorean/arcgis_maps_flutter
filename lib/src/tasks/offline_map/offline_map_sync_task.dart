@@ -43,8 +43,10 @@ enum PreplannedScheduledUpdatesOption {
 }
 
 class OfflineMapUpdateCapabilities {
-  const OfflineMapUpdateCapabilities._(this.supportsScheduledUpdatesForFeatures,
-      this.supportsSyncWithFeatureServices);
+  const OfflineMapUpdateCapabilities._(
+    this.supportsScheduledUpdatesForFeatures,
+    this.supportsSyncWithFeatureServices,
+  );
 
   /// Whether an offline map supports downloading of read-only scheduled
   /// feature updates.
@@ -156,10 +158,11 @@ class OfflineMapUpdatesInfo {
 
 class OfflineMapSyncParameters {
   OfflineMapSyncParameters({
-    required this.keepGeodatabaseDeltas,
-    required this.preplannedScheduledUpdatesOption,
-    required this.rollbackOnFailure,
-    required this.syncDirection,
+    this.keepGeodatabaseDeltas = false,
+    this.preplannedScheduledUpdatesOption =
+        PreplannedScheduledUpdatesOption.downloadAllUpdates,
+    this.rollbackOnFailure = false,
+    this.syncDirection = SyncDirection.birectional,
   });
 
   factory OfflineMapSyncParameters.fromJson(Map<String, dynamic> json) {
@@ -255,6 +258,8 @@ class OfflineMapSyncTask extends ArcgisNativeObject
     required this.offlineMapPath,
   });
 
+  /// The folder where mobile map package (.mmpk file),
+  /// excluding the ".mmpk" extension, is located.
   final String offlineMapPath;
 
   @override

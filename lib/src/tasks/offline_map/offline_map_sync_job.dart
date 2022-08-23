@@ -49,10 +49,10 @@ class GeodatabaseDeltaInfo {
 
   factory GeodatabaseDeltaInfo._fromJson(Map<dynamic, dynamic> json) {
     return GeodatabaseDeltaInfo._(
-      downloadDeltaFileUrl: json['downloadDeltaFileUrl'] as String,
+      downloadDeltaFileUrl: json['downloadDeltaFileUrl'] as String?,
       featureServiceUrl: json['featureServiceUrl'] as String,
       geodatabaseFileUrl: json['geodatabaseFileUrl'] as String,
-      uploadDeltaFileUrl: json['uploadDeltaFileUrl'] as String,
+      uploadDeltaFileUrl: json['uploadDeltaFileUrl'] as String?,
     );
   }
 

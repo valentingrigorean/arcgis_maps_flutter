@@ -21,6 +21,8 @@ class ArcgisNativeObjectFactoryImpl: ArcgisNativeObjectFactory {
         case "OfflineMapTask":
             let task = createOfflineMapTask(data: arguments as! [String: Any])
             return OfflineMapTaskNativeObject(objectId: objectId, task: task, messageSink: messageSink)
+        case "OfflineMapSyncTask":
+            return OfflineMapSyncTaskNativeObject(objectId: objectId, offlineMapPath: arguments as! String, messageSink: messageSink)
         default:
             fatalError("Not implemented.")
         }
