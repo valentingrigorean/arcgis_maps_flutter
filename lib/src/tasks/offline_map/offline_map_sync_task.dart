@@ -165,8 +165,9 @@ class OfflineMapSyncParameters {
   factory OfflineMapSyncParameters.fromJson(Map<String, dynamic> json) {
     return OfflineMapSyncParameters(
       keepGeodatabaseDeltas: json['keepGeodatabaseDeltas'] as bool,
-      preplannedScheduledUpdatesOption: PreplannedScheduledUpdatesOption.fromValue(
-          json['preplannedScheduledUpdatesOption'] as int),
+      preplannedScheduledUpdatesOption:
+          PreplannedScheduledUpdatesOption.fromValue(
+              json['preplannedScheduledUpdatesOption'] as int),
       rollbackOnFailure: json['rollbackOnFailure'] as bool,
       syncDirection: SyncDirection.fromValue(json['syncDirection'] as int),
     );
@@ -194,16 +195,42 @@ class OfflineMapSyncParameters {
   /// The synchronization direction for geodatabases registered with feature services.
   final SyncDirection syncDirection;
 
+  OfflineMapSyncParameters copyWith({
+    bool? keepGeodatabaseDeltas,
+    PreplannedScheduledUpdatesOption? preplannedScheduledUpdatesOption,
+    bool? rollbackOnFailure,
+    SyncDirection? syncDirection,
+  }) {
+    return OfflineMapSyncParameters(
+      keepGeodatabaseDeltas:
+          keepGeodatabaseDeltas ?? this.keepGeodatabaseDeltas,
+      preplannedScheduledUpdatesOption: preplannedScheduledUpdatesOption ??
+          this.preplannedScheduledUpdatesOption,
+      rollbackOnFailure: rollbackOnFailure ?? this.rollbackOnFailure,
+      syncDirection: syncDirection ?? this.syncDirection,
+    );
+  }
+
+  Object toJson() {
+    return {
+      'keepGeodatabaseDeltas': keepGeodatabaseDeltas,
+      'preplannedScheduledUpdatesOption':
+          preplannedScheduledUpdatesOption.value,
+      'rollbackOnFailure': rollbackOnFailure,
+      'syncDirection': syncDirection.value,
+    };
+  }
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is OfflineMapSyncParameters &&
-              runtimeType == other.runtimeType &&
-              keepGeodatabaseDeltas == other.keepGeodatabaseDeltas &&
-              preplannedScheduledUpdatesOption ==
-                  other.preplannedScheduledUpdatesOption &&
-              rollbackOnFailure == other.rollbackOnFailure &&
-              syncDirection == other.syncDirection;
+      other is OfflineMapSyncParameters &&
+          runtimeType == other.runtimeType &&
+          keepGeodatabaseDeltas == other.keepGeodatabaseDeltas &&
+          preplannedScheduledUpdatesOption ==
+              other.preplannedScheduledUpdatesOption &&
+          rollbackOnFailure == other.rollbackOnFailure &&
+          syncDirection == other.syncDirection;
 
   @override
   int get hashCode =>
@@ -212,12 +239,10 @@ class OfflineMapSyncParameters {
       rollbackOnFailure.hashCode ^
       syncDirection.hashCode;
 
-
   @override
   String toString() {
     return 'OfflineMapSyncParameters{keepGeodatabaseDeltas: $keepGeodatabaseDeltas, preplannedScheduledUpdatesOption: $preplannedScheduledUpdatesOption, rollbackOnFailure: $rollbackOnFailure, syncDirection: $syncDirection}';
   }
-
 }
 
 /// A task to sync an offline map.
@@ -227,11 +252,17 @@ class OfflineMapSyncParameters {
 class OfflineMapSyncTask extends ArcgisNativeObject
     with Loadable, RemoteResource {
   OfflineMapSyncTask({
-    required this.onlineMap,
+    required this.offlineMapPath,
   });
 
-  /// Offline map whose feature layers and tables need to be synced with their originating service.
-  final ArcGISMap onlineMap;
+  final String offlineMapPath;
+
+  @override
+  String get type => "OfflineMapSyncTask";
+
+  @protected
+  @override
+  dynamic getCreateArguments() => offlineMapPath;
 
   /// Describes the methods used for obtaining updates to the offline map
   /// that was used to create this task.
@@ -256,6 +287,22 @@ class OfflineMapSyncTask extends ArcgisNativeObject
     return OfflineMapUpdatesInfo._fromJson(updatesInfo);
   }
 
-  @override
-  String get type => "OfflineMapSyncTask";
+  Future<OfflineMapSyncParameters> defaultOfflineMapSyncParameters() async {
+    final parameters = await invokeMethod(
+        'offlineMapSyncTask#defaultOfflineMapSyncParameters');
+    return OfflineMapSyncParameters.fromJson(parameters);
+  }
+
+  Future<OfflineMapSyncJob> offlineMapSyncJob({
+    required OfflineMapSyncParameters parameters,
+  }) async {
+    final jobId = await invokeMethod(
+      'offlineMapSyncTask#offlineMapSyncJob',
+      arguments: parameters.toJson(),
+    );
+    return OfflineMapSyncJob._(
+      objectId: jobId,
+      parameters: parameters,
+    );
+  }
 }
