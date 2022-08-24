@@ -254,6 +254,8 @@ class OfflineMapSyncParameters {
 /// their originating ArcGIS feature services.
 class OfflineMapSyncTask extends ArcgisNativeObject
     with Loadable, RemoteResource {
+  Object? _error;
+
   OfflineMapSyncTask({
     required this.offlineMapPath,
   });
@@ -274,6 +276,7 @@ class OfflineMapSyncTask extends ArcgisNativeObject
   /// You can use this property to determine whether an offline map
   /// is configured to use the preplanned scheduled updates workflow
   Future<OfflineMapUpdateCapabilities?> get updateCapabilities async {
+    _checkIfHaveError();
     final capabilities =
         await invokeMethod('offlineMapSyncTask#getUpdateCapabilities');
 
@@ -284,6 +287,7 @@ class OfflineMapSyncTask extends ArcgisNativeObject
   }
 
   Future<OfflineMapUpdatesInfo?> checkForUpdates() async {
+    _checkIfHaveError();
     final updatesInfo =
         await invokeMethod('offlineMapSyncTask#checkForUpdates');
     if (updatesInfo == null) {
@@ -293,6 +297,7 @@ class OfflineMapSyncTask extends ArcgisNativeObject
   }
 
   Future<OfflineMapSyncParameters> defaultOfflineMapSyncParameters() async {
+    _checkIfHaveError();
     final parameters = await invokeMethod(
         'offlineMapSyncTask#defaultOfflineMapSyncParameters');
     return OfflineMapSyncParameters.fromJson(parameters);
@@ -301,6 +306,7 @@ class OfflineMapSyncTask extends ArcgisNativeObject
   Future<OfflineMapSyncJob> offlineMapSyncJob({
     required OfflineMapSyncParameters parameters,
   }) async {
+    _checkIfHaveError();
     final jobId = await invokeMethod(
       'offlineMapSyncTask#offlineMapSyncJob',
       arguments: parameters.toJson(),
@@ -309,5 +315,24 @@ class OfflineMapSyncTask extends ArcgisNativeObject
       objectId: jobId,
       parameters: parameters,
     );
+  }
+
+  @protected
+  @mustCallSuper
+  @override
+  Future<void> handleMethodCall(String method, dynamic arguments) {
+    switch (method) {
+      case 'offlineMapSyncTask#loadError':
+        _error = ArcgisError.fromJson(arguments);
+        return Future.value();
+      default:
+        return super.handleMethodCall(method, arguments);
+    }
+  }
+
+  void _checkIfHaveError() {
+    if (_error != null) {
+      throw _error!;
+    }
   }
 }

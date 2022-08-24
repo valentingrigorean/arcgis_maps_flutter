@@ -6,7 +6,7 @@ import Foundation
 import ArcGIS
 
 class GeodatabaseSyncTaskNativeObject: BaseNativeObject<AGSGeodatabaseSyncTask> {
-    init(objectId: String, task: AGSGeodatabaseSyncTask, messageSink: NativeObjectControllerMessageSink) {
+    init(objectId: String, task: AGSGeodatabaseSyncTask, messageSink: NativeMessageSink) {
         super.init(objectId: objectId, nativeObject: task, nativeHandlers: [
             LoadableNativeHandler(loadable: task),
             RemoteResourceNativeHandler(remoteResource: task),

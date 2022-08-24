@@ -6,7 +6,8 @@ import Foundation
 import ArcGIS
 
 class ArcgisNativeObjectFactoryImpl: ArcgisNativeObjectFactory {
-    func createNativeObject(objectId: String, type: String, arguments: Any?, messageSink: NativeObjectControllerMessageSink) -> NativeObject {
+    func createNativeObject(objectId: String, type: String, arguments: Any?, messageSink: NativeMessageSink) -> NativeObject {
+        let messageSink = NativeObjectMessageSink(objectId: objectId, messageSink: messageSink)
         switch (type) {
         case "ExportTileCacheTask":
             let url = arguments as! String

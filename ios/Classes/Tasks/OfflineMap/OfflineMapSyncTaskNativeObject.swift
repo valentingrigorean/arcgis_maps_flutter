@@ -11,16 +11,16 @@ class OfflineMapSyncTaskNativeObject: NativeObject {
     private var task: OfflineMapSyncTaskNativeObjectWrapper?
     private var isDisposed = false
 
-    init(objectId: String, offlineMapPath: String, messageSink: NativeObjectControllerMessageSink) {
+    init(objectId: String, offlineMapPath: String, messageSink: NativeMessageSink) {
         self.objectId = objectId
         self.messageSink = messageSink
         self.offlineMapPath = offlineMapPath
-        createTask()
+        loadOfflineMap()
     }
 
     let objectId: String
 
-    let messageSink: NativeObjectControllerMessageSink
+    let messageSink: NativeMessageSink
 
     func dispose() {
         isDisposed = true
@@ -36,19 +36,19 @@ class OfflineMapSyncTaskNativeObject: NativeObject {
         }
     }
 
-    private func createTask() {
+    private func loadOfflineMap() {
         let mobilePackages = AGSMobileMapPackage(name: offlineMapPath)
         mobilePackages.load { error in
             if self.isDisposed {
                 return
             }
             if let error = error {
-                self.messageSink.send(method: "offlineMapSyncTask#loadError", arguments: error.localizedDescription)
+                self.messageSink.send(method: "offlineMapSyncTask#loadError", arguments: error.toJSON())
                 return
             }
 
             if mobilePackages.maps.isEmpty {
-                self.messageSink.send(method: "offlineMapSyncTask#loadError", arguments: "No maps in the package")
+                self.messageSink.send(method: "offlineMapSyncTask#loadError", arguments: NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No maps in the package"]).toJSON())
                 return
             }
 
@@ -71,7 +71,7 @@ private struct MethodCall {
 }
 
 fileprivate class OfflineMapSyncTaskNativeObjectWrapper: BaseNativeObject<AGSOfflineMapSyncTask> {
-    init(objectId: String, task: AGSOfflineMapSyncTask, messageSink: NativeObjectControllerMessageSink) {
+    init(objectId: String, task: AGSOfflineMapSyncTask, messageSink: NativeMessageSink) {
         super.init(objectId: objectId, nativeObject: task, nativeHandlers: [
             LoadableNativeHandler(loadable: task),
         ], messageSink: messageSink)

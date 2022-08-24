@@ -55,6 +55,7 @@ import com.esri.arcgisruntime.security.UserCredential;
 import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
 import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
 import com.esri.arcgisruntime.tasks.geocode.GeocodeResult;
+import com.esri.arcgisruntime.tasks.geodatabase.SyncGeodatabaseParameters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.valentingrigorean.arcgis_maps_flutter.data.FieldTypeFlutter;
@@ -108,7 +109,6 @@ public class Convert {
         return map;
     }
 
-
     public static Scalebar.Alignment toScaleBarAlignment(int rawValue) {
         switch (rawValue) {
             case 0:
@@ -119,6 +119,36 @@ public class Convert {
                 return Scalebar.Alignment.CENTER;
             default:
                 throw new IllegalStateException("Unexpected value: " + rawValue);
+        }
+    }
+
+    public static SyncGeodatabaseParameters.SyncDirection toSyncDirection(int rawValue) {
+        switch (rawValue) {
+            case 0:
+                return SyncGeodatabaseParameters.SyncDirection.NONE;
+            case 1:
+                return SyncGeodatabaseParameters.SyncDirection.DOWNLOAD;
+            case 2:
+                return SyncGeodatabaseParameters.SyncDirection.UPLOAD;
+            case 3:
+                return SyncGeodatabaseParameters.SyncDirection.BIDIRECTIONAL;
+            default:
+                throw new IllegalStateException("Unexpected value: " + rawValue);
+        }
+    }
+
+    public static int syncDirectionToJson(SyncGeodatabaseParameters.SyncDirection syncDirection) {
+        switch (syncDirection) {
+            case NONE:
+                return 0;
+            case DOWNLOAD:
+                return 1;
+            case UPLOAD:
+                return 2;
+            case BIDIRECTIONAL:
+                return 3;
+            default:
+                throw new IllegalStateException("Unexpected value: " + syncDirection);
         }
     }
 

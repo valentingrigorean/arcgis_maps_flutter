@@ -43,16 +43,35 @@ class BaseNativeHandler<T>: NSObject, NativeHandler {
 protocol NativeObject {
     var objectId: String { get }
 
-    var messageSink: NativeObjectControllerMessageSink { get }
+    var messageSink: NativeMessageSink { get }
 
     func dispose()
 
     func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult)
 }
 
+public class NativeObjectMessageSink: NativeMessageSink {
+    private let objectId: String
+
+    private let messageSink: NativeMessageSink
+
+    init(objectId: String, messageSink: NativeMessageSink) {
+        self.objectId = objectId
+        self.messageSink = messageSink
+    }
+
+    public func send(method: String, arguments: Any?) {
+        messageSink.send(method: "messageNativeObject", arguments: [
+            "objectId": objectId,
+            "method": method,
+            "arguments": arguments
+        ])
+    }
+}
+
 
 class BaseNativeObject<T>: NativeMessageSink, NativeObject {
-    var messageSink: NativeObjectControllerMessageSink
+    var messageSink: NativeMessageSink
 
     private var isDisposed: Bool = false
     private let nativeHandlers: [NativeHandler]
@@ -61,7 +80,7 @@ class BaseNativeObject<T>: NativeMessageSink, NativeObject {
 
     let nativeObject: T
 
-    init(objectId: String, nativeObject: T, nativeHandlers: [NativeHandler], messageSink: NativeObjectControllerMessageSink) {
+    init(objectId: String, nativeObject: T, nativeHandlers: [NativeHandler], messageSink: NativeMessageSink) {
         self.objectId = objectId
         self.nativeObject = nativeObject
         self.nativeHandlers = nativeHandlers
@@ -96,11 +115,7 @@ class BaseNativeObject<T>: NativeMessageSink, NativeObject {
         if (isDisposed) {
             return
         }
-        messageSink.send(method: "messageNativeObject", arguments: [
-            "objectId": objectId,
-            "method": method,
-            "arguments": arguments
-        ])
+        messageSink.send(method: "messageNativeObject", arguments: arguments)
     }
 
 

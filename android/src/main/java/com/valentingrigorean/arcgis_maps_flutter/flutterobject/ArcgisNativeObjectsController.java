@@ -23,10 +23,6 @@ public class ArcgisNativeObjectsController implements MethodChannel.MethodCallHa
         storage = NativeObjectStorage.getInstance();
     }
 
-    public interface NativeObjectControllerMessageSink extends NativeMessageSink {
-
-    }
-
     public void dispose() {
         channel.setMethodCallHandler(null);
         storage.clearAll();
@@ -70,7 +66,7 @@ public class ArcgisNativeObjectsController implements MethodChannel.MethodCallHa
         }
     }
 
-    private static class MessageSink implements NativeObjectControllerMessageSink {
+    private static class MessageSink implements NativeMessageSink {
         private final MethodChannel channel;
 
         private MessageSink(MethodChannel channel) {

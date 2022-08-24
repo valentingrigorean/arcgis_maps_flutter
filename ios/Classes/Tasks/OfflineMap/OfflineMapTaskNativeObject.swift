@@ -7,7 +7,7 @@ import ArcGIS
 
 class OfflineMapTaskNativeObject: BaseNativeObject<AGSOfflineMapTask> {
 
-    init(objectId: String, task: AGSOfflineMapTask, messageSink: NativeObjectControllerMessageSink) {
+    init(objectId: String, task: AGSOfflineMapTask, messageSink: NativeMessageSink) {
         super.init(objectId: objectId, nativeObject: task, nativeHandlers: [
             LoadableNativeHandler(loadable: task),
         ], messageSink: messageSink)

@@ -2,9 +2,6 @@ package com.valentingrigorean.arcgis_maps_flutter.flutterobject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import java.util.HashMap;
-
 import io.flutter.plugin.common.MethodChannel;
 
 public abstract class BaseNativeObject<T> implements NativeObject, NativeMessageSink {
@@ -13,7 +10,7 @@ public abstract class BaseNativeObject<T> implements NativeObject, NativeMessage
     private final String objectId;
     private final NativeHandler[] nativeHandlers;
 
-    private ArcgisNativeObjectsController.NativeObjectControllerMessageSink messageSink;
+    private NativeMessageSink messageSink;
 
     private boolean isDisposed = false;
 
@@ -21,6 +18,7 @@ public abstract class BaseNativeObject<T> implements NativeObject, NativeMessage
         this.objectId = objectId;
         this.nativeObject = nativeObject;
         this.nativeHandlers = nativeHandlers;
+
         for (NativeHandler nativeHandler : nativeHandlers) {
             nativeHandler.setMessageSink(this);
         }
@@ -41,11 +39,7 @@ public abstract class BaseNativeObject<T> implements NativeObject, NativeMessage
         if (messageSink == null || isDisposed) {
             return;
         }
-        final HashMap<String, Object> data = new HashMap<>(3);
-        data.put("objectId", objectId);
-        data.put("method", method);
-        data.put("arguments", args);
-        messageSink.send("messageNativeObject", data);
+        messageSink.send(method, args);
     }
 
     @Override
@@ -54,8 +48,8 @@ public abstract class BaseNativeObject<T> implements NativeObject, NativeMessage
     }
 
     @Override
-    public void setMessageSink(@Nullable ArcgisNativeObjectsController.NativeObjectControllerMessageSink messageSink) {
-        this.messageSink = messageSink;
+    public void setMessageSink(@Nullable NativeMessageSink messageSink) {
+       this.messageSink = messageSink;
     }
 
     @Override
@@ -86,7 +80,7 @@ public abstract class BaseNativeObject<T> implements NativeObject, NativeMessage
 
     }
 
-    protected ArcgisNativeObjectsController.NativeObjectControllerMessageSink getMessageSink() {
+    protected NativeMessageSink getMessageSink() {
         return messageSink;
     }
 

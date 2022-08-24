@@ -22,7 +22,8 @@ public class ArcgisNativeObjectFactoryImpl implements ArcgisNativeObjectFactory 
 
     @NonNull
     @Override
-    public NativeObject createNativeObject(@NonNull String objectId, @NonNull String type, @Nullable Object arguments, @NonNull ArcgisNativeObjectsController.NativeObjectControllerMessageSink messageSink) {
+    public NativeObject createNativeObject(@NonNull String objectId, @NonNull String type, @Nullable Object arguments, @NonNull NativeMessageSink messageSink) {
+        messageSink = new NativeObjectMessageSink(objectId, messageSink);
         switch (type) {
             case "ExportTileCacheTask": {
                 final String url = (String) arguments;
@@ -45,7 +46,7 @@ public class ArcgisNativeObjectFactoryImpl implements ArcgisNativeObjectFactory 
                 nativeObject.setMessageSink(messageSink);
                 return nativeObject;
             }
-            case "OfflineMapTask":{
+            case "OfflineMapTask": {
                 final OfflineMapTask task = createOfflineMapTask(Convert.toMap(arguments));
                 final NativeObject nativeObject = new OfflineMapTaskNativeObject(objectId, task);
                 nativeObject.setMessageSink(messageSink);

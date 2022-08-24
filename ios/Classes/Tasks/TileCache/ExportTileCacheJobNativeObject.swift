@@ -7,7 +7,7 @@ import ArcGIS
 
 class ExportTileCacheJobNativeObject: BaseNativeObject<AGSExportTileCacheJob> {
 
-    init(objectId: String, job: AGSExportTileCacheJob, messageSink: NativeObjectControllerMessageSink) {
+    init(objectId: String, job: AGSExportTileCacheJob, messageSink: NativeMessageSink) {
         super.init(objectId: objectId, nativeObject: job, nativeHandlers: [
             JobNativeHandler(job: job),
             RemoteResourceNativeHandler(remoteResource: job)

@@ -8,19 +8,15 @@ protocol NativeMessageSink {
     func send(method: String, arguments: Any?) -> Void
 }
 
-protocol NativeObjectControllerMessageSink: NativeMessageSink {
-
-}
 
 protocol ArcgisNativeObjectFactory {
-    func createNativeObject(objectId: String, type: String, arguments: Any?, messageSink: NativeObjectControllerMessageSink) -> NativeObject
+    func createNativeObject(objectId: String, type: String, arguments: Any?, messageSink: NativeMessageSink) -> NativeObject
 }
 
-class ArcgisNativeObjectsController: NativeObjectControllerMessageSink {
+class ArcgisNativeObjectsController: NativeMessageSink {
 
 
     private let channel: FlutterMethodChannel
-
 
     private let factory: ArcgisNativeObjectFactory
 
