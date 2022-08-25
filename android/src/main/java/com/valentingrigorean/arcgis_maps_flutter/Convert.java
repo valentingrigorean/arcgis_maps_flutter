@@ -81,6 +81,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class Convert {
@@ -1087,7 +1088,7 @@ public class Convert {
 
     protected static Object toFlutterFieldType(Object o) {
         final Map<String, Object> data = new HashMap<>(2);
-        FieldTypeFlutter fieldTypeFlutter = FieldTypeFlutter.UNKNOWN;
+        FieldTypeFlutter fieldTypeFlutter;
         if (o == null) {
             fieldTypeFlutter = FieldTypeFlutter.NULLABLE;
         } else if (o instanceof String) {
@@ -1099,6 +1100,12 @@ public class Convert {
         } else if (o instanceof GregorianCalendar) {
             fieldTypeFlutter = FieldTypeFlutter.DATE;
             o = ISO8601Format.format(((GregorianCalendar) o).getTime());
+        } else if (o instanceof UUID) {
+            fieldTypeFlutter = FieldTypeFlutter.TEXT;
+            o = o.toString();
+        } else {
+            fieldTypeFlutter = FieldTypeFlutter.UNKNOWN;
+            o = o.toString();
         }
         data.put("type", fieldTypeFlutter.getValue());
         data.put("value", o);
