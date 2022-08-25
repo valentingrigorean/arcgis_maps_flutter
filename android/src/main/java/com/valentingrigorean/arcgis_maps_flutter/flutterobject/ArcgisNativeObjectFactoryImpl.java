@@ -12,6 +12,7 @@ import com.esri.arcgisruntime.tasks.tilecache.ExportTileCacheTask;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
 import com.valentingrigorean.arcgis_maps_flutter.data.TileCacheNativeObject;
 import com.valentingrigorean.arcgis_maps_flutter.tasks.geodatabase.GeodatabaseSyncTaskNativeObject;
+import com.valentingrigorean.arcgis_maps_flutter.tasks.offlinemap.OfflineMapSyncTaskNativeObject;
 import com.valentingrigorean.arcgis_maps_flutter.tasks.offlinemap.OfflineMapTaskNativeObject;
 import com.valentingrigorean.arcgis_maps_flutter.tasks.tilecache.ExportTileCacheTaskNativeObject;
 
@@ -23,7 +24,6 @@ public class ArcgisNativeObjectFactoryImpl implements ArcgisNativeObjectFactory 
     @NonNull
     @Override
     public NativeObject createNativeObject(@NonNull String objectId, @NonNull String type, @Nullable Object arguments, @NonNull NativeMessageSink messageSink) {
-        messageSink = new NativeObjectMessageSink(objectId, messageSink);
         switch (type) {
             case "ExportTileCacheTask": {
                 final String url = (String) arguments;
@@ -49,6 +49,11 @@ public class ArcgisNativeObjectFactoryImpl implements ArcgisNativeObjectFactory 
             case "OfflineMapTask": {
                 final OfflineMapTask task = createOfflineMapTask(Convert.toMap(arguments));
                 final NativeObject nativeObject = new OfflineMapTaskNativeObject(objectId, task);
+                nativeObject.setMessageSink(messageSink);
+                return nativeObject;
+            }
+            case "OfflineMapSyncTask": {
+                final OfflineMapSyncTaskNativeObject nativeObject = new OfflineMapSyncTaskNativeObject(objectId, arguments.toString());
                 nativeObject.setMessageSink(messageSink);
                 return nativeObject;
             }

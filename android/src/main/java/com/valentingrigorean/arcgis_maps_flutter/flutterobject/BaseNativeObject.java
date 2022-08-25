@@ -2,6 +2,7 @@ package com.valentingrigorean.arcgis_maps_flutter.flutterobject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import io.flutter.plugin.common.MethodChannel;
 
 public abstract class BaseNativeObject<T> implements NativeObject, NativeMessageSink {
@@ -10,6 +11,7 @@ public abstract class BaseNativeObject<T> implements NativeObject, NativeMessage
     private final String objectId;
     private final NativeHandler[] nativeHandlers;
 
+    private NativeObjectMessageSink nativeObjectMessageSink;
     private NativeMessageSink messageSink;
 
     private boolean isDisposed = false;
@@ -39,7 +41,7 @@ public abstract class BaseNativeObject<T> implements NativeObject, NativeMessage
         if (messageSink == null || isDisposed) {
             return;
         }
-        messageSink.send(method, args);
+        nativeObjectMessageSink.send(method, args);
     }
 
     @Override
@@ -49,7 +51,12 @@ public abstract class BaseNativeObject<T> implements NativeObject, NativeMessage
 
     @Override
     public void setMessageSink(@Nullable NativeMessageSink messageSink) {
-       this.messageSink = messageSink;
+        this.messageSink = messageSink;
+        if (messageSink != null) {
+            nativeObjectMessageSink = new NativeObjectMessageSink(objectId, messageSink);
+        } else {
+            nativeObjectMessageSink = null;
+        }
     }
 
     @Override

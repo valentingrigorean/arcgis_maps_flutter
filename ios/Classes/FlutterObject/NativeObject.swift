@@ -71,7 +71,7 @@ public class NativeObjectMessageSink: NativeMessageSink {
 
 
 class BaseNativeObject<T>: NativeMessageSink, NativeObject {
-    var messageSink: NativeMessageSink
+    private var nativeObjectMessageSink: NativeObjectMessageSink
 
     private var isDisposed: Bool = false
     private let nativeHandlers: [NativeHandler]
@@ -80,11 +80,14 @@ class BaseNativeObject<T>: NativeMessageSink, NativeObject {
 
     let nativeObject: T
 
+    var messageSink: NativeMessageSink
+
     init(objectId: String, nativeObject: T, nativeHandlers: [NativeHandler], messageSink: NativeMessageSink) {
         self.objectId = objectId
         self.nativeObject = nativeObject
         self.nativeHandlers = nativeHandlers
         self.messageSink = messageSink
+        nativeObjectMessageSink = NativeObjectMessageSink(objectId: objectId, messageSink: messageSink)
 
         for var handler in nativeHandlers {
             handler.messageSink = self
@@ -115,7 +118,7 @@ class BaseNativeObject<T>: NativeMessageSink, NativeObject {
         if (isDisposed) {
             return
         }
-        messageSink.send(method: "messageNativeObject", arguments: arguments)
+        nativeObjectMessageSink.send(method: "messageNativeObject", arguments: arguments)
     }
 
 
