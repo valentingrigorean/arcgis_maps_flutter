@@ -8,7 +8,6 @@ protocol NativeMessageSink {
     func send(method: String, arguments: Any?) -> Void
 }
 
-
 protocol ArcgisNativeObjectFactory {
     func createNativeObject(objectId: String, type: String, arguments: Any?, messageSink: NativeMessageSink) -> NativeObject
 }

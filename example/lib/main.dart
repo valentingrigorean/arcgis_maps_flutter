@@ -125,7 +125,7 @@ class MainPage extends StatelessWidget {
                 },
               ),
               ElevatedButton(
-                child: const Text('Offline map'),
+                child: const Text('Offline map & Sync'),
                 onPressed: () {
                   Navigator.push(
                     context,

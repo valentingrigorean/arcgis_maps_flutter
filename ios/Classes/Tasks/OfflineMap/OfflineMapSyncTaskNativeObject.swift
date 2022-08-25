@@ -13,7 +13,7 @@ class OfflineMapSyncTaskNativeObject: NativeObject {
 
     init(objectId: String, offlineMapPath: String, messageSink: NativeMessageSink) {
         self.objectId = objectId
-        self.messageSink = messageSink
+        self.messageSink = NativeObjectMessageSink(objectId: objectId, messageSink: messageSink)
         self.offlineMapPath = offlineMapPath
         loadOfflineMap()
     }
@@ -37,7 +37,7 @@ class OfflineMapSyncTaskNativeObject: NativeObject {
     }
 
     private func loadOfflineMap() {
-        let mobilePackages = AGSMobileMapPackage(name: offlineMapPath)
+        let mobilePackages = AGSMobileMapPackage(fileURL: URL(string: offlineMapPath)!)
         mobilePackages.load { error in
             if self.isDisposed {
                 return

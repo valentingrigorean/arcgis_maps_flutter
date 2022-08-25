@@ -36,6 +36,7 @@ class BaseNativeHandler<T>: NSObject, NativeHandler {
     }
 
     func sendMessage(method: String, arguments: Any?) {
+        print("BaseNativeHandler.sendMessage: \(method)")
         messageSink?.send(method: method, arguments: arguments)
     }
 }
@@ -118,7 +119,7 @@ class BaseNativeObject<T>: NativeMessageSink, NativeObject {
         if (isDisposed) {
             return
         }
-        nativeObjectMessageSink.send(method: "messageNativeObject", arguments: arguments)
+        nativeObjectMessageSink.send(method: method, arguments: arguments)
     }
 
 

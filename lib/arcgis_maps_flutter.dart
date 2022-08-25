@@ -42,6 +42,7 @@ import 'package:http/http.dart' as http;
 import 'package:xml2json/xml2json.dart';
 import 'package:jiffy/jiffy.dart';
 
+part 'src/dispose_scope.dart';
 
 part 'src/unit_system.dart';
 

@@ -19,6 +19,7 @@ import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject;
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler;
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeMessageSink;
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeObject;
+import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeObjectMessageSink;
 import com.valentingrigorean.arcgis_maps_flutter.io.RemoteResourceNativeHandler;
 import com.valentingrigorean.arcgis_maps_flutter.loadable.LoadableNativeHandler;
 
@@ -61,9 +62,9 @@ public class OfflineMapSyncTaskNativeObject implements NativeObject {
 
     @Override
     public void setMessageSink(@Nullable NativeMessageSink messageSink) {
-        this.messageSink = messageSink;
+        this.messageSink = new NativeObjectMessageSink(objectId, messageSink);
         if (offlineMapSyncTaskNativeObjectWrapper != null) {
-            offlineMapSyncTaskNativeObjectWrapper.setMessageSink(messageSink);
+            offlineMapSyncTaskNativeObjectWrapper.setMessageSink(this.messageSink);
         }
     }
 

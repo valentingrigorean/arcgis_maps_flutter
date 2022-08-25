@@ -58,7 +58,7 @@ class OfflineMapUpdateCapabilities {
   /// Whether an offline map references feature services which are sync enabled.
   final bool supportsSyncWithFeatureServices;
 
-  factory OfflineMapUpdateCapabilities._fromJson(Map<String, dynamic> json) {
+  factory OfflineMapUpdateCapabilities._fromJson(Map<dynamic, dynamic> json) {
     return OfflineMapUpdateCapabilities._(
       json['supportsScheduledUpdatesForFeatures'] as bool,
       json['supportsSyncWithFeatureServices'] as bool,
@@ -94,7 +94,7 @@ class OfflineMapUpdatesInfo {
     required this.uploadAvailability,
   });
 
-  factory OfflineMapUpdatesInfo._fromJson(Map<String, dynamic> json) {
+  factory OfflineMapUpdatesInfo._fromJson(Map<dynamic, dynamic> json) {
     return OfflineMapUpdatesInfo._(
       downloadAvailability: OfflineUpdateAvailability.fromValue(
           json['downloadAvailability'] as int),
@@ -165,7 +165,7 @@ class OfflineMapSyncParameters {
     this.syncDirection = SyncDirection.birectional,
   });
 
-  factory OfflineMapSyncParameters.fromJson(Map<String, dynamic> json) {
+  factory OfflineMapSyncParameters.fromJson(Map<dynamic, dynamic> json) {
     return OfflineMapSyncParameters(
       keepGeodatabaseDeltas: json['keepGeodatabaseDeltas'] as bool,
       preplannedScheduledUpdatesOption:
