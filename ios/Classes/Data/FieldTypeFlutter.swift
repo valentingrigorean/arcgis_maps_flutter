@@ -14,7 +14,7 @@ enum FieldTypeFlutter: Int, Codable {
 }
 
 func getFieldType(value: Any?) -> FieldTypeFlutter {
-    guard  let value = value else {
+    guard let value = value else {
         return .nullable
     }
     if let _ = value as? NSNull {
@@ -40,6 +40,8 @@ func getFieldType(value: Any?) -> FieldTypeFlutter {
         return .date
     } else if let _ = value as? NSData {
         return .date
+    } else if let _ = value as? UUID {
+        return .text
     }
     return .unknown
 }
@@ -59,9 +61,15 @@ func toFlutterFieldType(obj: Any?) -> Any {
         }
         break
     default:
-        value = obj
+        if let obj = obj as? UUID {
+            value = obj.uuidString
+        } else {
+            value = obj
+        }
         break
     }
+
+
     return [
         "type": flutterType.rawValue,
         "value": value
