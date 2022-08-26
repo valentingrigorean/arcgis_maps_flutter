@@ -256,24 +256,28 @@ class _MapPageFeatureServiceOfflineState
         if (kDebugMode) {
           print('status: $event');
         }
+        if(event == JobStatus.failed){
+          final error = await job.error;
+          if (kDebugMode) {
+            print('error: $error');
+          }
+          await geodatabase.close();
+        }
         if (event == JobStatus.succeeded) {
           final result = await job.result;
           if (kDebugMode) {
             print('result: $result');
           }
+          await geodatabase.close();
         }
       });
 
       await job.start();
-      await geodatabase.close();
     } catch (ex, stackTrace) {
       if (kDebugMode) {
         print('ex: $ex');
         print('stackTrace: $stackTrace');
       }
-    } finally {
-      await geodatabase.close();
-      geodatabase.dispose();
     }
   }
 }

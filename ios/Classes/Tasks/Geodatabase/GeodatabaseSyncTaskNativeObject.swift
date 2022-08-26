@@ -94,7 +94,7 @@ class GeodatabaseSyncTaskNativeObject: BaseNativeObject<AGSGeodatabaseSyncTask> 
 
     private func createSyncJob(job: AGSSyncGeodatabaseJob, result: @escaping FlutterResult) {
         let jobId = NSUUID().uuidString
-        let jobNativeObject = GeodatabaseSyncTaskNativeObject(objectId: jobId, job: job, messageSink: messageSink)
+        let jobNativeObject = SyncGeodatabaseJobNativeObject(objectId: jobId, job: job, messageSink: messageSink)
         storage.addNativeObject(object: jobNativeObject)
         result(jobId)
     }
