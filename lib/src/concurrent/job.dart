@@ -146,6 +146,8 @@ abstract class Job extends ArcgisNativeObject with RemoteResource {
   final StreamController<JobMessage> _messageController =
       StreamController<JobMessage>.broadcast();
 
+  bool _isStarted = false;
+
   Job({
     String? objectId,
     bool isCreated = false,
@@ -155,10 +157,14 @@ abstract class Job extends ArcgisNativeObject with RemoteResource {
         );
 
   @override
-  void dispose() {
+  void dispose() async {
     _progressController.close();
     _statusController.close();
     _messageController.close();
+    if (_isStarted) {
+      _isStarted = false;
+      await cancel();
+    }
     super.dispose();
   }
 
@@ -211,16 +217,19 @@ abstract class Job extends ArcgisNativeObject with RemoteResource {
 
   Future<bool> start() async {
     final result = await invokeMethod('job#start');
-    return result ?? false;
+    _isStarted = result ?? false;
+    return _isStarted;
   }
 
   Future<bool> cancel() async {
     final result = await invokeMethod('job#cancel');
+    _isStarted = result ?? false;
     return result ?? false;
   }
 
   Future<bool> pause() async {
     final result = await invokeMethod('job#pause');
+    _isStarted = result ?? false;
     return result ?? false;
   }
 

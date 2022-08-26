@@ -33,7 +33,7 @@ enum SyncDirection {
   upload(2),
 
   /// Both download and upload changes.
-  birectional(3);
+  bidirectional(3);
 
   const SyncDirection(this.value);
 

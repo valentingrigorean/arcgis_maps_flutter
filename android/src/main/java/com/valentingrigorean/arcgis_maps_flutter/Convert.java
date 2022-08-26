@@ -18,6 +18,8 @@ import com.esri.arcgisruntime.arcgisservices.LevelOfDetail;
 import com.esri.arcgisruntime.arcgisservices.TileInfo;
 import com.esri.arcgisruntime.arcgisservices.TimeAware;
 import com.esri.arcgisruntime.arcgisservices.TimeUnit;
+import com.esri.arcgisruntime.data.EditResult;
+import com.esri.arcgisruntime.data.FeatureEditResult;
 import com.esri.arcgisruntime.data.TileCache;
 import com.esri.arcgisruntime.geometry.AngularUnitId;
 import com.esri.arcgisruntime.geometry.Envelope;
@@ -110,6 +112,25 @@ public class Convert {
         return map;
     }
 
+    public static Object exceptionToJson(@Nullable Exception ex) {
+        if (ex == null) {
+            return null;
+        }
+
+        if (ex instanceof ArcGISRuntimeException) {
+            return arcGISRuntimeExceptionToJson((ArcGISRuntimeException) ex);
+        }
+
+        final HashMap<String, Object> map = new HashMap<>();
+
+        map.put("message", ex.getMessage());
+        if (ex.getCause() != null) {
+            map.put("innerErrorMessage", ex.getCause().getMessage());
+        }
+
+        return map;
+    }
+
     public static Scalebar.Alignment toScaleBarAlignment(int rawValue) {
         switch (rawValue) {
             case 0:
@@ -123,8 +144,8 @@ public class Convert {
         }
     }
 
-    public static SyncGeodatabaseParameters.SyncDirection toSyncDirection(int rawValue) {
-        switch (rawValue) {
+    public static SyncGeodatabaseParameters.SyncDirection toSyncDirection(Object o) {
+        switch (toInt(o)) {
             case 0:
                 return SyncGeodatabaseParameters.SyncDirection.NONE;
             case 1:
@@ -134,7 +155,7 @@ public class Convert {
             case 3:
                 return SyncGeodatabaseParameters.SyncDirection.BIDIRECTIONAL;
             default:
-                throw new IllegalStateException("Unexpected value: " + rawValue);
+                throw new IllegalStateException("Unexpected value: " + o);
         }
     }
 
@@ -838,6 +859,28 @@ public class Convert {
 
         data.put("score", result.getScore());
 
+        return data;
+    }
+
+    public static Object editResultToJson(EditResult editResult) {
+        final Map<String, Object> data = new HashMap<>(6);
+        data.put("completedWithErrors", editResult.hasCompletedWithErrors());
+        data.put("editOperation", editResult.getEditOperation() == EditResult.EditOperation.UNKNOWN ? -1 : editResult.getEditOperation().ordinal());
+        if (editResult.hasCompletedWithErrors()) {
+            data.put("error", arcGISRuntimeExceptionToJson(editResult.getError()));
+        }
+        data.put("globalId", editResult.getGlobalId());
+        data.put("objectId", editResult.getObjectId());
+        return data;
+    }
+
+    public static Object featureEditResultToJson(FeatureEditResult featureEditResult) {
+        final Map<String, Object> data = (Map<String, Object>) editResultToJson(featureEditResult);
+        final ArrayList<Object> attachmentResults = new ArrayList<>(featureEditResult.getAttachmentResults().size());
+        for (EditResult attachmentResult : featureEditResult.getAttachmentResults()) {
+            attachmentResults.add(editResultToJson(attachmentResult));
+        }
+        data.put("attachmentResults", attachmentResults);
         return data;
     }
 

@@ -156,7 +156,7 @@ class MainPage extends StatelessWidget {
                     ),
                   );
                 },
-                child: const Text('Feature service offline'),
+                child: const Text('Feature service offline & sync'),
               ),
               ElevatedButton(
                 child: const Text('Marker generatered from widget'),

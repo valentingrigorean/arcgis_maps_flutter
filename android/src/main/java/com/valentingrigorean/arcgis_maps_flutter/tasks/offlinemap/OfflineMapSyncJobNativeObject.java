@@ -11,6 +11,7 @@ import com.valentingrigorean.arcgis_maps_flutter.concurrent.JobNativeHandler;
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject;
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler;
 import com.valentingrigorean.arcgis_maps_flutter.io.RemoteResourceNativeHandler;
+import com.valentingrigorean.arcgis_maps_flutter.tasks.geodatabase.ConvertGeodatabase;
 
 import java.util.ArrayList;
 
@@ -31,7 +32,7 @@ public class OfflineMapSyncJobNativeObject extends BaseNativeObject<OfflineMapSy
                 final ListenableList<GeodatabaseDeltaInfo> geodatabaseDeltaInfos = getNativeObject().getGeodatabaseDeltaInfos();
                 final ArrayList<Object> list = new ArrayList<>(geodatabaseDeltaInfos.size());
                 for (GeodatabaseDeltaInfo geodatabaseDeltaInfo : geodatabaseDeltaInfos) {
-                    list.add(ConvertOfflineMap.geodatabaseDeltaInfoToJson(geodatabaseDeltaInfo));
+                    list.add(ConvertGeodatabase.geodatabaseDeltaInfoToJson(geodatabaseDeltaInfo));
                 }
                 result.success(list);
             }

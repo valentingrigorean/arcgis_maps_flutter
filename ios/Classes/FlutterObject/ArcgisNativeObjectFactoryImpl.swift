@@ -23,6 +23,9 @@ class ArcgisNativeObjectFactoryImpl: ArcgisNativeObjectFactory {
             return OfflineMapTaskNativeObject(objectId: objectId, task: task, messageSink: messageSink)
         case "OfflineMapSyncTask":
             return OfflineMapSyncTaskNativeObject(objectId: objectId, offlineMapPath: arguments as! String, messageSink: messageSink)
+        case "Geodatabase":
+            let url = arguments as! String
+            return GeodatabaseNativeObject(objectId: objectId, geodatabase: AGSGeodatabase(fileURL: URL(string: url)!), messageSink: messageSink)
         default:
             fatalError("Not implemented.")
         }

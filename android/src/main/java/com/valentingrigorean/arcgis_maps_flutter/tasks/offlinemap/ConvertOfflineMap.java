@@ -109,18 +109,6 @@ public class ConvertOfflineMap extends Convert {
         return parameters;
     }
 
-    public static Object geodatabaseDeltaInfoToJson(GeodatabaseDeltaInfo geodatabaseDeltaInfo) {
-        final HashMap<String, Object> data = new HashMap<>(4);
-        if (geodatabaseDeltaInfo.getDownloadDeltaPath() != null) {
-            data.put("downloadDeltaFileUrl", geodatabaseDeltaInfo.getDownloadDeltaPath());
-        }
-        data.put("featureServiceUrl", geodatabaseDeltaInfo.getFeatureServiceUrl());
-        data.put("geodatabaseFileUrl", geodatabaseDeltaInfo.getGeodatabasePath());
-        if (geodatabaseDeltaInfo.getUploadDeltaPath() != null) {
-            data.put("uploadDeltaFileUrl", geodatabaseDeltaInfo.getUploadDeltaPath());
-        }
-        return data;
-    }
 
     public static Object offlineMapSyncResultToJson(OfflineMapSyncResult result) {
         final HashMap<String, Object> data = new HashMap<>(2);

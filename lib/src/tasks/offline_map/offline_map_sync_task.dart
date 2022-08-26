@@ -162,7 +162,7 @@ class OfflineMapSyncParameters {
     this.preplannedScheduledUpdatesOption =
         PreplannedScheduledUpdatesOption.downloadAllUpdates,
     this.rollbackOnFailure = false,
-    this.syncDirection = SyncDirection.birectional,
+    this.syncDirection = SyncDirection.bidirectional,
   });
 
   factory OfflineMapSyncParameters.fromJson(Map<dynamic, dynamic> json) {

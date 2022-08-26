@@ -21,12 +21,16 @@ class _MapPageFeatureServiceOfflineState
         'https://services2.arcgis.com/ZQgQTuoyBrtmoGdP/arcgis/rest/services/WaterDistributionNetwork/FeatureServer',
   );
 
+  late final DisposeScope _disposeScope = DisposeScope()..add(_task);
+
   GenerateGeodatabaseJob? _job;
 
   late ArcgisMapController _mapController;
-  Layer? _downloadedFeatureLayer;
+  GeodatabaseLayer? _downloadedFeatureLayer;
 
   bool _isDownloading = false;
+
+  bool _isDownloaded = false;
 
   double _progress = 0;
 
@@ -38,9 +42,7 @@ class _MapPageFeatureServiceOfflineState
 
   @override
   void dispose() {
-    _job?.cancel();
-    _job?.dispose();
-    _task.dispose();
+    _disposeScope.dispose();
     _mapController.dispose();
     super.dispose();
   }
@@ -67,15 +69,25 @@ class _MapPageFeatureServiceOfflineState
           _mapController = controller;
         },
       ),
-      floatingActionButton: !_isDownloading
-          ? null
-          : FloatingActionButton(
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (_isDownloaded)
+            FloatingActionButton(
+              onPressed: _syncLayer,
+              heroTag: 'sync',
+              child: const Icon(Icons.sync),
+            ),
+          if (_isDownloading)
+            FloatingActionButton(
               onPressed: null,
               child: CircularProgressIndicator(
                 value: _progress,
                 color: Colors.white,
               ),
             ),
+        ],
+      ),
     );
   }
 
@@ -92,6 +104,8 @@ class _MapPageFeatureServiceOfflineState
         layerId: LayerId(appDocPath),
         path: appDocPath,
       );
+
+      _isDownloaded = true;
       await Future.delayed(const Duration(milliseconds: 500));
       if (mounted) {
         setState(() {});
@@ -135,6 +149,7 @@ class _MapPageFeatureServiceOfflineState
       ),
       fileNameWithPath: appDocPath,
     );
+    _disposeScope.add(job);
 
     job.onMessageAdded.listen((event) {
       if (kDebugMode) {
@@ -151,6 +166,7 @@ class _MapPageFeatureServiceOfflineState
       if (status == JobStatus.succeeded) {
         if (mounted) {
           setState(() {
+            _isDownloaded = true;
             _downloadedFeatureLayer = GeodatabaseLayer(
               layerId: LayerId(appDocPath),
               path: appDocPath.replaceAll(
@@ -189,6 +205,75 @@ class _MapPageFeatureServiceOfflineState
     final didStart = await job.start();
     if (kDebugMode) {
       print('didStart: $didStart');
+    }
+  }
+
+  void _syncLayer() async {
+    final path = _downloadedFeatureLayer!.path;
+    final geodatabase = Geodatabase(path: path);
+
+    try {
+      await geodatabase.loadAsync();
+
+      final params = await _task.defaultSyncGeodatabaseParameters(
+          geodatabase: geodatabase);
+      if (kDebugMode) {
+        print('params: $params');
+      }
+
+      final job = await _task.syncJob(
+        geodatabase: geodatabase,
+        parameters: params,
+      );
+
+      _disposeScope.add(job);
+
+      final job2 = await _task.syncJob(
+        geodatabase: geodatabase,
+        parameters: params,
+      );
+
+      _disposeScope.add(job2);
+
+      final deltas = await job.geodatabaseDeltaInfo;
+      if (kDebugMode) {
+        print('deltas: $deltas');
+      }
+
+      job.onMessageAdded.listen((event) {
+        if (kDebugMode) {
+          print('message: $event');
+        }
+      });
+
+      job.onProgressChanged.listen((progress) {
+        if (kDebugMode) {
+          print('progress: $progress');
+        }
+      });
+
+      job.onStatusChanged.listen((event) async {
+        if (kDebugMode) {
+          print('status: $event');
+        }
+        if (event == JobStatus.succeeded) {
+          final result = await job.result;
+          if (kDebugMode) {
+            print('result: $result');
+          }
+        }
+      });
+
+      await job.start();
+      await geodatabase.close();
+    } catch (ex, stackTrace) {
+      if (kDebugMode) {
+        print('ex: $ex');
+        print('stackTrace: $stackTrace');
+      }
+    } finally {
+      await geodatabase.close();
+      geodatabase.dispose();
     }
   }
 }
