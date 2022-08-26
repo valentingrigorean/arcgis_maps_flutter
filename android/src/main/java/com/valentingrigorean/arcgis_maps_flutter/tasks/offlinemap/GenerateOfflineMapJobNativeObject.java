@@ -14,5 +14,4 @@ public class GenerateOfflineMapJobNativeObject extends BaseNativeObject<Generate
                 new RemoteResourceNativeHandler(job),
         });
     }
-
 }

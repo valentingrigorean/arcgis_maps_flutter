@@ -29,6 +29,8 @@ class _MapPageOfflineMapState extends State<MapPageOfflineMap> {
   //   ),
   // );
 
+  final DisposeScope _disposeScope = DisposeScope();
+
   final _map = ArcGISMap.fromPortalItem(
     PortalItem(
       portal: Portal.arcGISOnline(
@@ -45,7 +47,7 @@ class _MapPageOfflineMapState extends State<MapPageOfflineMap> {
   late final ArcgisMapController _mapController;
 
   late final OfflineMapTask _offlineMapTask =
-      OfflineMapTask.onlineMap(map: _map);
+      OfflineMapTask.onlineMap(map: _map).disposeWith(_disposeScope);
 
   bool _isDownloading = false;
   double _progress = 0;
@@ -58,7 +60,7 @@ class _MapPageOfflineMapState extends State<MapPageOfflineMap> {
 
   @override
   void dispose() {
-    _offlineMapTask.dispose();
+    _disposeScope.dispose();
     super.dispose();
   }
 
@@ -101,7 +103,16 @@ class _MapPageOfflineMapState extends State<MapPageOfflineMap> {
           ? Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                if (_mapDownloadedAlready) ...[
+                  FloatingActionButton(
+                    heroTag: 'sync',
+                    onPressed: _syncDownloadedMap,
+                    child: const Icon(Icons.sync),
+                  ),
+                  const SizedBox(height: 8),
+                ],
                 FloatingActionButton(
+                  heroTag: 'delete',
                   onPressed: () async {
                     Directory appDocDir =
                         await getApplicationDocumentsDirectory();
@@ -145,6 +156,72 @@ class _MapPageOfflineMapState extends State<MapPageOfflineMap> {
     }
   }
 
+  void _syncDownloadedMap() async {
+    try {
+      final appDocDir = await getApplicationDocumentsDirectory();
+      final offlineMapPath = '${appDocDir.path}/offline_map_example';
+      final offlineMapSync = OfflineMapSyncTask(offlineMapPath: offlineMapPath)
+          .disposeWith(_disposeScope);
+
+      final updateCapabilities = await offlineMapSync.updateCapabilities;
+      if (kDebugMode) {
+        print('updateCapabilities: $updateCapabilities');
+      }
+
+      final checkForUpdates = await offlineMapSync.checkForUpdates();
+
+      if (kDebugMode) {
+        print('checkForUpdates: $checkForUpdates');
+      }
+
+      final defaultParams =
+          await offlineMapSync.defaultOfflineMapSyncParameters();
+
+      if (kDebugMode) {
+        print('defaultParams: $defaultParams');
+      }
+
+      final job =
+          await offlineMapSync.offlineMapSyncJob(parameters: defaultParams);
+
+      job.onStatusChanged.listen((event) {
+        if (kDebugMode) {
+          print('onStatusChanged: $event');
+        }
+      });
+
+      job.onMessageAdded.listen((event) {
+        if (kDebugMode) {
+          print('onMessageAdded: $event');
+        }
+      });
+
+      job.onProgressChanged.listen((event) {
+        if (kDebugMode) {
+          print('onProgressChanged: $event');
+        }
+      });
+
+      final geodatabaseDeltaInfos = await job.geodatabaseDeltaInfos;
+      if (kDebugMode) {
+        print('geodatabaseDeltaInfos: $geodatabaseDeltaInfos');
+      }
+
+      job.disposeWith(_disposeScope);
+      await job.start();
+
+      final geodatabase = await job.result;
+      if (kDebugMode) {
+        print('geodatabase: $geodatabase');
+      }
+    } catch (ex, stackTrace) {
+      if (kDebugMode) {
+        print(ex);
+        print(stackTrace);
+      }
+    }
+  }
+
   void _downloadMap() async {
     try {
       final areaOfInterest = await _mapController
@@ -179,6 +256,7 @@ class _MapPageOfflineMapState extends State<MapPageOfflineMap> {
         parameters: defaultParams,
         downloadDirectory: appDocPath,
       );
+      job.disposeWith(_disposeScope);
       job.onStatusChanged.listen((event) async {
         if (kDebugMode) {
           print(event);

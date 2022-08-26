@@ -18,6 +18,8 @@ import com.esri.arcgisruntime.arcgisservices.LevelOfDetail;
 import com.esri.arcgisruntime.arcgisservices.TileInfo;
 import com.esri.arcgisruntime.arcgisservices.TimeAware;
 import com.esri.arcgisruntime.arcgisservices.TimeUnit;
+import com.esri.arcgisruntime.data.EditResult;
+import com.esri.arcgisruntime.data.FeatureEditResult;
 import com.esri.arcgisruntime.data.TileCache;
 import com.esri.arcgisruntime.geometry.AngularUnitId;
 import com.esri.arcgisruntime.geometry.Envelope;
@@ -55,6 +57,7 @@ import com.esri.arcgisruntime.security.UserCredential;
 import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
 import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
 import com.esri.arcgisruntime.tasks.geocode.GeocodeResult;
+import com.esri.arcgisruntime.tasks.geodatabase.SyncGeodatabaseParameters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.valentingrigorean.arcgis_maps_flutter.data.FieldTypeFlutter;
@@ -109,6 +112,24 @@ public class Convert {
         return map;
     }
 
+    public static Object exceptionToJson(@Nullable Exception ex) {
+        if (ex == null) {
+            return null;
+        }
+
+        if (ex instanceof ArcGISRuntimeException) {
+            return arcGISRuntimeExceptionToJson((ArcGISRuntimeException) ex);
+        }
+
+        final HashMap<String, Object> map = new HashMap<>();
+
+        map.put("message", ex.getMessage());
+        if (ex.getCause() != null) {
+            map.put("innerErrorMessage", ex.getCause().getMessage());
+        }
+
+        return map;
+    }
 
     public static Scalebar.Alignment toScaleBarAlignment(int rawValue) {
         switch (rawValue) {
@@ -120,6 +141,36 @@ public class Convert {
                 return Scalebar.Alignment.CENTER;
             default:
                 throw new IllegalStateException("Unexpected value: " + rawValue);
+        }
+    }
+
+    public static SyncGeodatabaseParameters.SyncDirection toSyncDirection(Object o) {
+        switch (toInt(o)) {
+            case 0:
+                return SyncGeodatabaseParameters.SyncDirection.NONE;
+            case 1:
+                return SyncGeodatabaseParameters.SyncDirection.DOWNLOAD;
+            case 2:
+                return SyncGeodatabaseParameters.SyncDirection.UPLOAD;
+            case 3:
+                return SyncGeodatabaseParameters.SyncDirection.BIDIRECTIONAL;
+            default:
+                throw new IllegalStateException("Unexpected value: " + o);
+        }
+    }
+
+    public static int syncDirectionToJson(SyncGeodatabaseParameters.SyncDirection syncDirection) {
+        switch (syncDirection) {
+            case NONE:
+                return 0;
+            case DOWNLOAD:
+                return 1;
+            case UPLOAD:
+                return 2;
+            case BIDIRECTIONAL:
+                return 3;
+            default:
+                throw new IllegalStateException("Unexpected value: " + syncDirection);
         }
     }
 
@@ -808,6 +859,28 @@ public class Convert {
 
         data.put("score", result.getScore());
 
+        return data;
+    }
+
+    public static Object editResultToJson(EditResult editResult) {
+        final Map<String, Object> data = new HashMap<>(6);
+        data.put("completedWithErrors", editResult.hasCompletedWithErrors());
+        data.put("editOperation", editResult.getEditOperation() == EditResult.EditOperation.UNKNOWN ? -1 : editResult.getEditOperation().ordinal());
+        if (editResult.hasCompletedWithErrors()) {
+            data.put("error", arcGISRuntimeExceptionToJson(editResult.getError()));
+        }
+        data.put("globalId", editResult.getGlobalId());
+        data.put("objectId", editResult.getObjectId());
+        return data;
+    }
+
+    public static Object featureEditResultToJson(FeatureEditResult featureEditResult) {
+        final Map<String, Object> data = (Map<String, Object>) editResultToJson(featureEditResult);
+        final ArrayList<Object> attachmentResults = new ArrayList<>(featureEditResult.getAttachmentResults().size());
+        for (EditResult attachmentResult : featureEditResult.getAttachmentResults()) {
+            attachmentResults.add(editResultToJson(attachmentResult));
+        }
+        data.put("attachmentResults", attachmentResults);
         return data;
     }
 

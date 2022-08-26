@@ -6,7 +6,7 @@ import Foundation
 import ArcGIS
 
 class ArcgisNativeObjectFactoryImpl: ArcgisNativeObjectFactory {
-    func createNativeObject(objectId: String, type: String, arguments: Any?, messageSink: NativeObjectControllerMessageSink) -> NativeObject {
+    func createNativeObject(objectId: String, type: String, arguments: Any?, messageSink: NativeMessageSink) -> NativeObject {
         switch (type) {
         case "ExportTileCacheTask":
             let url = arguments as! String
@@ -21,6 +21,11 @@ class ArcgisNativeObjectFactoryImpl: ArcgisNativeObjectFactory {
         case "OfflineMapTask":
             let task = createOfflineMapTask(data: arguments as! [String: Any])
             return OfflineMapTaskNativeObject(objectId: objectId, task: task, messageSink: messageSink)
+        case "OfflineMapSyncTask":
+            return OfflineMapSyncTaskNativeObject(objectId: objectId, offlineMapPath: arguments as! String, messageSink: messageSink)
+        case "Geodatabase":
+            let url = arguments as! String
+            return GeodatabaseNativeObject(objectId: objectId, geodatabase: AGSGeodatabase(fileURL: URL(string: url)!), messageSink: messageSink)
         default:
             fatalError("Not implemented.")
         }

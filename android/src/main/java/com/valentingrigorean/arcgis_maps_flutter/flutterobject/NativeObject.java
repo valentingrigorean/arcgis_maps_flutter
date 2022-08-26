@@ -10,7 +10,7 @@ public interface NativeObject {
 
     void dispose();
 
-    void setMessageSink(@Nullable ArcgisNativeObjectsController.NativeObjectControllerMessageSink messageSink);
+    void setMessageSink(@Nullable NativeMessageSink messageSink);
 
     void onMethodCall(@NonNull String method, @Nullable Object args, @NonNull MethodChannel.Result result);
 }

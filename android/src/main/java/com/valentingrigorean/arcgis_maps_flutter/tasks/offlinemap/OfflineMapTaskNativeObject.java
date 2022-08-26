@@ -11,6 +11,7 @@ import com.esri.arcgisruntime.tasks.offlinemap.OfflineMapTask;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject;
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler;
+import com.valentingrigorean.arcgis_maps_flutter.io.RemoteResourceNativeHandler;
 import com.valentingrigorean.arcgis_maps_flutter.loadable.LoadableNativeHandler;
 
 import java.util.Map;
@@ -23,6 +24,7 @@ public class OfflineMapTaskNativeObject extends BaseNativeObject<OfflineMapTask>
     public OfflineMapTaskNativeObject(String objectId, OfflineMapTask task) {
         super(objectId, task, new NativeHandler[]{
                 new LoadableNativeHandler(task),
+                new RemoteResourceNativeHandler(task),
         });
     }
 

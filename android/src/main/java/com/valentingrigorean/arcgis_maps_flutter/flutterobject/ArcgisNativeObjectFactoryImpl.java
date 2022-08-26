@@ -3,6 +3,7 @@ package com.valentingrigorean.arcgis_maps_flutter.flutterobject;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.esri.arcgisruntime.data.Geodatabase;
 import com.esri.arcgisruntime.data.TileCache;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.portal.PortalItem;
@@ -10,8 +11,10 @@ import com.esri.arcgisruntime.tasks.geodatabase.GeodatabaseSyncTask;
 import com.esri.arcgisruntime.tasks.offlinemap.OfflineMapTask;
 import com.esri.arcgisruntime.tasks.tilecache.ExportTileCacheTask;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
+import com.valentingrigorean.arcgis_maps_flutter.data.GeodatabaseNativeObject;
 import com.valentingrigorean.arcgis_maps_flutter.data.TileCacheNativeObject;
 import com.valentingrigorean.arcgis_maps_flutter.tasks.geodatabase.GeodatabaseSyncTaskNativeObject;
+import com.valentingrigorean.arcgis_maps_flutter.tasks.offlinemap.OfflineMapSyncTaskNativeObject;
 import com.valentingrigorean.arcgis_maps_flutter.tasks.offlinemap.OfflineMapTaskNativeObject;
 import com.valentingrigorean.arcgis_maps_flutter.tasks.tilecache.ExportTileCacheTaskNativeObject;
 
@@ -22,7 +25,7 @@ public class ArcgisNativeObjectFactoryImpl implements ArcgisNativeObjectFactory 
 
     @NonNull
     @Override
-    public NativeObject createNativeObject(@NonNull String objectId, @NonNull String type, @Nullable Object arguments, @NonNull ArcgisNativeObjectsController.NativeObjectControllerMessageSink messageSink) {
+    public NativeObject createNativeObject(@NonNull String objectId, @NonNull String type, @Nullable Object arguments, @NonNull NativeMessageSink messageSink) {
         switch (type) {
             case "ExportTileCacheTask": {
                 final String url = (String) arguments;
@@ -45,9 +48,20 @@ public class ArcgisNativeObjectFactoryImpl implements ArcgisNativeObjectFactory 
                 nativeObject.setMessageSink(messageSink);
                 return nativeObject;
             }
-            case "OfflineMapTask":{
+            case "OfflineMapTask": {
                 final OfflineMapTask task = createOfflineMapTask(Convert.toMap(arguments));
                 final NativeObject nativeObject = new OfflineMapTaskNativeObject(objectId, task);
+                nativeObject.setMessageSink(messageSink);
+                return nativeObject;
+            }
+            case "OfflineMapSyncTask": {
+                final OfflineMapSyncTaskNativeObject nativeObject = new OfflineMapSyncTaskNativeObject(objectId, arguments.toString());
+                nativeObject.setMessageSink(messageSink);
+                return nativeObject;
+            }
+            case "Geodatabase":{
+                final String url = (String) arguments;
+                final NativeObject nativeObject = new GeodatabaseNativeObject(objectId, new Geodatabase(url));
                 nativeObject.setMessageSink(messageSink);
                 return nativeObject;
             }

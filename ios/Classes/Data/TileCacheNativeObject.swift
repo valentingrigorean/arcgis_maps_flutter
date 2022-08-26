@@ -7,7 +7,7 @@ import ArcGIS
 
 class TileCacheNativeObject: BaseNativeObject<AGSTileCache> {
 
-    init(objectId: String, tileCache: AGSTileCache, messageSink: NativeObjectControllerMessageSink) {
+    init(objectId: String, tileCache: AGSTileCache, messageSink: NativeMessageSink) {
         super.init(objectId: objectId,nativeObject: tileCache, nativeHandlers: [
             LoadableNativeHandler(loadable: tileCache)
         ], messageSink: messageSink)

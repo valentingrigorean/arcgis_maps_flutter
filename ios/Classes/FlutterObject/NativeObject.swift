@@ -36,6 +36,7 @@ class BaseNativeHandler<T>: NSObject, NativeHandler {
     }
 
     func sendMessage(method: String, arguments: Any?) {
+        print("BaseNativeHandler.sendMessage: \(method)")
         messageSink?.send(method: method, arguments: arguments)
     }
 }
@@ -43,16 +44,35 @@ class BaseNativeHandler<T>: NSObject, NativeHandler {
 protocol NativeObject {
     var objectId: String { get }
 
-    var messageSink: NativeObjectControllerMessageSink { get }
+    var messageSink: NativeMessageSink { get }
 
     func dispose()
 
     func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult)
 }
 
+public class NativeObjectMessageSink: NativeMessageSink {
+    private let objectId: String
+
+    private let messageSink: NativeMessageSink
+
+    init(objectId: String, messageSink: NativeMessageSink) {
+        self.objectId = objectId
+        self.messageSink = messageSink
+    }
+
+    public func send(method: String, arguments: Any?) {
+        messageSink.send(method: "messageNativeObject", arguments: [
+            "objectId": objectId,
+            "method": method,
+            "arguments": arguments
+        ])
+    }
+}
+
 
 class BaseNativeObject<T>: NativeMessageSink, NativeObject {
-    var messageSink: NativeObjectControllerMessageSink
+    private var nativeObjectMessageSink: NativeObjectMessageSink
 
     private var isDisposed: Bool = false
     private let nativeHandlers: [NativeHandler]
@@ -61,11 +81,14 @@ class BaseNativeObject<T>: NativeMessageSink, NativeObject {
 
     let nativeObject: T
 
-    init(objectId: String, nativeObject: T, nativeHandlers: [NativeHandler], messageSink: NativeObjectControllerMessageSink) {
+    var messageSink: NativeMessageSink
+
+    init(objectId: String, nativeObject: T, nativeHandlers: [NativeHandler], messageSink: NativeMessageSink) {
         self.objectId = objectId
         self.nativeObject = nativeObject
         self.nativeHandlers = nativeHandlers
         self.messageSink = messageSink
+        nativeObjectMessageSink = NativeObjectMessageSink(objectId: objectId, messageSink: messageSink)
 
         for var handler in nativeHandlers {
             handler.messageSink = self
@@ -96,11 +119,7 @@ class BaseNativeObject<T>: NativeMessageSink, NativeObject {
         if (isDisposed) {
             return
         }
-        messageSink.send(method: "messageNativeObject", arguments: [
-            "objectId": objectId,
-            "method": method,
-            "arguments": arguments
-        ])
+        nativeObjectMessageSink.send(method: method, arguments: arguments)
     }
 
 

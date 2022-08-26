@@ -42,6 +42,7 @@ import 'package:http/http.dart' as http;
 import 'package:xml2json/xml2json.dart';
 import 'package:jiffy/jiffy.dart';
 
+part 'src/dispose_scope.dart';
 
 part 'src/unit_system.dart';
 
@@ -53,8 +54,9 @@ part 'src/arcgisservices/tile_info.dart';
 
 part 'src/concurrent/job.dart';
 
-part 'src/data/geodatabase.dart';
+part 'src/data/edit_result.dart';
 part 'src/data/tile_cache.dart';
+part 'src/data/geodatabase.dart';
 part 'src/data/sync_model.dart';
 part 'src/data/tile_key.dart';
 
@@ -146,7 +148,10 @@ part 'src/tasks/geocode/locator_task.dart';
 part 'src/tasks/geodatabase/generate_geodatabase_job.dart';
 part 'src/tasks/geodatabase/generate_geodatabase_parameters.dart';
 part 'src/tasks/geodatabase/generate_layer_option.dart';
+part 'src/tasks/geodatabase/geodatabase_delta_info.dart';
 part 'src/tasks/geodatabase/geodatabase_sync_task.dart';
+part 'src/tasks/geodatabase/sync_geodatabase_job.dart';
+part 'src/tasks/geodatabase/sync_geodatabase_parameters.dart';
 
 part 'src/tasks/network_analysis/attribute_parameter_value.dart';
 part 'src/tasks/network_analysis/cost_attribute.dart';
@@ -167,6 +172,8 @@ part 'src/tasks/offline_map/generate_offline_map_job.dart';
 part 'src/tasks/offline_map/generate_offline_map_parameters.dart';
 part 'src/tasks/offline_map/generate_offline_map_result.dart';
 part 'src/tasks/offline_map/offline_map_item_info.dart';
+part 'src/tasks/offline_map/offline_map_sync_job.dart';
+part 'src/tasks/offline_map/offline_map_sync_task.dart';
 part 'src/tasks/offline_map/offline_map_task.dart';
 
 part 'src/tasks/tile_cache/estimate_tile_cache_size_job.dart';
