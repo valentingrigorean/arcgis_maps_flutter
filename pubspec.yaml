@@ -1,6 +1,6 @@
 name: arcgis_maps_flutter
 description: A new flutter plugin project.
-version: 0.0.5+13
+version: 0.0.5+14
 homepage:
 
 environment:
@@ -14,7 +14,7 @@ dependencies:
   stream_transform: ^2.0.0
   collection: ^1.16.0
   fluster: ^1.2.0
-  equatable: ^2.0.3
+  equatable: ^2.0.5
   http: ^0.13.5
   xml2json: ^5.3.4
   jiffy: ^5.0.0
