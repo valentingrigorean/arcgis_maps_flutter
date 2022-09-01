@@ -10,6 +10,19 @@ class GeometryEngine {
     return GeometryEngineFlutterPlatform.instance.project(geometry, target);
   }
 
+  /// Projects the given geometry from it's current spatial reference
+  /// system into the given spatial reference system.
+  ///
+  static Future<T?> projectAs<T extends Geometry>(
+      T geometry, SpatialReference target) async {
+    final result =
+        await GeometryEngineFlutterPlatform.instance.project(geometry, target);
+    if (result == null) {
+      return null;
+    }
+    return result as T?;
+  }
+
   static Future<GeodeticDistanceResult?> distanceGeodetic({
     required AGSPoint point1,
     required AGSPoint point2,
