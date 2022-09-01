@@ -16,6 +16,7 @@ import androidx.lifecycle.LifecycleOwner;
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
 import com.esri.arcgisruntime.arcgisservices.TimeAware;
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
+import com.esri.arcgisruntime.geometry.Envelope;
 import com.esri.arcgisruntime.geometry.Geometry;
 import com.esri.arcgisruntime.geometry.GeometryEngine;
 import com.esri.arcgisruntime.geometry.Point;
@@ -270,6 +271,29 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                     result.success(results);
                     legendInfoControllers.remove(legendInfoController);
                 });
+            }
+            break;
+            case "map#getMapMaxExtend": {
+                if (mapView.getMap() != null) {
+                    mapView.getMap().addDoneLoadingListener(() -> {
+                        final Envelope maxExtend = mapView.getMap().getMaxExtent();
+                        if (maxExtend == null) {
+                            result.success(null);
+                        } else {
+                            result.success(Convert.geometryToJson(maxExtend));
+                        }
+                    });
+                } else {
+                    result.success(null);
+                }
+            }
+            break;
+            case "map#setMapMaxExtent": {
+                final Envelope maxExtend = (Envelope) Convert.toGeometry(call.arguments);
+                if (mapView.getMap() != null) {
+                    mapView.getMap().setMaxExtent(maxExtend);
+                }
+                result.success(null);
             }
             break;
             case "map#setMap": {

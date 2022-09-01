@@ -70,6 +70,14 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
         'setMgetLegendInfosap() has not been implemented.');
   }
 
+  Future<AGSEnvelope?> getMapMaxExtend(int mapId) {
+    throw UnimplementedError('getMapMaxExtend() has not been implemented.');
+  }
+
+  Future<void> setMapMaxExtent(int mapId, AGSEnvelope envelope) {
+    throw UnimplementedError('setMapMaxExtent() has not been implemented.');
+  }
+
   Future<void> setMap(int mapId, ArcGISMap map) {
     throw UnimplementedError('setMap() has not been implemented.');
   }

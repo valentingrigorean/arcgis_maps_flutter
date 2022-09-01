@@ -183,6 +183,23 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
+  Future<AGSEnvelope?> getMapMaxExtend(int mapId) async {
+    final result = await channel(mapId).invokeMapMethod('map#getMapMaxExtend');
+    if (result == null) {
+      return null;
+    }
+    return AGSEnvelope.fromJson(result);
+  }
+
+  @override
+  Future<void> setMapMaxExtent(int mapId, AGSEnvelope envelope) {
+    return channel(mapId).invokeMethod<void>(
+      'map#setMapMaxExtent',
+      envelope.toJson(),
+    );
+  }
+
+  @override
   Future<void> setMap(int mapId, ArcGISMap map) {
     return channel(mapId).invokeMethod<void>("map#setMap", map.toJson());
   }

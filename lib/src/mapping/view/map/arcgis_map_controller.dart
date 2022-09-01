@@ -81,6 +81,16 @@ class ArcgisMapController {
     return result.expand((e) => e).toList();
   }
 
+  Future<AGSEnvelope?> getMapMaxExtend(){
+    return ArcgisMapsFlutterPlatform.instance
+        .getMapMaxExtend(mapId);
+  }
+
+  Future<void> setMapMaxExtent(AGSEnvelope envelope){
+    return ArcgisMapsFlutterPlatform.instance
+        .setMapMaxExtent(mapId, envelope);
+  }
+
   void addViewpointChangedListener(ViewpointChangedListener listener) {
     _viewpointChangedHandlers.addHandler(listener);
   }
@@ -150,6 +160,11 @@ class ArcgisMapController {
         .setViewpointScale(mapId, scale);
   }
 
+  /// Gets the current viewpoint being displayed.
+  /// For an [ArcgisMapView], this takes into account the attribution bar and
+  /// any [ArcgisMapView.contentInsets] that has been specified to return only the unobscured
+  /// portion of the map. Param [type] specifying how the viewpoint
+  /// should be represented.
   Future<Viewpoint?> getCurrentViewpoint(ViewpointType type) {
     return ArcgisMapsFlutterPlatform.instance.getCurrentViewpoint(mapId, type);
   }

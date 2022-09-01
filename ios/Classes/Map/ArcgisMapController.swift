@@ -175,6 +175,26 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             })
             legendInfoControllers.append(legendInfoController)
             break
+        case "map#getMapMaxExtend":
+            if let map = mapView.map {
+                map.load { error in
+                    if error == nil {
+                        result(map.maxExtent?.toJSONFlutter())
+                    } else {
+                        result(nil)
+                    }
+                }
+            } else {
+                result(nil)
+            }
+            break
+        case "map#setMapMaxExtent":
+            if let extent = call.arguments as? Dictionary<String, Any> {
+                let maxExtent = AGSEnvelope(data: extent)
+                mapView.map?.maxExtent = maxExtent
+            }
+            result(nil)
+            break
         case "map#setMap":
             changeMapType(args: call.arguments)
             result(nil)

@@ -32,6 +32,12 @@ class Viewpoint {
       );
 
   final double? scale;
+
+  /// The geometry represented by this viewpoint.
+  /// If [viewpointType] is [ViewpointType.centerAndScale],
+  /// this contains a point geometry.
+  /// If[viewpointType] is [ViewpointType.boundingGeometry],
+  /// this contains an envelope geometry.
   final Geometry targetGeometry;
   final ViewpointType viewpointType;
 
