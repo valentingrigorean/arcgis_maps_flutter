@@ -172,12 +172,15 @@ class ArcGISMap {
           _basemapTypeOptions == other._basemapTypeOptions &&
           _baseMap == other._baseMap &&
           _baseLayer == other._baseLayer &&
-          _portalItem == other._portalItem;
-
+          _portalItem == other._portalItem &&
+          _offlinePath == other._offlinePath &&
+          _offlineMapIndex == other._offlineMapIndex;
   @override
   int get hashCode =>
       _basemapTypeOptions.hashCode ^
       _baseMap.hashCode ^
       _baseLayer.hashCode ^
-      _portalItem.hashCode;
+      _portalItem.hashCode ^
+      _offlinePath.hashCode ^
+      _offlineMapIndex.hashCode;
 }
