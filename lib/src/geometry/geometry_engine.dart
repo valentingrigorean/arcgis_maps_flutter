@@ -119,4 +119,9 @@ class GeometryEngine {
   static Future<List<Geometry>> intersections(Geometry first, Geometry second) {
     return GeometryEngineFlutterPlatform.instance.intersections(first, second);
   }
+
+  /// Return true if [container] contains [within].
+  static Future<bool> contains(Geometry container, Geometry within) {
+    return GeometryEngineFlutterPlatform.instance.contains(container, within);
+  }
 }
