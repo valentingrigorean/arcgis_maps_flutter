@@ -48,7 +48,7 @@ class AGSMultipoint extends Geometry {
       }
     }
 
-    List<List<double>> _pointsToJson() {
+    List<List<double>> pointsToJson() {
       List<List<double>> pointsResult = [];
       for (var point in points) {
         pointsResult.add([point.x, point.y]);
@@ -56,7 +56,7 @@ class AGSMultipoint extends Geometry {
       return pointsResult;
     }
 
-    addIfPresent('points', _pointsToJson());
+    addIfPresent('points', pointsToJson());
     return json;
   }
 

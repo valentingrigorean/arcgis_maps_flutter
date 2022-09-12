@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 import 'package:arcgis_maps_flutter/src/symbology/marker_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polygon_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polyline_updates.dart';

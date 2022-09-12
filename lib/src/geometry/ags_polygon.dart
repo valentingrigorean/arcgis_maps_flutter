@@ -65,7 +65,7 @@ class AGSPolygon extends Geometry {
       json['hasM'] = hasM;
     }
 
-    Object _pointsToJson() {
+    Object pointsToJson() {
       final results = <List<Object>>[];
       for (final part in points) {
         final List<Object> pointsRaw = <Object>[];
@@ -77,7 +77,7 @@ class AGSPolygon extends Geometry {
       return results;
     }
 
-    addIfPresent('rings', _pointsToJson());
+    addIfPresent('rings', pointsToJson());
 
     return json;
   }

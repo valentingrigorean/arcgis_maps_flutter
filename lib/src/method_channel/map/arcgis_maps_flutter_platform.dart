@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:arcgis_maps_flutter/src/layers/layer_updates.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/map_event.dart';

@@ -1,7 +1,5 @@
 import 'dart:io';
-
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
-import 'package:arcgis_maps_flutter_example/utils/credentials.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -44,6 +42,7 @@ class _MapPageFeatureServiceOfflineState
   void dispose() {
     _disposeScope.dispose();
     _mapController.dispose();
+    _job?.dispose();
     super.dispose();
   }
 
