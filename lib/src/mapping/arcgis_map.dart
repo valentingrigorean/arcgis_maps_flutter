@@ -21,8 +21,6 @@ enum BasemapType {
   darkGrayCanvasVector
 }
 
-int _arcgisMapHandlerId = 0;
-
 class ArcGISMap {
   final BasemapTypeOptions? _basemapTypeOptions;
   final String? _baseMap;
@@ -30,7 +28,6 @@ class ArcGISMap {
   final PortalItem? _portalItem;
   final String? _offlinePath;
   final int _offlineMapIndex;
-  final int _id;
 
   bool _isDisposed = false;
 
@@ -46,8 +43,7 @@ class ArcGISMap {
         _baseLayer = baseLayer,
         _portalItem = portalItem,
         _offlinePath = offlinePath,
-        _offlineMapIndex = offlineMapIndex,
-        _id = _arcgisMapHandlerId++;
+        _offlineMapIndex = offlineMapIndex;
 
   factory ArcGISMap.fromPortalItem(PortalItem portalItem) =>
       ArcGISMap._(portalItem: portalItem);
@@ -176,12 +172,15 @@ class ArcGISMap {
           _basemapTypeOptions == other._basemapTypeOptions &&
           _baseMap == other._baseMap &&
           _baseLayer == other._baseLayer &&
-          _portalItem == other._portalItem;
-
+          _portalItem == other._portalItem &&
+          _offlinePath == other._offlinePath &&
+          _offlineMapIndex == other._offlineMapIndex;
   @override
   int get hashCode =>
       _basemapTypeOptions.hashCode ^
       _baseMap.hashCode ^
       _baseLayer.hashCode ^
-      _portalItem.hashCode;
+      _portalItem.hashCode ^
+      _offlinePath.hashCode ^
+      _offlineMapIndex.hashCode;
 }

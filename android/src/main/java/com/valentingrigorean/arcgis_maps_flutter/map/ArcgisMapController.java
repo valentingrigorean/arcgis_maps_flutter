@@ -2,8 +2,8 @@ package com.valentingrigorean.arcgis_maps_flutter.map;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Bitmap;
 import android.util.Log;
-import android.view.Choreographer;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -17,15 +17,12 @@ import androidx.lifecycle.LifecycleOwner;
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
 import com.esri.arcgisruntime.arcgisservices.TimeAware;
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
+import com.esri.arcgisruntime.geometry.Envelope;
 import com.esri.arcgisruntime.geometry.Geometry;
 import com.esri.arcgisruntime.geometry.GeometryEngine;
 import com.esri.arcgisruntime.geometry.Point;
-import com.esri.arcgisruntime.layers.ArcGISMapImageLayer;
 import com.esri.arcgisruntime.layers.Layer;
 import com.esri.arcgisruntime.loadable.LoadStatus;
-import com.esri.arcgisruntime.loadable.LoadStatusChangedEvent;
-import com.esri.arcgisruntime.loadable.LoadStatusChangedListener;
-import com.esri.arcgisruntime.location.LocationDataSource;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.LayerList;
 import com.esri.arcgisruntime.mapping.MobileMapPackage;
@@ -34,7 +31,6 @@ import com.esri.arcgisruntime.mapping.view.BackgroundGrid;
 import com.esri.arcgisruntime.mapping.view.DrawStatusChangedEvent;
 import com.esri.arcgisruntime.mapping.view.DrawStatusChangedListener;
 import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
-import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.mapping.view.TimeExtentChangedEvent;
 import com.esri.arcgisruntime.mapping.view.TimeExtentChangedListener;
@@ -64,8 +60,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
     private static final String TAG = "ArcgisMapController";
 
-
-    private final int id;
     private final Context context;
     private final LifecycleProvider lifecycleProvider;
     private final MethodChannel methodChannel;
@@ -89,12 +83,13 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
     private final LocationDisplayController locationDisplayController;
 
+    private final MapLoadedListener mapLoadedListener = new MapLoadedListener();
+
     @Nullable
     private MapView mapView;
     private MapViewOnTouchListener mapViewOnTouchListener;
 
     private FrameLayout mapContainer;
-    private Viewpoint viewpoint;
     private ScaleBarController scaleBarController;
     private InvalidateMapHelper invalidateMapHelper;
 
@@ -110,14 +105,15 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
     private boolean loadedCallbackPending = false;
 
+    private double minScale = 0;
+    private double maxScale = 0;
+
     ArcgisMapController(
             int id,
             Context context,
             Map<String, Object> params,
             BinaryMessenger binaryMessenger,
             LifecycleProvider lifecycleProvider) {
-
-        this.id = id;
 
         this.context = context;
         this.lifecycleProvider = lifecycleProvider;
@@ -144,7 +140,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         layersController = new LayersController(methodChannel);
         mapChangeAwares.add(layersController);
 
-        layersChangedController = new LayersChangedController(methodChannel, layersController);
+        layersChangedController = new LayersChangedController(methodChannel);
         mapChangeAwares.add(layersChangedController);
 
         final GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
@@ -270,6 +266,18 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 result.success(null);
             }
             break;
+            case "map#exportImage": {
+                ListenableFuture<Bitmap> future = mapView.exportImageAsync();
+                future.addDoneListener(() -> {
+                    try {
+                        Bitmap bitmap = future.get();
+                        result.success(Convert.bitmapToByteArray(bitmap));
+                    } catch (Exception e) {
+                        result.error("exportImage", e.getMessage(), null);
+                    }
+                });
+            }
+            break;
             case "map#getLegendInfos": {
                 final LegendInfoController legendInfoController = new LegendInfoController(context, layersController);
                 legendInfoControllers.add(legendInfoController);
@@ -277,6 +285,29 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                     result.success(results);
                     legendInfoControllers.remove(legendInfoController);
                 });
+            }
+            break;
+            case "map#getMapMaxExtend": {
+                if (mapView.getMap() != null) {
+                    mapView.getMap().addDoneLoadingListener(() -> {
+                        final Envelope maxExtend = mapView.getMap().getMaxExtent();
+                        if (maxExtend == null) {
+                            result.success(null);
+                        } else {
+                            result.success(Convert.geometryToJson(maxExtend));
+                        }
+                    });
+                } else {
+                    result.success(null);
+                }
+            }
+            break;
+            case "map#setMapMaxExtent": {
+                final Envelope maxExtend = (Envelope) Convert.toGeometry(call.arguments);
+                if (mapView.getMap() != null) {
+                    mapView.getMap().setMaxExtent(maxExtend);
+                }
+                result.success(null);
             }
             break;
             case "map#setMap": {
@@ -341,7 +372,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             }
             break;
             case "map#setViewpoint": {
-                viewpoint = Convert.toViewPoint(call.arguments);
+                Viewpoint viewpoint = Convert.toViewPoint(call.arguments);
                 mapView.setViewpointAsync(viewpoint).addDoneListener(() -> result.success(null));
             }
             break;
@@ -606,6 +637,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             mapView.dispose();
             mapView = null;
         }
+        mapLoadedListener.setMap(null);
     }
 
 
@@ -711,20 +743,10 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
     private void changeMap(ArcGISMap map) {
         final Viewpoint viewpoint = mapView.getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE);
+        mapLoadedListener.setMap(map);
+        map.loadAsync();
         mapView.setMap(map);
-        if (map != null) {
-            map.addDoneLoadingListener(() -> {
-                if (map.getLoadStatus() == LoadStatus.LOADED) {
-                    methodChannel.invokeMethod("map#loaded", null);
-                } else {
-                    Log.w(TAG, "changeMap: Failed to load map." + map.getLoadError().getMessage());
-                    if (map.getLoadError().getCause() != null) {
-                        Log.w(TAG, "changeMap: Failed to load map." + map.getLoadError().getCause().getMessage());
-                    }
-                    methodChannel.invokeMethod("map#loaded", Convert.arcGISRuntimeExceptionToJson(map.getLoadError()));
-                }
-            });
-        }
+        updateMapScale();
 
         for (final MapChangeAware mapChangeAware :
                 mapChangeAwares) {
@@ -782,6 +804,17 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         } else if (!this.haveScaleBar) {
             scaleBarController.removeScaleBar();
         }
+
+        final Object minScale = data.get("minScale");
+        if (minScale != null) {
+            this.minScale = Convert.toDouble(minScale);
+        }
+
+        final Object maxScale = data.get("maxScale");
+        if (maxScale != null) {
+            this.maxScale = Convert.toDouble(maxScale);
+        }
+        updateMapScale();
     }
 
 
@@ -818,5 +851,44 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         }
     }
 
+
+    private void updateMapScale() {
+        if (mapView != null && mapView.getMap() != null) {
+            mapView.getMap().setMinScale(minScale);
+            mapView.getMap().setMaxScale(maxScale);
+        }
+    }
+
+    private class MapLoadedListener implements Runnable {
+        private ArcGISMap map;
+
+        private MapLoadedListener() {
+
+        }
+
+        public void setMap(ArcGISMap map) {
+            if (this.map != null) {
+                this.map.removeDoneLoadingListener(this);
+            }
+            this.map = map;
+            if (map != null) {
+                map.addDoneLoadingListener(this);
+            }
+        }
+
+        @Override
+        public void run() {
+            map.removeDoneLoadingListener(this);
+            if (map.getLoadStatus() == LoadStatus.LOADED) {
+                methodChannel.invokeMethod("map#loaded", null);
+            } else {
+                Log.w(TAG, "changeMap: Failed to load map." + map.getLoadError().getMessage());
+                if (map.getLoadError().getCause() != null) {
+                    Log.w(TAG, "changeMap: Failed to load map." + map.getLoadError().getCause().getMessage());
+                }
+                methodChannel.invokeMethod("map#loaded", Convert.arcGISRuntimeExceptionToJson(map.getLoadError()));
+            }
+        }
+    }
 
 }

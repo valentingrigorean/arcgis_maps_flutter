@@ -76,6 +76,10 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
         'invalidatePlatformView() has not been implemented.');
   }
 
+  Future<Uint8List?> exportImage(int mapId) {
+    throw UnimplementedError('exportImage() has not been implemented.');
+  }
+
   Future<Location?> getLocation(int mapId) {
     throw UnimplementedError('getLocation() has not been implemented.');
   }
@@ -87,6 +91,14 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
   Future<List<LegendInfoResult>> getLegendInfos(int mapId, Layer layer) {
     throw UnimplementedError(
         'setMgetLegendInfosap() has not been implemented.');
+  }
+
+  Future<AGSEnvelope?> getMapMaxExtend(int mapId) {
+    throw UnimplementedError('getMapMaxExtend() has not been implemented.');
+  }
+
+  Future<void> setMapMaxExtent(int mapId, AGSEnvelope envelope) {
+    throw UnimplementedError('setMapMaxExtent() has not been implemented.');
   }
 
   Future<void> setMap(int mapId, ArcGISMap map) {
@@ -143,10 +155,8 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('setViewpoint() has not been implemented.');
   }
 
-  Future<bool> setViewpointGeometry(
-      int mapId, Geometry geometry, double? padding) {
-    throw UnimplementedError(
-        'setViewpointGeometry() has not been implemented.');
+  Future<bool> setViewpointGeometry(int mapId, Geometry geometry,double? padding) {
+    throw UnimplementedError('setViewpointGeometry() has not been implemented.');
   }
 
   Future<bool> setViewpointCenter(int mapId, AGSPoint center, double scale) {
@@ -163,7 +173,8 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
   }
 
   Future<bool> setViewpointScale(int mapId, double scale) {
-    throw UnimplementedError('setViewpointScale() has not been implemented.');
+    throw UnimplementedError(
+        'setViewpointScale() has not been implemented.');
   }
 
   Future<Offset?> locationToScreen(int mapId, AGSPoint mapPoint) {
@@ -281,4 +292,5 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
   void dispose(int mapId) {
     throw UnimplementedError('dispose() has not been implemented.');
   }
+
 }

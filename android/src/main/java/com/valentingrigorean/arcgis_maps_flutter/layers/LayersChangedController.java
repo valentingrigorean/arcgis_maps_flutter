@@ -23,10 +23,10 @@ public class LayersChangedController implements MapChangeAware, ArcGISMap.Basema
     private boolean trackLayersChange = false;
 
 
-    public LayersChangedController(MethodChannel channel, LayersController layersController) {
-        operationalLayersChanged = new LayerChangeListener(channel, layersController, LayersController.LayerType.OPERATIONAL);
-        baseLayersChanged = new LayerChangeListener(channel, layersController, LayersController.LayerType.BASE);
-        referenceLayerChanged = new LayerChangeListener(channel, layersController, LayersController.LayerType.REFERENCE);
+    public LayersChangedController(MethodChannel channel) {
+        operationalLayersChanged = new LayerChangeListener(channel, LayersController.LayerType.OPERATIONAL);
+        baseLayersChanged = new LayerChangeListener(channel, LayersController.LayerType.BASE);
+        referenceLayerChanged = new LayerChangeListener(channel, LayersController.LayerType.REFERENCE);
     }
 
     public void setTrackLayersChange(boolean val) {
@@ -106,12 +106,10 @@ public class LayersChangedController implements MapChangeAware, ArcGISMap.Basema
     private class LayerChangeListener implements ListChangedListener<Layer> {
 
         private final MethodChannel channel;
-        private final LayersController layersController;
         private final LayersController.LayerType layerType;
 
-        private LayerChangeListener(MethodChannel channel, LayersController layersController, LayersController.LayerType layerType) {
+        private LayerChangeListener(MethodChannel channel,LayersController.LayerType layerType) {
             this.channel = channel;
-            this.layersController = layersController;
             this.layerType = layerType;
         }
 

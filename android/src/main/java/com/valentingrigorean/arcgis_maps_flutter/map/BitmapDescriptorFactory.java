@@ -27,12 +27,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static com.valentingrigorean.arcgis_maps_flutter.Convert.toBitmap;
 
 public class BitmapDescriptorFactory {
+    private static ConcurrentHashMap<BitmapDescriptorOptions, ListenableFuture<PictureMarkerSymbol>> _bitmapDescriptorFutures = new ConcurrentHashMap<>();
+
     private static LruCacheEx _cache;
 
     private BitmapDescriptorFactory() {
@@ -131,11 +134,17 @@ public class BitmapDescriptorFactory {
                 return;
             }
 
-            final Bitmap bitmap = bitmapDescriptorOptions.createBitmap(context);
-            final ListenableFuture<PictureMarkerSymbol> future = PictureMarkerSymbol.createAsync(new BitmapDrawable(context.getResources(), bitmap));
+            if (!_bitmapDescriptorFutures.containsKey(bitmapDescriptorOptions)) {
+                final Bitmap bitmap = bitmapDescriptorOptions.createBitmap(context);
+                _bitmapDescriptorFutures.put(bitmapDescriptorOptions, PictureMarkerSymbol.createAsync(new BitmapDrawable(context.getResources(), bitmap)));
+            }
+
+
+            final ListenableFuture<PictureMarkerSymbol> future = _bitmapDescriptorFutures.get(bitmapDescriptorOptions);
             future.addDoneListener(() -> {
                 try {
                     final PictureMarkerSymbol symbol = future.get();
+                    final Bitmap bitmap = symbol.getImage().getBitmap();
                     if (bitmapDescriptorOptions.getWidth() != null) {
                         symbol.setWidth(bitmapDescriptorOptions.getWidth());
                     }
@@ -145,11 +154,13 @@ public class BitmapDescriptorFactory {
                     final CorePictureMarkerSymbol corePictureMarkerSymbol = (CorePictureMarkerSymbol) symbol.getInternal();
                     final CorePictureMarkerSymbolInfo info = new CorePictureMarkerSymbolInfo(bitmap.getByteCount(), corePictureMarkerSymbol.w(), bitmapDescriptorOptions);
                     _cache.put(bitmapDescriptorOptions, info);
-                    Log.d(TAG, "createSymbolAsync: Insert bitmap to cache for " + bitmapDescriptorOptions.toString() + ".");
+                    Log.d(TAG, "createSymbolAsync: Insert bitmap to cache for " + bitmapDescriptorOptions + ".");
                     loader.onLoaded(symbol);
                 } catch (Exception e) {
                     e.printStackTrace();
                     loader.onFailed();
+                } finally {
+                    _bitmapDescriptorFutures.remove(bitmapDescriptorOptions);
                 }
             });
         }

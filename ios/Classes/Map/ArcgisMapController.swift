@@ -47,6 +47,22 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private var timeExtentObservation: NSKeyValueObservation?
 
+    private var minScale = 0.0 {
+        didSet {
+            if let map = mapView.map {
+                map.minScale = minScale
+            }
+        }
+    }
+
+    private var maxScale = 0.0 {
+        didSet {
+            if let map = mapView.map {
+                map.maxScale = maxScale
+            }
+        }
+    }
+
     private let measureController: ArcGisMapMeasureController
 
     public init(
@@ -116,6 +132,23 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         case "map#waitForMap":
             result(nil)
             break
+        case "map#update":
+            if let data = call.arguments as? Dictionary<String, Any> {
+                if let mapOptions = data["options"] as? Dictionary<String, Any> {
+                    updateMapOptions(mapOptions: mapOptions)
+                }
+            }
+            result(nil)
+            break
+        case "map#exportImage":
+            mapView.exportImage { image, error in
+                if let error = error {
+                    result(FlutterError(code: "exportImage_error", message: error.localizedDescription, details: nil))
+                } else {
+                    result(image?.toJSONFlutter())
+                }
+            }
+            break
         case "map#getLocation":
             let location = mapView.locationDisplay.location
             if location == nil {
@@ -131,13 +164,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             } else {
                 result(mapLocation!.toJSONFlutter())
             }
-        case "map#update":
-            if let data = call.arguments as? Dictionary<String, Any> {
-                if let mapOptions = data["options"] as? Dictionary<String, Any> {
-                    updateMapOptions(mapOptions: mapOptions)
-                }
-            }
-            result(nil)
             break
         case "map#getLegendInfos":
             let legendInfoController = LegendInfoController(layersController: layersController)
@@ -152,9 +178,28 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             })
             legendInfoControllers.append(legendInfoController)
             break
+        case "map#getMapMaxExtend":
+            if let map = mapView.map {
+                map.load { error in
+                    if error == nil {
+                        result(map.maxExtent?.toJSONFlutter())
+                    } else {
+                        result(nil)
+                    }
+                }
+            } else {
+                result(nil)
+            }
+            break
+        case "map#setMapMaxExtent":
+            if let extent = call.arguments as? Dictionary<String, Any> {
+                let maxExtent = AGSEnvelope(data: extent)
+                mapView.map?.maxExtent = maxExtent
+            }
+            result(nil)
+            break
         case "map#setMap":
             changeMapType(args: call.arguments)
-
             result(nil)
             break
         case "map#setViewpointChangedListenerEvents":
@@ -407,20 +452,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         }
     }
 
-
-//    case "map#sendMeasureDistanceAction": {
-//    final Map<?, ?> data = call.arguments();
-//        measureController.onDistanceMeasure((String) data.get("action"),result);
-//break;
-//}
-//case "map#sendMeasureAreaAction": {
-//    final Map<?, ?> data = call.arguments();
-//    measureController.onAreaMeasure((String) data.get("action"),result);
-//    break;
-//}
-
     private func handleTimeAwareLayerInfos(result: @escaping FlutterResult) {
-        guard  let layers = mapView.map?.operationalLayers as AnyObject as? [AGSLayer], layers.count > 0 else {
+        guard let layers = mapView.map?.operationalLayers as AnyObject as? [AGSLayer], layers.count > 0 else {
             result([])
             return
         }
@@ -481,7 +514,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     private func changeMapType(args: Any?) {
-        guard  let dict = args as? Dictionary<String, Any> else {
+        guard let dict = args as? Dictionary<String, Any> else {
             return
         }
 
@@ -512,6 +545,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
             if mobileMapPackage.maps.isEmpty {
                 print("No maps in the package")
+                self.channel.invokeMethod("map#loaded", arguments: error?.toJSON())
                 return
             }
 
@@ -529,6 +563,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
             channel.invokeMethod("map#loaded", arguments: error?.toJSON())
         }
+        map.minScale = minScale
+        map.maxScale = maxScale
         mapView.map = map
         layersController.setMap(map)
 
@@ -583,6 +619,14 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         if let trackUserLocationTap = mapOptions["trackUserLocationTap"] as? Bool {
             locationDisplayController.trackUserLocationTap = trackUserLocationTap
         }
+
+        if let minScale = mapOptions["minScale"] as? Double {
+            self.minScale = minScale
+        }
+
+        if let maxScale = mapOptions["maxScale"] as? Double {
+            self.maxScale = maxScale
+        }
     }
 
     private func updateInteractionOptions(interactionOptions: Dictionary<String, Any>) {
@@ -623,7 +667,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     private func initWithArgs(args: Any?) {
-        guard  let dict = args as? Dictionary<String, Any> else {
+        guard let dict = args as? Dictionary<String, Any> else {
             return
         }
         if let mapType = dict["map"] {

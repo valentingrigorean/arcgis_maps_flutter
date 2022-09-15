@@ -1,5 +1,3 @@
-import 'dart:ui' show hashValues, hashList;
-
 import 'package:arcgis_maps_flutter/src/maps_object.dart';
 import 'package:arcgis_maps_flutter/src/utils/maps_object.dart';
 import 'package:flutter/foundation.dart';
@@ -26,7 +24,7 @@ class MapsObjectUpdates<T extends MapsObject> {
     ///
     /// It is a programming error to call this with an ID that is not guaranteed
     /// to be in [currentObjects].
-    T _idToCurrentObject(MapsObjectId<T> id) {
+    T idToCurrentObject(MapsObjectId<T> id) {
       return currentObjects[id]!;
     }
 
@@ -34,7 +32,7 @@ class MapsObjectUpdates<T extends MapsObject> {
 
     _objectsToAdd = currentObjectIds
         .difference(previousObjectIds)
-        .map(_idToCurrentObject)
+        .map(idToCurrentObject)
         .toSet();
 
     // Returns `true` if [current] is not equals to previous one with the
@@ -46,7 +44,7 @@ class MapsObjectUpdates<T extends MapsObject> {
 
     _objectsToChange = currentObjectIds
         .intersection(previousObjectIds)
-        .map(_idToCurrentObject)
+        .map(idToCurrentObject)
         .where(hasChanged)
         .toSet();
   }
@@ -115,8 +113,8 @@ class MapsObjectUpdates<T extends MapsObject> {
   }
 
   @override
-  int get hashCode => hashValues(hashList(_objectsToAdd),
-      hashList(_objectIdsToRemove), hashList(_objectsToChange));
+  int get hashCode => Object.hash(Object.hashAll(_objectsToAdd),
+      Object.hashAll(_objectIdsToRemove), Object.hashAll(_objectsToChange));
 
   @override
   String toString() {

@@ -8,16 +8,20 @@ class LevelOfDetail {
     required this.scale,
   });
 
+  factory LevelOfDetail.fromJson(Map<dynamic, dynamic> json) {
+    return LevelOfDetail(
+      level: json['level'] as int,
+      resolution: json['resolution'] as double,
+      scale: json['scale'] as double,
+    );
+  }
+
   final int level;
   final double resolution;
   final double scale;
 
   Object toJson() {
-    return [
-      level,
-      resolution,
-      scale
-    ];
+    return [level, resolution, scale];
   }
 
   @override

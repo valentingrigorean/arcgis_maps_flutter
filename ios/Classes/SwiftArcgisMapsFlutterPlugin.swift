@@ -9,10 +9,10 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
     private let geometryController: GeometryEngineController
     private let locatorTaskController: LocatorTaskController
     private let routeTaskController: RouteTaskController
-    private let offlineMapTaskController: OfflineMapTaskController
     private let coordinateFormatterController: CoordinateFormatterController
     private let serviceTableController: ArcGisServiceTableController
     private let authenticationManager: ArcGisAuthenticationManager
+    private let arcgisNativeObjectsController: ArcgisNativeObjectsController
 
     init(with registrar: FlutterPluginRegistrar) {
         channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel", binaryMessenger: registrar.messenger())
@@ -23,6 +23,7 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
         offlineMapTaskController = OfflineMapTaskController(messenger: registrar.messenger())
         serviceTableController = ArcGisServiceTableController(messenger: registrar.messenger())
         authenticationManager = ArcGisAuthenticationManager(messenger: registrar.messenger())
+        arcgisNativeObjectsController = ArcgisNativeObjectsController(messenger: registrar.messenger(), factory: ArcgisNativeObjectFactoryImpl())
 
         super.init()
         authenticationManager.setMethodCallHandler()
@@ -65,5 +66,9 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
             result(FlutterMethodNotImplemented)
             break
         }
+    }
+
+    public func detachFromEngine(for registrar: FlutterPluginRegistrar) {
+        NativeObjectStorage.shared.clearAll()
     }
 }

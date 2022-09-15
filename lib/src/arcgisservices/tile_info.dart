@@ -1,17 +1,29 @@
 part of arcgis_maps_flutter;
 
 enum ImageFormat {
-  defaultFormat,
-  png,
-  png8,
-  png24,
-  png32,
-  jpg,
-  jpgPng,
-  bmp,
-  gif,
-  tiff,
-  unknown,
+  png(0),
+  png8(1),
+  png24(2),
+  png32(3),
+  jpg(4),
+
+  /// Mixed (JPEG in the center of the cache and PNG 32 on the edge of the cache).
+  mixed(5),
+
+  /// Limited Error Raster Compression.
+  lerc(6),
+  unknown(-1);
+
+  const ImageFormat(this.value);
+
+  factory ImageFormat.fromValue(int value) {
+    return ImageFormat.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => ImageFormat.unknown,
+    );
+  }
+
+  final int value;
 }
 
 @immutable
@@ -26,9 +38,25 @@ class TileInfo {
     required this.tileWidth,
   });
 
+  factory TileInfo.fromJson(Map<dynamic, dynamic> json) {
+    return TileInfo(
+      dpi: json['dpi'] as int,
+      imageFormat: ImageFormat.fromValue(json['imageFormat'] as int),
+      levelOfDetails: (json['levelOfDetails'] as List<dynamic>)
+          .map((e) => LevelOfDetail.fromJson(e))
+          .toList(),
+      origin: AGSPoint.fromJson(json['origin'])!,
+      spatialReference: SpatialReference.fromJson(json['spatialReference'])!,
+      tileHeight: json['tileHeight'] as int,
+      tileWidth: json['tileWidth'] as int,
+    );
+  }
+
   /// The Dots-Per-Inch (DPI) resolution of tiled images.
   final int dpi;
+
   final ImageFormat imageFormat;
+
   final List<LevelOfDetail> levelOfDetails;
 
   /// The tiling scheme origin which specifies the starting location of Row 0 and Column 0.
@@ -44,9 +72,8 @@ class TileInfo {
 
   Object toJson() {
     final Map<String, Object> json = <String, Object>{};
-
     json['dpi'] = dpi;
-    json['imageFormat'] = imageFormat.index;
+    json['imageFormat'] = imageFormat.value;
     json['levelOfDetails'] = _levelOfDetailsToJson();
     json['origin'] = origin.toJson();
     json['spatialReference'] = spatialReference.toJson();

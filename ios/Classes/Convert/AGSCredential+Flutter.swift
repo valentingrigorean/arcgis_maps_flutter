@@ -27,4 +27,14 @@ extension AGSCredential {
         }
 
     }
+
+    func toJSONFlutter() -> Any {
+        [
+            "type": "UserCredential",
+            "username": username,
+            "password": password,
+            "referer": referer,
+            "token": token
+        ]
+    }
 }

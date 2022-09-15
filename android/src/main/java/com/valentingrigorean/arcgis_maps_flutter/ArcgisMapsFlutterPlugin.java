@@ -9,6 +9,8 @@ import androidx.lifecycle.Lifecycle;
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
 import com.esri.arcgisruntime.LicenseResult;
 import com.valentingrigorean.arcgis_maps_flutter.authentication.AuthenticationManagerController;
+import com.valentingrigorean.arcgis_maps_flutter.flutterobject.ArcgisNativeObjectFactoryImpl;
+import com.valentingrigorean.arcgis_maps_flutter.flutterobject.ArcgisNativeObjectsController;
 import com.valentingrigorean.arcgis_maps_flutter.geometry.CoordinateFormatterController;
 import com.valentingrigorean.arcgis_maps_flutter.geometry.GeometryEngineController;
 import com.valentingrigorean.arcgis_maps_flutter.map.ArcgisMapFactory;
@@ -16,7 +18,6 @@ import com.valentingrigorean.arcgis_maps_flutter.scene.ArcgisSceneViewFactory;
 import com.valentingrigorean.arcgis_maps_flutter.service_table.ServiceTableController;
 import com.valentingrigorean.arcgis_maps_flutter.tasks.geocode.LocatorTaskController;
 import com.valentingrigorean.arcgis_maps_flutter.tasks.networkanalysis.RouteTaskController;
-import com.valentingrigorean.arcgis_maps_flutter.tasks.offlinemap.OfflineMapTaskController;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -40,6 +41,7 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
     private AuthenticationManagerController authenticationManagerController;
     private LocatorTaskController locatorTaskController;
     private RouteTaskController routeTaskController;
+    private ArcgisNativeObjectsController nativeObjectsController;
     private ServiceTableController serviceTableController;
     private OfflineMapTaskController offlineMapTaskController;
     private MethodChannel channel;
@@ -72,6 +74,7 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
         offlineMapTaskController = new OfflineMapTaskController(binding.getBinaryMessenger());
 
         serviceTableController = new ServiceTableController(binding.getBinaryMessenger());
+        nativeObjectsController = new ArcgisNativeObjectsController(binding.getBinaryMessenger(), new ArcgisNativeObjectFactoryImpl());
     }
 
     @Override
@@ -97,6 +100,9 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
 
         serviceTableController.dispose();
         serviceTableController = null;
+
+        nativeObjectsController.dispose();
+        nativeObjectsController = null;
     }
 
     @Override

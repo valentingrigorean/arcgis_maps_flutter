@@ -2,14 +2,22 @@ package com.valentingrigorean.arcgis_maps_flutter.tasks.offlinemap;
 
 import com.esri.arcgisruntime.geometry.Geometry;
 import com.esri.arcgisruntime.tasks.geodatabase.GenerateGeodatabaseParameters;
+import com.esri.arcgisruntime.tasks.geodatabase.GeodatabaseDeltaInfo;
 import com.esri.arcgisruntime.tasks.offlinemap.GenerateOfflineMapParameters;
 import com.esri.arcgisruntime.tasks.offlinemap.GenerateOfflineMapUpdateMode;
 import com.esri.arcgisruntime.tasks.offlinemap.OfflineMapItemInfo;
+import com.esri.arcgisruntime.tasks.offlinemap.OfflineMapSyncParameters;
+import com.esri.arcgisruntime.tasks.offlinemap.OfflineMapSyncResult;
+import com.esri.arcgisruntime.tasks.offlinemap.OfflineMapUpdateCapabilities;
+import com.esri.arcgisruntime.tasks.offlinemap.OfflineMapUpdatesInfo;
+import com.esri.arcgisruntime.tasks.offlinemap.OfflineUpdateAvailability;
+import com.esri.arcgisruntime.tasks.offlinemap.PreplannedScheduledUpdatesOption;
 import com.esri.arcgisruntime.tasks.vectortilecache.EsriVectorTilesDownloadOption;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class ConvertOfflineMap extends Convert {
     public static Object generateOfflineMapParametersToJson(GenerateOfflineMapParameters parameters) {
@@ -64,6 +72,49 @@ public class ConvertOfflineMap extends Convert {
         }
         parameters.setReferenceBasemapFilename((String) data.get("referenceBasemapFilename"));
         return parameters;
+    }
+
+    public static Object offlineMapUpdateCapabilitiesToJson(OfflineMapUpdateCapabilities capabilities) {
+        final HashMap<String, Object> data = new HashMap<>(2);
+        data.put("supportsScheduledUpdatesForFeatures", capabilities.isSupportsScheduledUpdatesForFeatures());
+        data.put("supportsSyncWithFeatureServices", capabilities.isSupportsSyncWithFeatureServices());
+        return data;
+    }
+
+    public static Object offlineMapUpdatesInfoToJson(OfflineMapUpdatesInfo offlineMapUpdatesInfo) {
+        final HashMap<String, Object> data = new HashMap<>(4);
+        data.put("downloadAvailability", offlineUpdateAvailabilityToJson(offlineMapUpdatesInfo.getDownloadAvailability()));
+        data.put("isMobileMapPackageReopenRequired", offlineMapUpdatesInfo.isMobileMapPackageReopenRequired());
+        data.put("scheduledUpdatesDownloadSize", offlineMapUpdatesInfo.getScheduledUpdatesDownloadSize());
+        data.put("uploadAvailability", offlineUpdateAvailabilityToJson(offlineMapUpdatesInfo.getUploadAvailability()));
+        return data;
+    }
+
+    public static Object offlineMapSyncParametersToJson(OfflineMapSyncParameters offlineMapSyncParameters) {
+        final HashMap<String, Object> data = new HashMap<>(4);
+        data.put("keepGeodatabaseDeltas", offlineMapSyncParameters.isKeepGeodatabaseDeltas());
+        data.put("preplannedScheduledUpdatesOption", offlineMapSyncParameters.getPreplannedScheduledUpdatesOption().ordinal());
+        data.put("rollbackOnFailure", offlineMapSyncParameters.isRollbackOnFailure());
+        data.put("syncDirection", syncDirectionToJson(offlineMapSyncParameters.getSyncDirection()));
+        return data;
+    }
+
+    public static OfflineMapSyncParameters toOfflineMapSyncParameters(Object json) {
+        final Map<?, ?> data = toMap(json);
+        final OfflineMapSyncParameters parameters = new OfflineMapSyncParameters();
+        parameters.setKeepGeodatabaseDeltas(toBoolean(data.get("keepGeodatabaseDeltas")));
+        parameters.setPreplannedScheduledUpdatesOption(PreplannedScheduledUpdatesOption.values()[toInt(data.get("preplannedScheduledUpdatesOption"))]);
+        parameters.setRollbackOnFailure(toBoolean(data.get("rollbackOnFailure")));
+        parameters.setSyncDirection(toSyncDirection(toInt(data.get("syncDirection"))));
+        return parameters;
+    }
+
+
+    public static Object offlineMapSyncResultToJson(OfflineMapSyncResult result) {
+        final HashMap<String, Object> data = new HashMap<>(2);
+        data.put("hasErrors", result.hasErrors());
+        data.put("isMobileMapPackageReopenRequired", result.isMobileMapPackageReopenRequired());
+        return data;
     }
 
     private static Object offlineMapItemInfoToJson(OfflineMapItemInfo itemInfo) {
@@ -144,6 +195,17 @@ public class ConvertOfflineMap extends Convert {
                 return 2;
             default:
                 return 0;
+        }
+    }
+
+    private static int offlineUpdateAvailabilityToJson(OfflineUpdateAvailability availability) {
+        switch (availability) {
+            case AVAILABLE:
+                return 0;
+            case NONE:
+                return 1;
+            default:
+                return -1;
         }
     }
 

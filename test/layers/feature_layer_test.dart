@@ -5,7 +5,7 @@ void main() {
   test('Clone with url', () {
     final featureLayer = FeatureLayer.fromUrl(
       'url',
-      credential: Credential.creteUserCredential(
+      credential: const UserCredential.createUserCredential(
         username: 'username',
         password: 'password',
       ),
@@ -30,7 +30,7 @@ void main() {
       portalItem: PortalItem(
         portal: Portal.arcGISOnline(
           withLoginRequired: false,
-          credential: Credential.creteUserCredential(
+          credential: const UserCredential.createUserCredential(
             username: 'username',
             password: 'password',
           ),

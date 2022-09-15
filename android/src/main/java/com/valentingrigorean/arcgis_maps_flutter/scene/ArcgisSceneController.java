@@ -23,8 +23,7 @@ import io.flutter.plugin.platform.PlatformView;
 
 public class ArcgisSceneController implements DefaultLifecycleObserver, PlatformView, MethodChannel.MethodCallHandler {
 
-    private final int id;
-    private final Context context;
+
     private final LifecycleProvider lifecycleProvider;
     private final MethodChannel methodChannel;
 
@@ -38,8 +37,7 @@ public class ArcgisSceneController implements DefaultLifecycleObserver, Platform
     private Camera camera;
 
     public ArcgisSceneController(int id, Context context, Map<String, Object> params, BinaryMessenger binaryMessenger, LifecycleProvider lifecycleProvider) {
-        this.id = id;
-        this.context = context;
+
         this.lifecycleProvider = lifecycleProvider;
         methodChannel = new MethodChannel(binaryMessenger, "plugins.flutter.io/arcgis_scene_" + id);
         methodChannel.setMethodCallHandler(this);

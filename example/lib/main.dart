@@ -7,6 +7,8 @@ import 'package:arcgis_maps_flutter_example/map_page_auto_pan_mode.dart';
 import 'package:arcgis_maps_flutter_example/map_page_buffer.dart';
 import 'package:arcgis_maps_flutter_example/map_page_current_location_tap.dart';
 import 'package:arcgis_maps_flutter_example/map_page_dynamic_layer.dart';
+import 'package:arcgis_maps_flutter_example/map_page_export_image.dart';
+import 'package:arcgis_maps_flutter_example/map_page_feature_service_offline.dart';
 import 'package:arcgis_maps_flutter_example/map_page_geodesic_distance.dart';
 import 'package:arcgis_maps_flutter_example/map_page_geometry_engine.dart';
 import 'package:arcgis_maps_flutter_example/map_page_gesture.dart';
@@ -18,6 +20,7 @@ import 'package:arcgis_maps_flutter_example/map_page_marker_from_widget.dart';
 import 'package:arcgis_maps_flutter_example/map_page_marker_rotation.dart';
 import 'package:arcgis_maps_flutter_example/map_page_markers.dart';
 import 'package:arcgis_maps_flutter_example/map_page_markers_visibility_filter.dart';
+import 'package:arcgis_maps_flutter_example/map_page_max_extent.dart';
 import 'package:arcgis_maps_flutter_example/map_page_offline_map.dart';
 import 'package:arcgis_maps_flutter_example/map_page_polygon.dart';
 import 'package:arcgis_maps_flutter_example/map_page_portal.dart';
@@ -25,6 +28,7 @@ import 'package:arcgis_maps_flutter_example/map_page_route.dart';
 import 'package:arcgis_maps_flutter_example/map_page_scalerbar.dart';
 import 'package:arcgis_maps_flutter_example/map_page_screen_location.dart';
 import 'package:arcgis_maps_flutter_example/map_page_scrolling_list.dart';
+import 'package:arcgis_maps_flutter_example/map_page_tile_cache.dart';
 import 'package:arcgis_maps_flutter_example/map_page_time_slider.dart';
 import 'package:arcgis_maps_flutter_example/map_page_view_insests.dart';
 import 'package:arcgis_maps_flutter_example/scene_page.dart';
@@ -93,6 +97,13 @@ class MainPage extends StatelessWidget {
                 },
               ),
               ElevatedButton(
+                child: const Text('Map 2d Screenshot'),
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const MapPageExportImage()));
+                },
+              ),
+              ElevatedButton(
                 child: const Text('Map ScaleBar'),
                 onPressed: () {
                   Navigator.push(
@@ -115,15 +126,38 @@ class MainPage extends StatelessWidget {
                 },
               ),
               ElevatedButton(
-                child: const Text('Offline map'),
+                child: const Text('Offline map & Sync'),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const MapPageofflineMap(),
+                      builder: (context) => const MapPageOfflineMap(),
                     ),
                   );
                 },
+              ),
+              ElevatedButton(
+                child: const Text('Offline tile cache map'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MapPageTileCache(),
+                    ),
+                  );
+                },
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          const MapPageFeatureServiceOffline(),
+                    ),
+                  );
+                },
+                child: const Text('Feature service offline & sync'),
               ),
               ElevatedButton(
                 child: const Text('Marker generatered from widget'),
@@ -132,6 +166,17 @@ class MainPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const MapPageMarkerFromWidget(),
+                    ),
+                  );
+                },
+              ),
+              ElevatedButton(
+                child: const Text('Map Max Extent'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MapPageMaxExtent(),
                     ),
                   );
                 },

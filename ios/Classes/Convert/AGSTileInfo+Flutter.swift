@@ -20,4 +20,16 @@ extension AGSTileInfo {
 
         self.init(dpi: dpi, format: AGSTileImageFormat(rawValue: imageFormat) ?? .unknown, levelsOfDetail: levelOfDetails, origin: origin, spatialReference: spatialReference, tileHeight: tileHeight, tileWidth: tileWidth)
     }
+
+    func toJSONFlutter() -> Dictionary<String, Any> {
+        [
+            "dpi": dpi,
+            "imageFormat": format.rawValue,
+            "levelOfDetails": levelsOfDetail.map { $0.toJSONFlutter() },
+            "origin": origin.toJSONFlutter(),
+            "spatialReference": spatialReference.toJSONFlutter(),
+            "tileHeight": tileHeight,
+            "tileWidth": tileWidth
+        ]
+    }
 }
