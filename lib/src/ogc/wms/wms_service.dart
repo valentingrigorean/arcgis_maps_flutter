@@ -155,12 +155,6 @@ class WmsService {
         return ImageFormat.png32;
       case 'image/jpeg':
         return ImageFormat.jpg;
-      case 'image/bmp':
-        return ImageFormat.bmp;
-      case 'image/gif':
-        return ImageFormat.gif;
-      case 'image/tiff':
-        return ImageFormat.tiff;
       default:
         return ImageFormat.unknown;
     }

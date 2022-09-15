@@ -1,6 +1,6 @@
 part of arcgis_maps_flutter;
 
-enum AttachmentSyncDirection {
+enum OfflineMapAttachmentSyncDirection {
   /// There is no specified attachment sync direction.
   none(0),
 
@@ -10,12 +10,12 @@ enum AttachmentSyncDirection {
   /// The attachment changes are both uploaded and downloaded.
   upload(2);
 
-  const AttachmentSyncDirection(this.value);
+  const OfflineMapAttachmentSyncDirection(this.value);
 
-  factory AttachmentSyncDirection.fromValue(int value) {
-    return AttachmentSyncDirection.values.firstWhere(
-      (e) => e.value == value,
-      orElse: () => AttachmentSyncDirection.none,
+  factory OfflineMapAttachmentSyncDirection.fromValue(int value) {
+    return OfflineMapAttachmentSyncDirection.values.firstWhere(
+          (e) => e.value == value,
+      orElse: () => OfflineMapAttachmentSyncDirection.none,
     );
   }
 
@@ -33,7 +33,7 @@ enum SyncDirection {
   upload(2),
 
   /// Both download and upload changes.
-  birectional(3);
+  bidirectional(3);
 
   const SyncDirection(this.value);
 
@@ -47,32 +47,6 @@ enum SyncDirection {
   final int value;
 }
 
-enum SyncModel {
-  /// The geodatabase is not sync enabled.
-  none(0),
-
-  /// Layers within a geodatabase cannot be synchronized independently,
-  /// the whole geodatabase must be synced. The sync operation and
-  /// sync direction applies to all the layers in the geodatabase.
-  geodatabase(1),
-
-  /// Layers within a geodatabase can be synchronized independently of one
-  /// another. Any subset of the layers can be synchronized when running
-  /// the sync operation. Also, each layer's sync direction can
-  /// be set independently.
-  layer(2);
-
-  const SyncModel(this.value);
-
-  factory SyncModel.fromValue(int value) {
-    return SyncModel.values.firstWhere(
-      (e) => e.value == value,
-      orElse: () => SyncModel.none,
-    );
-  }
-
-  final int value;
-}
 
 enum OnlineOnlyServicesOption {
   /// Online layers and tables that cannot be taken offline will
@@ -199,7 +173,7 @@ class GenerateOfflineMapParameters {
     this.maxScale = 0,
     this.onlineOnlyServicesOption = OnlineOnlyServicesOption.exclude,
     this.itemInfo,
-    this.attachmentSyncDirection = AttachmentSyncDirection.birectional,
+    this.attachmentSyncDirection = OfflineMapAttachmentSyncDirection.birectional,
     this.continueOnErrors = true,
     this.includeBasemap = true,
     this.isDefinitionExpressionFilterEnabled = true,
@@ -224,7 +198,7 @@ class GenerateOfflineMapParameters {
           ? OfflineMapItemInfo.fromJson(
               json['itemInfo'] as Map<dynamic, dynamic>)
           : null,
-      attachmentSyncDirection: AttachmentSyncDirection.fromValue(
+      attachmentSyncDirection: OfflineMapAttachmentSyncDirection.fromValue(
           (json['attachmentSyncDirection'] as num).toInt()),
       continueOnErrors: json['continueOnErrors'] as bool,
       includeBasemap: json['includeBasemap'] as bool,
@@ -295,7 +269,7 @@ class GenerateOfflineMapParameters {
   /// |                              | Bidirectional                     | Layers *without* attachments will treat this as attachmentSyncDirection = None        |
   /// If [GenerateOfflineMapParameters] is used in conjunction with  [GenerateOfflineMapParameterOverrides]
   /// this property is superseded.
-  final AttachmentSyncDirection attachmentSyncDirection;
+  final OfflineMapAttachmentSyncDirection attachmentSyncDirection;
 
   /// Indicates whether or not the job should continue running in the event of
   /// a failure to take a layer offline.

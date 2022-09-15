@@ -3,44 +3,42 @@ import 'dart:io';
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:path_provider/path_provider.dart';
 
-class MapPageofflineMap extends StatefulWidget {
-  const MapPageofflineMap({Key? key}) : super(key: key);
+class MapPageOfflineMap extends StatefulWidget {
+  const MapPageOfflineMap({Key? key}) : super(key: key);
 
   @override
-  State<MapPageofflineMap> createState() => _MapPageofflineMapState();
+  State<MapPageOfflineMap> createState() => _MapPageOfflineMapState();
 }
 
-class _MapPageofflineMapState extends State<MapPageofflineMap> {
+class _MapPageOfflineMapState extends State<MapPageOfflineMap> {
   // final _map = ArcgisMapsUtils.createMap(
   //   ArcgisMapsUtils.defaultMap,
   //   Brightness.light,
   // );
 
-  final _map = ArcGISMap.fromPortalItem(
-    PortalItem(
-      portal: Portal(
-        postalUrl: 'https://snla.maps.arcgis.com/',
-        loginRequired: false,
-        credential: Credential.creteUserCredential(
-          username: dotenv.env['snla_maps_arcgis_username'] ?? '',
-          password: dotenv.env['snla_maps_arcgis_password'] ?? '',
-        ),
-      ),
-      itemId: '81a73308a0a449a4b8549a0c294fc544',
-    ),
-  );
-
   // final _map = ArcGISMap.fromPortalItem(
   //   PortalItem(
-  //     portal: Portal.arcGISOnline(
-  //       withLoginRequired: false,
+  //     portal: Portal(
+  //       postalUrl: 'https://snla.maps.arcgis.com/',
+  //       loginRequired: false,
+  //       credential: snlaCredentials,
   //     ),
-  //     itemId: 'acc027394bc84c2fb04d1ed317aac674',
+  //     itemId: '81a73308a0a449a4b8549a0c294fc544',
   //   ),
   // );
+
+  final DisposeScope _disposeScope = DisposeScope();
+
+  final _map = ArcGISMap.fromPortalItem(
+    PortalItem(
+      portal: Portal.arcGISOnline(
+        withLoginRequired: false,
+      ),
+      itemId: 'acc027394bc84c2fb04d1ed317aac674',
+    ),
+  );
 
   ArcGISMap? _offlineMap;
 
@@ -49,7 +47,7 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
   late final ArcgisMapController _mapController;
 
   late final OfflineMapTask _offlineMapTask =
-      OfflineMapTask.onlineMap(map: _map);
+      OfflineMapTask.onlineMap(map: _map).disposeWith(_disposeScope);
 
   bool _isDownloading = false;
   double _progress = 0;
@@ -62,7 +60,7 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
 
   @override
   void dispose() {
-    _offlineMapTask.dispose();
+    _disposeScope.dispose();
     super.dispose();
   }
 
@@ -105,13 +103,24 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
           ? Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                if (_mapDownloadedAlready) ...[
+                  FloatingActionButton(
+                    heroTag: 'sync',
+                    onPressed: _syncDownloadedMap,
+                    child: const Icon(Icons.sync),
+                  ),
+                  const SizedBox(height: 8),
+                ],
                 FloatingActionButton(
+                  heroTag: 'delete',
                   onPressed: () async {
                     Directory appDocDir =
                         await getApplicationDocumentsDirectory();
                     String appDocPath = '${appDocDir.path}/offline_map_example';
-                    File file = File(appDocPath);
-                    await file.delete(recursive: true);
+                    try {
+                      Directory directory = Directory(appDocPath);
+                      await directory.delete(recursive: true);
+                    } catch (_) {}
                     _mapDownloadedAlready = false;
                     _offlineMap = null;
                     if (mounted) {
@@ -144,6 +153,72 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
 
     if (mounted) {
       setState(() {});
+    }
+  }
+
+  void _syncDownloadedMap() async {
+    try {
+      final appDocDir = await getApplicationDocumentsDirectory();
+      final offlineMapPath = '${appDocDir.path}/offline_map_example';
+      final offlineMapSync = OfflineMapSyncTask(offlineMapPath: offlineMapPath)
+          .disposeWith(_disposeScope);
+
+      final updateCapabilities = await offlineMapSync.updateCapabilities;
+      if (kDebugMode) {
+        print('updateCapabilities: $updateCapabilities');
+      }
+
+      final checkForUpdates = await offlineMapSync.checkForUpdates();
+
+      if (kDebugMode) {
+        print('checkForUpdates: $checkForUpdates');
+      }
+
+      final defaultParams =
+          await offlineMapSync.defaultOfflineMapSyncParameters();
+
+      if (kDebugMode) {
+        print('defaultParams: $defaultParams');
+      }
+
+      final job =
+          await offlineMapSync.offlineMapSyncJob(parameters: defaultParams);
+
+      job.onStatusChanged.listen((event) {
+        if (kDebugMode) {
+          print('onStatusChanged: $event');
+        }
+      });
+
+      job.onMessageAdded.listen((event) {
+        if (kDebugMode) {
+          print('onMessageAdded: $event');
+        }
+      });
+
+      job.onProgressChanged.listen((event) {
+        if (kDebugMode) {
+          print('onProgressChanged: $event');
+        }
+      });
+
+      final geodatabaseDeltaInfos = await job.geodatabaseDeltaInfos;
+      if (kDebugMode) {
+        print('geodatabaseDeltaInfos: $geodatabaseDeltaInfos');
+      }
+
+      job.disposeWith(_disposeScope);
+      await job.start();
+
+      final geodatabase = await job.result;
+      if (kDebugMode) {
+        print('geodatabase: $geodatabase');
+      }
+    } catch (ex, stackTrace) {
+      if (kDebugMode) {
+        print(ex);
+        print(stackTrace);
+      }
     }
   }
 
@@ -181,6 +256,7 @@ class _MapPageofflineMapState extends State<MapPageofflineMap> {
         parameters: defaultParams,
         downloadDirectory: appDocPath,
       );
+      job.disposeWith(_disposeScope);
       job.onStatusChanged.listen((event) async {
         if (kDebugMode) {
           print(event);

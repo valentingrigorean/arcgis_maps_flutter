@@ -14,7 +14,7 @@ extension Int {
         case 1:
             return .boundingGeometry
         default:
-            return .unknown
+            return .boundingGeometry
         }
     }
 }

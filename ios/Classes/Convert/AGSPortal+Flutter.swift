@@ -9,7 +9,7 @@ extension AGSPortal {
     convenience init(data: Dictionary<String, Any>) {
         let postalUrl = data["postalUrl"] as! String
         let loginRequired = data["loginRequired"] as! Bool
-        self.init(url: URL(string: postalUrl) as! URL, loginRequired: loginRequired)
+        self.init(url: URL(string: postalUrl)!, loginRequired: loginRequired)
         if let rawCredentials = data["credential"] as? Dictionary<String, Any> {
             credential = AGSCredential(data: rawCredentials)
         }

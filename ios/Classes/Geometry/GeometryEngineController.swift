@@ -94,11 +94,11 @@ class GeometryEngineController {
             }
             let firstGeometry = AGSGeometry.fromFlutter(data: data["firstGeometry"] as! Dictionary<String, Any>)!
             let secondGeometry = AGSGeometry.fromFlutter(data: data["secondGeometry"] as! Dictionary<String, Any>)!
-            guard let geometryList  = AGSGeometryEngine.intersections(ofGeometry1: firstGeometry, geometry2: secondGeometry) else {
+            guard let geometryList = AGSGeometryEngine.intersections(ofGeometry1: firstGeometry, geometry2: secondGeometry) else {
                 result([])
                 return
             }
-            var geometryResults :[Any] = []
+            var geometryResults: [Any] = []
             geometryList.forEach { any in
                 if let geometry = any as? AGSGeometry {
                     let json = geometry.toJSONFlutter()
@@ -106,6 +106,15 @@ class GeometryEngineController {
                 }
             }
             result(geometryResults)
+            break
+        case "contains":
+            guard let data = call.arguments as? Dictionary<String, Any> else {
+                result(false)
+                return
+            }
+            let firstGeometry = AGSGeometry.fromFlutter(data: data["containerGeometry"] as! Dictionary<String, Any>)!
+            let secondGeometry = AGSGeometry.fromFlutter(data: data["withinGeometry"] as! Dictionary<String, Any>)!
+            result(AGSGeometryEngine.geometry(firstGeometry, contains: secondGeometry))
             break
         default:
             result(FlutterMethodNotImplemented)

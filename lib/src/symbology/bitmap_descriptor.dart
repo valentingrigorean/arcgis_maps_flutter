@@ -177,7 +177,7 @@ class _ListBitmapDescriptor implements _BitmapDescriptorBase {
           listEquals(descriptors, other.descriptors);
 
   @override
-  int get hashCode => hashList(descriptors);
+  int get hashCode => Object.hashAll(descriptors);
 }
 
 @immutable

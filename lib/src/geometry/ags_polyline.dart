@@ -66,7 +66,7 @@ class AGSPolyline extends Geometry {
       }
     }
 
-    Object _pointsToJson() {
+    Object pointsToJson() {
       final results = <List<Object>>[];
       for (final part in points) {
         final List<Object> pointsRaw = <Object>[];
@@ -78,7 +78,7 @@ class AGSPolyline extends Geometry {
       return results;
     }
 
-    addIfPresent('paths', _pointsToJson());
+    addIfPresent('paths', pointsToJson());
     return json;
   }
 

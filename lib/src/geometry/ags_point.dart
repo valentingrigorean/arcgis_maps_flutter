@@ -28,6 +28,10 @@ class AGSPoint extends Geometry {
       return null;
     }
 
+    if (json['x'] == null || json['y'] == null) {
+      return null;
+    }
+
     return AGSPoint(
       x: json['x'].toDouble(),
       y: json['y'].toDouble(),

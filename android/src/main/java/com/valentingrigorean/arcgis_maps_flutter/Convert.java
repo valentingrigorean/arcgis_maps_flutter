@@ -18,6 +18,9 @@ import com.esri.arcgisruntime.arcgisservices.LevelOfDetail;
 import com.esri.arcgisruntime.arcgisservices.TileInfo;
 import com.esri.arcgisruntime.arcgisservices.TimeAware;
 import com.esri.arcgisruntime.arcgisservices.TimeUnit;
+import com.esri.arcgisruntime.data.EditResult;
+import com.esri.arcgisruntime.data.FeatureEditResult;
+import com.esri.arcgisruntime.data.TileCache;
 import com.esri.arcgisruntime.geometry.AngularUnitId;
 import com.esri.arcgisruntime.geometry.Envelope;
 import com.esri.arcgisruntime.geometry.GeodeticCurveType;
@@ -30,7 +33,6 @@ import com.esri.arcgisruntime.geometry.Polygon;
 import com.esri.arcgisruntime.geometry.Polyline;
 import com.esri.arcgisruntime.geometry.SpatialReference;
 import com.esri.arcgisruntime.layers.Layer;
-import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.loadable.Loadable;
 import com.esri.arcgisruntime.location.LocationDataSource;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
@@ -55,8 +57,7 @@ import com.esri.arcgisruntime.security.UserCredential;
 import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
 import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
 import com.esri.arcgisruntime.tasks.geocode.GeocodeResult;
-import com.esri.arcgisruntime.tasks.geocode.LocatorAttribute;
-import com.esri.arcgisruntime.tasks.geocode.LocatorInfo;
+import com.esri.arcgisruntime.tasks.geodatabase.SyncGeodatabaseParameters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.valentingrigorean.arcgis_maps_flutter.data.FieldTypeFlutter;
@@ -73,21 +74,25 @@ import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.Scalebar;
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.Style;
 import com.valentingrigorean.arcgis_maps_flutter.utils.LoadStatusChangedListenerLogger;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class Convert {
 
-    private static String TAG = "ConvertRouteTask";
+    private static final String TAG = "Convert";
 
-    private static final SimpleDateFormat ISO8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    protected static final SimpleDateFormat ISO8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US);
+    protected static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static Object arcGISRuntimeExceptionToJson(@Nullable ArcGISRuntimeException ex) {
         if (ex == null) {
@@ -107,6 +112,24 @@ public class Convert {
         return map;
     }
 
+    public static Object exceptionToJson(@Nullable Exception ex) {
+        if (ex == null) {
+            return null;
+        }
+
+        if (ex instanceof ArcGISRuntimeException) {
+            return arcGISRuntimeExceptionToJson((ArcGISRuntimeException) ex);
+        }
+
+        final HashMap<String, Object> map = new HashMap<>();
+
+        map.put("message", ex.getMessage());
+        if (ex.getCause() != null) {
+            map.put("innerErrorMessage", ex.getCause().getMessage());
+        }
+
+        return map;
+    }
 
     public static Scalebar.Alignment toScaleBarAlignment(int rawValue) {
         switch (rawValue) {
@@ -118,6 +141,36 @@ public class Convert {
                 return Scalebar.Alignment.CENTER;
             default:
                 throw new IllegalStateException("Unexpected value: " + rawValue);
+        }
+    }
+
+    public static SyncGeodatabaseParameters.SyncDirection toSyncDirection(Object o) {
+        switch (toInt(o)) {
+            case 0:
+                return SyncGeodatabaseParameters.SyncDirection.NONE;
+            case 1:
+                return SyncGeodatabaseParameters.SyncDirection.DOWNLOAD;
+            case 2:
+                return SyncGeodatabaseParameters.SyncDirection.UPLOAD;
+            case 3:
+                return SyncGeodatabaseParameters.SyncDirection.BIDIRECTIONAL;
+            default:
+                throw new IllegalStateException("Unexpected value: " + o);
+        }
+    }
+
+    public static int syncDirectionToJson(SyncGeodatabaseParameters.SyncDirection syncDirection) {
+        switch (syncDirection) {
+            case NONE:
+                return 0;
+            case DOWNLOAD:
+                return 1;
+            case UPLOAD:
+                return 2;
+            case BIDIRECTIONAL:
+                return 3;
+            default:
+                throw new IllegalStateException("Unexpected value: " + syncDirection);
         }
     }
 
@@ -177,9 +230,6 @@ public class Convert {
 
     public static Geometry toGeometry(Object o) {
         final Map<?, ?> data = toMap(o);
-        if (data == null) {
-            return null;
-        }
         final GeometryType geometryType = GeometryType.values()[toInt(data.get("geometryType"))];
         switch (geometryType) {
             case POINT:
@@ -203,7 +253,7 @@ public class Convert {
     }
 
     public static Object geometryToJson(Geometry geometry) {
-        final StringBuffer sb = new StringBuffer(geometry.toJson());
+        final StringBuilder sb = new StringBuilder(geometry.toJson());
         if (sb.length() > "{}".length()) {
             final String geometryType = ",\"geometryType\":" + geometry.getGeometryType().ordinal();
             sb.insert(sb.length() - 1, geometryType);
@@ -219,7 +269,7 @@ public class Convert {
 
     public static Point toPoint(Object o) {
         final Map<?, ?> data = toMap(o);
-        final double x = toDouble(data.get("x"));
+        final double x = toDouble(Objects.requireNonNull(data).get("x"));
         final double y = toDouble(data.get("y"));
 
         Double z = null;
@@ -248,13 +298,11 @@ public class Convert {
             return Point.createWithM(x, y, m);
         }
 
-        if (z == null && spatialReference == null && m == null)
+        if (z == null && spatialReference == null)
             return new Point(x, y);
-        if (spatialReference == null && z != null)
+        if (spatialReference == null)
             return new Point(x, y, z);
-        if (spatialReference != null && z == null)
-            return new Point(x, y, spatialReference);
-        return new Point(x, y, z, spatialReference);
+        return new Point(x, y, spatialReference);
     }
 
     public static Envelope toEnvelope(Object o) {
@@ -276,7 +324,7 @@ public class Convert {
 
     public static Viewpoint toViewPoint(Object o) {
         final Map<?, ?> data = toMap(o);
-        final double scale = toDouble(data.get("scale"));
+        final double scale = toDouble(Objects.requireNonNull(data).get("scale"));
         final Point targetGeometry = toPoint(data.get("targetGeometry"));
         return new Viewpoint(targetGeometry, scale);
     }
@@ -284,26 +332,39 @@ public class Convert {
     public static Credential toCredentials(Object o) {
         final Map<?, ?> map = toMap(o);
 
-        final String type = (String) map.get("type");
-        switch (type) {
-            case "UserCredential":
-                final Object referer = map.get("referer");
-                final Object token = map.get("token");
-                if (token != null) {
-                    return UserCredential.createFromToken((String) token, (String) referer);
-                }
-                final String username = (String) map.get("username");
-                final String password = (String) map.get("password");
-                return new UserCredential(username, password, (String) referer);
-            default:
-                throw new UnsupportedOperationException("Not implemented.");
+        final String type = (String) Objects.requireNonNull(map).get("type");
+        if ("UserCredential".equals(type)) {
+            final Object referer = map.get("referer");
+            final Object token = map.get("token");
+            if (token != null) {
+                return UserCredential.createFromToken((String) token, (String) referer);
+            }
+            final String username = (String) map.get("username");
+            final String password = (String) map.get("password");
+            return new UserCredential(username, password, (String) referer);
         }
+        throw new UnsupportedOperationException("Not implemented.");
+    }
+
+    public static Object credentialToJson(Credential credential) {
+
+        if (credential instanceof UserCredential) {
+            final UserCredential userCredential = (UserCredential) credential;
+            final Map<String, Object> map = new HashMap<>(5);
+            map.put("type", "UserCredential");
+            map.put("username", userCredential.getUsername());
+            map.put("password", userCredential.getPassword());
+            map.put("referer", userCredential.getReferer());
+            map.put("token", userCredential.getToken());
+            return map;
+        }
+        return null;
     }
 
     public static Camera toCamera(Object o) {
         final Map<?, ?> data = toMap(o);
 
-        double heading = toDouble(data.get("heading"));
+        double heading = toDouble(Objects.requireNonNull(data).get("heading"));
         double pitch = toDouble(data.get("pitch"));
         double roll = toDouble(data.get("roll"));
         if (data.containsKey("cameraLocation")) {
@@ -335,12 +396,12 @@ public class Convert {
     public static Surface toSurface(Object o) {
         final Map<?, ?> data = toMap(o);
 
-        float alpha = toFloat(data.get("alpha"));
+        float alpha = toFloat(Objects.requireNonNull(data).get("alpha"));
         boolean isEnabled = toBoolean(data.get("isEnabled"));
 
         List<ElevationSource> elevationSources = null;
         if (data.containsKey("elevationSources")) {
-            elevationSources = toElevationSourceList((List<Object>) data.get("elevationSources"));
+            elevationSources = toElevationSourceList((List<?>) data.get("elevationSources"));
         }
 
         Surface surface;
@@ -383,11 +444,12 @@ public class Convert {
             arcGISMap = new ArcGISMap(basemap);
         }
 
-        final Map<?, ?> basemapTypeOptions = toMap(data.get("basemapTypeOptions"));
-        if (basemapTypeOptions != null) {
+        final Object basemapTypeOptionsRaw = data.get("basemapTypeOptions");
+        if (basemapTypeOptionsRaw != null) {
+            final Map<?, ?> basemapTypeOptions = toMap(basemapTypeOptionsRaw);
             final Basemap.Type type = getBasemapType((String) basemapTypeOptions.get("basemapType"));
-            final Double latitude = toDouble(basemapTypeOptions.get("latitude"));
-            final Double longitude = toDouble(basemapTypeOptions.get("longitude"));
+            final double latitude = toDouble(basemapTypeOptions.get("latitude"));
+            final double longitude = toDouble(basemapTypeOptions.get("longitude"));
             final int levelOfDetail = toInt(basemapTypeOptions.get("levelOfDetail"));
             arcGISMap = new ArcGISMap(type, latitude, longitude, levelOfDetail);
         }
@@ -401,11 +463,12 @@ public class Convert {
         return arcGISMap;
     }
 
+    @SuppressWarnings("unchecked")
     public static FlutterLayer.ServiceImageTiledLayerOptions toServiceImageTiledLayerOptions(Object o) {
         final Map<?, ?> data = toMap(o);
 
         return new FlutterLayer.ServiceImageTiledLayerOptions(
-                toTileInfo(data.get("tileInfo")),
+                toTileInfo(Objects.requireNonNull(data).get("tileInfo")),
                 toEnvelop(data.get("fullExtent")),
                 data.get("url").toString(),
                 (List<String>) data.get("subdomains"),
@@ -417,12 +480,18 @@ public class Convert {
         final Map<?, ?> data = toMap(o);
         final int dpi = toInt(data.get("dpi"));
         final int imageFormat = toInt(data.get("imageFormat"));
-        final List<LevelOfDetail> levelOfDetails = toList(data.get("levelOfDetails")).stream().map(e -> toLevelOfDetail(e)).collect(Collectors.toList());
+        final List<LevelOfDetail> levelOfDetails = toList(data.get("levelOfDetails")).stream().map(Convert::toLevelOfDetail).collect(Collectors.toList());
         final Point origin = toPoint(data.get("origin"));
         final SpatialReference spatialReference = toSpatialReference(data.get("spatialReference"));
         final int tileHeight = toInt(data.get("tileHeight"));
         final int tileWidth = toInt(data.get("tileWidth"));
-        return new TileInfo(dpi, TileInfo.ImageFormat.values()[imageFormat], levelOfDetails, origin, spatialReference, tileHeight, tileWidth);
+        return new TileInfo(dpi, imageFormat == -1 ? TileInfo.ImageFormat.UNKNOWN : TileInfo.ImageFormat.values()[imageFormat], levelOfDetails, origin, spatialReference, tileHeight, tileWidth);
+    }
+
+    public static TileCache toTileCache(Object o) {
+        final Map<?, ?> data = toMap(o);
+        final String url = data.get("url").toString();
+        return new TileCache(url);
     }
 
     public static LevelOfDetail toLevelOfDetail(Object o) {
@@ -469,9 +538,6 @@ public class Convert {
             return null;
         }
         final Map<?, ?> data = toMap(o);
-        if (data == null) {
-            return null;
-        }
         final double minZoom = toDouble(data.get("minZoom"));
         final double maxZoom = toDouble(data.get("maxZoom"));
         return new SymbolVisibilityFilter(minZoom, maxZoom);
@@ -479,9 +545,6 @@ public class Convert {
 
     public static void interpretMarkerController(Object o, MarkerController controller, SymbolVisibilityFilterController symbolVisibilityFilterController) {
         final Map<?, ?> data = toMap(o);
-        if (data == null) {
-            return;
-        }
         interpretBaseGraphicController(data, controller, symbolVisibilityFilterController);
 
         final Object position = data.get("position");
@@ -519,9 +582,6 @@ public class Convert {
 
     public static void interpretPolygonController(Object o, PolygonController controller, SymbolVisibilityFilterController symbolVisibilityFilterController) {
         final Map<?, ?> data = toMap(o);
-        if (data == null) {
-            return;
-        }
         interpretBaseGraphicController(data, controller, symbolVisibilityFilterController);
         final Object fillColor = data.get("fillColor");
         if (fillColor != null) {
@@ -541,8 +601,11 @@ public class Convert {
             controller.setStrokeStyle(toSimpleLineStyle(toInt(strokeStyle)));
         }
 
-        final List<?> points = toList(data.get("points"));
-        if (points != null) {
+
+        final Object pointsRaw = data.get("points");
+        if (pointsRaw != null) {
+            final List<?> points = toList(pointsRaw);
+
             final ArrayList<Point> nativePoints = new ArrayList<>(points.size());
             for (final Object point : points) {
                 nativePoints.add(toPoint(point));
@@ -553,9 +616,6 @@ public class Convert {
 
     public static void interpretPolylineController(Object o, PolylineController controller, SymbolVisibilityFilterController symbolVisibilityFilterController) {
         final Map<?, ?> data = toMap(o);
-        if (data == null) {
-            return;
-        }
         interpretBaseGraphicController(data, controller, symbolVisibilityFilterController);
         final Object color = data.get("color");
         if (color != null) {
@@ -573,13 +633,16 @@ public class Convert {
         if (antialias != null) {
             controller.setAntialias(toBoolean(antialias));
         }
-        final List<?> points = toList(data.get("points"));
-        if (points != null) {
+        final Object pointsRaw = data.get("points");
+        if (pointsRaw != null) {
+            final List<?> points = toList(pointsRaw);
+
             final ArrayList<Point> nativePoints = new ArrayList<>(points.size());
             for (final Object point : points) {
                 nativePoints.add(toPoint(point));
             }
             controller.setGeometry(new Polyline(new PointCollection(nativePoints)));
+
         }
     }
 
@@ -591,6 +654,12 @@ public class Convert {
         } else {
             return bitmap;
         }
+    }
+
+    public static byte[] bitmapToByteArray(Bitmap bmp) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return stream.toByteArray();
     }
 
 
@@ -658,10 +727,10 @@ public class Convert {
 
     @Nullable
     public static TimeExtent toTimeExtent(Object o) {
-        final Map<?, ?> data = toMap(o);
-        if (data == null || data.isEmpty()) {
+        if (o == null) {
             return null;
         }
+        final Map<?, ?> data = toMap(o);
 
         final Object startTime = data.get("startTime");
         final Object endTime = data.get("endTime");
@@ -670,15 +739,15 @@ public class Convert {
             return null;
         }
 
-        return new TimeExtent(toCalendarFromISO8601(startTime), toCalendarFromISO8601(endTime));
+        return new TimeExtent(Objects.requireNonNull(toCalendarFromISO8601(startTime)), Objects.requireNonNull(toCalendarFromISO8601(endTime)));
     }
 
     @Nullable
     public static TimeValue toTimeValue(Object o) {
-        final Map<?, ?> data = toMap(o);
-        if (data == null) {
+        if (o == null) {
             return null;
         }
+        final Map<?, ?> data = toMap(o);
         final double duration = toDouble(data.get("duration"));
         final int unit = toInt(data.get("unit"));
         return new TimeValue(duration, TimeUnit.values()[unit]);
@@ -746,9 +815,7 @@ public class Convert {
                 continue;
 
             final Map<String, Object> attributes = new HashMap<>(element.getAttributes().size());
-            element.getAttributes().forEach((k, v) -> {
-                attributes.put(k, toFlutterFieldType(v));
-            });
+            element.getAttributes().forEach((k, v) -> attributes.put(k, toFlutterFieldType(v)));
 
             final Map<String, Object> elementData = new HashMap<>(2);
 
@@ -772,9 +839,7 @@ public class Convert {
     public static Object geocodeResultToJson(GeocodeResult result) {
         final Map<String, Object> data = new HashMap<>(6);
         final Map<String, Object> attributes = new HashMap<>(result.getAttributes().size());
-        result.getAttributes().forEach((k, v) -> {
-            attributes.put(k, toFlutterFieldType(v));
-        });
+        result.getAttributes().forEach((k, v) -> attributes.put(k, toFlutterFieldType(v)));
         data.put("attributes", attributes);
 
         if (result.getDisplayLocation() != null) {
@@ -794,6 +859,28 @@ public class Convert {
 
         data.put("score", result.getScore());
 
+        return data;
+    }
+
+    public static Object editResultToJson(EditResult editResult) {
+        final Map<String, Object> data = new HashMap<>(6);
+        data.put("completedWithErrors", editResult.hasCompletedWithErrors());
+        data.put("editOperation", editResult.getEditOperation() == EditResult.EditOperation.UNKNOWN ? -1 : editResult.getEditOperation().ordinal());
+        if (editResult.hasCompletedWithErrors()) {
+            data.put("error", arcGISRuntimeExceptionToJson(editResult.getError()));
+        }
+        data.put("globalId", editResult.getGlobalId());
+        data.put("objectId", editResult.getObjectId());
+        return data;
+    }
+
+    public static Object featureEditResultToJson(FeatureEditResult featureEditResult) {
+        final Map<String, Object> data = (Map<String, Object>) editResultToJson(featureEditResult);
+        final ArrayList<Object> attachmentResults = new ArrayList<>(featureEditResult.getAttachmentResults().size());
+        for (EditResult attachmentResult : featureEditResult.getAttachmentResults()) {
+            attachmentResults.add(editResultToJson(attachmentResult));
+        }
+        data.put("attachmentResults", attachmentResults);
         return data;
     }
 
@@ -889,10 +976,12 @@ public class Convert {
         }
     }
 
-    public static SpatialReference toSpatialReference(Object o) {
-        final Map<?, ?> data = toMap(o);
-        if (data == null)
+    @Nullable
+    public static SpatialReference toSpatialReference(@Nullable Object o) {
+        if (o == null) {
             return null;
+        }
+        final Map<?, ?> data = toMap(o);
         final Object wkId = data.get("wkid");
         if (wkId != null) {
             return SpatialReference.create(toInt(wkId));
@@ -1050,7 +1139,7 @@ public class Convert {
     }
 
 
-    private static List<ElevationSource> toElevationSourceList(List<Object> list) {
+    private static List<ElevationSource> toElevationSourceList(List<?> list) {
 
         ArrayList<ElevationSource> elevationSources = new ArrayList<>();
         for (Object o : list) {
@@ -1063,18 +1152,16 @@ public class Convert {
     private static ElevationSource toElevationSource(Object o) {
         Map<?, ?> map = toMap(o);
 
-        switch (map.get("elevationType").toString()) {
-            case "ArcGISTiledElevationSource":
-                return new ArcGISTiledElevationSource((String) map.get("url"));
-            default:
-                throw new IllegalStateException("Unexpected value: " + map.get("elevationType").toString());
+        if ("ArcGISTiledElevationSource".equals(map.get("elevationType").toString())) {
+            return new ArcGISTiledElevationSource((String) map.get("url"));
         }
+        throw new IllegalStateException("Unexpected value: " + map.get("elevationType").toString());
     }
 
 
     protected static Object toFlutterFieldType(Object o) {
         final Map<String, Object> data = new HashMap<>(2);
-        FieldTypeFlutter fieldTypeFlutter = FieldTypeFlutter.UNKNOWN;
+        FieldTypeFlutter fieldTypeFlutter;
         if (o == null) {
             fieldTypeFlutter = FieldTypeFlutter.NULLABLE;
         } else if (o instanceof String) {
@@ -1086,6 +1173,12 @@ public class Convert {
         } else if (o instanceof GregorianCalendar) {
             fieldTypeFlutter = FieldTypeFlutter.DATE;
             o = ISO8601Format.format(((GregorianCalendar) o).getTime());
+        } else if (o instanceof UUID) {
+            fieldTypeFlutter = FieldTypeFlutter.TEXT;
+            o = o.toString();
+        } else {
+            fieldTypeFlutter = FieldTypeFlutter.UNKNOWN;
+            o = o.toString();
         }
         data.put("type", fieldTypeFlutter.getValue());
         data.put("value", o);
@@ -1110,23 +1203,30 @@ public class Convert {
         return (Boolean) o;
     }
 
+    @NonNull
     public static Map<?, ?> toMap(Object o) {
         return (Map<?, ?>) o;
     }
 
+    @NonNull
     public static List<?> toList(Object o) {
         return (List<?>) o;
     }
 
-    public static <T> List<T> toListOf(Object o) {
-        return (List<T>) o;
-    }
-
+    @SuppressWarnings("unchecked")
     public static double[] toDoubleArray(Object o) {
-        if (o instanceof ArrayList) {
-            return ((ArrayList<Double>) o).stream().mapToDouble(Double::doubleValue).toArray();
+        if (o instanceof List) {
+            return ((List<Double>) o).stream().mapToDouble(Double::doubleValue).toArray();
         }
         return (double[]) o;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static int[] toIntArray(Object o) {
+        if (o instanceof List) {
+            return ((List<Integer>) o).stream().mapToInt(Integer::intValue).toArray();
+        }
+        return (int[]) o;
     }
 
     public static double toDouble(Object o) {

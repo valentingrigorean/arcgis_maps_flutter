@@ -146,6 +146,11 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
+  Future<Uint8List?> exportImage(int mapId) {
+    return channel(mapId).invokeMethod<Uint8List>('map#exportImage');
+  }
+
+  @override
   Future<Location?> getLocation(int mapId) async {
     final result = await channel(mapId).invokeMapMethod('map#getLocation');
     if (result == null) {
@@ -174,6 +179,23 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
       return const [];
     }
     return results.map((e) => LegendInfoResult.fromJson(e)!).toList();
+  }
+
+  @override
+  Future<AGSEnvelope?> getMapMaxExtend(int mapId) async {
+    final result = await channel(mapId).invokeMapMethod('map#getMapMaxExtend');
+    if (result == null) {
+      return null;
+    }
+    return AGSEnvelope.fromJson(result);
+  }
+
+  @override
+  Future<void> setMapMaxExtent(int mapId, AGSEnvelope envelope) {
+    return channel(mapId).invokeMethod<void>(
+      'map#setMapMaxExtent',
+      envelope.toJson(),
+    );
   }
 
   @override

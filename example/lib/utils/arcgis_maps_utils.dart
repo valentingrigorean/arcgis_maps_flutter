@@ -1,14 +1,9 @@
 
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
+import 'package:arcgis_maps_flutter_example/utils/credentials.dart';
 import 'package:arcgis_maps_flutter_example/utils/models.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-
-final Credential _kGeodataCredentials = Credential.creteUserCredential(
-  username:  dotenv.env['geodataCredentialsUsername'] ?? '' ,
-  password:  dotenv.env['geodataCredentialsPassword'] ?? '' ,
-);
 
 const Portal _kSnlaArcgisPortal = Portal(
   postalUrl: 'https://snla.maps.arcgis.com/',
@@ -18,74 +13,74 @@ const Portal _kSnlaArcgisPortal = Portal(
 Map<GeomapTransportType, Layer> _geomapLayersMap = {
   GeomapTransportType.bus: FeatureLayer.fromUrl(
       'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/1',
-      credential: _kGeodataCredentials),
+      credential: geodataCredentials),
   GeomapTransportType.subway: FeatureLayer.fromUrl(
     'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/2',
-    credential: _kGeodataCredentials,
+    credential: geodataCredentials,
   ),
   GeomapTransportType.tram: FeatureLayer.fromUrl(
     'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/3',
-    credential: _kGeodataCredentials,
+    credential: geodataCredentials,
   ),
   GeomapTransportType.ferry: FeatureLayer.fromUrl(
     'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/4',
-    credential: _kGeodataCredentials,
+    credential: geodataCredentials,
   ),
   GeomapTransportType.train: FeatureLayer.fromUrl(
     'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/5',
-    credential: _kGeodataCredentials,
+    credential: geodataCredentials,
   ),
   GeomapTransportType.airports: FeatureLayer.fromUrl(
     'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/6',
-    credential: _kGeodataCredentials,
+    credential: geodataCredentials,
   ),
   GeomapTransportType.chargingStation: FeatureLayer.fromUrl(
     'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/7',
-    credential: _kGeodataCredentials,
+    credential: geodataCredentials,
   ),
   GeomapTransportType.tollStation: FeatureLayer.fromUrl(
     'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/8',
-    credential: _kGeodataCredentials,
+    credential: geodataCredentials,
   ),
   GeomapTransportType.restArea: FeatureLayer.fromUrl(
     'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/9',
-    credential: _kGeodataCredentials,
+    credential: geodataCredentials,
   ),
   GeomapTransportType.webcamAlongTheRoad: FeatureLayer.fromUrl(
     'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/10',
-    credential: _kGeodataCredentials,
+    credential: geodataCredentials,
   ),
   GeomapTransportType.trafficVolume: FeatureLayer.fromUrl(
     'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/11',
-    credential: _kGeodataCredentials,
+    credential: geodataCredentials,
   ),
   GeomapTransportType.trafficVolumeWithLabels: FeatureLayer.fromUrl(
     'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/12',
-    credential: _kGeodataCredentials,
+    credential: geodataCredentials,
   ),
   GeomapTransportType.parkingSpace: FeatureLayer.fromUrl(
     'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/14',
-    credential: _kGeodataCredentials,
+    credential: geodataCredentials,
   ),
   GeomapTransportType.chargePoint: FeatureLayer.fromUrl(
     'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/15',
-    credential: _kGeodataCredentials,
+    credential: geodataCredentials,
   ),
   GeomapTransportType.aviationObstacleLine: FeatureLayer.fromUrl(
     'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/18',
-    credential: _kGeodataCredentials,
+    credential: geodataCredentials,
   ),
   GeomapTransportType.aviationObstacleLinePoint: FeatureLayer.fromUrl(
     'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/19',
-    credential: _kGeodataCredentials,
+    credential: geodataCredentials,
   ),
   GeomapTransportType.aviationObstaclesPoint: FeatureLayer.fromUrl(
     'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/20',
-    credential: _kGeodataCredentials,
+    credential: geodataCredentials,
   ),
   GeomapTransportType.roadCenterLine: FeatureLayer.fromUrl(
     'https://services.geodataonline.no/arcgis/rest/services/Geomap_UTM33_EUREF89/GeomapSamferdsel/FeatureServer/21',
-    credential: _kGeodataCredentials,
+    credential: geodataCredentials,
   ),
 };
 
@@ -158,7 +153,7 @@ const List<MapTypeOptions> _supportedMapsTypes = [
 final LocatorTask _geodataLocator = LocatorTask(
   url:
   'https://services.geodataonline.no/arcgis/rest/services/Geosok/GeosokLokasjon2/GeocodeServer',
-  credential: _kGeodataCredentials,
+  credential: geodataCredentials,
 );
 
 final LocatorTask _esriLocator = LocatorTask(
@@ -168,7 +163,7 @@ final LocatorTask _esriLocator = LocatorTask(
 final RouteTask _geodataRouteTask = RouteTask(
   url:
   'https://services.geodataonline.no/arcgis/rest/services/Geosok/GeosokRute3/NAServer/Route',
-  credential: _kGeodataCredentials,
+  credential: geodataCredentials,
 );
 
 final RouteTask _esriRouteTask = RouteTask(
@@ -265,7 +260,7 @@ class ArcgisMapsUtils {
   static Set<Layer> getAvalancheLayers() => {
     MapImageLayer.fromUrl(
       'https://gis3.nve.no/arcgis/rest/services/wmts/KastWMTS/MapServer',
-      credential: _kGeodataCredentials,
+      credential: geodataCredentials,
       opacity: 0.4,
     ),
   };

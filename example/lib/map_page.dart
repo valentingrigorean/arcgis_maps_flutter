@@ -2,14 +2,9 @@
 
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-
 // ignore_for_file: unused_field
 
-final geodataCredentials = Credential.creteUserCredential(
-  username: dotenv.env['username']!,
-  password: dotenv.env['password']!,
-);
+
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
