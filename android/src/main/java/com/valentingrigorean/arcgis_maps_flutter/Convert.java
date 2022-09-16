@@ -75,6 +75,7 @@ import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.Style;
 import com.valentingrigorean.arcgis_maps_flutter.utils.LoadStatusChangedListenerLogger;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -1162,9 +1163,7 @@ public class Convert {
     protected static Object toFlutterFieldType(Object o) {
         final Map<String, Object> data = new HashMap<>(2);
         FieldTypeFlutter fieldTypeFlutter;
-        if (o == null) {
-            fieldTypeFlutter = FieldTypeFlutter.NULLABLE;
-        } else if (o instanceof String) {
+        if (o instanceof String) {
             fieldTypeFlutter = FieldTypeFlutter.TEXT;
         } else if (o instanceof Short || o instanceof Integer) {
             fieldTypeFlutter = FieldTypeFlutter.INTEGER;
@@ -1176,6 +1175,18 @@ public class Convert {
         } else if (o instanceof UUID) {
             fieldTypeFlutter = FieldTypeFlutter.TEXT;
             o = o.toString();
+        } else if (o instanceof byte[] || o instanceof ByteBuffer) {
+            fieldTypeFlutter = FieldTypeFlutter.BLOB;
+            if (o instanceof ByteBuffer) {
+                o = ((ByteBuffer) o).array();
+            }
+        } else if (o instanceof Geometry) {
+            fieldTypeFlutter = FieldTypeFlutter.GEOMETRY;
+            if (o != null) {
+                o = geometryToJson((Geometry) o);
+            }
+        } else if (o == null) {
+            fieldTypeFlutter = FieldTypeFlutter.NULLABLE;
         } else {
             fieldTypeFlutter = FieldTypeFlutter.UNKNOWN;
             o = o.toString();
@@ -1189,13 +1200,23 @@ public class Convert {
         final Map<?, ?> data = toMap(o);
         final FieldTypeFlutter fieldTypeFlutter = FieldTypeFlutter.values()[toInt(data.get("type"))];
         Object value = data.get("value");
-        if (fieldTypeFlutter == FieldTypeFlutter.DATE) {
-            try {
-                value = ISO8601Format.parse(value.toString());
-            } catch (Exception e) {
-                // no op
-            }
+        switch (fieldTypeFlutter) {
+            case DATE:
+                try {
+                    value = ISO8601Format.parse(value.toString());
+                } catch (Exception e) {
+                    // no op
+                }
+                break;
+            case GEOMETRY:
+                if (value != null) {
+                    value = toGeometry(value);
+                }
+                break;
+            default:
+                break;
         }
+
         return value;
     }
 

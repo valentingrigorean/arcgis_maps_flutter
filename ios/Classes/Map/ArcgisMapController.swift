@@ -36,7 +36,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private var layerHandle: AGSCancelable?
 
-
     private var trackIdentityLayers = false
 
     private var trackViewpointChangedListenerEvent = false

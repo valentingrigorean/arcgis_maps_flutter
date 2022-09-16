@@ -90,7 +90,7 @@ public class GeometryEngineController implements MethodChannel.MethodCallHandler
                 final Map<?, ?> data = Convert.toMap(call.arguments);
                 final Geometry firstGeometry = Convert.toGeometry(data.get("firstGeometry"));
                 final Geometry secondGeometry = Convert.toGeometry(data.get("secondGeometry"));
-                Geometry geometry = GeometryEngine.intersection(firstGeometry, secondGeometry);
+                Geometry geometry = GeometryEngine.intersection(firstGeometry,secondGeometry);
                 result.success(Convert.geometryToJson(geometry));
             }
             break;
@@ -98,20 +98,12 @@ public class GeometryEngineController implements MethodChannel.MethodCallHandler
                 final Map<?, ?> data = Convert.toMap(call.arguments);
                 final Geometry firstGeometry = Convert.toGeometry(data.get("firstGeometry"));
                 final Geometry secondGeometry = Convert.toGeometry(data.get("secondGeometry"));
-                List<Geometry> geometryList = GeometryEngine.intersections(firstGeometry, secondGeometry);
+                List<Geometry> geometryList = GeometryEngine.intersections(firstGeometry,secondGeometry);
                 ArrayList<Object> resultList = new ArrayList<>();
                 for (Geometry geometry : geometryList) {
                     resultList.add(Convert.geometryToJson(geometry));
                 }
                 result.success(resultList);
-            }
-            break;
-            case "contains": {
-                final Map<?, ?> data = Convert.toMap(call.arguments);
-                final Geometry firstGeometry = Convert.toGeometry(data.get("containerGeometry"));
-                final Geometry secondGeometry = Convert.toGeometry(data.get("withinGeometry"));
-                boolean contains = GeometryEngine.contains(firstGeometry, secondGeometry);
-                result.success(contains);
             }
             break;
             default:

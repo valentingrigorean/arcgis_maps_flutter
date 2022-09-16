@@ -6,7 +6,9 @@ public enum FieldTypeFlutter {
     DOUBLE(2),
     DATE(3),
     TEXT(4),
-    NULLABLE(5);
+    NULLABLE(5),
+    BLOB(6),
+    GEOMETRY(7);
 
     private final int value;
 
