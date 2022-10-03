@@ -804,12 +804,15 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             map.removeDoneLoadingListener(this);
             if (map.getLoadStatus() == LoadStatus.LOADED) {
                 methodChannel.invokeMethod("map#loaded", null);
-            } else {
+            } else if (map.getLoadError() != null) {
                 Log.w(TAG, "changeMap: Failed to load map." + map.getLoadError().getMessage());
                 if (map.getLoadError().getCause() != null) {
                     Log.w(TAG, "changeMap: Failed to load map." + map.getLoadError().getCause().getMessage());
                 }
                 methodChannel.invokeMethod("map#loaded", Convert.arcGISRuntimeExceptionToJson(map.getLoadError()));
+            } else {
+                Log.w(TAG, "changeMap: Unknown error");
+                methodChannel.invokeMethod("map#loaded", null);
             }
         }
     }

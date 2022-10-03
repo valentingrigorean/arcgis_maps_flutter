@@ -146,6 +146,7 @@ abstract class Job extends ArcgisNativeObject with RemoteResource {
   final StreamController<JobMessage> _messageController =
       StreamController<JobMessage>.broadcast();
 
+
   bool _isStarted = false;
 
   Job({
@@ -236,6 +237,9 @@ abstract class Job extends ArcgisNativeObject with RemoteResource {
   @override
   @protected
   Future<void> handleMethodCall(String method, dynamic arguments) async {
+    if(isDisposed){
+      return;
+    }
     switch (method) {
       case 'job#onProgressChanged':
         final double progress = arguments;
