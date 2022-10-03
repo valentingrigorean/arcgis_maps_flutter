@@ -27,13 +27,18 @@ extension AGSGeometry {
         }
     }
 
-    func toJSONFlutter() -> Any {
-        let json = try! toJSON()
-        if var dict = json as? Dictionary<String, Any> {
-            dict["geometryType"] = geometryType.rawValue
-            return dict
+    func toJSONFlutter() -> Any? {
+        do {
+            let json = try toJSON()
+            if var dict = json as? Dictionary<String, Any> {
+                dict["geometryType"] = geometryType.rawValue
+                return dict
+            }
+            return json
+        } catch let error {
+            fatalError("\(error)")
+            return nil
         }
-        return json
     }
 }
 

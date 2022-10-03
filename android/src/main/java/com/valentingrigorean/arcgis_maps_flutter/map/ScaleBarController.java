@@ -69,11 +69,12 @@ public class ScaleBarController implements MapScaleChangedListener {
             viewPropertyAnimator.cancel();
             viewPropertyAnimator = null;
         }
-        if (mapScale == mapView.getMapScale()) {
+        final double currentScale = mapScaleChangedEvent.getSource().getMapScale();
+        if (mapScale == currentScale) {
             return;
         }
 
-        mapScale = mapView.getMapScale();
+        mapScale = currentScale;
 
         if (!didGotScale) {
             didGotScale = true;
