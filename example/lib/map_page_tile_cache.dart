@@ -1,3 +1,5 @@
+// ignore_for_file: unused_field
+
 import 'dart:io';
 
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';

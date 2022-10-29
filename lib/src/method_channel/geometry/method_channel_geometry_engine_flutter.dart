@@ -115,4 +115,11 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
     );
     return result ?? false;
   }
+
+  @override
+  Future<Geometry?> geodesicSector(GeodesicSectorParameters params) async {
+    final result =
+        await _channel.invokeMethod("geodesicSector", params.toJson());
+    return Geometry.fromJson(result);
+  }
 }

@@ -62,4 +62,8 @@ abstract class GeometryEngineFlutterPlatform extends PlatformInterface {
   Future<bool> contains(Geometry container, Geometry within) {
     throw UnimplementedError('contains() has not been implemented.');
   }
+
+  Future<Geometry?> geodesicSector(GeodesicSectorParameters params) {
+    throw UnimplementedError('geodesicSector() has not been implemented.');
+  }
 }

@@ -124,4 +124,18 @@ class GeometryEngine {
   static Future<bool> contains(Geometry container, Geometry within) {
     return GeometryEngineFlutterPlatform.instance.contains(container, within);
   }
+
+
+  /// Constructs a geodesic sector defined by a geodesic arc and 2 radii.
+  /// The arc is a portion of an ellipse that is centered on a specified point
+  /// and is defined by it's 2 axes and the length of it's longest axis.
+  /// The first radius angle is defined by the startDirection angle and the
+  /// second radius angle is the sum of the startDirection and the sectorAngle. T
+  /// he sector is constructed as a [AGSPolygon], [AGSPolyline] or [AGSMultipoint] geometry.
+  /// [params] Specifies the parameters for constructing the sector.
+  /// Returns The sector is returned in the format specified by the geometryType
+  /// and is generalized according to the arcVertexCount and the radiusVertexCount parameters.
+  static Future<Geometry?> geodesicSector(GeodesicSectorParameters params){
+    return GeometryEngineFlutterPlatform.instance.geodesicSector(params);
+  }
 }
