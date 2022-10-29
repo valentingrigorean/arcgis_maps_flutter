@@ -12,7 +12,7 @@ abstract class Geometry {
   final GeometryType geometryType;
 
   Map<String, Object> toJson() => {
-        'geometryType': geometryTypeToPlatformIndex(geometryType),
+        'type': geometryType.value,
         if (spatialReference != null)
           'spatialReference': spatialReference!.toJson(),
       };
@@ -22,8 +22,8 @@ abstract class Geometry {
       return null;
     }
 
-    if (json.containsKey('geometryType')) {
-      final geometryType = geometryTypeFromPlatformIndex(json['geometryType']);
+    if (json.containsKey('type')) {
+      final geometryType = GeometryType.fromValue(json['type']);
       switch (geometryType) {
         case GeometryType.point:
           return AGSPoint.fromJson(json);

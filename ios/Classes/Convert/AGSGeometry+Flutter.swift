@@ -7,7 +7,7 @@ import ArcGIS
 
 extension AGSGeometry {
     static func fromFlutter(data: Dictionary<String, Any>) -> AGSGeometry? {
-        let geometryType = AGSGeometryType(rawValue: data["geometryType"] as! Int)!
+        let geometryType = AGSGeometryType(rawValue: data["type"] as! Int)!
         switch (geometryType) {
         case .point:
             return AGSPoint(data: data)
@@ -31,7 +31,7 @@ extension AGSGeometry {
         do {
             let json = try toJSON()
             if var dict = json as? Dictionary<String, Any> {
-                dict["geometryType"] = geometryType.rawValue
+                dict["type"] = geometryType.rawValue
                 return dict
             }
             return json
