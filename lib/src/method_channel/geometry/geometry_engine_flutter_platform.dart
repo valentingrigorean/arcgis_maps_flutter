@@ -66,4 +66,15 @@ abstract class GeometryEngineFlutterPlatform extends PlatformInterface {
   Future<Geometry?> geodesicSector(GeodesicSectorParameters params) {
     throw UnimplementedError('geodesicSector() has not been implemented.');
   }
+
+  Future<List<AGSPoint>> geodeticMove({
+    required List<AGSPoint> points,
+    required double distance,
+    required LinearUnitId distanceUnit,
+    required double azimuth,
+    required AngularUnitId azimuthUnit,
+    required GeodeticCurveType curveType,
+  }) {
+    throw UnimplementedError('geodeticMove() has not been implemented.');
+  }
 }
