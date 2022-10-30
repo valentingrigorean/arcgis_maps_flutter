@@ -135,13 +135,13 @@ class GeometryEngineController {
                 AGSPoint(data: $0)
             }
             let distance = data["distance"] as! Double
-            let linearUnitId = AGSLinearUnitID.fromFlutter(data["linearUnitId"] as! Int)
+            let distanceUnitId = AGSLinearUnitID.fromFlutter(data["distanceUnit"] as! Int)
             let azimuth = data["azimuth"] as! Double
-            let azimuthUnitId = AGSAngularUnitID.fromFlutter(data["azimuthUnitId"] as! Int)
+            let azimuthUnitId = AGSAngularUnitID.fromFlutter(data["azimuthUnit"] as! Int)
             let curveType = AGSGeodeticCurveType.init(rawValue: data["curveType"] as! Int)!
             let results = AGSGeometryEngine.geodeticMove(points,
                     distance: distance,
-                    distanceUnit: AGSLinearUnit(unitID: linearUnitId)!,
+                    distanceUnit: AGSLinearUnit(unitID: distanceUnitId)!,
                     azimuth: azimuth,
                     azimuthUnit: AGSAngularUnit(unitID: azimuthUnitId)!,
                     curveType: curveType
