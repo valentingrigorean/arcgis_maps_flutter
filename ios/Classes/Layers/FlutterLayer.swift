@@ -131,10 +131,14 @@ struct FlutterLayer: Hashable, Equatable {
                     print(error.localizedDescription)
                 } else {
                     geodatabase.geodatabaseFeatureTables.forEach { table in
-                        if let featureLayersIds = featureLayersIds, featureLayersIds.contains(table.serviceLayerID) {
-                            layer.layers.add(AGSFeatureLayer(featureTable: table))
-                        } else {
-                            layer.layers.add(AGSFeatureLayer(featureTable: table))
+                        guard let featureLayersIds = featureLayersIds else {
+                            let featureLayer = AGSFeatureLayer(featureTable: table)
+                            layer.layers.add(featureLayer)
+                            return
+                        }
+                        if featureLayersIds.contains(table.serviceLayerID)  {
+                            let featureLayer = AGSFeatureLayer(featureTable: table)
+                            layer.layers.add(featureLayer)
                         }
                     }
                 }
