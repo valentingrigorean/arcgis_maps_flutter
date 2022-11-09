@@ -2,7 +2,7 @@ group 'com.valentingrigorean.arcgis_maps_flutter'
 version '1.0'
 
 buildscript {
-    ext.kotlin_version = '1.4.10'
+    ext.kotlin_version = '1.5.20'
 
 
     repositories {
