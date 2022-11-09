@@ -87,6 +87,8 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     private ScaleBarController scaleBarController;
     private InvalidateMapHelper invalidateMapHelper;
 
+    private Viewpoint viewpoint;
+
     private boolean haveScaleBar;
 
     private boolean trackViewpointChangedListenerEvents = false;
@@ -301,11 +303,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 result.success(null);
             }
             break;
-            case "map#setViewpointChangedEvents": {
-                trackViewpointChangedListenerEvents = call.arguments();
-                result.success(null);
-            }
-            break;
             case "map#setLayersChangedListener": {
                 layersChangedController.setTrackLayersChange(call.arguments());
                 result.success(null);
@@ -326,6 +323,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             break;
             case "map#setViewpointChangedListenerEvents": {
                 trackViewpointChangedListenerEvents = call.arguments();
+                result.success(null);
             }
             break;
             case "map#getTimeExtent": {
@@ -358,8 +356,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             }
             break;
             case "map#setViewpoint": {
-                Viewpoint viewpoint = Convert.toViewPoint(call.arguments);
-                mapView.setViewpointAsync(viewpoint).addDoneListener(() -> result.success(null));
+                setViewpoint(call.arguments,true,result);
             }
             break;
             case "map#setViewpointGeometry": {
@@ -486,7 +483,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                     double scale = (double) data.get("scale");
                     ListenableFuture<Boolean> future = mapView.setViewpointScaleAsync(scale);
                     future.addDoneListener(() -> {
-                        boolean scaled = false;
+                        boolean scaled;
                         try {
                             scaled = future.get();
                             result.success(scaled);
@@ -613,17 +610,38 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         }
     }
 
-    private void setViewpoint(Object args, boolean animated) {
+    private void setViewpoint(Object args, boolean animated, @Nullable MethodChannel.Result result) {
         if (args == null) {
+            if (result != null) {
+                result.success(null);
+            }
             return;
         }
-        final Viewpoint viewpoint = Convert.toViewPoint(args);
+        viewpoint = Convert.toViewPoint(args);
+
+        if (mapView.getMap() == null) {
+            if (result != null) {
+                result.success(null);
+            }
+            return;
+        }
+
 
         if (animated) {
-            mapView.setViewpoint(viewpoint);
+            mapView.setViewpointAsync(viewpoint).addDoneListener(() -> {
+                if (result != null) {
+                    result.success(null);
+                }
+            });
         } else {
-            mapView.setViewpointAsync(viewpoint);
+            mapView.setViewpointAsync(viewpoint, 0).addDoneListener(() -> {
+                if (result != null) {
+                    result.success(null);
+                }
+            });
         }
+
+        viewpoint = null;
     }
 
     private void changeMapType(Object args) {
@@ -665,7 +683,10 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     }
 
     private void changeMap(ArcGISMap map) {
-        final Viewpoint viewpoint = mapView.getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE);
+        Viewpoint viewpoint = this.viewpoint;
+        if (viewpoint == null) {
+            viewpoint = mapView.getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE);
+        }
         mapLoadedListener.setMap(map);
         map.loadAsync();
         mapView.setMap(map);
@@ -677,10 +698,9 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         }
 
         if (viewpoint != null) {
+            this.viewpoint = null;
             ListenableFuture<Boolean> future = mapView.setViewpointAsync(viewpoint);
-            future.addDoneListener(() -> {
-                invalidateMapHelper.invalidateMapIfNeeded();
-            });
+            future.addDoneListener(() -> invalidateMapHelper.invalidateMapIfNeeded());
         }
     }
 
@@ -748,7 +768,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         }
         final Object viewPoint = params.get("viewpoint");
         if (viewPoint != null) {
-            setViewpoint(viewPoint, false);
+            setViewpoint(viewPoint, false,null);
         }
 
         final Object options = params.get("options");
