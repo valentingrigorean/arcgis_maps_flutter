@@ -21,11 +21,14 @@ import com.esri.arcgisruntime.arcgisservices.TimeUnit;
 import com.esri.arcgisruntime.data.EditResult;
 import com.esri.arcgisruntime.data.FeatureEditResult;
 import com.esri.arcgisruntime.data.TileCache;
+import com.esri.arcgisruntime.geometry.AngularUnit;
 import com.esri.arcgisruntime.geometry.AngularUnitId;
 import com.esri.arcgisruntime.geometry.Envelope;
+import com.esri.arcgisruntime.geometry.GeodesicSectorParameters;
 import com.esri.arcgisruntime.geometry.GeodeticCurveType;
 import com.esri.arcgisruntime.geometry.Geometry;
 import com.esri.arcgisruntime.geometry.GeometryType;
+import com.esri.arcgisruntime.geometry.LinearUnit;
 import com.esri.arcgisruntime.geometry.LinearUnitId;
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.geometry.PointCollection;
@@ -75,6 +78,7 @@ import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.Style;
 import com.valentingrigorean.arcgis_maps_flutter.utils.LoadStatusChangedListenerLogger;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -228,9 +232,44 @@ public class Convert {
         return null;
     }
 
+    public static GeometryType toGeometryType(Object o) {
+        switch (toInt(o)) {
+            case 1:
+                return GeometryType.POINT;
+            case 2:
+                return GeometryType.ENVELOPE;
+            case 3:
+                return GeometryType.POLYLINE;
+            case 4:
+                return GeometryType.POLYGON;
+            case 5:
+                return GeometryType.MULTIPOINT;
+            default:
+                return GeometryType.UNKNOWN;
+        }
+    }
+
+    public static int GeometryTypeToJson(GeometryType geometryType) {
+        switch (geometryType) {
+            case POINT:
+                return 1;
+            case ENVELOPE:
+                return 2;
+            case POLYLINE:
+                return 3;
+            case POLYGON:
+                return 4;
+            case MULTIPOINT:
+                return 5;
+            case UNKNOWN:
+            default:
+                return -1;
+        }
+    }
+
     public static Geometry toGeometry(Object o) {
         final Map<?, ?> data = toMap(o);
-        final GeometryType geometryType = GeometryType.values()[toInt(data.get("geometryType"))];
+        final GeometryType geometryType = toGeometryType(data.get("type"));
         switch (geometryType) {
             case POINT:
                 return toPoint(data);
@@ -253,9 +292,13 @@ public class Convert {
     }
 
     public static Object geometryToJson(Geometry geometry) {
+        if (geometry == null) {
+            return null;
+        }
         final StringBuilder sb = new StringBuilder(geometry.toJson());
-        if (sb.length() > "{}".length()) {
-            final String geometryType = ",\"geometryType\":" + geometry.getGeometryType().ordinal();
+        /// account for empty geometries
+        if (sb.length() > 2) {
+            final String geometryType = ",\"type\":" + GeometryTypeToJson(geometry.getGeometryType());
             sb.insert(sb.length() - 1, geometryType);
         }
 
@@ -510,6 +553,27 @@ public class Convert {
             return new Envelope(toDouble(bbox.get(0)), toDouble(bbox.get(1)), toDouble(bbox.get(2)), toDouble(bbox.get(3)), spatialReference);
         }
         throw new UnsupportedOperationException("Not implemented!");
+    }
+
+    public static GeodesicSectorParameters toGeodesicSectorParameters(Object o) {
+        final Map<?, ?> data = toMap(o);
+        final Point center = toPoint(data.get("center"));
+        final double semiAxis1Length = toDouble(data.get("semiAxis1Length"));
+        final double semiAxis2Length = toDouble(data.get("semiAxis2Length"));
+        final double startDirection = toDouble(data.get("startDirection"));
+        final double sectorAngle = toDouble(data.get("sectorAngle"));
+        final GeodesicSectorParameters geodesicSectorParameters = new GeodesicSectorParameters(center, semiAxis1Length, semiAxis2Length, startDirection, sectorAngle);
+
+        geodesicSectorParameters.setLinearUnit(new LinearUnit(Convert.toLinearUnitId(data.get("linearUnit"))));
+        geodesicSectorParameters.setAngularUnit(new AngularUnit(Convert.toAngularUnitId(data.get("angularUnit"))));
+        geodesicSectorParameters.setAxisDirection(toDouble(data.get("axisDirection")));
+        final Object maxSegmentLength = data.get("maxSegmentLength");
+        if (maxSegmentLength != null) {
+            geodesicSectorParameters.setMaxSegmentLength(toDouble(maxSegmentLength));
+        }
+        geodesicSectorParameters.setGeometryType(toGeometryType(data.get("geometryType")));
+        geodesicSectorParameters.setMaxPointCount(toInt(data.get("maxPointCount")));
+        return geodesicSectorParameters;
     }
 
     public static void interpretMapViewOptions(Object o, MapView mapView) {
@@ -1162,9 +1226,7 @@ public class Convert {
     protected static Object toFlutterFieldType(Object o) {
         final Map<String, Object> data = new HashMap<>(2);
         FieldTypeFlutter fieldTypeFlutter;
-        if (o == null) {
-            fieldTypeFlutter = FieldTypeFlutter.NULLABLE;
-        } else if (o instanceof String) {
+        if (o instanceof String) {
             fieldTypeFlutter = FieldTypeFlutter.TEXT;
         } else if (o instanceof Short || o instanceof Integer) {
             fieldTypeFlutter = FieldTypeFlutter.INTEGER;
@@ -1176,6 +1238,18 @@ public class Convert {
         } else if (o instanceof UUID) {
             fieldTypeFlutter = FieldTypeFlutter.TEXT;
             o = o.toString();
+        } else if (o instanceof byte[] || o instanceof ByteBuffer) {
+            fieldTypeFlutter = FieldTypeFlutter.BLOB;
+            if (o instanceof ByteBuffer) {
+                o = ((ByteBuffer) o).array();
+            }
+        } else if (o instanceof Geometry) {
+            fieldTypeFlutter = FieldTypeFlutter.GEOMETRY;
+            if (o != null) {
+                o = geometryToJson((Geometry) o);
+            }
+        } else if (o == null) {
+            fieldTypeFlutter = FieldTypeFlutter.NULLABLE;
         } else {
             fieldTypeFlutter = FieldTypeFlutter.UNKNOWN;
             o = o.toString();
@@ -1189,13 +1263,23 @@ public class Convert {
         final Map<?, ?> data = toMap(o);
         final FieldTypeFlutter fieldTypeFlutter = FieldTypeFlutter.values()[toInt(data.get("type"))];
         Object value = data.get("value");
-        if (fieldTypeFlutter == FieldTypeFlutter.DATE) {
-            try {
-                value = ISO8601Format.parse(value.toString());
-            } catch (Exception e) {
-                // no op
-            }
+        switch (fieldTypeFlutter) {
+            case DATE:
+                try {
+                    value = ISO8601Format.parse(value.toString());
+                } catch (Exception e) {
+                    // no op
+                }
+                break;
+            case GEOMETRY:
+                if (value != null) {
+                    value = toGeometry(value);
+                }
+                break;
+            default:
+                break;
         }
+
         return value;
     }
 

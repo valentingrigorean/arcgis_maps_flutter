@@ -101,8 +101,9 @@ class GeometryEngineController {
             var geometryResults: [Any] = []
             geometryList.forEach { any in
                 if let geometry = any as? AGSGeometry {
-                    let json = geometry.toJSONFlutter()
-                    geometryResults.append(json)
+                    if let json = geometry.toJSONFlutter() {
+                        geometryResults.append(json)
+                    }
                 }
             }
             result(geometryResults)
@@ -115,6 +116,39 @@ class GeometryEngineController {
             let firstGeometry = AGSGeometry.fromFlutter(data: data["containerGeometry"] as! Dictionary<String, Any>)!
             let secondGeometry = AGSGeometry.fromFlutter(data: data["withinGeometry"] as! Dictionary<String, Any>)!
             result(AGSGeometryEngine.geometry(firstGeometry, contains: secondGeometry))
+            break
+        case "geodesicSector":
+            guard let data = call.arguments as? Dictionary<String, Any> else {
+                result(nil)
+                return
+            }
+            let params = AGSGeodesicSectorParameters(data: data)
+            let geometry = AGSGeometryEngine.geodesicSector(with: params)
+            result(geometry?.toJSONFlutter())
+            break
+        case "geodeticMove":
+            guard let data = call.arguments as? Dictionary<String, Any> else {
+                result(nil)
+                return
+            }
+            let points = (data["points"] as! [Dictionary<String, Any>]).map {
+                AGSPoint(data: $0)
+            }
+            let distance = data["distance"] as! Double
+            let distanceUnitId = AGSLinearUnitID.fromFlutter(data["distanceUnit"] as! Int)
+            let azimuth = data["azimuth"] as! Double
+            let azimuthUnitId = AGSAngularUnitID.fromFlutter(data["azimuthUnit"] as! Int)
+            let curveType = AGSGeodeticCurveType.init(rawValue: data["curveType"] as! Int)!
+            let results = AGSGeometryEngine.geodeticMove(points,
+                    distance: distance,
+                    distanceUnit: AGSLinearUnit(unitID: distanceUnitId)!,
+                    azimuth: azimuth,
+                    azimuthUnit: AGSAngularUnit(unitID: azimuthUnitId)!,
+                    curveType: curveType
+            )
+            result(results?.map {
+                $0.toJSONFlutter()
+            })
             break
         default:
             result(FlutterMethodNotImplemented)

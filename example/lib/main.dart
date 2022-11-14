@@ -10,6 +10,7 @@ import 'package:arcgis_maps_flutter_example/map_page_dynamic_layer.dart';
 import 'package:arcgis_maps_flutter_example/map_page_export_image.dart';
 import 'package:arcgis_maps_flutter_example/map_page_feature_service_offline.dart';
 import 'package:arcgis_maps_flutter_example/map_page_geodesic_distance.dart';
+import 'package:arcgis_maps_flutter_example/map_page_geodesic_sector.dart';
 import 'package:arcgis_maps_flutter_example/map_page_geometry_engine.dart';
 import 'package:arcgis_maps_flutter_example/map_page_gesture.dart';
 import 'package:arcgis_maps_flutter_example/map_page_group_layer.dart';
@@ -225,6 +226,18 @@ class MainPage extends StatelessWidget {
                   );
                 },
               ),
+              ElevatedButton(
+                child: const Text('Map Geodesic Sector'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MapPageGeodesicSector(),
+                    ),
+                  );
+                },
+              ),
+
               ElevatedButton(
                 child: const Text('Map View insets'),
                 onPressed: () {

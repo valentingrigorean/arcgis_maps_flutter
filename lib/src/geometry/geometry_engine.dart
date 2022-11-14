@@ -124,4 +124,39 @@ class GeometryEngine {
   static Future<bool> contains(Geometry container, Geometry within) {
     return GeometryEngineFlutterPlatform.instance.contains(container, within);
   }
+
+  /// Constructs a geodesic sector defined by a geodesic arc and 2 radii.
+  /// The arc is a portion of an ellipse that is centered on a specified point
+  /// and is defined by it's 2 axes and the length of it's longest axis.
+  /// The first radius angle is defined by the startDirection angle and the
+  /// second radius angle is the sum of the startDirection and the sectorAngle. T
+  /// he sector is constructed as a [AGSPolygon], [AGSPolyline] or [AGSMultipoint] geometry.
+  /// [params] Specifies the parameters for constructing the sector.
+  /// Returns The sector is returned in the format specified by the geometryType
+  /// and is generalized according to the arcVertexCount and the radiusVertexCount parameters.
+  static Future<Geometry?> geodesicSector(GeodesicSectorParameters params) {
+    return GeometryEngineFlutterPlatform.instance.geodesicSector(params);
+  }
+
+  /// Moves each point in the point collection by a geodesic distance.
+  /// There must be the same spatial reference on each point in the input array of points.
+  /// The returned array is in the same order as the input, but with new points at their destination locations.
+  /// Specifying a negative distance moves points in the opposite direction from azimuth.
+  static Future<List<AGSPoint>> geodeticMove({
+    required List<AGSPoint> points,
+    required double distance,
+    required LinearUnitId distanceUnit,
+    required double azimuth,
+    required AngularUnitId azimuthUnit,
+    required GeodeticCurveType curveType,
+  }) {
+    return GeometryEngineFlutterPlatform.instance.geodeticMove(
+      points: points,
+      distance: distance,
+      distanceUnit: distanceUnit,
+      azimuth: azimuth,
+      azimuthUnit: azimuthUnit,
+      curveType: curveType,
+    );
+  }
 }

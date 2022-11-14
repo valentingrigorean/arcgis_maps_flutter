@@ -36,7 +36,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private var layerHandle: AGSCancelable?
 
-
     private var trackIdentityLayers = false
 
     private var trackViewpointChangedListenerEvent = false
@@ -149,22 +148,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 }
             }
             break
-        case "map#getLocation":
-            let location = mapView.locationDisplay.location
-            if location == nil {
-                result(nil)
-            } else {
-                result(location!.toJSONFlutter())
-            }
-            break
-        case "map#getMapLocation":
-            let mapLocation = mapView.locationDisplay.mapLocation
-            if mapLocation == nil {
-                result(nil)
-            } else {
-                result(mapLocation!.toJSONFlutter())
-            }
-            break
         case "map#getLegendInfos":
             let legendInfoController = LegendInfoController(layersController: layersController)
             legendInfoController.loadAsync(args: call.arguments, result: { [weak self] items in
@@ -189,6 +172,22 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 }
             } else {
                 result(nil)
+            }
+            break
+        case "map#getLocation":
+            let location = mapView.locationDisplay.location
+            if location == nil {
+                result(nil)
+            } else {
+                result(location!.toJSONFlutter())
+            }
+            break
+        case "map#getMapLocation":
+            let mapLocation = mapView.locationDisplay.mapLocation
+            if mapLocation == nil {
+                result(nil)
+            } else {
+                result(mapLocation!.toJSONFlutter())
             }
             break
         case "map#setMapMaxExtent":
@@ -264,8 +263,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             }
             break
         case "map#setViewpoint":
-            setViewpoint(args: call.arguments, animated: true)
-            result(nil)
+            setViewpoint(args: call.arguments, animated: true, result: result)
             break
         case "map#setViewpointGeometry":
             if let data = call.arguments as? Dictionary<String, Any> {
@@ -555,7 +553,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     private func changeMap(map: AGSMap) {
-        let viewPoint = mapView.currentViewpoint(with: AGSViewpointType.centerAndScale)
+        let viewPoint = viewpoint ?? mapView.currentViewpoint(with: AGSViewpointType.centerAndScale)
         map.load { [weak self]  error in
             guard let channel = self?.channel else {
                 return
@@ -571,6 +569,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         if viewPoint != nil {
             mapView.setViewpoint(viewPoint!, duration: 0)
         }
+        viewpoint = nil
     }
 
     private func updateMapOptions(mapOptions: Dictionary<String, Any>) {
@@ -651,19 +650,33 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     private func setViewpoint(args: Any?,
-                              animated: Bool) {
+                              animated: Bool, result: FlutterResult?) {
         guard let data = args as? Dictionary<String, Any> else {
+            result?(nil)
             return
         }
 
         let newViewpoint = AGSViewpoint(data: data)
         viewpoint = newViewpoint
 
+        guard let _ = mapView.map else {
+            result?(nil)
+            return
+        }
+
         if animated {
-            mapView.setViewpoint(newViewpoint, completion: nil)
+            mapView.setViewpoint(newViewpoint, completion: { [weak self] _ in
+                guard let result = result else {
+                    return
+                }
+                result(nil)
+            })
         } else {
             mapView.setViewpoint(newViewpoint, duration: 0)
+            result?(nil)
         }
+
+        viewpoint = nil
     }
 
     private func initWithArgs(args: Any?) {
@@ -674,7 +687,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             changeMapType(args: mapType)
         }
         if let viewPoint = dict["viewpoint"] {
-            setViewpoint(args: viewPoint, animated: false)
+            setViewpoint(args: viewPoint, animated: false, result: nil)
         }
 
         layersController.updateFromArgs(args: dict)
@@ -784,13 +797,15 @@ extension ArcgisMapController: AGSGeoViewTouchDelegate {
     }
 
     private func sendOnMapTap(screenPoint: CGPoint) {
-        let json = mapView.screen(toLocation: screenPoint).toJSONFlutter()
-        channel.invokeMethod("map#onTap", arguments: ["screenPoint": screenPoint.toJSON(), "position": json])
+        if let json = mapView.screen(toLocation: screenPoint).toJSONFlutter() {
+            channel.invokeMethod("map#onTap", arguments: ["screenPoint": screenPoint.toJSON(), "position": json])
+        }
     }
 
     private func sendOnMapLongPress(screenPoint: CGPoint) {
-        let json = mapView.screen(toLocation: screenPoint).toJSONFlutter()
-        channel.invokeMethod("map#onLongPress", arguments: ["screenPoint": screenPoint.toJSON(), "position": json])
+        if let json = mapView.screen(toLocation: screenPoint).toJSONFlutter() {
+            channel.invokeMethod("map#onLongPress", arguments: ["screenPoint": screenPoint.toJSON(), "position": json])
+        }
     }
 
     private func sendUserLocationTap() {

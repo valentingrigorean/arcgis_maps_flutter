@@ -115,4 +115,41 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
     );
     return result ?? false;
   }
+
+  @override
+  Future<Geometry?> geodesicSector(GeodesicSectorParameters params) async {
+    final result =
+        await _channel.invokeMethod("geodesicSector", params.toJson());
+    return Geometry.fromJson(result);
+  }
+
+  @override
+  Future<List<AGSPoint>> geodeticMove({
+    required List<AGSPoint> points,
+    required double distance,
+    required LinearUnitId distanceUnit,
+    required double azimuth,
+    required AngularUnitId azimuthUnit,
+    required GeodeticCurveType curveType,
+  }) async {
+    final result = await _channel.invokeMethod("geodeticMove", {
+      "points": points.map((e) => e.toJson()).toList(),
+      "distance": distance,
+      "distanceUnit": distanceUnit.index,
+      "azimuth": azimuth,
+      "azimuthUnit": azimuthUnit.index,
+      "curveType": curveType.index,
+    });
+    if (result == null) {
+      return const [];
+    }
+    List<AGSPoint> pointList = [];
+    for (var json in result) {
+      AGSPoint? point = AGSPoint.fromJson(json);
+      if (point != null) {
+        pointList.add(point);
+      }
+    }
+    return pointList;
+  }
 }
