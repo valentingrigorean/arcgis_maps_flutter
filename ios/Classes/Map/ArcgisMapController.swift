@@ -467,30 +467,46 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         changeMap(map: map)
     }
 
-    private func loadOfflineMap(args: Dictionary<String, Any>) {
+        private func loadOfflineMap(args: Dictionary<String, Any>) {
         let offlinePath = args["offlinePath"] as! String
         let mapIndex = args["offlineMapIndex"] as! Int
 
-        let mobileMapPackage = AGSMobileMapPackage(fileURL: URL(string: offlinePath)!)
-        mobileMapPackage.load { [weak self] error in
-            guard let self = self else {
-                return
-            }
+        let ext = offlinePath.components(separatedBy: ".").last
 
-            if error != nil {
-                print(error.debugDescription)
-                self.channel.invokeMethod("map#loaded", arguments: error?.toJSON())
-                return
-            }
-
-            if mobileMapPackage.maps.isEmpty {
-                print("No maps in the package")
-                self.channel.invokeMethod("map#loaded", arguments: error?.toJSON())
-                return
-            }
-
-            let map = mobileMapPackage.maps[mapIndex]
+        switch ext {
+        case "vtpk":
+             // .vtpk extension is automatically added by the ArcGIS Runtime
+            let vectorTileLayer = AGSArcGISVectorTiledLayer(name: offlinePath.replacingOccurrences(of: ".vtpk", with: ""))
+            let basemap = AGSBasemap(baseLayer: vectorTileLayer)
+            let map = AGSMap(basemap: basemap)
             self.changeMap(map: map)
+            return
+        case "mmpk":
+            let mobileMapPackage = AGSMobileMapPackage(fileURL: URL(string: offlinePath)!)
+            mobileMapPackage.load { [weak self] error in
+                guard let self = self else {
+                    return
+                }
+
+                if error != nil {
+                    print(error.debugDescription)
+                    self.channel.invokeMethod("map#loaded", arguments: error?.toJSON())
+                    return
+                }
+
+                if mobileMapPackage.maps.isEmpty {
+                    print("No maps in the package")
+                    self.channel.invokeMethod("map#loaded", arguments: error?.toJSON())
+                    return
+                }
+
+                let map = mobileMapPackage.maps[mapIndex]
+                self.changeMap(map: map)
+                return
+            }
+        default:
+            return
+        
         }
     }
 
