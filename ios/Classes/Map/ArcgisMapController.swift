@@ -482,30 +482,36 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             changeMap(map: map)
             return
         case "mmpk":
-            let mobileMapPackage = AGSMobileMapPackage(fileURL: URL(string: offlinePath)!)
-            mobileMapPackage.load { [weak self] error in
-                guard let self = self else {
-                    return
-                }
+            // For offline maps we use the folder not the extension
+            loadMobileMapPackage(offlinePath: offlinePath.replacingOccurrences(of: ".mmpk", with: ""), mapIndex: mapIndex)
+            return
+        default:
+            loadMobileMapPackage(offlinePath: offlinePath, mapIndex: mapIndex)
+            return
+        }
+    }
 
-                if error != nil {
-                    print(error.debugDescription)
-                    self.channel.invokeMethod("map#loaded", arguments: error?.toJSON())
-                    return
-                }
-
-                if mobileMapPackage.maps.isEmpty {
-                    print("No maps in the package")
-                    self.channel.invokeMethod("map#loaded", arguments: error?.toJSON())
-                    return
-                }
-
-                let map = mobileMapPackage.maps[mapIndex]
-                self.changeMap(map: map)
+    private func loadMobileMapPackage(offlinePath:String, mapIndex:Int) {
+        let mobileMapPackage = AGSMobileMapPackage(fileURL: URL(string: offlinePath)!)
+        mobileMapPackage.load { [weak self] error in
+            guard let self = self else {
                 return
             }
-        default:
-            return
+
+            if error != nil {
+                print(error.debugDescription)
+                self.channel.invokeMethod("map#loaded", arguments: error?.toJSON())
+                return
+            }
+
+            if mobileMapPackage.maps.isEmpty {
+                print("No maps in the package")
+                self.channel.invokeMethod("map#loaded", arguments: error?.toJSON())
+                return
+            }
+
+            let map = mobileMapPackage.maps[mapIndex]
+            self.changeMap(map: map)
         }
     }
 
