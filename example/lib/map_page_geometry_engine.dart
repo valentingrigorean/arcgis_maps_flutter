@@ -18,7 +18,7 @@ class _MapPageGeometryEngineState extends State<MapPageGeometryEngine> {
         children: [
           ArcgisMapView(
             map: ArcGISMap.imagery(),
-            onTap: (point) async {
+            onTap: (_,point) async {
               final projection = await GeometryEngine.project(
                 point,
                 SpatialReference.wgs84(),

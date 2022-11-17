@@ -24,14 +24,14 @@ class _MapPageBufferState extends State<MapPageBuffer> {
           ArcgisMapView(
             map: ArcGISMap.imagery(),
             polygons: _polygon == null ? const {} : {_polygon!},
-            onTap: (point) async {
+            onTap: (screenPoint, position) async {
               AGSPolygon? polygon;
               if (_currentBufferType == 0) {
                 polygon = await GeometryEngine.bufferGeometry(
-                    geometry: point, distance: 1000);
+                    geometry: position, distance: 1000);
               } else {
                 polygon = await GeometryEngine.geodeticBufferGeometry(
-                  geometry: point,
+                  geometry: position,
                   distance: 1000,
                   distanceUnit: LinearUnitId.meters,
                   maxDeviation: double.nan,

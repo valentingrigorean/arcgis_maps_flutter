@@ -5,7 +5,7 @@
 import Foundation
 
 extension CGPoint {
-    func toJSON() -> Any {
+    func toJSONFlutter() -> Any {
         [x, y]
     }
 }

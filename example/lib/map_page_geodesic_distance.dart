@@ -50,7 +50,7 @@ class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance> {
             }
           });
         },
-        onTap: (AGSPoint point) async {
+        onTap: (_, AGSPoint point) async {
           if (_userLocation == null) {
             return;
           }

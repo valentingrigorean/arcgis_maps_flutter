@@ -45,7 +45,7 @@ class _MapPageLocatorState extends State<MapPageLocator> {
             ignoring: _isLoading,
             child: ArcgisMapView(
               map: ArcGISMap.imageryWithLabelsVector(),
-              onTap: (point) async {
+              onTap: (_,point) async {
                 setState(() {
                   _isLoading = true;
                 });

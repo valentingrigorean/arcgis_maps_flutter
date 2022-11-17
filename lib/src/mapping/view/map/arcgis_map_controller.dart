@@ -43,10 +43,8 @@ class ArcgisMapController {
         .getLegendInfos(mapId, layer);
   }
 
-
-  Future<Uint8List?> exportImage(){
-    return ArcgisMapsFlutterPlatform.instance
-        .exportImage(mapId);
+  Future<Uint8List?> exportImage() {
+    return ArcgisMapsFlutterPlatform.instance.exportImage(mapId);
   }
 
   Set<T> getLayersOfType<T extends Layer>() {
@@ -81,14 +79,12 @@ class ArcgisMapController {
     return result.expand((e) => e).toList();
   }
 
-  Future<AGSEnvelope?> getMapMaxExtend(){
-    return ArcgisMapsFlutterPlatform.instance
-        .getMapMaxExtend(mapId);
+  Future<AGSEnvelope?> getMapMaxExtend() {
+    return ArcgisMapsFlutterPlatform.instance.getMapMaxExtend(mapId);
   }
 
-  Future<void> setMapMaxExtent(AGSEnvelope envelope){
-    return ArcgisMapsFlutterPlatform.instance
-        .setMapMaxExtent(mapId, envelope);
+  Future<void> setMapMaxExtent(AGSEnvelope envelope) {
+    return ArcgisMapsFlutterPlatform.instance.setMapMaxExtent(mapId, envelope);
   }
 
   void addViewpointChangedListener(ViewpointChangedListener listener) {
@@ -272,12 +268,12 @@ class ArcgisMapController {
         .onMapLoad(mapId: mapId)
         .listen((MapLoadedEvent e) => _arcgisMapState.onMapLoaded(e.value));
 
-    ArcgisMapsFlutterPlatform.instance
-        .onTap(mapId: mapId)
-        .listen((MapTapEvent e) => _arcgisMapState.onTap(e.position));
+    ArcgisMapsFlutterPlatform.instance.onTap(mapId: mapId).listen(
+        (MapTapEvent e) => _arcgisMapState.onTap(e.screenPoint, e.position));
 
     ArcgisMapsFlutterPlatform.instance.onLongPress(mapId: mapId).listen(
-        (MapLongPressEvent e) => _arcgisMapState.onLongPress(e.position));
+        (MapLongPressEvent e) =>
+            _arcgisMapState.onLongPress(e.screenPoint, e.position));
 
     ArcgisMapsFlutterPlatform.instance.onLayerLoad(mapId: mapId).listen(
         (LayerLoadedEvent e) =>
@@ -311,11 +307,12 @@ class ArcgisMapController {
     );
 
     ArcgisMapsFlutterPlatform.instance.onIdentifyLayer(mapId: mapId).listen(
-        (IdentifyLayerEvent e) =>
-            _arcgisMapState.onIdentifyLayer(e.value, e.result));
+        (IdentifyLayerEvent e) => _arcgisMapState.onIdentifyLayer(
+            e.value, e.screenPoint, e.position, e.result));
 
     ArcgisMapsFlutterPlatform.instance.onIdentifyLayers(mapId: mapId).listen(
-        (IdentifyLayersEvent e) => _arcgisMapState.onIdentifyLayers(e.results));
+        (IdentifyLayersEvent e) => _arcgisMapState.onIdentifyLayers(
+            e.screenPoint, e.position, e.results));
 
     ArcgisMapsFlutterPlatform.instance.onUserLocationTap(mapId: mapId).listen(
           (UserLocationTapEvent e) => _arcgisMapState.onUserLocationTap(),

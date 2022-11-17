@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 
 class MapEvent<T> {
@@ -53,18 +55,28 @@ class UserLocationTapEvent extends MapEvent<void> {
 class IdentifyLayerEvent extends MapEvent<LayerId> {
   const IdentifyLayerEvent(
     int mapId,
-    LayerId layerId,
-    this.result,
-  ) : super(mapId, layerId);
+    LayerId layerId, {
+    required this.result,
+    required this.screenPoint,
+    required this.position,
+  }) : super(mapId, layerId);
+
+  final Offset screenPoint;
+  final AGSPoint position;
 
   final IdentifyLayerResult result;
 }
 
 class IdentifyLayersEvent extends MapEvent<void> {
   const IdentifyLayersEvent(
-    int mapId,
-    this.results,
-  ) : super(mapId, null);
+    int mapId, {
+    required this.results,
+    required this.screenPoint,
+    required this.position,
+  }) : super(mapId, null);
+
+  final Offset screenPoint;
+  final AGSPoint position;
 
   final List<IdentifyLayerResult> results;
 }
@@ -92,16 +104,18 @@ class MapTapEvent extends _PositionedMapEvent<void> {
   ///
   /// The `position` of this event is the LatLng where the Map was tapped.
   const MapTapEvent(
-    int mapId,
-    AGSPoint position,
-  ) : super(mapId, position, null);
+    super.mapId, {
+    required super.screenPoint,
+    required super.position,
+  }) : super(value: null);
 }
 
 class MapLongPressEvent extends _PositionedMapEvent<void> {
   const MapLongPressEvent(
-    int mapId,
-    AGSPoint position,
-  ) : super(mapId, position, null);
+    super.mapId, {
+    required super.screenPoint,
+    required super.position,
+  }) : super(value: null);
 }
 
 class ViewpointChangedEvent extends MapEvent<void> {
@@ -133,11 +147,14 @@ class _PositionedMapEvent<T> extends MapEvent<T> {
   /// The `mapId` is the id of the map that triggered the event.
   /// `value` may be `null` in events that don't transport any meaningful data.
   const _PositionedMapEvent(
-    int mapId,
-    this.position,
-    T value,
-  ) : super(mapId, value);
+    int mapId, {
+    required this.position,
+    required this.screenPoint,
+    required T value,
+  }) : super(mapId, value);
 
   /// The position where this event happened.
   final AGSPoint position;
+
+  final Offset screenPoint;
 }

@@ -109,8 +109,14 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
                     sendOnMapTap(screenPoint);
                     return;
                 }
-                final Object json = Convert.identifyLayerResultsToJson(results);
-                methodChannel.invokeMethod("map#onIdentifyLayers", json);
+                final Object jsonResults = Convert.identifyLayerResultsToJson(results);
+                final Point position = mMapView.screenToLocation(screenPoint);
+                final HashMap<String, Object> data = new HashMap<>(3);
+                data.put("results", jsonResults);
+                data.put("screenPoint", Convert.pointToJson(screenPoint));
+                data.put("position", Convert.geometryToJson(position));
+
+                methodChannel.invokeMethod("map#onIdentifyLayers", data);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -139,6 +145,7 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
         }
         final HashMap<String, Object> data = new HashMap<>(1);
         data.put("position", Convert.geometryToJson(mapPoint));
+        data.put("screenPoint", Convert.pointToJson(screenPoint));
         methodChannel.invokeMethod("map#onTap", data);
     }
 
@@ -150,6 +157,7 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
 
         final HashMap<String, Object> data = new HashMap<>(1);
         data.put("position", Convert.geometryToJson(mapPoint));
+        data.put("screenPoint", Convert.pointToJson(screenPoint));
         methodChannel.invokeMethod("map#onLongPress", data);
     }
 

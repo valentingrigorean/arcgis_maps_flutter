@@ -98,6 +98,13 @@ public class Convert {
     protected static final SimpleDateFormat ISO8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US);
     protected static final ObjectMapper objectMapper = new ObjectMapper();
 
+    public static Object pointToJson(android.graphics.Point screenPoint) {
+        final double[] data = new double[2];
+        data[0] = screenPoint.x;
+        data[1] = screenPoint.y;
+        return data;
+    }
+
     public static Object arcGISRuntimeExceptionToJson(@Nullable ArcGISRuntimeException ex) {
         if (ex == null) {
             return null;
@@ -1375,5 +1382,6 @@ public class Convert {
         final LoadStatusChangedListenerLogger logger = new LoadStatusChangedListenerLogger(tag, loadable);
         logger.attach();
     }
+
 
 }
