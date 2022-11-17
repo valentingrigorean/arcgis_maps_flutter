@@ -551,7 +551,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
       case 'map#onIdentifyLayers':
         final Map<dynamic, dynamic> args = call.arguments;
         final screenPoint = _fromJson(args['screenPoint']);
-        final position = AGSPoint.fromJson(args['screenPoint'])!;
+        final position = AGSPoint.fromJson(args['position'])!;
         final List<IdentifyLayerResult> results = [];
         for (var item in args['results']) {
           final String layerName = item['layerName']!;
