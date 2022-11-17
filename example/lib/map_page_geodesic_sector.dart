@@ -20,7 +20,7 @@ class _MapPageGeodesicSectorState extends State<MapPageGeodesicSector> {
       ),
       body: ArcgisMapView(
         map: ArcGISMap.imagery(),
-        onTap: (point) async {
+        onTap: (_,point) async {
           final geometry = await GeometryEngine.geodesicSector(
             GeodesicSectorParameters(
               center: point,

@@ -21,7 +21,7 @@ class _MapPageViewInsetsState extends State<MapPageViewInsets> {
             isAttributionTextVisible: false,
             insetsContentInsetFromSafeArea: false,
             contentInsets: const EdgeInsets.only(bottom: 200),
-            onTap: (point) {
+            onTap: (_,point) {
               _mapController.setViewpointCenter(point);
             },
             onMapCreated: (controller) {

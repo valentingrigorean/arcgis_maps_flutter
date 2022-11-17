@@ -18,12 +18,12 @@ class _MapPageGestureState extends State<MapPageGesture> {
         children: [
           ArcgisMapView(
             map: ArcGISMap.imagery(),
-            onTap: (point) {
+            onTap: (_,point) {
               setState(() {
                 text = 'OnTap: $point';
               });
             },
-            onLongPress: (point) {
+            onLongPress: (_,point) {
               setState(() {
                 text = 'OnLongPress: $point';
               });

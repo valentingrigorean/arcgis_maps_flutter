@@ -32,7 +32,7 @@ class _MapPageMarkerFromWidgetState extends State<MapPageMarkerFromWidget> {
       body: ArcgisMapView(
         map: ArcGISMap.imagery(),
         markers: _markers,
-        onTap: (point) async {
+        onTap: (_,point) async {
           final bitmapDescriptor = await BitmapDescriptor.fromWidget(
             context: context,
             builder: (context) {

@@ -12,10 +12,13 @@ typedef MapLoadedCallback = void Function(ArcgisError? error);
 
 typedef LayerLoadedCallback = void Function(Layer layer, ArcgisError? error);
 
-typedef IdentifyLayerCallback = void Function(IdentifyLayerResult result);
+typedef GestureCallback = void Function(Offset screenPoint, AGSPoint poisition);
+
+typedef IdentifyLayerCallback = void Function(
+    Offset screenPoint, AGSPoint position, IdentifyLayerResult result);
 
 typedef IdentifyLayersCallback = void Function(
-    List<IdentifyLayerResult> results);
+    Offset screenPoint, AGSPoint position, List<IdentifyLayerResult> results);
 
 /// Callback function taking a single argument.
 typedef ArgumentCallback<T> = void Function(T argument);
@@ -187,9 +190,9 @@ class ArcgisMapView extends StatefulWidget {
   final bool isAttributionTextVisible;
 
   /// Called every time a [ArcgisMapView] is tapped.
-  final ArgumentCallback<AGSPoint>? onTap;
+  final GestureCallback? onTap;
 
-  final ArgumentCallback<AGSPoint>? onLongPress;
+  final GestureCallback? onLongPress;
 
   /// Options to configure user interactions with the view.
   final InteractionOptions interactionOptions;
@@ -390,31 +393,33 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     }
   }
 
-  void onTap(AGSPoint point) {
+  void onTap(Offset screenPoint, AGSPoint position) {
     final onTap = widget.onTap;
     if (onTap != null) {
-      onTap(point);
+      onTap(screenPoint, position);
     }
   }
 
-  void onLongPress(AGSPoint position) {
+  void onLongPress(Offset screenPoint, AGSPoint position) {
     final onLongPress = widget.onLongPress;
     if (onLongPress != null) {
-      onLongPress(position);
+      onLongPress(screenPoint, position);
     }
   }
 
-  void onIdentifyLayer(LayerId layerId, IdentifyLayerResult result) {
+  void onIdentifyLayer(LayerId layerId, Offset screenMap, AGSPoint position,
+      IdentifyLayerResult result) {
     final callback = widget.onIdentifyLayer[layerId];
     if (callback != null) {
-      callback(result);
+      callback(screenMap, position, result);
     }
   }
 
-  void onIdentifyLayers(List<IdentifyLayerResult> results) {
+  void onIdentifyLayers(
+      Offset screenMap, AGSPoint position, List<IdentifyLayerResult> results) {
     final callback = widget.onIdentifyLayers;
     if (callback != null) {
-      callback(results);
+      callback(screenMap, position, results);
     }
   }
 
