@@ -31,8 +31,6 @@ import 'package:arcgis_maps_flutter/src/method_channel/scene/arcgis_scene_flutte
 import 'package:arcgis_maps_flutter/src/method_channel/geometry/geometry_engine_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/geometry/coordinate_formatter_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/map_event.dart';
-import 'package:arcgis_maps_flutter/src/method_channel/tasks/geocode/locator_task_flutter_platform.dart';
-import 'package:arcgis_maps_flutter/src/method_channel/tasks/network_analysis/route_task_flutter_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:math' as math;

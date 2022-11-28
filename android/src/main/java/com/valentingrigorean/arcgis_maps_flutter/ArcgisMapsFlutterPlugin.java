@@ -14,8 +14,6 @@ import com.valentingrigorean.arcgis_maps_flutter.geometry.CoordinateFormatterCon
 import com.valentingrigorean.arcgis_maps_flutter.geometry.GeometryEngineController;
 import com.valentingrigorean.arcgis_maps_flutter.map.ArcgisMapFactory;
 import com.valentingrigorean.arcgis_maps_flutter.scene.ArcgisSceneViewFactory;
-import com.valentingrigorean.arcgis_maps_flutter.tasks.geocode.LocatorTaskController;
-import com.valentingrigorean.arcgis_maps_flutter.tasks.networkanalysis.RouteTaskController;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -36,14 +34,11 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
 
     private GeometryEngineController geometryEngineController;
     private CoordinateFormatterController coordinateFormatterController;
-    private LocatorTaskController locatorTaskController;
-    private RouteTaskController routeTaskController;
     private ArcgisNativeObjectsController nativeObjectsController;
     private MethodChannel channel;
 
     @Nullable
     private Lifecycle lifecycle;
-
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
@@ -60,11 +55,7 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
 
         coordinateFormatterController = new CoordinateFormatterController(binding.getBinaryMessenger());
 
-        locatorTaskController = new LocatorTaskController(binding.getBinaryMessenger());
-
-        routeTaskController = new RouteTaskController(binding.getApplicationContext(), binding.getBinaryMessenger());
-
-        nativeObjectsController = new ArcgisNativeObjectsController(binding.getBinaryMessenger(), new ArcgisNativeObjectFactoryImpl());
+        nativeObjectsController = new ArcgisNativeObjectsController(binding.getBinaryMessenger(), new ArcgisNativeObjectFactoryImpl(binding.getApplicationContext()));
     }
 
     @Override
@@ -75,12 +66,6 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
 
         coordinateFormatterController.dispose();
         coordinateFormatterController = null;
-
-        locatorTaskController.dispose();
-        locatorTaskController = null;
-
-        routeTaskController.dispose();
-        routeTaskController = null;
 
         nativeObjectsController.dispose();
         nativeObjectsController = null;
