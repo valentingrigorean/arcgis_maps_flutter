@@ -18,6 +18,7 @@ import com.valentingrigorean.arcgis_maps_flutter.io.RemoteResourceNativeHandler;
 import com.valentingrigorean.arcgis_maps_flutter.loadable.LoadableNativeHandler;
 
 import java.util.List;
+import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
 
@@ -35,6 +36,9 @@ public class LocatorTaskNativeObject extends BaseNativeObject<LocatorTask> {
             case "locatorTask#getLocatorInfo":
                 getLocatorInfo(result);
                 break;
+            case "locatorTask#geocode":
+                geocode(args, result);
+                break;
             case "locatorTask#reverseGeocode":
                 reverseGeocode(args, result);
                 break;
@@ -42,6 +46,7 @@ public class LocatorTaskNativeObject extends BaseNativeObject<LocatorTask> {
                 super.onMethodCall(method, args, result);
         }
     }
+
 
     private void getLocatorInfo(MethodChannel.Result result) {
         final LocatorTask locatorTask = getNativeObject();
@@ -54,6 +59,27 @@ public class LocatorTaskNativeObject extends BaseNativeObject<LocatorTask> {
             } else {
                 final ArcGISRuntimeException exception = locatorTask.getLoadError();
                 result.error("ERROR", exception != null ? exception.getMessage() : "Unknown error.", null);
+            }
+        });
+    }
+
+    private void geocode(Object args, MethodChannel.Result result) {
+        final Map<?, ?> data = Convert.toMap(args);
+        final String searchText = data.get("searchText").toString();
+        final Object parameters = data.get("parameters");
+        ListenableFuture<List<GeocodeResult>> future;
+        if (parameters == null) {
+            future = getNativeObject().geocodeAsync(searchText);
+        } else {
+            future = getNativeObject().geocodeAsync(searchText, ConvertLocatorTask.toGeocodeParameters(parameters));
+        }
+        future.addDoneListener(() -> {
+            try {
+                final List<GeocodeResult> geocodeResults = future.get();
+                result.success(ConvertLocatorTask.geocodeResultsToJson(geocodeResults));
+            } catch (Exception e) {
+                Log.e(TAG, "geocode: ", e);
+                result.error("ERROR", e.getMessage(), null);
             }
         });
     }

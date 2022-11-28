@@ -7,8 +7,8 @@ class GeocodeParameters {
     this.categories = const [],
     this.countryCode = '',
     this.forStorage = false,
-    this.maxResults = 10,
-    this.minScore = 75,
+    this.maxResults = 2147483647,
+    this.minScore = 0.0,
     this.outputLanguageCode = '',
     this.outputSpatialReference,
     this.preferredSearchLocation,
@@ -58,7 +58,7 @@ class GeocodeParameters {
   /// than this value will not be returned.
   /// Only applies when geocoding locally on the device using a locator dataset
   /// (i.e not using an ArcGIS Geocode service).
-  final int minScore;
+  final double minScore;
 
   /// The language in which results should be returned.
   /// Based on the 2-digit ISO 639-1 language code.
