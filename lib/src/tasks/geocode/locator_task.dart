@@ -31,7 +31,7 @@ class LocatorTask extends ArcgisNativeObject
     required String searchText,
     GeocodeParameters? parameters,
   }) async {
-    final result = await invokeMethod('locatorTask#geocode', arguments: {
+    final result = await invokeMethod<List<dynamic>>('locatorTask#geocode', arguments: {
       'searchText': searchText,
       'parameters': parameters?.toJson()
     });
@@ -39,8 +39,7 @@ class LocatorTask extends ArcgisNativeObject
     if (result == null) {
       return const [];
     }
-    return result
-        .then((value) => value.map((e) => GeocodeResult.fromJson(e)).toList());
+    return result.map((e) => GeocodeResult.fromJson(e)).toList();
   }
 
   Future<List<GeocodeResult>> reverseGeocode(AGSPoint location) async {
