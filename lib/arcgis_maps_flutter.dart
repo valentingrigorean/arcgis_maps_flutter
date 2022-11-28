@@ -137,6 +137,7 @@ part 'src/symbology/polyline.dart';
 part 'src/symbology/symbol.dart';
 part 'src/symbology/symbol_visibility_filter.dart';
 
+part 'src/tasks/geocode/geocode_parameters.dart';
 part 'src/tasks/geocode/geocode_result.dart';
 part 'src/tasks/geocode/locator_attribute.dart';
 part 'src/tasks/geocode/locator_info.dart';

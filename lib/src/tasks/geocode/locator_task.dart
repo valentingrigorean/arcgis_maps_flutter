@@ -19,9 +19,28 @@ class LocatorTask extends ArcgisNativeObject
   @override
   dynamic getCreateArguments() => _url;
 
-  Future<LocatorInfo> getLocatorInfo() async {
+  Future<LocatorInfo?> getLocatorInfo() async {
     final result = await invokeMethod('locatorTask#getLocatorInfo');
+    if (result == null) {
+      return null;
+    }
     return LocatorInfo.fromJson(result);
+  }
+
+  Future<List<GeocodeResult>> geocode({
+    required String searchText,
+    GeocodeParameters? parameters,
+  }) async {
+    final result = await invokeMethod('locatorTask#geocode', arguments: {
+      'searchText': searchText,
+      'parameters': parameters?.toJson()
+    });
+
+    if (result == null) {
+      return const [];
+    }
+    return result
+        .then((value) => value.map((e) => GeocodeResult.fromJson(e)).toList());
   }
 
   Future<List<GeocodeResult>> reverseGeocode(AGSPoint location) async {
