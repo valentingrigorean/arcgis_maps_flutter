@@ -9,7 +9,7 @@ class RouteResult {
     // TODO(vali): impl AGSPointBarrier/AGSPolygonBarrier/AGSPolylineBarrier
   });
 
-  factory RouteResult.fromJson(Map<String, dynamic> json) {
+  factory RouteResult.fromJson(Map<dynamic, dynamic> json) {
     return RouteResult._(
       directionsLanguage: json['directionsLanguage'] as String,
       messages: (json['messages'] as List<dynamic>).cast<String>(),
@@ -30,7 +30,7 @@ class RouteResult {
   final List<Route> routes;
 
   @override
-  String toString(){
+  String toString() {
     return 'RouteResult{directionsLanguage: $directionsLanguage, messages: $messages, routes: $routes}';
   }
 }

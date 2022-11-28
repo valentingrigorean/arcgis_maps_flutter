@@ -23,7 +23,7 @@ class RouteParameters {
     this.stops = const [],
   });
 
-  factory RouteParameters.fromJson(Map<String, dynamic> json) {
+  factory RouteParameters.fromJson(Map<dynamic, dynamic> json) {
     return RouteParameters(
       accumulateAttributeNames:
           (json['accumulateAttributeNames'] as List<dynamic>).cast<String>(),
