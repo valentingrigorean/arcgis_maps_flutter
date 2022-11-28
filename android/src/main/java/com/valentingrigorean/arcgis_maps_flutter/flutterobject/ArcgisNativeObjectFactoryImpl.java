@@ -1,5 +1,7 @@
 package com.valentingrigorean.arcgis_maps_flutter.flutterobject;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -7,13 +9,17 @@ import com.esri.arcgisruntime.data.Geodatabase;
 import com.esri.arcgisruntime.data.TileCache;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.portal.PortalItem;
+import com.esri.arcgisruntime.tasks.geocode.LocatorTask;
 import com.esri.arcgisruntime.tasks.geodatabase.GeodatabaseSyncTask;
+import com.esri.arcgisruntime.tasks.networkanalysis.RouteTask;
 import com.esri.arcgisruntime.tasks.offlinemap.OfflineMapTask;
 import com.esri.arcgisruntime.tasks.tilecache.ExportTileCacheTask;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
 import com.valentingrigorean.arcgis_maps_flutter.data.GeodatabaseNativeObject;
 import com.valentingrigorean.arcgis_maps_flutter.data.TileCacheNativeObject;
+import com.valentingrigorean.arcgis_maps_flutter.tasks.geocode.LocatorTaskNativeObject;
 import com.valentingrigorean.arcgis_maps_flutter.tasks.geodatabase.GeodatabaseSyncTaskNativeObject;
+import com.valentingrigorean.arcgis_maps_flutter.tasks.networkanalysis.RouteTaskNativeObject;
 import com.valentingrigorean.arcgis_maps_flutter.tasks.offlinemap.OfflineMapSyncTaskNativeObject;
 import com.valentingrigorean.arcgis_maps_flutter.tasks.offlinemap.OfflineMapTaskNativeObject;
 import com.valentingrigorean.arcgis_maps_flutter.tasks.tilecache.ExportTileCacheTaskNativeObject;
@@ -22,6 +28,12 @@ import java.util.Map;
 import java.util.Objects;
 
 public class ArcgisNativeObjectFactoryImpl implements ArcgisNativeObjectFactory {
+
+    private final Context context;
+
+    public ArcgisNativeObjectFactoryImpl(Context context) {
+        this.context = context;
+    }
 
     @NonNull
     @Override
@@ -59,9 +71,23 @@ public class ArcgisNativeObjectFactoryImpl implements ArcgisNativeObjectFactory 
                 nativeObject.setMessageSink(messageSink);
                 return nativeObject;
             }
-            case "Geodatabase":{
+            case "Geodatabase": {
                 final String url = (String) arguments;
                 final NativeObject nativeObject = new GeodatabaseNativeObject(objectId, new Geodatabase(url));
+                nativeObject.setMessageSink(messageSink);
+                return nativeObject;
+            }
+            case "RouteTask": {
+                final String url = (String) arguments;
+                final RouteTask routeTask = new RouteTask(context, url);
+                final NativeObject nativeObject = new RouteTaskNativeObject(objectId, routeTask);
+                nativeObject.setMessageSink(messageSink);
+                return nativeObject;
+            }
+            case "LocatorTask":{
+                final String url = (String) arguments;
+                final LocatorTask locatorTask = new LocatorTask(url);
+                final NativeObject nativeObject = new LocatorTaskNativeObject(objectId, locatorTask);
                 nativeObject.setMessageSink(messageSink);
                 return nativeObject;
             }

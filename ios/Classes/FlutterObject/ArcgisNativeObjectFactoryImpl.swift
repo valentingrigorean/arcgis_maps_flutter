@@ -26,6 +26,12 @@ class ArcgisNativeObjectFactoryImpl: ArcgisNativeObjectFactory {
         case "Geodatabase":
             let url = arguments as! String
             return GeodatabaseNativeObject(objectId: objectId, geodatabase: AGSGeodatabase(fileURL: URL(string: url)!), messageSink: messageSink)
+        case "RouteTask":
+            let url = arguments as! String
+            return RouteTaskNativeObject(objectId: objectId, task: AGSRouteTask(url: URL(string: url)!), messageSink: messageSink)
+        case "LocatorTask":
+            let url = arguments as! String
+            return LocatorTaskNativeObject(objectId: objectId, task: AGSLocatorTask(url: URL(string: url)!), messageSink: messageSink)
         default:
             fatalError("Not implemented.")
         }

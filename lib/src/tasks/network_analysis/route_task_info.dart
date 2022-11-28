@@ -25,7 +25,7 @@ class RouteTaskInfo {
     required this.supportsRerouting,
   });
 
-  factory RouteTaskInfo.fromJson(Map<String, dynamic> json) {
+  factory RouteTaskInfo.fromJson(Map<dynamic, dynamic> json) {
     final accumulateAttributeNames =
         (json['accumulateAttributeNames'] as List<dynamic>).cast<String>();
     final costAttributes = (json['costAttributes'] as Map<dynamic, dynamic>)

@@ -10,7 +10,7 @@ class MapPageLocator extends StatefulWidget {
 }
 
 class _MapPageLocatorState extends State<MapPageLocator> {
-  final LocatorTask _locatorTask =  LocatorTask(
+  final LocatorTask _locatorTask = LocatorTask(
       url:
           'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer');
   List<GeocodeResult> _results = [];
@@ -21,7 +21,7 @@ class _MapPageLocatorState extends State<MapPageLocator> {
   void initState() {
     super.initState();
     _locatorTask.getLocatorInfo().then((value) {
-      if(kDebugMode){
+      if (kDebugMode) {
         print(value);
       }
     });
@@ -36,8 +36,26 @@ class _MapPageLocatorState extends State<MapPageLocator> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text('Locator'),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: SafeArea(
+            top: false,
+            bottom: false,
+            child: TextField(
+              decoration: const InputDecoration(
+                hintText: 'Search',
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(horizontal: 16),
+              ),
+              onSubmitted: (value) {
+                _search(value);
+              },
+            ),
+          ),
+        ),
       ),
       body: Stack(
         children: [
@@ -45,7 +63,7 @@ class _MapPageLocatorState extends State<MapPageLocator> {
             ignoring: _isLoading,
             child: ArcgisMapView(
               map: ArcGISMap.imageryWithLabelsVector(),
-              onTap: (_,point) async {
+              onTap: (_, point) async {
                 setState(() {
                   _isLoading = true;
                 });
@@ -94,5 +112,29 @@ class _MapPageLocatorState extends State<MapPageLocator> {
         ],
       ),
     );
+  }
+
+  void _search(String value) async {
+    setState(() {
+      _isLoading = true;
+      _results.clear();
+    });
+
+    try {
+      final results = await _locatorTask.geocode(
+        searchText: value,
+      );
+      setState(() {
+        _results = results;
+        _isLoading = false;
+      });
+    } catch (ex) {
+      if (kDebugMode) {
+        print(ex);
+      }
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 }
