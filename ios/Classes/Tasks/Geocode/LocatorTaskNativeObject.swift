@@ -43,7 +43,7 @@ class LocatorTaskNativeObject: BaseNativeObject<AGSLocatorTask> {
     private func geocode(arguments: Dictionary<String, Any>, result: @escaping FlutterResult) {
         let searchTerm = arguments["searchText"] as! String
         let callback = result
-        if let params = arguments["params"] as? Dictionary<String, Any> {
+        if let params = arguments["parameters"] as? Dictionary<String, Any> {
             let geocodeParameters = AGSGeocodeParameters(data: params)
             nativeObject.geocode(withSearchText: searchTerm, parameters: geocodeParameters) { (results, error) in
                 if let error = error {
