@@ -52,6 +52,7 @@ class _MapPageLocatorState extends State<MapPageLocator> {
               ),
               onSubmitted: (value) {
                 _search(value);
+                _suggest(value);
               },
             ),
           ),
@@ -69,7 +70,8 @@ class _MapPageLocatorState extends State<MapPageLocator> {
                 });
                 _results.clear();
                 try {
-                  final results = await _locatorTask.reverseGeocode(point);
+                  final results =
+                      await _locatorTask.reverseGeocode(location: point);
                   setState(() {
                     _results = results;
                     _isLoading = false;
@@ -135,6 +137,31 @@ class _MapPageLocatorState extends State<MapPageLocator> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  void _suggest(String value) async {
+    try {
+      final results = await _locatorTask.suggest(
+        searchText: value,
+      );
+      if (kDebugMode) {
+        print(results);
+      }
+
+      if (results.isEmpty) {
+        return;
+      }
+      final result = results.first;
+      final location =
+          await _locatorTask.geocodeSuggestResult(suggestResult: result);
+      if (kDebugMode) {
+        print(location);
+      }
+    } catch (ex) {
+      if (kDebugMode) {
+        print(ex);
+      }
     }
   }
 }
