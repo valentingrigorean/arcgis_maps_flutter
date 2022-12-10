@@ -80,6 +80,32 @@ class GeocodeParameters {
   /// Only results that lie within this area are included.
   final Geometry? searchArea;
 
+  GeocodeParameters copyWith({
+    List<String>? resultAttributeNames,
+    List<String>? categories,
+    String? countryCode,
+    bool? forStorage,
+    int? maxResults,
+    double? minScore,
+    String? outputLanguageCode,
+    SpatialReference? outputSpatialReference,
+    AGSPoint? preferredSearchLocation,
+    Geometry? searchArea,
+  }) {
+    return GeocodeParameters(
+      resultAttributeNames: resultAttributeNames ?? this.resultAttributeNames,
+      categories: categories ?? this.categories,
+      countryCode: countryCode ?? this.countryCode,
+      forStorage: forStorage ?? this.forStorage,
+      maxResults: maxResults ?? this.maxResults,
+      minScore: minScore ?? this.minScore,
+      outputLanguageCode: outputLanguageCode ?? this.outputLanguageCode,
+      outputSpatialReference: outputSpatialReference ?? this.outputSpatialReference,
+      preferredSearchLocation: preferredSearchLocation ?? this.preferredSearchLocation,
+      searchArea: searchArea ?? this.searchArea,
+    );
+  }
+
   Object toJson() {
     final Map<String, dynamic> json = <String, dynamic>{};
     if (resultAttributeNames.isNotEmpty) {

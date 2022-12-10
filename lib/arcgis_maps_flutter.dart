@@ -142,6 +142,9 @@ part 'src/tasks/geocode/geocode_result.dart';
 part 'src/tasks/geocode/locator_attribute.dart';
 part 'src/tasks/geocode/locator_info.dart';
 part 'src/tasks/geocode/locator_task.dart';
+part 'src/tasks/geocode/reverse_geocode_parameters.dart';
+part 'src/tasks/geocode/suggest_parameters.dart';
+part 'src/tasks/geocode/suggest_result.dart';
 
 part 'src/tasks/geodatabase/generate_geodatabase_job.dart';
 part 'src/tasks/geodatabase/generate_geodatabase_parameters.dart';
