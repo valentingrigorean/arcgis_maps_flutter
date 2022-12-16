@@ -23,6 +23,32 @@ class GeodatabaseSyncTask extends ArcgisNativeObject
     return GenerateGeodatabaseParameters.fromJson(result);
   }
 
+  Future<List<SyncLayerResult>?> importDelta({
+    required Geodatabase geodatabase,
+    required String deltaFilePath
+  }) async {
+    final result = await invokeMethod(
+      'geodatabaseSyncTask#importDelta',
+      arguments: {
+        'geodatabase': geodatabase.toJson(),
+        'deltaFilePath': deltaFilePath
+      },
+    );
+
+    try {
+      if (result == null) {
+        return null;
+      }
+      return (result as List<dynamic>)
+          .map((e) => SyncLayerResult._fromJson(e))
+          .toList();
+    } on PlatformException catch (e) {
+      print(e.toString());
+      return null;
+    }
+
+  }
+
   Future<GenerateGeodatabaseJob> generateJob({
     required GenerateGeodatabaseParameters parameters,
     required String fileNameWithPath,
@@ -77,4 +103,5 @@ class GeodatabaseSyncTask extends ArcgisNativeObject
     );
     return SyncGeodatabaseJob._(jobId: jobId!);
   }
+
 }

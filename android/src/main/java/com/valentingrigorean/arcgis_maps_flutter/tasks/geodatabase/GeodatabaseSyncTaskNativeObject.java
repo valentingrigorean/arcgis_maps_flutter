@@ -12,6 +12,7 @@ import com.esri.arcgisruntime.tasks.geodatabase.GenerateGeodatabaseParameters;
 import com.esri.arcgisruntime.tasks.geodatabase.GeodatabaseSyncTask;
 import com.esri.arcgisruntime.tasks.geodatabase.SyncGeodatabaseJob;
 import com.esri.arcgisruntime.tasks.geodatabase.SyncGeodatabaseParameters;
+import com.esri.arcgisruntime.tasks.geodatabase.SyncLayerResult;
 import com.valentingrigorean.arcgis_maps_flutter.Convert;
 import com.valentingrigorean.arcgis_maps_flutter.data.GeodatabaseNativeObject;
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject;
@@ -21,6 +22,7 @@ import com.valentingrigorean.arcgis_maps_flutter.io.RemoteResourceNativeHandler;
 import com.valentingrigorean.arcgis_maps_flutter.loadable.LoadableNativeHandler;
 import com.valentingrigorean.arcgis_maps_flutter.tasks.tilecache.ExportTileCacheJobNativeObject;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -40,6 +42,9 @@ public class GeodatabaseSyncTaskNativeObject extends BaseNativeObject<Geodatabas
         switch (method) {
             case "geodatabaseSyncTask#defaultGenerateGeodatabaseParameters":
                 defaultGenerateGeodatabaseParameters(args, result);
+                break;
+            case "geodatabaseSyncTask#importDelta":
+                importDelta(args, result);
                 break;
             case "geodatabaseSyncTask#generateJob":
                 generateJob(args, result);
@@ -67,6 +72,22 @@ public class GeodatabaseSyncTaskNativeObject extends BaseNativeObject<Geodatabas
                 result.success(ConvertGeodatabase.generateGeodatabaseParametersToJson(future.get()));
             } catch (Exception e) {
                 result.error("defaultGenerateGeodatabaseParameters", e.getMessage(), null);
+            }
+        });
+    }
+
+    private void importDelta(Object args, MethodChannel.Result result) {
+        final Map<?, ?> data = Convert.toMap(args);
+        final String deltaFilePath = (String) data.get("deltaFilePath");
+        final String geodatabaseId = (String) data.get("geodatabase");
+        final GeodatabaseNativeObject geodatabase = (GeodatabaseNativeObject) getNativeObjectStorage().getNativeObject(geodatabaseId);
+
+        final ListenableFuture<List<SyncLayerResult>> future = GeodatabaseSyncTask.importDeltaAsync(geodatabase.getNativeObject(), deltaFilePath);
+        future.addDoneListener(() -> {
+            try {
+                result.success(ConvertGeodatabase.syncLayerResultsToJson(future.get()));
+            } catch (Exception e) {
+                result.success(null);
             }
         });
     }
