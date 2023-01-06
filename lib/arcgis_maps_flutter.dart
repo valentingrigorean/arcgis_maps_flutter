@@ -33,6 +33,7 @@ import 'package:arcgis_maps_flutter/src/method_channel/geometry/coordinate_forma
 import 'package:arcgis_maps_flutter/src/method_channel/map/map_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'dart:math' as math;
 import 'package:http/http.dart' as http;
 import 'package:xml2json/xml2json.dart';

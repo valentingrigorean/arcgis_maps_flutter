@@ -19,6 +19,9 @@ class GeodatabaseSyncTaskNativeObject: BaseNativeObject<AGSGeodatabaseSyncTask> 
         case "geodatabaseSyncTask#defaultGenerateGeodatabaseParameters":
             defaultGenerateGeodatabaseParameters(arguments: arguments, result: result)
             break
+        case "geodatabaseSyncTask#importDelta":
+            importDelta(arguments: arguments, result: result)
+            break
         case "geodatabaseSyncTask#generateJob":
             generateJob(arguments: arguments, result: result)
             break
@@ -44,6 +47,20 @@ class GeodatabaseSyncTaskNativeObject: BaseNativeObject<AGSGeodatabaseSyncTask> 
                 result(params.toJSONFlutter())
             } else {
                 result(error?.toJSON())
+            }
+        }
+    }
+
+    private func importDelta(arguments: Any?, result: @escaping FlutterResult) {
+        let data = arguments as! [String: Any]
+        let deltaFilePath = data["deltaFilePath"] as! String
+        let geodatabaseId = data["geodatabase"] as! String
+        let geodatabase = storage.getNativeObject(objectId: geodatabaseId) as! GeodatabaseNativeObject
+        nativeObject.importDelta(with: geodatabase.nativeObject, inputPath: deltaFilePath) { layerResults, error  in
+            if let layerRes = layerResults {
+                result(layerRes.map({$0.toJSONFlutter()}))
+            } else {
+                result(nil)
             }
         }
     }
