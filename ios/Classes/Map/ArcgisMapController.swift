@@ -16,7 +16,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     private let polygonsController: PolygonsController
     private let polylinesController: PolylinesController
 
-    //private let locationDisplayController: LocationDisplayController
+    private let locationDisplayController: LocationDisplayController
 
     private let symbolVisibilityFilterController: SymbolVisibilityFilterController
 
@@ -93,9 +93,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         //scaleBarController = ScaleBarController(mapView: mapView)
 
 //        layersChangedController = LayersChangedController(geoView: mapView, channel: channel, layersController: layersController)
-//        let locationDisplayChannel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)_location_display", binaryMessenger: registrar.messenger())
-//        locationDisplayController = LocationDisplayController(methodChannel: locationDisplayChannel, mapView: mapView)
-        graphicsTouchDelegates = [markersController, polygonsController, polylinesController]//, locationDisplayController]
+        let locationDisplayChannel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)_location_display", binaryMessenger: registrar.messenger())
+        locationDisplayController = LocationDisplayController(methodChannel: locationDisplayChannel, mapView: mapView)
+        graphicsTouchDelegates = [markersController, polygonsController, polylinesController, locationDisplayController]
 
         super.init()
 
@@ -108,13 +108,16 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             self?.viewpointChangedHandler()
         }
 
-        //locationDisplayController.locationTapHandler = sendUserLocationTap
+        locationDisplayController.locationTapHandler = { [weak self] in
+            self?.sendUserLocationTap()
+        }
         initWithArgs(args: args)
     }
 
     deinit {
         print("ArcgisMapController deinit")
-        //locationDisplayController.locationTapHandler = nil
+        channel.setMethodCallHandler(nil)
+        locationDisplayController.locationTapHandler = nil
         timeExtentObservation?.invalidate()
         timeExtentObservation = nil
         clearSymbolsControllers()
@@ -582,9 +585,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             //scaleBarController.interpretConfiguration(args: scalebarConfiguration)
         }
 
-//        if let trackUserLocationTap = mapOptions["trackUserLocationTap"] as? Bool {
-//            locationDisplayController.trackUserLocationTap = trackUserLocationTap
-//        }
+        if let trackUserLocationTap = mapOptions["trackUserLocationTap"] as? Bool {
+            locationDisplayController.trackUserLocationTap = trackUserLocationTap
+        }
 
         if let minScale = mapOptions["minScale"] as? Double {
             self.minScale = minScale
