@@ -373,6 +373,4 @@ class LayersController {
         }
         return nil
     }
-
-
 }
