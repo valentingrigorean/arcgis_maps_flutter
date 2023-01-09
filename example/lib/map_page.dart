@@ -141,7 +141,7 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
 
   void onMapCreated(ArcgisMapController mapController) {
     _mapController = mapController;
-    //mapController.locationDisplay.autoPanMode = AutoPanMode.navigation;
+    mapController.locationDisplay.autoPanMode = AutoPanMode.navigation;
     _compasController = CompassController.fromMapController(mapController);
     setState(() {});
   }
