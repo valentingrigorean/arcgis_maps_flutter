@@ -18,7 +18,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     //private let locationDisplayController: LocationDisplayController
 
-    // private let symbolVisibilityFilterController: SymbolVisibilityFilterController
+    private let symbolVisibilityFilterController: SymbolVisibilityFilterController
 
     // private let scaleBarController: ScaleBarController
 
@@ -75,8 +75,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         mapView.selectionProperties = AGSSelectionProperties(color: UIColor.cyan)
 
         selectionPropertiesHandler = SelectionPropertiesHandler(selectionProperties: mapView.selectionProperties)
-//
-//        symbolVisibilityFilterController = SymbolVisibilityFilterController(mapView: mapView)
+
+        symbolVisibilityFilterController = SymbolVisibilityFilterController(mapView: mapView)
 
 //        let graphicsOverlay = AGSGraphicsOverlay()
 //        polygonsController = PolygonsController(methodChannel: channel, graphicsOverlays: graphicsOverlay)
@@ -118,7 +118,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         timeExtentObservation?.invalidate()
         timeExtentObservation = nil
         clearSymbolsControllers()
-        //symbolVisibilityFilterController.clear()
+        symbolVisibilityFilterController.clear()
         mapView.viewpointChangedHandler = nil
     }
 
@@ -436,7 +436,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     private func initSymbolsControllers() {
         for var controller in symbolsControllers {
             controller.selectionPropertiesHandler = selectionPropertiesHandler
-            //controller.symbolVisibilityFilterController = symbolVisibilityFilterController
+            controller.symbolVisibilityFilterController = symbolVisibilityFilterController
         }
     }
 
