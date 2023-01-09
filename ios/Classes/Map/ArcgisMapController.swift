@@ -12,9 +12,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private let channel: FlutterMethodChannel
     private let layersController: LayersController
-//    private let markersController: MarkersController
-//    private let polygonsController: PolygonsController
-//    private let polylinesController: PolylinesController
+    private let markersController: MarkersController
+    private let polygonsController: PolygonsController
+    private let polylinesController: PolylinesController
 
     //private let locationDisplayController: LocationDisplayController
 
@@ -78,16 +78,16 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         symbolVisibilityFilterController = SymbolVisibilityFilterController(mapView: mapView)
 
-//        let graphicsOverlay = AGSGraphicsOverlay()
-//        polygonsController = PolygonsController(methodChannel: channel, graphicsOverlays: graphicsOverlay)
-//        polylinesController = PolylinesController(methodChannel: channel, graphicsOverlays: graphicsOverlay)
-//        markersController = MarkersController(methodChannel: channel, graphicsOverlays: graphicsOverlay)
-//
-//        symbolsControllers = [polygonsController, polylinesController, markersController]
-//
-//        mapView.graphicsOverlays.add(graphicsOverlay)
-//
-//
+        let graphicsOverlay = AGSGraphicsOverlay()
+        polygonsController = PolygonsController(methodChannel: channel, graphicsOverlays: graphicsOverlay)
+        polylinesController = PolylinesController(methodChannel: channel, graphicsOverlays: graphicsOverlay)
+        markersController = MarkersController(methodChannel: channel, graphicsOverlays: graphicsOverlay)
+
+        symbolsControllers = [polygonsController, polylinesController, markersController]
+
+        mapView.graphicsOverlays.add(graphicsOverlay)
+
+
         layersController = LayersController(methodChannel: channel)
 
         //scaleBarController = ScaleBarController(mapView: mapView)
@@ -95,8 +95,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 //        layersChangedController = LayersChangedController(geoView: mapView, channel: channel, layersController: layersController)
 //        let locationDisplayChannel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)_location_display", binaryMessenger: registrar.messenger())
 //        locationDisplayController = LocationDisplayController(methodChannel: locationDisplayChannel, mapView: mapView)
-        graphicsTouchDelegates = []//[markersController, polygonsController, polylinesController]//, locationDisplayController]
-        symbolsControllers = []
+        graphicsTouchDelegates = [markersController, polygonsController, polylinesController]//, locationDisplayController]
+
         super.init()
 
         setMethodCallHandlers()
@@ -330,50 +330,50 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 result(nil)
                 break
             case "markers#update":
-//                if let markersUpdate = call.arguments as? Dictionary<String, Any> {
-//                    if let markersToAdd = markersUpdate["markersToAdd"] as? [Dictionary<String, Any>] {
-//                        markersController.addMarkers(markersToAdd: markersToAdd)
-//                    }
-//                    if let markersToChange = markersUpdate["markersToChange"] as? [Dictionary<String, Any>] {
-//                        markersController.changeMarkers(markersToChange: markersToChange)
-//                    }
-//                    if let markerIdsToRemove = markersUpdate["markerIdsToRemove"] as? [String] {
-//                        markersController.removeMarkers(markerIdsToRemove: markerIdsToRemove)
-//                    }
-//                }
+                if let markersUpdate = call.arguments as? Dictionary<String, Any> {
+                    if let markersToAdd = markersUpdate["markersToAdd"] as? [Dictionary<String, Any>] {
+                        markersController.addMarkers(markersToAdd: markersToAdd)
+                    }
+                    if let markersToChange = markersUpdate["markersToChange"] as? [Dictionary<String, Any>] {
+                        markersController.changeMarkers(markersToChange: markersToChange)
+                    }
+                    if let markerIdsToRemove = markersUpdate["markerIdsToRemove"] as? [String] {
+                        markersController.removeMarkers(markerIdsToRemove: markerIdsToRemove)
+                    }
+                }
                 result(nil)
                 break
             case "map#clearMarkerSelection":
                 selectionPropertiesHandler.reset()
-                //markersController.clearSelectedMarker()
+                markersController.clearSelectedMarker()
                 result(nil)
                 break
             case "polygons#update":
-//                if let polygonUpdates = call.arguments as? Dictionary<String, Any> {
-//                    if let polygonsToAdd = polygonUpdates["polygonsToAdd"] as? [Dictionary<String, Any>] {
-//                        polygonsController.addPolygons(polygonsToAdd: polygonsToAdd)
-//                    }
-//                    if let polygonsToChange = polygonUpdates["polygonsToChange"] as? [Dictionary<String, Any>] {
-//                        polygonsController.changePolygons(polygonsToChange: polygonsToChange)
-//                    }
-//                    if let polygonIdsToRemove = polygonUpdates["polygonIdsToRemove"] as? [String] {
-//                        polygonsController.removePolygons(polygonIdsToRemove: polygonIdsToRemove)
-//                    }
-//                }
+                if let polygonUpdates = call.arguments as? Dictionary<String, Any> {
+                    if let polygonsToAdd = polygonUpdates["polygonsToAdd"] as? [Dictionary<String, Any>] {
+                        polygonsController.addPolygons(polygonsToAdd: polygonsToAdd)
+                    }
+                    if let polygonsToChange = polygonUpdates["polygonsToChange"] as? [Dictionary<String, Any>] {
+                        polygonsController.changePolygons(polygonsToChange: polygonsToChange)
+                    }
+                    if let polygonIdsToRemove = polygonUpdates["polygonIdsToRemove"] as? [String] {
+                        polygonsController.removePolygons(polygonIdsToRemove: polygonIdsToRemove)
+                    }
+                }
                 result(nil)
                 break
             case "polylines#update":
-//                if let polylineUpdates = call.arguments as? Dictionary<String, Any> {
-//                    if let polylinesToAdd = polylineUpdates["polylinesToAdd"] as? [Dictionary<String, Any>] {
-//                        polylinesController.addPolylines(polylinesToAdd: polylinesToAdd)
-//                    }
-//                    if let polylinesToChange = polylineUpdates["polylinesToChange"] as? [Dictionary<String, Any>] {
-//                        polylinesController.changePolylines(polylinesToChange: polylinesToChange)
-//                    }
-//                    if let polylineIdsToRemove = polylineUpdates["polylineIdsToRemove"] as? [String] {
-//                        polylinesController.removePolylines(polylineIdsToRemove: polylineIdsToRemove)
-//                    }
-//                }
+                if let polylineUpdates = call.arguments as? Dictionary<String, Any> {
+                    if let polylinesToAdd = polylineUpdates["polylinesToAdd"] as? [Dictionary<String, Any>] {
+                        polylinesController.addPolylines(polylinesToAdd: polylinesToAdd)
+                    }
+                    if let polylinesToChange = polylineUpdates["polylinesToChange"] as? [Dictionary<String, Any>] {
+                        polylinesController.changePolylines(polylinesToChange: polylinesToChange)
+                    }
+                    if let polylineIdsToRemove = polylineUpdates["polylineIdsToRemove"] as? [String] {
+                        polylinesController.removePolylines(polylineIdsToRemove: polylineIdsToRemove)
+                    }
+                }
                 result(nil)
                 break
             case "layer#setTimeOffset":
@@ -657,18 +657,18 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             setViewpoint(args: viewPoint, animated: false, result: nil)
         }
 
-       layersController.updateFromArgs(args: dict)
-//        if let markersToAdd = dict["markersToAdd"] as? [Dictionary<String, Any>] {
-//            markersController.addMarkers(markersToAdd: markersToAdd)
-//        }
-//
-//        if let polygonsToAdd = dict["polygonsToAdd"] as? [Dictionary<String, Any>] {
-//            polygonsController.addPolygons(polygonsToAdd: polygonsToAdd)
-//        }
-//
-//        if let polylinesToAdd = dict["polylinesToAdd"] as? [Dictionary<String, Any>] {
-//            polylinesController.addPolylines(polylinesToAdd: polylinesToAdd)
-//        }
+        layersController.updateFromArgs(args: dict)
+        if let markersToAdd = dict["markersToAdd"] as? [Dictionary<String, Any>] {
+            markersController.addMarkers(markersToAdd: markersToAdd)
+        }
+
+        if let polygonsToAdd = dict["polygonsToAdd"] as? [Dictionary<String, Any>] {
+            polygonsController.addPolygons(polygonsToAdd: polygonsToAdd)
+        }
+
+        if let polylinesToAdd = dict["polylinesToAdd"] as? [Dictionary<String, Any>] {
+            polylinesController.addPolylines(polylinesToAdd: polylinesToAdd)
+        }
 
         if let options = dict["options"] as? Dictionary<String, Any> {
             updateMapOptions(mapOptions: options)
