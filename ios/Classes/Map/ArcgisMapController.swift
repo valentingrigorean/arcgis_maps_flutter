@@ -22,7 +22,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     // private let scaleBarController: ScaleBarController
 
-    //private let layersChangedController: LayersChangedController
+    private let layersChangedController: LayersChangedController
 
     private var lastScreenPoint = CGPoint.zero
 
@@ -92,7 +92,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         //scaleBarController = ScaleBarController(mapView: mapView)
 
-//        layersChangedController = LayersChangedController(geoView: mapView, channel: channel, layersController: layersController)
+        layersChangedController = LayersChangedController(geoView: mapView, channel: channel, layersController: layersController)
         let locationDisplayChannel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)_location_display", binaryMessenger: registrar.messenger())
         locationDisplayController = LocationDisplayController(methodChannel: locationDisplayChannel, mapView: mapView)
         graphicsTouchDelegates = [markersController, polygonsController, polylinesController, locationDisplayController]
@@ -212,9 +212,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 result(nil)
                 break
             case "map#setLayersChangedListener":
-//                if let val = call.arguments as? Bool {
-//                    layersChangedController.trackLayersChange = val
-//                }
+                if let val = call.arguments as? Bool {
+                    layersChangedController.trackLayersChange = val
+                }
                 result(nil)
                 break
             case "map#setTimeExtentChangedListener":
