@@ -11,7 +11,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     private let selectionPropertiesHandler: SelectionPropertiesHandler
 
     private let channel: FlutterMethodChannel
-//    private let layersController: LayersController
+    private let layersController: LayersController
 //    private let markersController: MarkersController
 //    private let polygonsController: PolygonsController
 //    private let polylinesController: PolylinesController
@@ -88,7 +88,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 //        mapView.graphicsOverlays.add(graphicsOverlay)
 //
 //
-//        layersController = LayersController(methodChannel: channel)
+        layersController = LayersController(methodChannel: channel)
 
         //scaleBarController = ScaleBarController(mapView: mapView)
 
@@ -150,17 +150,17 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 }
                 break
             case "map#getLegendInfos":
-//                let legendInfoController = LegendInfoController(layersController: layersController)
-//                legendInfoController.loadAsync(args: call.arguments, result: { [weak self] items in
-//                    result(items)
-//                    guard let self = self else {
-//                        return
-//                    }
-//                    self.legendInfoControllers = self.legendInfoControllers.filter {
-//                        $0 !== legendInfoController
-//                    }
-//                })
-//                legendInfoControllers.append(legendInfoController)
+                let legendInfoController = LegendInfoController(layersController: layersController)
+                legendInfoController.loadAsync(args: call.arguments, result: { [weak self] items in
+                    result(items)
+                    guard let self = self else {
+                        return
+                    }
+                    self.legendInfoControllers = self.legendInfoControllers.filter {
+                        $0 !== legendInfoController
+                    }
+                })
+                legendInfoControllers.append(legendInfoController)
                 break
             case "map#getMapMaxExtend":
                 if let map = mapView.map {
@@ -326,7 +326,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 result(mapView.mapScale)
                 break
             case "layers#update":
-                //layersController.updateFromArgs(args: call.arguments as Any)
+                layersController.updateFromArgs(args: call.arguments as Any)
                 result(nil)
                 break
             case "markers#update":
@@ -377,7 +377,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 result(nil)
                 break
             case "layer#setTimeOffset":
-                // layersController.setTimeOffset(arguments: call.arguments)
+                layersController.setTimeOffset(arguments: call.arguments)
                 result(nil)
                 break
             case "map#setViewpointScaleAsync":
@@ -423,14 +423,13 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 }
                 timeAwareLayers.append(timeAwareLayer)
             }
-            result([])
-//            result(timeAwareLayers.map { (layer) -> Any in
-//                var layerId: String?
-//                if layer is AGSLayer {
-//                    layerId = self.layersController.getLayerIdByLayer(layer: layer as! AGSLayer)
-//                }
-//                return layer.toJSONFlutter(layerId: layerId)
-//            })
+            result(timeAwareLayers.map { (layer) -> Any in
+                var layerId: String?
+                if layer is AGSLayer {
+                    layerId = self.layersController.getLayerIdByLayer(layer: layer as! AGSLayer)
+                }
+                return layer.toJSONFlutter(layerId: layerId)
+            })
         }
     }
 
@@ -532,7 +531,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         map.minScale = minScale
         map.maxScale = maxScale
         mapView.map = map
-        //layersController.setMap(map)
+        layersController.setMap(map)
 
         if viewPoint != nil {
             mapView.setViewpoint(viewPoint!, duration: 0)
@@ -658,7 +657,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             setViewpoint(args: viewPoint, animated: false, result: nil)
         }
 
-//        layersController.updateFromArgs(args: dict)
+       layersController.updateFromArgs(args: dict)
 //        if let markersToAdd = dict["markersToAdd"] as? [Dictionary<String, Any>] {
 //            markersController.addMarkers(markersToAdd: markersToAdd)
 //        }
