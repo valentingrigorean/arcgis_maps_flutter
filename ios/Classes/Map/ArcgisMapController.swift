@@ -8,7 +8,7 @@ import ArcGIS
 public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private let mapView: AGSMapView
-    // private let selectionPropertiesHandler: SelectionPropertiesHandler
+    private let selectionPropertiesHandler: SelectionPropertiesHandler
 
     private let channel: FlutterMethodChannel
 //    private let layersController: LayersController
@@ -73,8 +73,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         mapView = AGSMapView(frame: frame)
         mapView.selectionProperties = AGSSelectionProperties(color: UIColor.cyan)
-//
-//        selectionPropertiesHandler = SelectionPropertiesHandler(selectionProperties: mapView.selectionProperties)
+
+        selectionPropertiesHandler = SelectionPropertiesHandler(selectionProperties: mapView.selectionProperties)
 //
 //        symbolVisibilityFilterController = SymbolVisibilityFilterController(mapView: mapView)
 
@@ -344,7 +344,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 result(nil)
                 break
             case "map#clearMarkerSelection":
-                //selectionPropertiesHandler.reset()
+                selectionPropertiesHandler.reset()
                 //markersController.clearSelectedMarker()
                 result(nil)
                 break
@@ -435,10 +435,10 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     private func initSymbolsControllers() {
-//        for var controller in symbolsControllers {
-//            controller.selectionPropertiesHandler = selectionPropertiesHandler
-//            controller.symbolVisibilityFilterController = symbolVisibilityFilterController
-//        }
+        for var controller in symbolsControllers {
+            controller.selectionPropertiesHandler = selectionPropertiesHandler
+            //controller.symbolVisibilityFilterController = symbolVisibilityFilterController
+        }
     }
 
     private func clearSymbolsControllers() {
