@@ -20,7 +20,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private let symbolVisibilityFilterController: SymbolVisibilityFilterController
 
-    // private let scaleBarController: ScaleBarController
+  private let scaleBarController: ScaleBarController
 
     private let layersChangedController: LayersChangedController
 
@@ -90,7 +90,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         layersController = LayersController(methodChannel: channel)
 
-        //scaleBarController = ScaleBarController(mapView: mapView)
+        scaleBarController = ScaleBarController(mapView: mapView)
 
         layersChangedController = LayersChangedController(geoView: mapView, channel: channel, layersController: layersController)
         let locationDisplayChannel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)_location_display", binaryMessenger: registrar.messenger())
@@ -115,7 +115,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     deinit {
-        print("ArcgisMapController deinit")
         channel.setMethodCallHandler(nil)
         locationDisplayController.locationTapHandler = nil
         timeExtentObservation?.invalidate()
@@ -577,12 +576,12 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         if let haveScaleBar = mapOptions["haveScalebar"] as? Bool {
             if self.haveScaleBar && !haveScaleBar {
-                //scaleBarController.removeScaleBar()
+                scaleBarController.removeScaleBar()
             }
         }
 
         if let scalebarConfiguration = mapOptions["scalebarConfiguration"] {
-            //scaleBarController.interpretConfiguration(args: scalebarConfiguration)
+            scaleBarController.interpretConfiguration(args: scalebarConfiguration)
         }
 
         if let trackUserLocationTap = mapOptions["trackUserLocationTap"] as? Bool {
