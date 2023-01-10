@@ -20,7 +20,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private let symbolVisibilityFilterController: SymbolVisibilityFilterController
 
-  private let scaleBarController: ScaleBarController
+    private let scaleBarController: ScaleBarController
 
     private let layersChangedController: LayersChangedController
 
