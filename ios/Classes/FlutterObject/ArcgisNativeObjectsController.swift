@@ -14,7 +14,6 @@ protocol ArcgisNativeObjectFactory {
 
 class ArcgisNativeObjectsController: NativeMessageSink {
 
-
     private let channel: FlutterMethodChannel
 
     private let factory: ArcgisNativeObjectFactory
