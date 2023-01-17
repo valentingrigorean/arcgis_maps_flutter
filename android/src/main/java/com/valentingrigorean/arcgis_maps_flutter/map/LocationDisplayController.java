@@ -2,6 +2,7 @@ package com.valentingrigorean.arcgis_maps_flutter.map;
 
 import androidx.annotation.NonNull;
 
+import com.esri.arcgisruntime.ArcGISRuntimeException;
 import com.esri.arcgisruntime.mapping.view.Graphic;
 import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
 import com.esri.arcgisruntime.mapping.view.LocationDisplay;
@@ -52,6 +53,11 @@ public class LocationDisplayController implements MapTouchGraphicDelegate, Locat
         locationDisplay.removeAutoPanModeChangedListener(this);
         locationDisplay.removeLocationChangedListener(this);
 
+        if (startResult != null) {
+            startResult.success(null);
+            startResult = null;
+        }
+
         channel.setMethodCallHandler(null);
     }
 
@@ -87,18 +93,7 @@ public class LocationDisplayController implements MapTouchGraphicDelegate, Locat
     @Override
     public void onStatusChanged(LocationDisplay.DataSourceStatusChangedEvent dataSourceStatusChangedEvent) {
         locationGraphic.setGeometry(locationDisplay.getMapLocation());
-        if (startResult != null) {
-            if (dataSourceStatusChangedEvent.isStarted()) {
-                startResult.success(null);
-            } else {
-                String error = "Unknown error";
-                if (dataSourceStatusChangedEvent.getError() != null) {
-                    error = dataSourceStatusChangedEvent.getError().getMessage();
-                }
-                startResult.error("Failed to start locationDisplay", error, null);
-            }
-            startResult = null;
-        }
+        handleStatusChanged(dataSourceStatusChangedEvent.isStarted(), dataSourceStatusChangedEvent.getError());
     }
 
 
@@ -182,6 +177,22 @@ public class LocationDisplayController implements MapTouchGraphicDelegate, Locat
             default:
                 result.notImplemented();
                 break;
+        }
+    }
+
+    private void handleStatusChanged(boolean isStarted,
+                                     Throwable error) {
+        if (startResult != null) {
+            if (isStarted) {
+                startResult.success(null);
+            } else {
+                String errorMessage = "Unknown error";
+                if (error != null) {
+                    errorMessage = error.getMessage();
+                }
+                startResult.error("Failed to start locationDisplay", errorMessage, null);
+            }
+            startResult = null;
         }
     }
 
