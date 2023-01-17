@@ -56,6 +56,10 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
 
         clearHandlers();
 
+        if (flutterMapViewDelegate.getMapView() == null) {
+            return false;
+        }
+
         final android.graphics.Point screenPoint = new android.graphics.Point((int) e.getX(), (int) e.getY());
 
         if (canConsumeGraphics()) {
@@ -79,7 +83,12 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
     }
 
     private void identifyGraphicsOverlays(android.graphics.Point screenPoint) {
-        graphicHandler = mMapView.identifyGraphicsOverlaysAsync(screenPoint, 12, false);
+        final MapView mapView = flutterMapViewDelegate.getMapView();
+        if (mapView == null) {
+            return;
+        }
+
+        graphicHandler = mapView.identifyGraphicsOverlaysAsync(screenPoint, 12, false);
         graphicHandler.addDoneListener(() -> {
             try {
                 final List<IdentifyGraphicsOverlayResult> results = graphicHandler.get();
@@ -100,7 +109,11 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
     }
 
     private void identifyLayers(android.graphics.Point screenPoint) {
-        layerHandler = mMapView.identifyLayersAsync(screenPoint, 10, false);
+        final MapView mapView = flutterMapViewDelegate.getMapView();
+        if (mapView == null) {
+            return;
+        }
+        layerHandler = mapView.identifyLayersAsync(screenPoint, 10, false);
         layerHandler.addDoneListener(() -> {
             try {
                 final List<IdentifyLayerResult> results = layerHandler.get();
@@ -140,7 +153,11 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
     }
 
     private void sendOnMapTap(android.graphics.Point screenPoint) {
-        final Point mapPoint = mMapView.screenToLocation(screenPoint);
+        final MapView mapView = flutterMapViewDelegate.getMapView();
+        if (mapView == null) {
+            return;
+        }
+        final Point mapPoint = mapView.screenToLocation(screenPoint);
         if (mapPoint == null) {
             return;
         }
@@ -151,7 +168,12 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
     }
 
     private void sendOnMapLongPress(android.graphics.Point screenPoint) {
-        final Point mapPoint = mMapView.screenToLocation(screenPoint);
+        final MapView mapView = flutterMapViewDelegate.getMapView();
+        if (mapView == null) {
+            return;
+        }
+        
+        final Point mapPoint = mapView.screenToLocation(screenPoint);
         if (mapPoint == null) {
             return;
         }
