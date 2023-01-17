@@ -231,10 +231,12 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   Future<List<TimeAwareLayerInfo>> getTimeAwareLayerInfos(int mapId) async {
     final result =
         await channel(mapId).invokeListMethod('map#getTimeAwareLayerInfos');
+    if (result == null) {
+      return const [];
+    }
     return result
-            ?.map<TimeAwareLayerInfo>((e) => TimeAwareLayerInfo.fromJson(e))
-            .toList() ??
-        const [];
+        .map<TimeAwareLayerInfo>((e) => TimeAwareLayerInfo.fromJson(e))
+        .toList();
   }
 
   @override

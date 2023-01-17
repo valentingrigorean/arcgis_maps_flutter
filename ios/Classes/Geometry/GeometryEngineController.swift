@@ -10,14 +10,20 @@ class GeometryEngineController {
 
     init(messenger: FlutterBinaryMessenger) {
         channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel/geometry_engine", binaryMessenger: messenger)
-        channel.setMethodCallHandler(handle)
+        channel.setMethodCallHandler({ [weak self](call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+            guard let self else {
+                result(nil)
+                return
+            }
+            self.handle(call: call, result: result)
+        })
     }
 
     deinit {
         channel.setMethodCallHandler(nil)
     }
 
-    private func handle(_ call: FlutterMethodCall,
+    private func handle(call: FlutterMethodCall,
                         result: @escaping FlutterResult) -> Void {
         switch (call.method) {
         case "project":

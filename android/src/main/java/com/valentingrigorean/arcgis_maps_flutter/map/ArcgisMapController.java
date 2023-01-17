@@ -82,7 +82,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     private final MapLoadedListener mapLoadedListener = new MapLoadedListener();
 
     @Nullable
-    private MapView mapView;
+    private FlutterMapView mapView;
     private MapViewOnTouchListener mapViewOnTouchListener;
 
     private FrameLayout mapContainer;
@@ -116,7 +116,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
         mapContainer = new FrameLayout(context);
 
-        mapView = new MapView(context);
+        mapView = new FlutterMapView(context);
 
         mapContainer.addView(mapView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
@@ -197,17 +197,10 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             lifecycle.removeObserver(this);
         }
 
-
-        if (mapView != null) {
-            mapView.removeTimeExtentChangedListener(this);
-            mapView.removeViewpointChangedListener(this);
-        }
-
         if (scaleBarController != null) {
             scaleBarController.dispose();
             scaleBarController = null;
         }
-
 
         mapViewOnTouchListener.clearAllDelegates();
         mapViewOnTouchListener = null;
@@ -409,10 +402,14 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             case "map#locationToScreen": {
                 final Point mapPoint = Convert.toPoint(call.arguments);
                 final android.graphics.Point screenPoint = mapView.locationToScreen(mapPoint);
-                double[] screenPoints = new double[2];
-                screenPoints[0] = Convert.pixelsToDpF(context, screenPoint.x);
-                screenPoints[1] = Convert.pixelsToDpF(context, screenPoint.y);
-                result.success(screenPoints);
+                if (screenPoint == null) {
+                    result.success(null);
+                } else {
+                    double[] screenPoints = new double[2];
+                    screenPoints[0] = Convert.pixelsToDpF(context, screenPoint.x);
+                    screenPoints[1] = Convert.pixelsToDpF(context, screenPoint.y);
+                    result.success(screenPoints);
+                }
             }
             break;
             case "map#screenToLocation": {

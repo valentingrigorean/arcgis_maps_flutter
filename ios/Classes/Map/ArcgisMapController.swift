@@ -129,274 +129,282 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     private func setMethodCallHandlers() -> Void {
-        channel.setMethodCallHandler({ [unowned self](call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
-            switch call.method {
-            case "map#waitForMap":
+        channel.setMethodCallHandler({ [weak self](call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+            guard let self else {
                 result(nil)
-                break
-            case "map#update":
-                if let data = call.arguments as? Dictionary<String, Any> {
-                    if let mapOptions = data["options"] as? Dictionary<String, Any> {
-                        updateMapOptions(mapOptions: mapOptions)
-                    }
-                }
-                result(nil)
-                break
-            case "map#exportImage":
-                mapView.exportImage { image, error in
-                    if let error = error {
-                        result(FlutterError(code: "exportImage_error", message: error.localizedDescription, details: nil))
-                    } else {
-                        result(image?.toJSONFlutter())
-                    }
-                }
-                break
-            case "map#getLegendInfos":
-                let legendInfoController = LegendInfoController(layersController: layersController)
-                legendInfoController.loadAsync(args: call.arguments, result: { [weak self] items in
-                    result(items)
-                    guard let self = self else {
-                        return
-                    }
-                    self.legendInfoControllers = self.legendInfoControllers.filter {
-                        $0 !== legendInfoController
-                    }
-                })
-                legendInfoControllers.append(legendInfoController)
-                break
-            case "map#getMapMaxExtend":
-                if let map = mapView.map {
-                    map.load { error in
-                        if error == nil {
-                            result(map.maxExtent?.toJSONFlutter())
-                        } else {
-                            result(nil)
-                        }
-                    }
-                } else {
-                    result(nil)
-                }
-                break
-            case "map#getLocation":
-                let location = mapView.locationDisplay.location
-                if location == nil {
-                    result(nil)
-                } else {
-                    result(location!.toJSONFlutter())
-                }
-                break
-            case "map#getMapLocation":
-                let mapLocation = mapView.locationDisplay.mapLocation
-                if mapLocation == nil {
-                    result(nil)
-                } else {
-                    result(mapLocation!.toJSONFlutter())
-                }
-                break
-            case "map#setMapMaxExtent":
-                if let extent = call.arguments as? Dictionary<String, Any> {
-                    let maxExtent = AGSEnvelope(data: extent)
-                    mapView.map?.maxExtent = maxExtent
-                }
-                result(nil)
-                break
-            case "map#setMap":
-                changeMapType(args: call.arguments)
-                result(nil)
-                break
-            case "map#setViewpointChangedListenerEvents":
-                if let val = call.arguments as? Bool {
-                    trackViewpointChangedListenerEvent = val
-                }
-                result(nil)
-                break
-            case "map#setLayersChangedListener":
-                if let val = call.arguments as? Bool {
-                    layersChangedController.trackLayersChange = val
-                }
-                result(nil)
-                break
-            case "map#setTimeExtentChangedListener":
-                if let val = call.arguments as? Bool {
-                    if val, timeExtentObservation == nil {
-                        timeExtentObservation = mapView.observe(\.timeExtent, options: .new) { [weak self] (_,
-                                                                                                            _) in
-                            guard let self = self else {
-                                return
-                            }
-                            self.onTimeExtentChanged(timeExtent: self.mapView.timeExtent)
-                        }
-                    } else {
-                        timeExtentObservation?.invalidate()
-                        timeExtentObservation = nil
-                    }
-                }
-                result(nil)
-                break
-            case "map#setTimeExtent":
-                if let timeExtentRaw = call.arguments as? Dictionary<String, Any> {
-                    let timeExtent = AGSTimeExtent(data: timeExtentRaw)
-                    if mapView.timeExtent != timeExtent {
-                        mapView.timeExtent = timeExtent
-                    }
-                } else {
-                    mapView.timeExtent = nil
-                }
-                print("map#setTimeExtent")
-                break
-            case "map#getTimeExtent":
-                result(mapView.timeExtent?.toJSONFlutter())
-                break
-            case "map#getMapRotation":
-                result(mapView.rotation)
-                break
-            case "map#getWanderExtentFactor":
-                result(mapView.locationDisplay.wanderExtentFactor)
-                break
-            case "map#getTimeAwareLayerInfos":
-                handleTimeAwareLayerInfos(result: result)
-                break
-            case "map#getCurrentViewpoint":
-                let type = (call.arguments as! Int).toAGSViewpointType()
-                let currentViewPoint = mapView.currentViewpoint(with: type)
-                if let json = try? currentViewPoint?.toJSON() {
-                    result(json)
-                } else {
-                    result(nil)
-                }
-                break
-            case "map#setViewpoint":
-                setViewpoint(args: call.arguments, animated: true, result: result)
-                break
-            case "map#setViewpointGeometry":
-                if let data = call.arguments as? Dictionary<String, Any> {
-                    let geometry = AGSGeometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
-
-                    if let padding = data["padding"] as? Double {
-                        mapView.setViewpointGeometry(geometry.extent, padding: padding) { finished in
-                            result(finished)
-                        }
-                    } else {
-                        mapView.setViewpointGeometry(geometry.extent) { finished in
-                            result(finished)
-                        }
-                    }
-                } else {
-                    result(false)
-                }
-                break
-            case "map#setViewpointCenter":
-                if let data = call.arguments as? Dictionary<String, Any> {
-                    let center = AGSPoint.fromFlutter(data: data["center"] as! Dictionary<String, Any>)! as! AGSPoint
-                    let scale = data["scale"] as! Double
-                    mapView.setViewpointCenter(center, scale: scale) { finished in
-                        result(finished)
-                    }
-                } else {
-                    result(false)
-                }
-                break
-            case "map#setViewpointRotation":
-                if let angleDegrees = call.arguments as? Double {
-                    mapView.setViewpointRotation(angleDegrees)
-                }
-                result(nil)
-                break
-            case "map#locationToScreen":
-                if let mapPointData = call.arguments as? Dictionary<String, Any> {
-                    let screenPoint = mapView.location(toScreen: AGSPoint(data: mapPointData))
-                    result([screenPoint.x, screenPoint.y])
-                } else {
-                    result(nil)
-                }
-                break
-            case "map#screenToLocation":
-                if let data = call.arguments as? Dictionary<String, Any> {
-                    let mapPoints = data["position"] as! [Double]
-                    var mapPoint = mapView.screen(toLocation: CGPoint(x: mapPoints[0], y: mapPoints[1]))
-                    if let spatialReference = AGSSpatialReference(data: data["spatialReference"] as! Dictionary<String, Any>) {
-                        if spatialReference.wkid != mapPoint.spatialReference?.wkid {
-                            mapPoint = AGSGeometryEngine.projectGeometry(mapPoint, to: spatialReference) as! AGSPoint
-                        }
-                    }
-                    result(try? mapPoint.toJSON())
-                } else {
-                    result(nil)
-                }
-                break
-            case "map#getMapScale":
-                result(mapView.mapScale)
-                break
-            case "layers#update":
-                layersController.updateFromArgs(args: call.arguments as Any)
-                result(nil)
-                break
-            case "markers#update":
-                if let markersUpdate = call.arguments as? Dictionary<String, Any> {
-                    if let markersToAdd = markersUpdate["markersToAdd"] as? [Dictionary<String, Any>] {
-                        markersController.addMarkers(markersToAdd: markersToAdd)
-                    }
-                    if let markersToChange = markersUpdate["markersToChange"] as? [Dictionary<String, Any>] {
-                        markersController.changeMarkers(markersToChange: markersToChange)
-                    }
-                    if let markerIdsToRemove = markersUpdate["markerIdsToRemove"] as? [String] {
-                        markersController.removeMarkers(markerIdsToRemove: markerIdsToRemove)
-                    }
-                }
-                result(nil)
-                break
-            case "map#clearMarkerSelection":
-                selectionPropertiesHandler.reset()
-                markersController.clearSelectedMarker()
-                result(nil)
-                break
-            case "polygons#update":
-                if let polygonUpdates = call.arguments as? Dictionary<String, Any> {
-                    if let polygonsToAdd = polygonUpdates["polygonsToAdd"] as? [Dictionary<String, Any>] {
-                        polygonsController.addPolygons(polygonsToAdd: polygonsToAdd)
-                    }
-                    if let polygonsToChange = polygonUpdates["polygonsToChange"] as? [Dictionary<String, Any>] {
-                        polygonsController.changePolygons(polygonsToChange: polygonsToChange)
-                    }
-                    if let polygonIdsToRemove = polygonUpdates["polygonIdsToRemove"] as? [String] {
-                        polygonsController.removePolygons(polygonIdsToRemove: polygonIdsToRemove)
-                    }
-                }
-                result(nil)
-                break
-            case "polylines#update":
-                if let polylineUpdates = call.arguments as? Dictionary<String, Any> {
-                    if let polylinesToAdd = polylineUpdates["polylinesToAdd"] as? [Dictionary<String, Any>] {
-                        polylinesController.addPolylines(polylinesToAdd: polylinesToAdd)
-                    }
-                    if let polylinesToChange = polylineUpdates["polylinesToChange"] as? [Dictionary<String, Any>] {
-                        polylinesController.changePolylines(polylinesToChange: polylinesToChange)
-                    }
-                    if let polylineIdsToRemove = polylineUpdates["polylineIdsToRemove"] as? [String] {
-                        polylinesController.removePolylines(polylineIdsToRemove: polylineIdsToRemove)
-                    }
-                }
-                result(nil)
-                break
-            case "layer#setTimeOffset":
-                layersController.setTimeOffset(arguments: call.arguments)
-                result(nil)
-                break
-            case "map#setViewpointScaleAsync":
-                if let data = call.arguments as? Dictionary<String, Any> {
-                    let scale = data["scale"] as! Double
-                    mapView.setViewpointScale(scale, completion: { finished in
-                        result(finished)
-                    })
-                } else {
-                    result(false)
-                }
-                break
-            default:
-                result(FlutterMethodNotImplemented)
-                break
+                return
             }
+            self.methodCallHandler(call: call, result: result)
         })
+    }
+
+    private func methodCallHandler(call: FlutterMethodCall, result: @escaping FlutterResult) {
+        switch call.method {
+        case "map#waitForMap":
+            result(nil)
+            break
+        case "map#update":
+            if let data = call.arguments as? Dictionary<String, Any> {
+                if let mapOptions = data["options"] as? Dictionary<String, Any> {
+                    updateMapOptions(mapOptions: mapOptions)
+                }
+            }
+            result(nil)
+            break
+        case "map#exportImage":
+            mapView.exportImage { image, error in
+                if let error = error {
+                    result(FlutterError(code: "exportImage_error", message: error.localizedDescription, details: nil))
+                } else {
+                    result(image?.toJSONFlutter())
+                }
+            }
+            break
+        case "map#getLegendInfos":
+            let legendInfoController = LegendInfoController(layersController: layersController)
+            legendInfoController.loadAsync(args: call.arguments, result: { [weak self] items in
+                result(items)
+                guard let self = self else {
+                    return
+                }
+                self.legendInfoControllers = self.legendInfoControllers.filter {
+                    $0 !== legendInfoController
+                }
+            })
+            legendInfoControllers.append(legendInfoController)
+            break
+        case "map#getMapMaxExtend":
+            if let map = mapView.map {
+                map.load { error in
+                    if error == nil {
+                        result(map.maxExtent?.toJSONFlutter())
+                    } else {
+                        result(nil)
+                    }
+                }
+            } else {
+                result(nil)
+            }
+            break
+        case "map#getLocation":
+            let location = mapView.locationDisplay.location
+            if location == nil {
+                result(nil)
+            } else {
+                result(location!.toJSONFlutter())
+            }
+            break
+        case "map#getMapLocation":
+            let mapLocation = mapView.locationDisplay.mapLocation
+            if mapLocation == nil {
+                result(nil)
+            } else {
+                result(mapLocation!.toJSONFlutter())
+            }
+            break
+        case "map#setMapMaxExtent":
+            if let extent = call.arguments as? Dictionary<String, Any> {
+                let maxExtent = AGSEnvelope(data: extent)
+                mapView.map?.maxExtent = maxExtent
+            }
+            result(nil)
+            break
+        case "map#setMap":
+            changeMapType(args: call.arguments)
+            result(nil)
+            break
+        case "map#setViewpointChangedListenerEvents":
+            if let val = call.arguments as? Bool {
+                trackViewpointChangedListenerEvent = val
+            }
+            result(nil)
+            break
+        case "map#setLayersChangedListener":
+            if let val = call.arguments as? Bool {
+                layersChangedController.trackLayersChange = val
+            }
+            result(nil)
+            break
+        case "map#setTimeExtentChangedListener":
+            if let val = call.arguments as? Bool {
+                if val, timeExtentObservation == nil {
+                    timeExtentObservation = mapView.observe(\.timeExtent, options: .new) { [weak self] (_,
+                                                                                                        _) in
+                        guard let self = self else {
+                            return
+                        }
+                        self.onTimeExtentChanged(timeExtent: self.mapView.timeExtent)
+                    }
+                } else {
+                    timeExtentObservation?.invalidate()
+                    timeExtentObservation = nil
+                }
+            }
+            result(nil)
+            break
+        case "map#setTimeExtent":
+            if let timeExtentRaw = call.arguments as? Dictionary<String, Any> {
+                let timeExtent = AGSTimeExtent(data: timeExtentRaw)
+                if mapView.timeExtent != timeExtent {
+                    mapView.timeExtent = timeExtent
+                }
+            } else {
+                mapView.timeExtent = nil
+            }
+            print("map#setTimeExtent")
+            break
+        case "map#getTimeExtent":
+            result(mapView.timeExtent?.toJSONFlutter())
+            break
+        case "map#getMapRotation":
+            result(mapView.rotation)
+            break
+        case "map#getWanderExtentFactor":
+            result(mapView.locationDisplay.wanderExtentFactor)
+            break
+        case "map#getTimeAwareLayerInfos":
+            handleTimeAwareLayerInfos(result: result)
+            break
+        case "map#getCurrentViewpoint":
+            let type = (call.arguments as! Int).toAGSViewpointType()
+            let currentViewPoint = mapView.currentViewpoint(with: type)
+            if let json = try? currentViewPoint?.toJSON() {
+                result(json)
+            } else {
+                result(nil)
+            }
+            break
+        case "map#setViewpoint":
+            setViewpoint(args: call.arguments, animated: true, result: result)
+            break
+        case "map#setViewpointGeometry":
+            if let data = call.arguments as? Dictionary<String, Any> {
+                let geometry = AGSGeometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
+
+                if let padding = data["padding"] as? Double {
+                    mapView.setViewpointGeometry(geometry.extent, padding: padding) { finished in
+                        result(finished)
+                    }
+                } else {
+                    mapView.setViewpointGeometry(geometry.extent) { finished in
+                        result(finished)
+                    }
+                }
+            } else {
+                result(false)
+            }
+            break
+        case "map#setViewpointCenter":
+            if let data = call.arguments as? Dictionary<String, Any> {
+                let center = AGSPoint.fromFlutter(data: data["center"] as! Dictionary<String, Any>)! as! AGSPoint
+                let scale = data["scale"] as! Double
+                mapView.setViewpointCenter(center, scale: scale) { finished in
+                    result(finished)
+                }
+            } else {
+                result(false)
+            }
+            break
+        case "map#setViewpointRotation":
+            if let angleDegrees = call.arguments as? Double {
+                mapView.setViewpointRotation(angleDegrees)
+            }
+            result(nil)
+            break
+        case "map#locationToScreen":
+            if let mapPointData = call.arguments as? Dictionary<String, Any> {
+                let screenPoint = mapView.location(toScreen: AGSPoint(data: mapPointData))
+                result([screenPoint.x, screenPoint.y])
+            } else {
+                result(nil)
+            }
+            break
+        case "map#screenToLocation":
+            if let data = call.arguments as? Dictionary<String, Any> {
+                let mapPoints = data["position"] as! [Double]
+                var mapPoint = mapView.screen(toLocation: CGPoint(x: mapPoints[0], y: mapPoints[1]))
+                if let spatialReference = AGSSpatialReference(data: data["spatialReference"] as! Dictionary<String, Any>) {
+                    if spatialReference.wkid != mapPoint.spatialReference?.wkid {
+                        mapPoint = AGSGeometryEngine.projectGeometry(mapPoint, to: spatialReference) as! AGSPoint
+                    }
+                }
+                result(try? mapPoint.toJSON())
+            } else {
+                result(nil)
+            }
+            break
+        case "map#getMapScale":
+            result(mapView.mapScale)
+            break
+        case "layers#update":
+            layersController.updateFromArgs(args: call.arguments as Any)
+            result(nil)
+            break
+        case "markers#update":
+            if let markersUpdate = call.arguments as? Dictionary<String, Any> {
+                if let markersToAdd = markersUpdate["markersToAdd"] as? [Dictionary<String, Any>] {
+                    markersController.addMarkers(markersToAdd: markersToAdd)
+                }
+                if let markersToChange = markersUpdate["markersToChange"] as? [Dictionary<String, Any>] {
+                    markersController.changeMarkers(markersToChange: markersToChange)
+                }
+                if let markerIdsToRemove = markersUpdate["markerIdsToRemove"] as? [String] {
+                    markersController.removeMarkers(markerIdsToRemove: markerIdsToRemove)
+                }
+            }
+            result(nil)
+            break
+        case "map#clearMarkerSelection":
+            selectionPropertiesHandler.reset()
+            markersController.clearSelectedMarker()
+            result(nil)
+            break
+        case "polygons#update":
+            if let polygonUpdates = call.arguments as? Dictionary<String, Any> {
+                if let polygonsToAdd = polygonUpdates["polygonsToAdd"] as? [Dictionary<String, Any>] {
+                    polygonsController.addPolygons(polygonsToAdd: polygonsToAdd)
+                }
+                if let polygonsToChange = polygonUpdates["polygonsToChange"] as? [Dictionary<String, Any>] {
+                    polygonsController.changePolygons(polygonsToChange: polygonsToChange)
+                }
+                if let polygonIdsToRemove = polygonUpdates["polygonIdsToRemove"] as? [String] {
+                    polygonsController.removePolygons(polygonIdsToRemove: polygonIdsToRemove)
+                }
+            }
+            result(nil)
+            break
+        case "polylines#update":
+            if let polylineUpdates = call.arguments as? Dictionary<String, Any> {
+                if let polylinesToAdd = polylineUpdates["polylinesToAdd"] as? [Dictionary<String, Any>] {
+                    polylinesController.addPolylines(polylinesToAdd: polylinesToAdd)
+                }
+                if let polylinesToChange = polylineUpdates["polylinesToChange"] as? [Dictionary<String, Any>] {
+                    polylinesController.changePolylines(polylinesToChange: polylinesToChange)
+                }
+                if let polylineIdsToRemove = polylineUpdates["polylineIdsToRemove"] as? [String] {
+                    polylinesController.removePolylines(polylineIdsToRemove: polylineIdsToRemove)
+                }
+            }
+            result(nil)
+            break
+        case "layer#setTimeOffset":
+            layersController.setTimeOffset(arguments: call.arguments)
+            result(nil)
+            break
+        case "map#setViewpointScaleAsync":
+            if let data = call.arguments as? Dictionary<String, Any> {
+                let scale = data["scale"] as! Double
+                mapView.setViewpointScale(scale, completion: { finished in
+                    result(finished)
+                })
+            } else {
+                result(false)
+            }
+            break
+        default:
+            result(FlutterMethodNotImplemented)
+            break
+        }
     }
 
     private func handleTimeAwareLayerInfos(result: @escaping FlutterResult) {

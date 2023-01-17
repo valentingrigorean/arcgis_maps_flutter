@@ -28,13 +28,14 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
 
     private ListenableFuture<List<IdentifyGraphicsOverlayResult>> graphicHandler;
     private ListenableFuture<List<IdentifyLayerResult>> layerHandler;
-
     private boolean trackIdentityLayers;
 
+    private final FlutterMapViewDelegate flutterMapViewDelegate;
 
-    public MapViewOnTouchListener(Context context, MapView mapView, MethodChannel methodChannel) {
-        super(context, mapView);
+    public MapViewOnTouchListener(Context context, FlutterMapViewDelegate flutterMapViewDelegate, MethodChannel methodChannel) {
+        super(context, flutterMapViewDelegate.getMapView());
         this.methodChannel = methodChannel;
+        this.flutterMapViewDelegate = flutterMapViewDelegate;
     }
 
     public void setTrackIdentityLayers(boolean trackIdentityLayers) {

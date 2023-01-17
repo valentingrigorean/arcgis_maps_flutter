@@ -13,14 +13,14 @@ import com.esri.arcgisruntime.mapping.view.LayerViewStatus;
 public class InvalidateMapHelper implements DrawStatusChangedListener, LayerViewStateChangedListener {
     private static final String TAG = InvalidateMapHelper.class.getSimpleName();
 
-    private final GeoView mapView;
+    private final FlutterMapViewDelegate flutterMapViewDelegate;
     private boolean loadedCallbackPending = false;
     private boolean isDisposed = false;
 
-    public InvalidateMapHelper(GeoView mapView) {
-        this.mapView = mapView;
-        mapView.addDrawStatusChangedListener(this);
-        mapView.addLayerViewStateChangedListener(this);
+    public InvalidateMapHelper(FlutterMapViewDelegate flutterMapViewDelegate) {
+        this.flutterMapViewDelegate = flutterMapViewDelegate;
+        flutterMapViewDelegate.addDrawStatusChangedListener(this);
+        flutterMapViewDelegate.addLayerViewStateChangedListener(this);
     }
 
     public void dispose() {
@@ -28,8 +28,8 @@ public class InvalidateMapHelper implements DrawStatusChangedListener, LayerView
             return;
         }
         isDisposed = true;
-        mapView.removeLayerViewStateChangedListener(this);
-        mapView.removeDrawStatusChangedListener(this);
+        flutterMapViewDelegate.removeLayerViewStateChangedListener(this);
+        flutterMapViewDelegate.removeDrawStatusChangedListener(this);
     }
 
     /**
@@ -61,14 +61,15 @@ public class InvalidateMapHelper implements DrawStatusChangedListener, LayerView
             return;
         }
 
+
         switch (drawStatusChangedEvent.getDrawStatus()) {
             case COMPLETED:
                 Log.d(TAG, "drawStatusChanged: invalidating map");
                 loadedCallbackPending = false;
                 postFrameCallback(() -> postFrameCallback(
                         () -> {
-                            if (mapView != null && !isDisposed) {
-                                mapView.invalidate();
+                            if (flutterMapViewDelegate.getMapView() != null && !isDisposed) {
+                                flutterMapViewDelegate.getMapView().invalidate();
                             }
                         }));
                 break;
