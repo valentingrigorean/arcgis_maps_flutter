@@ -236,6 +236,10 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
+        if (disposed) {
+            result.success(null);
+            return;
+        }
         switch (call.method) {
             case "map#waitForMap": {
                 result.success(null);
