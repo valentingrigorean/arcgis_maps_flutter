@@ -60,26 +60,35 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
             return false;
         }
 
-        final android.graphics.Point screenPoint = new android.graphics.Point((int) e.getX(), (int) e.getY());
+        try {
+            final android.graphics.Point screenPoint = new android.graphics.Point((int) e.getX(), (int) e.getY());
 
-        if (canConsumeGraphics()) {
-            Log.d(TAG, "onSingleTapConfirmed: identifyGraphicsOverlays");
-            identifyGraphicsOverlays(screenPoint);
-        } else if (trackIdentityLayers) {
-            Log.d(TAG, "onSingleTapConfirmed: identifyLayers");
-            identifyLayers(screenPoint);
-        } else {
-            sendOnMapTap(screenPoint);
+            if (canConsumeGraphics()) {
+                Log.d(TAG, "onSingleTapConfirmed: identifyGraphicsOverlays");
+                identifyGraphicsOverlays(screenPoint);
+            } else if (trackIdentityLayers) {
+                Log.d(TAG, "onSingleTapConfirmed: identifyLayers");
+                identifyLayers(screenPoint);
+            } else {
+                sendOnMapTap(screenPoint);
+            }
+
+            return true;
+        } catch (Exception ex) {
+            Log.e(TAG, "onSingleTapConfirmed: ", ex);
         }
-
-        return true;
+        return false;
     }
 
     @Override
     public void onLongPress(MotionEvent e) {
-        super.onLongPress(e);
-        final android.graphics.Point screenPoint = new android.graphics.Point((int) e.getX(), (int) e.getY());
-        sendOnMapLongPress(screenPoint);
+        try {
+            super.onLongPress(e);
+            final android.graphics.Point screenPoint = new android.graphics.Point((int) e.getX(), (int) e.getY());
+            sendOnMapLongPress(screenPoint);
+        } catch (Exception exception) {
+            Log.e(TAG, "onLongPress: ", exception);
+        }
     }
 
     private void identifyGraphicsOverlays(android.graphics.Point screenPoint) {
@@ -172,7 +181,7 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
         if (mapView == null) {
             return;
         }
-        
+
         final Point mapPoint = mapView.screenToLocation(screenPoint);
         if (mapPoint == null) {
             return;
