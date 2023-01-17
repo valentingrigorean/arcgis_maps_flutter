@@ -52,6 +52,7 @@ android {
     lint {
         disable 'InvalidPackage'
     }
+    namespace 'com.valentingrigorean.arcgis_maps_flutter_example'
 }
 
 flutter {

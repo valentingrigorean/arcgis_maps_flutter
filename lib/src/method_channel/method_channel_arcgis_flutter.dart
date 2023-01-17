@@ -26,7 +26,10 @@ class MethodChannelArcgisFlutter extends ArcgisFlutterPlatform {
   Future<LicenseStatus> setLicense(String licenseKey) async {
     final int? result =
         await _channel.invokeMethod<int>('arcgis#setLicense', licenseKey);
-    return LicenseStatus.values[result!];
+    if(result == null){
+      return LicenseStatus.invalid;
+    }
+    return LicenseStatus.values[result];
   }
 
   @override

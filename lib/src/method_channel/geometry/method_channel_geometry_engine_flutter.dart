@@ -93,6 +93,9 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
       "firstGeometry": first.toJson(),
       "secondGeometry": second.toJson(),
     });
+    if(result == null) {
+      return [];
+    }
     List<dynamic> list = result;
     List<Geometry> geometryList = [];
     for (var json in list) {

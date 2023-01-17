@@ -66,6 +66,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.valentingrigorean.arcgis_maps_flutter.data.FieldTypeFlutter;
 import com.valentingrigorean.arcgis_maps_flutter.layers.FlutterLayer;
 import com.valentingrigorean.arcgis_maps_flutter.map.BitmapDescriptorFactory;
+import com.valentingrigorean.arcgis_maps_flutter.map.FlutterMapViewDelegate;
 import com.valentingrigorean.arcgis_maps_flutter.map.GraphicControllerSink;
 import com.valentingrigorean.arcgis_maps_flutter.map.MarkerController;
 import com.valentingrigorean.arcgis_maps_flutter.map.PolygonController;
@@ -583,11 +584,11 @@ public class Convert {
         return geodesicSectorParameters;
     }
 
-    public static void interpretMapViewOptions(Object o, MapView mapView) {
+    public static void interpretMapViewOptions(Object o, FlutterMapViewDelegate flutterMapViewDelegate) {
         final Map<?, ?> data = toMap(o);
         final Object interactionOptions = data.get("interactionOptions");
         if (interactionOptions != null) {
-            interpretInteractionOptions(interactionOptions, mapView);
+            interpretInteractionOptions(interactionOptions, flutterMapViewDelegate);
         }
     }
 
@@ -728,6 +729,9 @@ public class Convert {
     }
 
     public static byte[] bitmapToByteArray(Bitmap bmp) {
+        if (bmp == null) {
+            return null;
+        }
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
         return stream.toByteArray();
@@ -780,9 +784,11 @@ public class Convert {
         return json;
     }
 
-
     @Nullable
     public static Object timeExtentToJson(TimeExtent timeExtent) {
+        if (timeExtent == null) {
+            return null;
+        }
         if (timeExtent.getStartTime() == null && timeExtent.getEndTime() == null) {
             return null;
         }
@@ -1017,9 +1023,13 @@ public class Convert {
         }
     }
 
-    private static void interpretInteractionOptions(Object o, MapView mapView) {
+    private static void interpretInteractionOptions(Object o, FlutterMapViewDelegate flutterMapViewDelegate) {
         final Map<?, ?> data = toMap(o);
-        final MapView.InteractionOptions interactionOptions = mapView.getInteractionOptions();
+        final MapView.InteractionOptions interactionOptions = flutterMapViewDelegate.getInteractionOptions();
+
+        if (interactionOptions == null) {
+            return;
+        }
 
         final Object isEnabled = data.get("isEnabled");
         if (isEnabled != null) {

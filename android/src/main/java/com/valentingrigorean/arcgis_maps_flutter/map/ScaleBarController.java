@@ -16,35 +16,29 @@ import java.util.Map;
 
 public class ScaleBarController implements MapScaleChangedListener {
     private final Context context;
-    private final MapView mapView;
+    private final FlutterMapViewDelegate flutterMapViewDelegate;
     private final FrameLayout container;
     private final Scalebar scalebar;
-
     private ScaleBarState scaleBarState = ScaleBarState.NONE;
-
     private FrameLayout.LayoutParams layoutParams;
-
     private boolean isAutoHide = false;
     private int hideAfterMS = 2000;
     private ViewPropertyAnimator viewPropertyAnimator;
-
     private double mapScale;
-
     private boolean didGotScale = false;
 
-
-    public ScaleBarController(Context context, MapView mapView, FrameLayout container) {
+    public ScaleBarController(Context context,FlutterMapViewDelegate flutterMapViewDelegate, FrameLayout container) {
         this.context = context;
-        this.mapView = mapView;
+        this.flutterMapViewDelegate = flutterMapViewDelegate;
         this.container = container;
         scalebar = new Scalebar(context);
         scalebar.setAlpha(0f);
-        mapView.addMapScaleChangedListener(this);
+        flutterMapViewDelegate.addMapScaleChangedListener(this);
     }
 
     public void dispose() {
         removeScaleBar();
-        mapView.removeMapScaleChangedListener(this);
+        flutterMapViewDelegate.removeMapScaleChangedListener(this);
     }
 
     public void removeScaleBar() {
@@ -131,7 +125,7 @@ public class ScaleBarController implements MapScaleChangedListener {
 
         if (isAutoHide) {
             scalebar.setAlpha(0);
-            mapScale = mapView.getMapScale();
+            mapScale = flutterMapViewDelegate.getMapScale();
         } else {
             scalebar.setAlpha(1f);
         }
@@ -152,11 +146,11 @@ public class ScaleBarController implements MapScaleChangedListener {
     private void validateScaleBarState(boolean isInMap) {
         if (isInMap && scaleBarState != ScaleBarState.IN_MAP) {
             removeScaleBar();
-            scalebar.addToMapView(mapView);
+            scalebar.addToMapView(flutterMapViewDelegate.getMapView());
             scaleBarState = ScaleBarState.IN_MAP;
         } else if (scaleBarState != ScaleBarState.IN_CONTAINER) {
             removeScaleBar();
-            scalebar.bindTo(mapView);
+            scalebar.bindTo(flutterMapViewDelegate.getMapView());
             layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                     Convert.dpToPixelsI(context, 50));
             container.addView(scalebar, layoutParams);

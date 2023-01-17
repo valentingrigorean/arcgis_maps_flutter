@@ -10,16 +10,16 @@ import java.util.Map;
 public class SymbolVisibilityFilterController implements MapScaleChangedListener {
     private final Map<GraphicControllerSink, SymbolVisibilityFilter> graphicControllers = new HashMap<>();
     private final Map<GraphicControllerSink, Boolean> initialValues = new HashMap<>();
-    private final MapView mapView;
+    private final FlutterMapViewDelegate flutterMapViewDelegate;
 
     private boolean isRegister;
 
-    public SymbolVisibilityFilterController(MapView mapView) {
-        this.mapView = mapView;
+    public SymbolVisibilityFilterController(FlutterMapViewDelegate flutterMapViewDelegate) {
+        this.flutterMapViewDelegate = flutterMapViewDelegate;
     }
 
     public void clear() {
-        mapView.removeMapScaleChangedListener(this);
+        flutterMapViewDelegate.removeMapScaleChangedListener(this);
         isRegister = false;
 
         for (Map.Entry<GraphicControllerSink, SymbolVisibilityFilter> entry :
@@ -42,7 +42,7 @@ public class SymbolVisibilityFilterController implements MapScaleChangedListener
 
     public void invalidate(GraphicControllerSink graphicController) {
         if (containsGraphicsController(graphicController)) {
-            handleGraphicsFilterZoom(graphicController, graphicControllers.get(graphicController), mapView.getMapScale());
+            handleGraphicsFilterZoom(graphicController, graphicControllers.get(graphicController), flutterMapViewDelegate.getMapScale());
         }
     }
 
@@ -53,7 +53,7 @@ public class SymbolVisibilityFilterController implements MapScaleChangedListener
 
         initialValues.put(graphicController, initValue);
 
-        handleGraphicsFilterZoom(graphicController, symbolVisibilityFilter, mapView.getMapScale());
+        handleGraphicsFilterZoom(graphicController, symbolVisibilityFilter, flutterMapViewDelegate.getMapScale());
 
         if (graphicControllers.containsKey(graphicController)) {
             if (graphicControllers.get(graphicController) == symbolVisibilityFilter) {
@@ -101,10 +101,10 @@ public class SymbolVisibilityFilterController implements MapScaleChangedListener
     private void handleRegistrationToScaleChanged() {
         if (graphicControllers.size() > 0 && !isRegister) {
             isRegister = true;
-            mapView.addMapScaleChangedListener(this);
+            flutterMapViewDelegate.addMapScaleChangedListener(this);
         } else if (graphicControllers.size() == 0 && isRegister) {
             isRegister = false;
-            mapView.removeMapScaleChangedListener(this);
+            flutterMapViewDelegate.removeMapScaleChangedListener(this);
         }
     }
 }

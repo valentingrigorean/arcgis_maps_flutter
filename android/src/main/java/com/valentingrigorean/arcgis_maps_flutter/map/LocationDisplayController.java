@@ -17,7 +17,7 @@ public class LocationDisplayController implements MapTouchGraphicDelegate, Locat
     private static final String LOCATION_ATTRIBUTE = "my_location_attribute";
 
     private final MethodChannel channel;
-    private final MapView mapView;
+    private final FlutterMapViewDelegate flutterMapViewDelegate;
     private final LocationDisplay locationDisplay;
     private final GraphicsOverlay locationGraphicsOverlay;
 
@@ -30,14 +30,14 @@ public class LocationDisplayController implements MapTouchGraphicDelegate, Locat
 
     private boolean trackUserLocationTap = false;
 
-    public LocationDisplayController(MethodChannel methodChannel, MapView mapView) {
+    public LocationDisplayController(MethodChannel methodChannel, FlutterMapViewDelegate flutterMapViewDelegate) {
         this.channel = methodChannel;
-        this.mapView = mapView;
-        this.locationDisplay = mapView.getLocationDisplay();
+        this.flutterMapViewDelegate = flutterMapViewDelegate;
+        this.locationDisplay = flutterMapViewDelegate.getLocationDisplay();
         this.locationGraphicsOverlay = new GraphicsOverlay();
         this.locationGraphicsOverlay.setOpacity(0);
         this.locationGraphic = new Graphic();
-        this.locationGraphic.setGeometry(mapView.getLocationDisplay().getMapLocation());
+        this.locationGraphic.setGeometry(flutterMapViewDelegate.getLocationDisplay().getMapLocation());
         this.locationGraphic.getAttributes().put(LOCATION_ATTRIBUTE, true);
         this.locationGraphic.setSymbol(locationDisplay.getDefaultSymbol());
         this.locationGraphicsOverlay.getGraphics().add(locationGraphic);
@@ -59,9 +59,9 @@ public class LocationDisplayController implements MapTouchGraphicDelegate, Locat
         if (this.trackUserLocationTap != trackUserLocationTap) {
             this.trackUserLocationTap = trackUserLocationTap;
             if (trackUserLocationTap) {
-                mapView.getGraphicsOverlays().add(locationGraphicsOverlay);
+                flutterMapViewDelegate.getGraphicsOverlays().add(locationGraphicsOverlay);
             } else {
-                mapView.getGraphicsOverlays().remove(locationGraphicsOverlay);
+                flutterMapViewDelegate.getGraphicsOverlays().remove(locationGraphicsOverlay);
             }
         }
     }
