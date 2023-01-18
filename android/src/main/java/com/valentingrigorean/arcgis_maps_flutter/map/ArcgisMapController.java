@@ -85,7 +85,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     private FlutterMapView mapView;
     private MapViewOnTouchListener mapViewOnTouchListener;
 
-    private FrameLayout mapContainer;
     private ScaleBarController scaleBarController;
     private InvalidateMapHelper invalidateMapHelper;
 
@@ -114,14 +113,9 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         methodChannel = new MethodChannel(binaryMessenger, "plugins.flutter.io/arcgis_maps_" + id);
         methodChannel.setMethodCallHandler(this);
 
-        mapContainer = new FrameLayout(context);
-
         mapView = new FlutterMapView(context);
 
-        mapContainer.addView(mapView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
-
-        scaleBarController = new ScaleBarController(context, mapView, mapContainer);
+        scaleBarController = new ScaleBarController(context, mapView, mapView);
 
         selectionPropertiesHandler = new SelectionPropertiesHandler(mapView.getSelectionProperties());
 
@@ -157,7 +151,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         mapViewOnTouchListener.addGraphicDelegate(locationDisplayController);
 
         mapView.getGraphicsOverlays().add(graphicsOverlay);
-        mapView.setOnTouchListener(mapViewOnTouchListener);
+        mapView.getMapView().setOnTouchListener(mapViewOnTouchListener);
         mapView.addViewpointChangedListener(this);
 
         invalidateMapHelper = new InvalidateMapHelper(mapView);
@@ -174,7 +168,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
     @Override
     public View getView() {
-        return mapContainer;
+        return mapView;
     }
 
     @Override
@@ -560,12 +554,9 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     }
 
     private void destroyMapViewIfNecessary() {
-        if (mapContainer != null) {
-            mapContainer.removeAllViews();
-            mapContainer = null;
-        }
         if (mapView != null) {
             mapView.dispose();
+            mapView.removeAllViews();
             mapView = null;
         }
         mapLoadedListener.setMap(null);
