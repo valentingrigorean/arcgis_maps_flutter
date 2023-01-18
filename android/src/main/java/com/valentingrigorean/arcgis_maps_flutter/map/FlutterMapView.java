@@ -3,6 +3,8 @@ package com.valentingrigorean.arcgis_maps_flutter.map;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
@@ -156,12 +158,28 @@ public class FlutterMapView extends FrameLayout implements FlutterMapViewDelegat
 
     @Override
     public double getMapScale() {
-        return isDisposed ? 0 : mapView.getMapScale();
+        if (isDisposed) {
+            return 0;
+        }
+        try {
+            return mapView.getMapScale();
+        } catch (Exception e) {
+            Log.e("FlutterMapView", "getMapScale", e);
+            return 0;
+        }
     }
 
     @Override
     public double getMapRotation() {
-        return isDisposed ? 0 : mapView.getMapRotation();
+        if (isDisposed) {
+            return 0;
+        }
+        try {
+            return mapView.getMapRotation();
+        } catch (Exception e) {
+            Log.e("FlutterMapView", "getMapRotation", e);
+            return 0;
+        }
     }
 
     @Override
