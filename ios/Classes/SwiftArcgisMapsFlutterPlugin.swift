@@ -2,7 +2,6 @@ import Flutter
 import UIKit
 import ArcGIS
 
-
 public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
 
     private let channel: FlutterMethodChannel

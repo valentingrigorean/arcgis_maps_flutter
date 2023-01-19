@@ -131,7 +131,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     private func setMethodCallHandlers() -> Void {
         channel.setMethodCallHandler({ [weak self](call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
             guard let self else {
-                result(nil)
                 return
             }
             self.methodCallHandler(call: call, result: result)
@@ -163,10 +162,10 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         case "map#getLegendInfos":
             let legendInfoController = LegendInfoController(layersController: layersController)
             legendInfoController.loadAsync(args: call.arguments, result: { [weak self] items in
-                result(items)
                 guard let self = self else {
                     return
                 }
+                result(items)
                 self.legendInfoControllers = self.legendInfoControllers.filter {
                     $0 !== legendInfoController
                 }

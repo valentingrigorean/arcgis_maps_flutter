@@ -13,7 +13,6 @@ class CoordinateFormatterController {
         channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel/coordinate_formatter", binaryMessenger: messenger)
         channel.setMethodCallHandler({ [weak self](call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
             guard let self else {
-                result(nil)
                 return
             }
             self.handle(call: call, result: result)

@@ -41,7 +41,6 @@ class ArcgisNativeObjectsController: NativeMessageSink {
     private func setMethodCallHandlers() {
         channel.setMethodCallHandler({ [weak self](call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
             guard let self else {
-                result(nil)
                 return
             }
             self.methodCallHandler(call: call, result: result)
