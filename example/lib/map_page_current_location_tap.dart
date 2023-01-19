@@ -18,20 +18,20 @@ class _MapPageCurrentLocationTapState extends State<MapPageCurrentLocationTap> {
   @override
   void initState() {
     super.initState();
-
     requestPermission(LocationPermissionLevel.locationWhenInUse);
   }
 
   @override
   Widget build(BuildContext context) {
     late Widget body;
+
     if (_permissionStatus == PermissionStatus.granted) {
       body = ArcgisMapView(
         map: ArcGISMap.topographic(),
         myLocationEnabled: true,
         onUserLocationTap: () async {
           final point = await _locationDisplay.mapLocation;
-          if(!mounted){
+          if (!mounted) {
             return;
           }
           ScaffoldMessenger.of(context).showSnackBar(
@@ -77,15 +77,12 @@ class _MapPageCurrentLocationTapState extends State<MapPageCurrentLocationTap> {
       LocationPermissionLevel permissionLevel) async {
     final PermissionStatus permissionRequestResult = await LocationPermissions()
         .requestPermissions(permissionLevel: permissionLevel);
-
-    setState(() {
-      if (kDebugMode) {
-        print(permissionRequestResult);
-      }
-      _permissionStatus = permissionRequestResult;
-      if (kDebugMode) {
-        print(_permissionStatus);
-      }
-    });
+    _permissionStatus = permissionRequestResult;
+    if (kDebugMode) {
+      print(permissionRequestResult);
+    }
+    if (mounted) {
+      setState(() {});
+    }
   }
 }
