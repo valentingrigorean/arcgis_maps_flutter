@@ -92,7 +92,11 @@ public class LocationDisplayController implements MapTouchGraphicDelegate, Locat
 
     @Override
     public void onStatusChanged(LocationDisplay.DataSourceStatusChangedEvent dataSourceStatusChangedEvent) {
-        locationGraphic.setGeometry(locationDisplay.getMapLocation());
+        try {
+            locationGraphic.setGeometry(locationDisplay.getMapLocation());
+        } catch (ArcGISRuntimeException e) {
+            //ignore
+        }
         handleStatusChanged(dataSourceStatusChangedEvent.isStarted(), dataSourceStatusChangedEvent.getError());
     }
 
