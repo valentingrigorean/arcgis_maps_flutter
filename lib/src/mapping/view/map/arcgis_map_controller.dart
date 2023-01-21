@@ -19,6 +19,8 @@ class ArcgisMapController {
         .setTimeExtentChangedListener(mapId, register);
   });
 
+  bool _isDisposed = false;
+
   final int mapId;
 
   ArcgisMapController._(
@@ -37,6 +39,8 @@ class ArcgisMapController {
   }
 
   final LocationDisplay locationDisplay;
+
+  bool get isDisposed => _isDisposed;
 
   Future<List<LegendInfoResult>> getLegendInfosForLayer(Layer layer) async {
     return await ArcgisMapsFlutterPlatform.instance
@@ -247,6 +251,10 @@ class ArcgisMapController {
 
   /// Disposes of the platform resources
   void dispose() {
+    if (_isDisposed) {
+      return;
+    }
+    _isDisposed = true;
     locationDisplay.dispose();
     ArcgisMapsFlutterPlatform.instance.dispose(mapId);
   }
@@ -317,6 +325,12 @@ class ArcgisMapController {
     ArcgisMapsFlutterPlatform.instance.onUserLocationTap(mapId: mapId).listen(
           (UserLocationTapEvent e) => _arcgisMapState.onUserLocationTap(),
         );
+  }
+
+  void _checkIfDisposed() {
+    if (_isDisposed) {
+      throw StateError('Cannot access a disposed ArcGISMapController.');
+    }
   }
 }
 

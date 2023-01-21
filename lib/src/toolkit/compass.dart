@@ -53,6 +53,9 @@ class CompassController extends ChangeNotifier
       rotation = _initialRotation;
       return;
     }
+    if (controller.isDisposed) {
+      return;
+    }
     rotation = await controller.getMapRotation();
   }
 }
@@ -77,7 +80,7 @@ class Compass extends StatefulWidget {
   final Widget? child;
 
   @override
-  State<Compass>  createState() => _CompassState();
+  State<Compass> createState() => _CompassState();
 }
 
 class _CompassState extends State<Compass> with SingleTickerProviderStateMixin {
