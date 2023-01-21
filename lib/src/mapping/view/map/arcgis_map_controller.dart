@@ -92,26 +92,32 @@ class ArcgisMapController {
   }
 
   void addViewpointChangedListener(ViewpointChangedListener listener) {
+    if (_isDisposed) return;
     _viewpointChangedHandlers.addHandler(listener);
   }
 
   void removeViewpointChangedListener(ViewpointChangedListener listener) {
+    if (_isDisposed) return;
     _viewpointChangedHandlers.removeHandler(listener);
   }
 
   void addLayersChangedListener(LayersChangedListener listener) {
+    if (_isDisposed) return;
     _layersChangedHandlers.addHandler(listener);
   }
 
   void removeLayersChangedListener(LayersChangedListener listener) {
+    if (_isDisposed) return;
     _layersChangedHandlers.removeHandler(listener);
   }
 
   void addTimeExtentChangedListener(TimeExtentChangedListener listener) {
+    if (_isDisposed) return;
     _timeExtentChangedHandlers.addHandler(listener);
   }
 
   void removeTimeExtentChangedListener(TimeExtentChangedListener listener) {
+    if (_isDisposed) return;
     _timeExtentChangedHandlers.removeHandler(listener);
   }
 
@@ -255,6 +261,9 @@ class ArcgisMapController {
       return;
     }
     _isDisposed = true;
+    _viewpointChangedHandlers.clearAll();
+    _layersChangedHandlers.clearAll();
+    _timeExtentChangedHandlers.clearAll();
     locationDisplay.dispose();
     ArcgisMapsFlutterPlatform.instance.dispose(mapId);
   }
@@ -363,6 +372,13 @@ class _EventBaseHandler<T> {
     if (_isWired && _handlers.isEmpty) {
       _isWired = false;
       registerHandlerCallback(false);
+    }
+  }
+
+  void clearAll() {
+    _handlers.clear();
+    if (_isWired) {
+      _isWired = false;
     }
   }
 }
