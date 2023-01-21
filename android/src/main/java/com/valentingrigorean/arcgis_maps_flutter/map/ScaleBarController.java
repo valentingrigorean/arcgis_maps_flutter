@@ -27,7 +27,7 @@ public class ScaleBarController implements MapScaleChangedListener {
     private double mapScale;
     private boolean didGotScale = false;
 
-    public ScaleBarController(Context context,FlutterMapViewDelegate flutterMapViewDelegate, FrameLayout container) {
+    public ScaleBarController(Context context, FlutterMapViewDelegate flutterMapViewDelegate, FrameLayout container) {
         this.context = context;
         this.flutterMapViewDelegate = flutterMapViewDelegate;
         this.container = container;
@@ -63,7 +63,7 @@ public class ScaleBarController implements MapScaleChangedListener {
             viewPropertyAnimator.cancel();
             viewPropertyAnimator = null;
         }
-        final double currentScale = mapScaleChangedEvent.getSource().getMapScale();
+        double currentScale = flutterMapViewDelegate.getMapScale();
         if (mapScale == currentScale) {
             return;
         }
