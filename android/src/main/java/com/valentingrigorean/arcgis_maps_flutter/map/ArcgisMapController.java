@@ -827,12 +827,16 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
         }
 
         public void setMap(ArcGISMap map) {
-            if (this.map != null) {
-                this.map.removeDoneLoadingListener(this);
-            }
-            this.map = map;
-            if (map != null) {
-                map.addDoneLoadingListener(this);
+            try {
+                if (this.map != null) {
+                    this.map.removeDoneLoadingListener(this);
+                }
+                this.map = map;
+                if (map != null) {
+                    map.addDoneLoadingListener(this);
+                }
+            }catch (Exception e){
+                Log.e(TAG, "setMap: ", e);
             }
         }
 
