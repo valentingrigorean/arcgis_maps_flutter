@@ -838,6 +838,9 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
 
         @Override
         public void run() {
+            if (disposed) {
+                return;
+            }
             map.removeDoneLoadingListener(this);
             if (map.getLoadStatus() == LoadStatus.LOADED) {
                 methodChannel.invokeMethod("map#loaded", null);
