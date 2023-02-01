@@ -20,6 +20,7 @@ import com.esri.arcgisruntime.arcgisservices.TimeAware;
 import com.esri.arcgisruntime.arcgisservices.TimeUnit;
 import com.esri.arcgisruntime.data.EditResult;
 import com.esri.arcgisruntime.data.FeatureEditResult;
+import com.esri.arcgisruntime.data.QueryParameters;
 import com.esri.arcgisruntime.data.TileCache;
 import com.esri.arcgisruntime.geometry.AngularUnit;
 import com.esri.arcgisruntime.geometry.AngularUnitId;
@@ -187,6 +188,68 @@ public class Convert {
         }
     }
 
+    public static QueryParameters.SpatialRelationship toSpatialRelationship(Object o) {
+        switch (toInt(o)) {
+            case -1:
+                return QueryParameters.SpatialRelationship.UNKNOWN;
+            case 0:
+                return QueryParameters.SpatialRelationship.RELATE;
+            case 1:
+                return QueryParameters.SpatialRelationship.EQUALS;
+            case 2:
+                return QueryParameters.SpatialRelationship.DISJOINT;
+            case 3:
+                return QueryParameters.SpatialRelationship.INTERSECTS;
+            case 4:
+                return QueryParameters.SpatialRelationship.TOUCHES;
+            case 5:
+                return QueryParameters.SpatialRelationship.CROSSES;
+            case 6:
+                return QueryParameters.SpatialRelationship.WITHIN;
+            case 7:
+                return QueryParameters.SpatialRelationship.CONTAINS;
+            case 8:
+                return QueryParameters.SpatialRelationship.OVERLAPS;
+            case 9:
+                return QueryParameters.SpatialRelationship.ENVELOPE_INTERSECTS;
+            case 10:
+                return QueryParameters.SpatialRelationship.INDEX_INTERSECTS;
+            default:
+                throw new IllegalStateException("Unexpected value: " + o);
+        }
+    }
+
+    public static int spatialRelationshipToJson(QueryParameters.SpatialRelationship spatialRelationship) {
+        switch (spatialRelationship) {
+            case UNKNOWN:
+                return -1;
+            case RELATE:
+                return 0;
+            case EQUALS:
+                return 1;
+            case DISJOINT:
+                return 2;
+            case INTERSECTS:
+                return 3;
+            case TOUCHES:
+                return 4;
+            case CROSSES:
+                return 5;
+            case WITHIN:
+                return 6;
+            case CONTAINS:
+                return 7;
+            case OVERLAPS:
+                return 8;
+            case ENVELOPE_INTERSECTS:
+                return 9;
+            case INDEX_INTERSECTS:
+                return 10;
+            default:
+                throw new IllegalStateException("Unexpected value: " + spatialRelationship);
+        }
+    }
+
     public static Style toScaleBarStyle(int rawValue) {
         switch (rawValue) {
             case 0:
@@ -317,6 +380,21 @@ public class Convert {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Nullable
+    public static Object geoElementToJson(GeoElement element) {
+
+        final Map<String, Object> attributes = new HashMap<>(element.getAttributes().size());
+        element.getAttributes().forEach((k, v) -> attributes.put(k, toFlutterFieldType(v)));
+
+        final Map<String, Object> elementData = new HashMap<>(2);
+
+        elementData.put("attributes", attributes);
+        if (element.getGeometry() != null)
+            elementData.put("geometry", geometryToJson(element.getGeometry()));
+
+        return elementData;
     }
 
     public static Point toPoint(Object o) {

@@ -165,3 +165,68 @@ extension AGSAreaUnitID {
         }
     }
 }
+
+extension AGSSpatialRelationship {
+
+    static func fromFlutter(_ index: Int) -> AGSSpatialRelationship {
+        switch index {
+        case -1:
+            return .unknown
+        case 0:
+            return .relate
+        case 1:
+            return .equals
+        case 2:
+            return .disjoint
+        case 3:
+            return .intersects
+        case 4:
+            return .touches
+        case 5:
+            return .crosses
+        case 6:
+            return .within
+        case 7:
+            return .contains
+        case 8:
+            return .overlaps
+        case 9:
+            return .envelopeIntersects
+        case 10:
+            return .indexIntersects
+        default:
+            return .unknown
+        }
+    }
+
+    func toFlutter() -> Int {
+        switch self {
+        case .unknown:
+            return -1
+        case .relate:
+            return 0
+        case .equals:
+            return 1
+        case .disjoint:
+            return 2
+        case .intersects:
+            return 3
+        case .touches:
+            return 4
+        case .crosses:
+            return 5
+        case .within:
+            return 6
+        case .contains:
+            return 7
+        case .overlaps:
+            return 8
+        case .envelopeIntersects:
+            return 9
+        case .indexIntersects:
+            return 10
+        default:
+            return -1
+        }
+    }
+}
