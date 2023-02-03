@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 
 class MethodChannelArcgisNativeFlutter extends ArcgisNativeFlutterPlatform {
   final MethodChannel _channel =
-      const MethodChannel('plugins.flutter.io/arcgis_channel/native_objects');
+      const OptionalMethodChannel('plugins.flutter.io/arcgis_channel/native_objects');
 
   final StreamController<NativeMessage> _onMessage =
       StreamController<NativeMessage>.broadcast();

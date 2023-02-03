@@ -43,7 +43,7 @@ class MethodChannelArcgisSceneFlutter extends ArcgisSceneFlutterPlatform {
   Future<void> init(int sceneId) {
     MethodChannel? channel = _channels[sceneId];
     if (channel == null) {
-      channel = MethodChannel('plugins.flutter.io/arcgis_maps_$sceneId');
+      channel = OptionalMethodChannel('plugins.flutter.io/arcgis_maps_$sceneId');
       channel.setMethodCallHandler(
           (MethodCall call) => _handleMethodCall(call, sceneId));
       _channels[sceneId] = channel;
