@@ -260,9 +260,13 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   }
 
   @override
-  void dispose() async {
+  void dispose() {
+    _disposeController();
     super.dispose();
-    ArcgisMapController controller = await _controller.future;
+  }
+
+  Future<void> _disposeController() async {
+    final ArcgisMapController controller = await _controller.future;
     controller.dispose();
   }
 

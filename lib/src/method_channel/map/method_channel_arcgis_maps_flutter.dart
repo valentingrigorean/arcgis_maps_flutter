@@ -396,7 +396,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
 
   @override
   void dispose(int mapId) {
-    // Noop!
+    _channels.remove(mapId);
   }
 
   @override
