@@ -1,10 +1,12 @@
+import 'dart:ffi';
+
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/geometry/geometry_engine_flutter_platform.dart';
 import 'package:flutter/services.dart';
 
 class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
-  final MethodChannel _channel =
-      const OptionalMethodChannel("plugins.flutter.io/arcgis_channel/geometry_engine");
+  final MethodChannel _channel = const OptionalMethodChannel(
+      "plugins.flutter.io/arcgis_channel/geometry_engine");
 
   @override
   Future<Geometry?> project(
@@ -93,7 +95,7 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
       "firstGeometry": first.toJson(),
       "secondGeometry": second.toJson(),
     });
-    if(result == null) {
+    if (result == null) {
       return [];
     }
     List<dynamic> list = result;
@@ -154,5 +156,17 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
       }
     }
     return pointList;
+  }
+
+  @override
+  Future<Geometry?> simplify(Geometry geometry) async {
+    final result = await _channel.invokeMethod("simplify", geometry.toJson());
+    return Geometry.fromJson(result);
+  }
+
+  @override
+  Future<bool> isSimple(Geometry geometry) async {
+    final result = await _channel.invokeMethod("isSimple", geometry.toJson());
+    return result ?? true;
   }
 }

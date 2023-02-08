@@ -77,6 +77,12 @@ public class GeometryEngineController implements MethodChannel.MethodCallHandler
             case "geodeticMove": {
                 handleGeodeticMove(call.arguments(), result);
             }
+            case "simplify": {
+                handleSimply(call.arguments(), result);
+            }
+            case "isSimple": {
+                handleIsSimple(call.arguments(), result);
+            }
             break;
             default:
                 result.notImplemented();
@@ -185,4 +191,24 @@ public class GeometryEngineController implements MethodChannel.MethodCallHandler
         }
     }
 
+    private void handleSimply(Map<?, ?> data, MethodChannel.Result result) {
+        Geometry originGeometry = Convert.toGeometry(data);
+        if (originGeometry == null) {
+            Log.e(TAG, "Failed to simply as geometry is null");
+            result.success(null);
+        } else {
+            Geometry simplifiedGeometry = GeometryEngine.simplify(originGeometry);
+            result.success(Convert.geometryToJson(simplifiedGeometry));
+        }
+    }
+
+    private void handleIsSimple(Map<?, ?> data, MethodChannel.Result result) {
+        Geometry originGeometry = Convert.toGeometry(data);
+        if (originGeometry == null) {
+            Log.e(TAG, "Failed to get isSimple as geometry is null");
+            result.success(true);
+        } else {
+            result.success(GeometryEngine.isSimple(originGeometry));
+        }
+    }
 }
