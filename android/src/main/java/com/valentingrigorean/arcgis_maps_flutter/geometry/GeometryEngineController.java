@@ -80,6 +80,7 @@ public class GeometryEngineController implements MethodChannel.MethodCallHandler
             case "simplify": {
                 handleSimply(call.arguments(), result);
             }
+            break;
             case "isSimple": {
                 handleIsSimple(call.arguments(), result);
             }
