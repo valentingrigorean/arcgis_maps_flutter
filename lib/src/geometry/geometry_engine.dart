@@ -159,4 +159,33 @@ class GeometryEngine {
       curveType: curveType,
     );
   }
+
+  /// Simplifies the given geometry to make it topologically consistent according to its geometry type. For instance, it rectifies polygons that may be self-intersecting, or contain incorrect ring orientations.
+  /// Many of the methods in the geometry engine only work on geometry that is simple, and only simple geometries can be stored in a geodatabase.
+  ///
+  /// Supports true curves.
+  static Future<Geometry?> simplify(Geometry geometry) {
+    return GeometryEngineFlutterPlatform.instance.simplify(geometry);
+  }
+
+  /// Indicates if this Geometry is topologically simple (in other words, is topologically correct).
+  /// [AGSPoint] geometries are always simple.
+  ///
+  /// [AGSMultipoint] geometries cannot have any points with exactly equal x and y values.
+  ///
+  /// [AGSPolyline]  can have no degenerate segments.
+  ///
+  /// For [AGSPolygon], the following must be true for the polygon to be considered simple:
+  ///
+  /// - Exterior rings must be clockwise, and holes must be counterclockwise.
+  /// - Rings can touch other rings only at a finite number of vertices.
+  /// - Rings can be self tangent only at a finite number of vertices.
+  /// - Segments with a length less than zero are not allowed.
+  /// - Each path must contain at least three non-coincident vertices.
+  /// Paths must not be empty.
+  ///
+  /// Returns true by default if geometry is null or error occurs.
+  static Future<bool> isSimple(Geometry geometry) {
+    return GeometryEngineFlutterPlatform.instance.isSimple(geometry);
+  }
 }

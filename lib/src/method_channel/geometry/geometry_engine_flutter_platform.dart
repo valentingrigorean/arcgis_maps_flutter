@@ -77,4 +77,12 @@ abstract class GeometryEngineFlutterPlatform extends PlatformInterface {
   }) {
     throw UnimplementedError('geodeticMove() has not been implemented.');
   }
+
+  Future<Geometry?> simplify(Geometry geometry) {
+    throw UnimplementedError('simplify() has not been implemented.');
+  }
+
+  Future<bool> isSimple(Geometry geometry) {
+    throw UnimplementedError('isSimple() has not been implemented.');
+  }
 }

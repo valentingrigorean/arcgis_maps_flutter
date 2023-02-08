@@ -155,6 +155,29 @@ class GeometryEngineController {
                 $0.toJSONFlutter()
             })
             break
+        case "simplify":
+            guard let geometryData = call.arguments as? Dictionary<String, Any> else {
+                result(nil)
+                return
+            }
+            guard let originGeomtry = AGSGeometry.fromFlutter(data: geometryData) else {
+                result(nil)
+                return
+            }
+            let simplifiedGeomtry = AGSGeometryEngine.simplifyGeometry(originGeomtry)
+            result(simplifiedGeomtry?.toJSONFlutter())
+            break
+        case "isSimple":
+            guard let geometryData = call.arguments as? Dictionary<String, Any> else {
+                result(true)
+                return
+            }
+            guard let originGeomtry = AGSGeometry.fromFlutter(data: geometryData) else {
+                result(true)
+                return
+            }
+            result(AGSGeometryEngine.geometryIsSimple(originGeomtry))
+            break
         default:
             result(FlutterMethodNotImplemented)
             break
