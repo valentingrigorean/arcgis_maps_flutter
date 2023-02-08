@@ -2,16 +2,16 @@ group 'com.valentingrigorean.arcgis_maps_flutter'
 version '1.0'
 
 buildscript {
-    ext.kotlin_version = '1.5.20'
+    ext.kotlin_version = '1.7.10'
 
 
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.0'
+        classpath 'com.android.tools.build:gradle:7.2.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -19,7 +19,7 @@ buildscript {
 rootProject.allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
 
         maven {
             url 'https://esri.jfrog.io/artifactory/arcgis'
@@ -50,10 +50,5 @@ android {
 
     packagingOptions {
         pickFirst "META-INF/DEPENDENCIES"
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
