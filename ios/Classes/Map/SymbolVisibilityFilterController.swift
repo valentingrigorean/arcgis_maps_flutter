@@ -61,6 +61,12 @@ class SymbolVisibilityFilterController {
         initialValues[id] = initValue
     }
 
+    func invalidateAll(){
+        for item in (graphicControllers.values) {
+            handleGraphicsFilterZoom(graphicControllerInfo: item, currentZoom: mapScale)
+        }
+    }
+
     func invalidate(graphicController: BaseGraphicController) {
         let id = objectIdentifierFor(graphicController)
 

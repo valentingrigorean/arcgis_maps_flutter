@@ -350,6 +350,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 if let markerIdsToRemove = markersUpdate["markerIdsToRemove"] as? [String] {
                     markersController.removeMarkers(markerIdsToRemove: markerIdsToRemove)
                 }
+                symbolVisibilityFilterController.invalidateAll()
             }
             result(nil)
             break
