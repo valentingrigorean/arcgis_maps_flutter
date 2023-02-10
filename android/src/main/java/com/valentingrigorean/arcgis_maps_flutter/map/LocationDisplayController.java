@@ -108,7 +108,11 @@ public class LocationDisplayController implements MapTouchGraphicDelegate, Locat
 
     @Override
     public void onLocationChanged(LocationDisplay.LocationChangedEvent locationChangedEvent) {
-        locationGraphic.setGeometry(locationDisplay.getMapLocation());
+        try {
+            locationGraphic.setGeometry(locationDisplay.getMapLocation());
+        }catch (ArcGISRuntimeException e){
+            //ignore
+        }
         channel.invokeMethod("onLocationChanged", Convert.locationToJson(locationChangedEvent.getLocation()));
     }
 
