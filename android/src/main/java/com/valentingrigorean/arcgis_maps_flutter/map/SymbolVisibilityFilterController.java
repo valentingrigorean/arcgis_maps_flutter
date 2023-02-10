@@ -77,10 +77,13 @@ public class SymbolVisibilityFilterController implements MapScaleChangedListener
 
     @Override
     public void mapScaleChanged(MapScaleChangedEvent mapScaleChangedEvent) {
-        final double currentZoom = mapScaleChangedEvent.getSource().getMapScale();
+        invalidate();
+    }
+
+    public void invalidate() {
         for (Map.Entry<GraphicControllerSink, SymbolVisibilityFilter> entry :
                 graphicControllers.entrySet()) {
-            handleGraphicsFilterZoom(entry.getKey(), entry.getValue(), currentZoom);
+            handleGraphicsFilterZoom(entry.getKey(), entry.getValue(), flutterMapViewDelegate.getMapScale());
         }
     }
 

@@ -438,13 +438,14 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             }
             break;
             case "markers#update": {
-                invalidateMapHelper.invalidateMapIfNeeded();
                 List<Object> markersToAdd = call.argument("markersToAdd");
                 markersController.addMarkers(markersToAdd);
                 List<Object> markersToChange = call.argument("markersToChange");
                 markersController.changeMarkers(markersToChange);
                 List<Object> markerIdsToRemove = call.argument("markerIdsToRemove");
                 markersController.removeMarkers(markerIdsToRemove);
+                invalidateMapHelper.invalidateMapIfNeeded();
+                symbolVisibilityFilterController.invalidate();
                 result.success(null);
             }
             break;
@@ -835,7 +836,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 if (map != null) {
                     map.addDoneLoadingListener(this);
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 Log.e(TAG, "setMap: ", e);
             }
         }
