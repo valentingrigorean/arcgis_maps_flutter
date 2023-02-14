@@ -182,10 +182,36 @@ class GeometryEngine {
   /// - Rings can be self tangent only at a finite number of vertices.
   /// - Segments with a length less than zero are not allowed.
   /// - Each path must contain at least three non-coincident vertices.
-  /// Paths must not be empty.
+  /// - Paths must not be empty.
   ///
   /// Returns true by default if geometry is null or error occurs.
   static Future<bool> isSimple(Geometry geometry) {
     return GeometryEngineFlutterPlatform.instance.isSimple(geometry);
+  }
+
+  /// Densifies the input geometry by creating additional vertices along the geometry, using a geodesic curve.
+  ///
+  /// Return the geodesic densified geometry.
+  static Future<Geometry?> densifyGeodetic(
+      {required Geometry geometry,
+      required double maxSegmentLength,
+      LinearUnitId lengthUnit = LinearUnitId.meters,
+      required GeodeticCurveType curveType}) {
+    return GeometryEngineFlutterPlatform.instance.densifyGeodetic(
+        geometry: geometry,
+        maxSegmentLength: maxSegmentLength,
+        lengthUnit: lengthUnit,
+        curveType: curveType);
+  }
+
+  /// Calculates the geodesic length of the geometry. Supports true curves, calculating the result by densifying curves.
+  ///
+  /// Returns the geodesic length of the given geometry.
+  static Future<num?> lengthGeodetic(
+      {required Geometry geometry,
+      LinearUnitId lengthUnit = LinearUnitId.meters,
+      required GeodeticCurveType curveType}) {
+    return GeometryEngineFlutterPlatform.instance.lengthGeodetic(
+        geometry: geometry, lengthUnit: lengthUnit, curveType: curveType);
   }
 }

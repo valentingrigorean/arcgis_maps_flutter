@@ -169,4 +169,33 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
     final result = await _channel.invokeMethod("isSimple", geometry.toJson());
     return result ?? true;
   }
+
+  @override
+  Future<Geometry?> densifyGeodetic(
+      {required Geometry geometry,
+      required double maxSegmentLength,
+      required LinearUnitId lengthUnit,
+      required GeodeticCurveType curveType}) async {
+    final result = await _channel.invokeMethod("densifyGeodetic", {
+      "geometry": geometry.toJson(),
+      "maxSegmentLength": maxSegmentLength,
+      "lengthUnit": lengthUnit.index,
+      "curveType": curveType.index
+    });
+    return Geometry.fromJson(result);
+  }
+
+  @override
+  Future<num?> lengthGeodetic(
+      {required Geometry geometry,
+      required LinearUnitId lengthUnit,
+      required GeodeticCurveType curveType}) async {
+    final result = await _channel.invokeMethod("lengthGeodetic", {
+      "geometry": geometry.toJson(),
+      "lengthUnit": lengthUnit.index,
+      "curveType": curveType.index
+    });
+
+    return result;
+  }
 }

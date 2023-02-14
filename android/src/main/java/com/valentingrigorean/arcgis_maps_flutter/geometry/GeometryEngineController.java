@@ -85,6 +85,14 @@ public class GeometryEngineController implements MethodChannel.MethodCallHandler
                 handleIsSimple(call.arguments(), result);
             }
             break;
+            case "densifyGeodetic": {
+                handleDensifyGeodetic(call.arguments(), result);
+            }
+            break;
+            case "lengthGeodetic": {
+                handleLengthGeodetic(call.arguments(), result);
+            }
+            break;
             default:
                 result.notImplemented();
                 break;
@@ -210,6 +218,32 @@ public class GeometryEngineController implements MethodChannel.MethodCallHandler
             result.success(true);
         } else {
             result.success(GeometryEngine.isSimple(originGeometry));
+        }
+    }
+
+    private void handleDensifyGeodetic(Map<?, ?> data, MethodChannel.Result result) {
+        final Geometry geometry = Convert.toGeometry(data.get("geometry"));
+        final double maxSegmentLength = Convert.toDouble(data.get("maxSegmentLength"));
+        final LinearUnitId lengthUnit = Convert.toLinearUnitId(data.get("lengthUnit"));
+        final GeodeticCurveType curveType = Convert.toGeodeticCurveType(data.get("curveType"));
+        if (geometry == null) {
+            Log.e(TAG, "Failed to get isSimple as geometry is null");
+            result.success(null);
+        } else {
+            Geometry resultGeometry = GeometryEngine.densifyGeodetic(geometry, maxSegmentLength, new LinearUnit(lengthUnit), curveType);
+            result.success(Convert.geometryToJson(resultGeometry));
+        }
+    }
+
+    private void handleLengthGeodetic(Map<?, ?> data, MethodChannel.Result result) {
+        final Geometry geometry = Convert.toGeometry(data.get("geometry"));
+        final LinearUnitId lengthUnit = Convert.toLinearUnitId(data.get("lengthUnit"));
+        final GeodeticCurveType curveType = Convert.toGeodeticCurveType(data.get("curveType"));
+        if (geometry == null) {
+            Log.e(TAG, "Failed to get isSimple as geometry is null");
+            result.success(null);
+        } else {
+            result.success(GeometryEngine.lengthGeodetic(geometry, new LinearUnit(lengthUnit), curveType));
         }
     }
 }

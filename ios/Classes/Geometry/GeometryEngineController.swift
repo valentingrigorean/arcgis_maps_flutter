@@ -178,6 +178,28 @@ class GeometryEngineController {
             }
             result(AGSGeometryEngine.geometryIsSimple(originGeomtry))
             break
+        case "densifyGeodetic":
+            guard let data = call.arguments as? Dictionary<String, Any> else {
+                result(nil)
+                return
+            }
+            let geometry = AGSGeometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
+            let maxSegmentLength = data["maxSegmentLength"] as! Double
+            let lengthUnitId = AGSLinearUnitID.fromFlutter(data["lengthUnit"] as! Int)
+            let curveType = AGSGeodeticCurveType.init(rawValue: data["curveType"] as! Int)!
+            let resultGeomtry = AGSGeometryEngine.geodeticDensifyGeometry(geometry, maxSegmentLength: maxSegmentLength , lengthUnit: AGSLinearUnit(unitID: lengthUnitId)!, curveType: curveType)
+            result(resultGeomtry?.toJSONFlutter())
+            break
+        case "lengthGeodetic":
+            guard let data = call.arguments as? Dictionary<String, Any> else {
+                result(nil)
+                return
+            }
+            let geometry = AGSGeometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
+            let lengthUnitId = AGSLinearUnitID.fromFlutter(data["lengthUnit"] as! Int)
+            let curveType = AGSGeodeticCurveType.init(rawValue: data["curveType"] as! Int)!
+            result(AGSGeometryEngine.geodeticLength(of: geometry, lengthUnit: AGSLinearUnit(unitID: lengthUnitId)!, curveType: curveType))
+            break
         default:
             result(FlutterMethodNotImplemented)
             break
