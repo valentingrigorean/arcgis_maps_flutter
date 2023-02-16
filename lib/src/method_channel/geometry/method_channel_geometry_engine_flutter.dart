@@ -198,4 +198,18 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
 
     return result;
   }
+
+  @override
+  Future<num?> areaGeodetic(
+      {required Geometry geometry,
+      required AreaUnitId areaUnit,
+      required GeodeticCurveType curveType}) async {
+    final result = await _channel.invokeMethod("areaGeodetic", {
+      "geometry": geometry.toJson(),
+      "areaUnit": areaUnit.index,
+      "curveType": curveType.index
+    });
+
+    return result;
+  }
 }

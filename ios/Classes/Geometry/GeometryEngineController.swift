@@ -200,6 +200,17 @@ class GeometryEngineController {
             let curveType = AGSGeodeticCurveType.init(rawValue: data["curveType"] as! Int)!
             result(AGSGeometryEngine.geodeticLength(of: geometry, lengthUnit: AGSLinearUnit(unitID: lengthUnitId)!, curveType: curveType))
             break
+        case "areaGeodetic":
+            guard let data = call.arguments as? Dictionary<String, Any> else {
+                result(nil)
+                return
+            }
+            let geometry = AGSGeometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
+            let areaUnitId = AGSAreaUnitID.fromFlutter(data["areaUnit"] as! Int)
+            let curveType = AGSGeodeticCurveType.init(rawValue: data["curveType"] as! Int)!
+    
+            result(AGSGeometryEngine.geodeticArea(of: geometry, areaUnit:AGSAreaUnit(unitID: areaUnitId)!, curveType: curveType))
+            break
         default:
             result(FlutterMethodNotImplemented)
             break

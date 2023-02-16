@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 
 import com.esri.arcgisruntime.geometry.AngularUnit;
 import com.esri.arcgisruntime.geometry.AngularUnitId;
+import com.esri.arcgisruntime.geometry.AreaUnit;
+import com.esri.arcgisruntime.geometry.AreaUnitId;
 import com.esri.arcgisruntime.geometry.GeodesicSectorParameters;
 import com.esri.arcgisruntime.geometry.GeodeticCurveType;
 import com.esri.arcgisruntime.geometry.GeodeticDistanceResult;
@@ -91,6 +93,10 @@ public class GeometryEngineController implements MethodChannel.MethodCallHandler
             break;
             case "lengthGeodetic": {
                 handleLengthGeodetic(call.arguments(), result);
+            }
+            break;
+            case "areaGeodetic": {
+                handleAreaGeodetic(call.arguments(), result);
             }
             break;
             default:
@@ -240,10 +246,22 @@ public class GeometryEngineController implements MethodChannel.MethodCallHandler
         final LinearUnitId lengthUnit = Convert.toLinearUnitId(data.get("lengthUnit"));
         final GeodeticCurveType curveType = Convert.toGeodeticCurveType(data.get("curveType"));
         if (geometry == null) {
-            Log.e(TAG, "Failed to get isSimple as geometry is null");
+            Log.e(TAG, "Failed to get lengthGeodetic as geometry is null");
             result.success(null);
         } else {
             result.success(GeometryEngine.lengthGeodetic(geometry, new LinearUnit(lengthUnit), curveType));
+        }
+    }
+
+    private void handleAreaGeodetic(Map<?, ?> data, MethodChannel.Result result) {
+        final Geometry geometry = Convert.toGeometry(data.get("geometry"));
+        final AreaUnitId areaUnit = Convert.toAreaUnitId(data.get("areaUnit"));
+        final GeodeticCurveType curveType = Convert.toGeodeticCurveType(data.get("curveType"));
+        if (geometry == null) {
+            Log.e(TAG, "Failed to get areaGeodetic as geometry is null");
+            result.success(null);
+        } else {
+            result.success(GeometryEngine.areaGeodetic(geometry, new AreaUnit(areaUnit), curveType));
         }
     }
 }

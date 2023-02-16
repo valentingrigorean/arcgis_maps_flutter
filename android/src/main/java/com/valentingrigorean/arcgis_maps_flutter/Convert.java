@@ -23,6 +23,7 @@ import com.esri.arcgisruntime.data.FeatureEditResult;
 import com.esri.arcgisruntime.data.TileCache;
 import com.esri.arcgisruntime.geometry.AngularUnit;
 import com.esri.arcgisruntime.geometry.AngularUnitId;
+import com.esri.arcgisruntime.geometry.AreaUnitId;
 import com.esri.arcgisruntime.geometry.Envelope;
 import com.esri.arcgisruntime.geometry.GeodesicSectorParameters;
 import com.esri.arcgisruntime.geometry.GeodeticCurveType;
@@ -983,6 +984,34 @@ public class Convert {
                 return LinearUnitId.YARDS;
             default:
                 return LinearUnitId.OTHER;
+        }
+    }
+
+    public static AreaUnitId toAreaUnitId(Object o) {
+        final int index = toInt(o);
+        switch (index) {
+            case 0:
+                return AreaUnitId.ACRES;
+            case 1:
+                return AreaUnitId.HECTARES;
+            case 2:
+                return AreaUnitId.SQUARE_CENTIMETERS;
+            case 3:
+                return AreaUnitId.SQUARE_DECIMETERS;
+            case 4:
+                return AreaUnitId.SQUARE_FEET;
+            case 5:
+                return AreaUnitId.SQUARE_METERS;
+            case 6:
+                return AreaUnitId.SQUARE_KILOMETERS;
+            case 7:
+                return AreaUnitId.SQUARE_MILES;
+            case 8:
+                return AreaUnitId.SQUARE_MILLIMETERS;
+            case 9:
+                return AreaUnitId.SQUARE_YARDS;
+            default:
+                return AreaUnitId.OTHER;
         }
     }
 

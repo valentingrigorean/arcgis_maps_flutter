@@ -214,4 +214,15 @@ class GeometryEngine {
     return GeometryEngineFlutterPlatform.instance.lengthGeodetic(
         geometry: geometry, lengthUnit: lengthUnit, curveType: curveType);
   }
+
+  /// Calculates the geodesic area of the given geometry. Supports true curves, calculating the result by densifying curves.
+  ///
+  /// Returns the calculated geodesic area in the requested unit.
+  static Future<num?> areaGeodetic(
+      {required Geometry geometry,
+      AreaUnitId areaUnit = AreaUnitId.squareMeters,
+      required GeodeticCurveType curveType}) {
+    return GeometryEngineFlutterPlatform.instance.areaGeodetic(
+        geometry: geometry, areaUnit: areaUnit, curveType: curveType);
+  }
 }
