@@ -69,6 +69,7 @@ part 'src/geometry/geometry.dart';
 part 'src/geometry/geometry_type.dart';
 part 'src/geometry/geometry_engine.dart';
 part 'src/geometry/geodetic_distance_result.dart';
+part 'src/geometry/area_unit.dart';
 
 part 'src/layers/layer.dart';
 part 'src/layers/service_image_tiled_layer.dart';

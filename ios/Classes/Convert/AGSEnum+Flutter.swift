@@ -135,3 +135,33 @@ extension AGSAngularUnitID {
         }
     }
 }
+
+extension AGSAreaUnitID {
+    
+    static func fromFlutter(_ index: Int) -> AGSAreaUnitID {
+        switch index {
+        case 0:
+            return .acres
+        case 1:
+            return .hectares
+        case 2:
+            return .squareCentimeters
+        case 3:
+            return .squareDecimeters
+        case 4:
+            return .squareFeet
+        case 5:
+            return .squareMeters
+        case 6:
+            return .squareKilometers
+        case 7:
+            return .squareMiles
+        case 8:
+            return .squareMillimeters
+        case 9:
+            return .squareYards
+        default:
+            return .other
+        }
+    }
+}
