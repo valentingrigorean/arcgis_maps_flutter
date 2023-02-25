@@ -175,7 +175,7 @@ class ArcgisMapController {
     return ArcgisMapsFlutterPlatform.instance.getCurrentViewpoint(mapId, type);
   }
 
-  Future<Viewpoint?> getInitialViewpoint(ViewpointType type) {
+  Future<Viewpoint?> getInitialViewpoint() {
     return ArcgisMapsFlutterPlatform.instance.getInitialViewpoint(mapId);
   }
 
