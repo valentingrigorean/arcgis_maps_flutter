@@ -175,6 +175,10 @@ class ArcgisMapController {
     return ArcgisMapsFlutterPlatform.instance.getCurrentViewpoint(mapId, type);
   }
 
+  Future<Viewpoint?> getInitialViewpoint(ViewpointType type) {
+    return ArcgisMapsFlutterPlatform.instance.getInitialViewpoint(mapId);
+  }
+
   Future<Offset?> locationToScreen(AGSPoint mapPoint) {
     return ArcgisMapsFlutterPlatform.instance.locationToScreen(mapId, mapPoint);
   }

@@ -273,6 +273,13 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 result(nil)
             }
             break
+        case "map#getInitialViewpoint":
+            if let json = try? mapView.map?.initialViewpoint?.toJSON() {
+                result(json)
+            } else{
+                result(nil)
+            }
+            break
         case "map#setViewpoint":
             setViewpoint(args: call.arguments, animated: true, result: result)
             break
