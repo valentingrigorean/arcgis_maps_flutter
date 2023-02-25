@@ -163,8 +163,7 @@ abstract class Job extends ArcgisNativeObject with RemoteResource {
     _statusController.close();
     _messageController.close();
     if (_isStarted) {
-      _isStarted = false;
-      await cancel();
+      cancel();
     }
     super.dispose();
   }
