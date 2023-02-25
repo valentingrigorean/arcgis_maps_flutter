@@ -59,7 +59,6 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     private final Context context;
     private final LifecycleProvider lifecycleProvider;
     private final MethodChannel methodChannel;
-
     private final SelectionPropertiesHandler selectionPropertiesHandler;
 
     private final LayersController layersController;
@@ -574,12 +573,12 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
     }
 
     private void destroyMapViewIfNecessary() {
+        mapLoadedListener.setMap(null);
         if (mapView != null) {
             mapView.dispose();
             mapView.removeAllViews();
             mapView = null;
         }
-        mapLoadedListener.setMap(null);
     }
 
 
