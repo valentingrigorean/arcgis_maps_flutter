@@ -1,7 +1,7 @@
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:location_permissions/location_permissions.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class MapPageCurrentLocationTap extends StatefulWidget {
   const MapPageCurrentLocationTap({Key? key}) : super(key: key);
@@ -12,13 +12,13 @@ class MapPageCurrentLocationTap extends StatefulWidget {
 }
 
 class _MapPageCurrentLocationTapState extends State<MapPageCurrentLocationTap> {
-  PermissionStatus _permissionStatus = PermissionStatus.unknown;
+  PermissionStatus _permissionStatus = PermissionStatus.denied;
   late LocationDisplay _locationDisplay;
 
   @override
   void initState() {
     super.initState();
-    requestPermission(LocationPermissionLevel.locationWhenInUse);
+    requestPermission();
   }
 
   @override
@@ -58,7 +58,7 @@ class _MapPageCurrentLocationTapState extends State<MapPageCurrentLocationTap> {
       body = Center(
         child: ElevatedButton(
           onPressed: () {
-            LocationPermissions().openAppSettings();
+            // LocationPermissions().openAppSettings();
           },
           child: const Text('Permission Required'),
         ),
@@ -73,16 +73,20 @@ class _MapPageCurrentLocationTapState extends State<MapPageCurrentLocationTap> {
     );
   }
 
-  Future<void> requestPermission(
-      LocationPermissionLevel permissionLevel) async {
-    final PermissionStatus permissionRequestResult = await LocationPermissions()
-        .requestPermissions(permissionLevel: permissionLevel);
-    _permissionStatus = permissionRequestResult;
-    if (kDebugMode) {
-      print(permissionRequestResult);
+  Future<void> requestPermission() async {
+    var currentStatus = await Permission.locationWhenInUse.status;
+    PermissionStatus newStatus;
+    if (currentStatus != PermissionStatus.granted) {
+      newStatus = PermissionStatus.granted;
+    } else {
+      newStatus = await Permission.locationWhenInUse.request();
     }
-    if (mounted) {
-      setState(() {});
+    if(mounted){
+      setState(() {
+        print(newStatus);
+        _permissionStatus = newStatus;
+        print(_permissionStatus);
+      });
     }
   }
 }
