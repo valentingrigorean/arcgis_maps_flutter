@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:location_permissions/location_permissions.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class MapPageGeodeticDistance extends StatefulWidget {
   const MapPageGeodeticDistance({Key? key}) : super(key: key);
@@ -13,7 +13,7 @@ class MapPageGeodeticDistance extends StatefulWidget {
 }
 
 class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance> {
-  PermissionStatus _permissionStatus = PermissionStatus.unknown;
+  PermissionStatus _permissionStatus = PermissionStatus.denied;
   AGSPoint? _userLocation;
 
   StreamSubscription? _locationSubscription;
@@ -22,7 +22,7 @@ class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance> {
   void initState() {
     super.initState();
 
-    requestPermission(LocationPermissionLevel.locationWhenInUse);
+    requestPermission();
   }
 
   @override
@@ -90,7 +90,7 @@ class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance> {
       body = Center(
         child: ElevatedButton(
           onPressed: () {
-            LocationPermissions().openAppSettings();
+            // LocationPermissions().openAppSettings();
           },
           child: const Text('Permission Required'),
         ),
@@ -105,13 +105,20 @@ class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance> {
     );
   }
 
-  Future<void> requestPermission(
-      LocationPermissionLevel permissionLevel) async {
-    final PermissionStatus permissionRequestResult = await LocationPermissions()
-        .requestPermissions(permissionLevel: permissionLevel);
 
-    setState(() {
-      _permissionStatus = permissionRequestResult;
-    });
+  Future<void> requestPermission() async {
+    var currentStatus = await Permission.locationWhenInUse.status;
+    PermissionStatus newStatus;
+    if (currentStatus != PermissionStatus.granted) {
+      newStatus = PermissionStatus.granted;
+    } else {
+      newStatus = await Permission.locationWhenInUse.request();
+    }
+
+    if (mounted) {
+      setState(() {
+        _permissionStatus = newStatus;
+      });
+    }
   }
 }

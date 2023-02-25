@@ -284,6 +284,16 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
+  Future<Viewpoint?> getInitialViewpoint(int mapId) async {
+    final result = await channel(mapId).invokeMapMethod<String, dynamic>(
+        "map#getInitialViewpoint");
+    if (result == null) {
+      return null;
+    }
+    return Viewpoint.fromJson(result);
+  }
+
+  @override
   Future<void> setViewpoint(int mapId, Viewpoint viewpoint) {
     return channel(mapId)
         .invokeMethod<void>("map#setViewpoint", viewpoint.toJson());
