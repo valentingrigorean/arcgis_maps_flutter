@@ -21,7 +21,7 @@ extension AGSGeometry {
                 fatalError("\(error)")
             }
         case .unknown:
-            fatalError("not impl")
+            return nil
         @unknown default:
             return nil
         }
@@ -36,7 +36,6 @@ extension AGSGeometry {
             }
             return json
         } catch let error {
-            fatalError("\(error)")
             return nil
         }
     }
