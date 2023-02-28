@@ -56,6 +56,7 @@ part 'src/data/tile_cache.dart';
 part 'src/data/geodatabase.dart';
 part 'src/data/sync_model.dart';
 part 'src/data/tile_key.dart';
+part 'src/data/query_parameters.dart';
 
 part 'src/geometry/ags_polygon.dart';
 part 'src/geometry/ags_polyline.dart';

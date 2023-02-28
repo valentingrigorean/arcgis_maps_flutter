@@ -16,14 +16,20 @@ import androidx.lifecycle.LifecycleOwner;
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
 import com.esri.arcgisruntime.arcgisservices.TimeAware;
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
+import com.esri.arcgisruntime.data.Feature;
+import com.esri.arcgisruntime.data.FeatureQueryResult;
+import com.esri.arcgisruntime.data.QueryParameters;
 import com.esri.arcgisruntime.geometry.Envelope;
 import com.esri.arcgisruntime.geometry.Geometry;
 import com.esri.arcgisruntime.geometry.GeometryEngine;
 import com.esri.arcgisruntime.geometry.Point;
+import com.esri.arcgisruntime.layers.FeatureLayer;
+import com.esri.arcgisruntime.layers.GroupLayer;
 import com.esri.arcgisruntime.layers.Layer;
 import com.esri.arcgisruntime.layers.ArcGISVectorTiledLayer;
 import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
+import com.esri.arcgisruntime.mapping.GeoElement;
 import com.esri.arcgisruntime.mapping.LayerList;
 import com.esri.arcgisruntime.mapping.MobileMapPackage;
 import com.esri.arcgisruntime.mapping.Basemap;
@@ -43,6 +49,7 @@ import com.valentingrigorean.arcgis_maps_flutter.layers.MapChangeAware;
 import com.valentingrigorean.arcgis_maps_flutter.utils.AGSLoadObjects;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -337,6 +344,136 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
             break;
             case "map#getWanderExtentFactor": {
                 result.success(mapView.getLocationDisplay().getWanderExtentFactor());
+            }
+            break;
+            case "map#queryFeatureTableFromLayer": {
+
+                final Map<String, ?> data = call.arguments();
+
+                if (mapView != null && data != null) {
+
+                    QueryParameters params = new QueryParameters();
+                    String layerName = "";
+
+                    // init query params
+                    for (Map.Entry<String, ?> entry : data.entrySet()) {
+
+                        switch (entry.getKey()) {
+                            case "layerName":
+                                layerName = (String) entry.getValue();
+                                break;
+                            case "objectId":
+                                params.getObjectIds().add(Long.parseLong((String) entry.getValue()));
+                                break;
+                            case "maxResults":
+                                params.setMaxFeatures(Integer.parseInt((String) entry.getValue()));
+                                break;
+                            case "geometry":
+                                params.setGeometry(Convert.toGeometry((entry.getValue())));
+                                break;
+                            case "spatialRelationship":
+                                params.setSpatialRelationship(Convert.toSpatialRelationship(entry.getValue()));
+                                break;
+                            default:
+                                if (params.getWhereClause().isEmpty()) {
+                                    params.setWhereClause(
+                                            String.format(
+                                                    "upper(%s) LIKE '%%%s%%'",
+                                                    entry.getKey(),
+                                                    entry.getValue().toString().toUpperCase()
+                                            )
+                                    );
+                                } else {
+                                    String whereClause = params.getWhereClause();
+                                    params.setWhereClause(whereClause.concat(
+                                            String.format(
+                                                    " AND upper(%s) LIKE '%%%s%%'",
+                                                    entry.getKey(),
+                                                    entry.getValue().toString().toUpperCase()
+                                            )
+                                    ));
+                                }
+                                break;
+                        }
+                    }
+
+                    // check map
+                    final ArcGISMap map = mapView.getMap();
+
+                    if (map == null || map.getOperationalLayers().size() == 0) {
+                        result.success(null);
+                        return;
+                    }
+
+                    final LayerList layers = map.getOperationalLayers();
+
+                    String finalLayerName = layerName;
+                    AGSLoadObjects.load(layers, (loaded -> {
+                        if (!loaded) {
+                            result.success(null);
+                            return;
+                        }
+
+                        for (final Layer layer : layers) {
+                            if (layer instanceof FeatureLayer) {
+
+                                FeatureLayer featureLayer = (FeatureLayer) layer;
+                                if (featureLayer.getName().equalsIgnoreCase(finalLayerName)){
+
+                                    final ListenableFuture<FeatureQueryResult> future =
+                                            featureLayer.getFeatureTable().queryFeaturesAsync(params);
+
+                                    future.addDoneListener(() -> {
+                                        try {
+                                            FeatureQueryResult queryResult = future.get();
+                                            final ArrayList<Object> results = new ArrayList<>();
+                                            for (Feature feature : queryResult) {
+                                                results.add(Convert.geoElementToJson(feature));
+                                            }
+                                            result.success(results);
+                                        } catch (Exception e) {
+                                            result.success(null);
+                                        }
+                                    });
+                                    return;
+                                }
+                            } else if (layer instanceof GroupLayer) {
+                                GroupLayer gLayer = (GroupLayer) layer;
+
+                                for (final Layer layerItem: gLayer.getLayers()){
+                                    if (layerItem instanceof FeatureLayer) {
+
+                                        FeatureLayer featureLayer = (FeatureLayer) layerItem;
+                                        
+                                        if (featureLayer.getName().equalsIgnoreCase(finalLayerName)){
+
+                                            final ListenableFuture<FeatureQueryResult> future =
+                                                    featureLayer.getFeatureTable().queryFeaturesAsync(params);
+
+                                            future.addDoneListener(() -> {
+                                                try {
+                                                    FeatureQueryResult queryResult = future.get();
+                                                    final ArrayList<Object> results = new ArrayList<>();
+                                                    for (Feature feature : queryResult) {
+                                                        results.add(Convert.geoElementToJson(feature));
+                                                    }
+
+                                                    result.success(results);
+                                                } catch (Exception e) {
+                                                    result.success(null);
+                                                }
+                                            });
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        result.success(null);
+                    }));
+                } else {
+                    result.success(null);
+                }
             }
             break;
             case "map#getTimeAwareLayerInfos":
