@@ -98,6 +98,9 @@ public class GeometryEngineController implements MethodChannel.MethodCallHandler
             case "areaGeodetic": {
                 handleAreaGeodetic(call.arguments(), result);
             }
+            case "getExtent": {
+                handleGetExtent(call.arguments(), result);
+            }
             break;
             default:
                 result.notImplemented();
@@ -264,4 +267,13 @@ public class GeometryEngineController implements MethodChannel.MethodCallHandler
             result.success(GeometryEngine.areaGeodetic(geometry, new AreaUnit(areaUnit), curveType));
         }
     }
-}
+
+    private void handleGetExtent(Map<?, ?> data, MethodChannel.Result result) {
+        final Geometry geometry = Convert.toGeometry(data.get("geometry"));
+        if (geometry == null) {
+            Log.e(TAG, "Failed to get extent as geometry is null");
+            result.success(null);
+        } else {
+            result.success(Convert.geometryToJson(geometry.getExtent()));
+        }
+    }

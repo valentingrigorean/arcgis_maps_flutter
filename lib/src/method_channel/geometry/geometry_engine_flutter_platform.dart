@@ -107,4 +107,8 @@ abstract class GeometryEngineFlutterPlatform extends PlatformInterface {
       required GeodeticCurveType curveType}) {
     throw UnimplementedError('areaGeodetic() has not been implemented.');
   }
+
+  Future<AGSEnvelope?> getExtent(Geometry geometry){
+    throw UnimplementedError('getExtent() has not been implemented.');
+  }
 }

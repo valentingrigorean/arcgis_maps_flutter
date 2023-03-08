@@ -212,4 +212,16 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
 
     return result;
   }
+
+  @override
+  Future<AGSEnvelope?> getExtent(Geometry geometry) async {
+    final extent = await _channel.invokeMethod("getExtent", {
+      "geometry": geometry.toJson()
+    });
+    AGSEnvelope? result;
+    if(extent is AGSEnvelope){
+      result = extent;
+    }
+    return result;
+  }
 }

@@ -225,4 +225,9 @@ class GeometryEngine {
     return GeometryEngineFlutterPlatform.instance.areaGeodetic(
         geometry: geometry, areaUnit: areaUnit, curveType: curveType);
   }
+
+  /// Get extent of Geometry.
+  static Future<AGSEnvelope?> getExtent(Geometry geometry) {
+    return GeometryEngineFlutterPlatform.instance.getExtent(geometry);
+  }
 }

@@ -34,7 +34,6 @@ class QueryParameters {
 
   SpatialRelationship? spatialRelationship;
 
-  @override
   String get type => "QueryParameters";
 
   Object toJson() {
