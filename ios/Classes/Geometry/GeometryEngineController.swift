@@ -211,6 +211,16 @@ class GeometryEngineController {
     
             result(AGSGeometryEngine.geodeticArea(of: geometry, areaUnit:AGSAreaUnit(unitID: areaUnitId)!, curveType: curveType))
             break
+        case "getExtent":
+            guard let data = call.arguments as? Dictionary<String, Any> else {
+                result(nil)
+                return
+            }
+            let geometry = AGSGeometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
+            let resultGeomtry = geometry.extent
+            result(resultGeomtry.toJSONFlutter())
+            break
+
         default:
             result(FlutterMethodNotImplemented)
             break
