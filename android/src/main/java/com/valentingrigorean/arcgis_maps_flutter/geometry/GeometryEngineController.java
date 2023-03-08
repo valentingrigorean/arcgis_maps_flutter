@@ -277,3 +277,4 @@ public class GeometryEngineController implements MethodChannel.MethodCallHandler
             result.success(Convert.geometryToJson(geometry.getExtent()));
         }
     }
+}
