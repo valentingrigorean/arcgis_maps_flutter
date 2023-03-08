@@ -29,6 +29,7 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
     private ListenableFuture<List<IdentifyGraphicsOverlayResult>> graphicHandler;
     private ListenableFuture<List<IdentifyLayerResult>> layerHandler;
     private boolean trackIdentityLayers;
+    private boolean isLongPress = false;
 
     private final FlutterMapViewDelegate flutterMapViewDelegate;
 
@@ -85,10 +86,26 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
         try {
             super.onLongPress(e);
             final android.graphics.Point screenPoint = new android.graphics.Point((int) e.getX(), (int) e.getY());
-            sendOnMapLongPress(screenPoint);
+            sendOnMapLongPress(screenPoint, false);
+            isLongPress = true;
         } catch (Exception exception) {
             Log.e(TAG, "onLongPress: ", exception);
         }
+    }
+
+    @Override
+    public boolean onUp(MotionEvent e) {
+        if (isLongPress) {
+            try {
+                super.onUp(e);
+                final android.graphics.Point screenPoint = new android.graphics.Point((int) e.getX(), (int) e.getY());
+                sendOnMapLongPress(screenPoint, true);
+                isLongPress = false;
+            } catch (Exception exception) {
+                Log.e(TAG, "onLongPressEnd: ", exception);
+            }
+        }
+        return true;
     }
 
     private void identifyGraphicsOverlays(android.graphics.Point screenPoint) {
@@ -176,7 +193,7 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
         methodChannel.invokeMethod("map#onTap", data);
     }
 
-    private void sendOnMapLongPress(android.graphics.Point screenPoint) {
+    private void sendOnMapLongPress(android.graphics.Point screenPoint, boolean isEnd) {
         final MapView mapView = flutterMapViewDelegate.getMapView();
         if (mapView == null) {
             return;
@@ -190,7 +207,11 @@ public class MapViewOnTouchListener extends DefaultMapViewOnTouchListener {
         final HashMap<String, Object> data = new HashMap<>(1);
         data.put("position", Convert.geometryToJson(mapPoint));
         data.put("screenPoint", Convert.pointToJson(screenPoint));
-        methodChannel.invokeMethod("map#onLongPress", data);
+        if (isEnd) {
+            methodChannel.invokeMethod("map#onLongPressEnd", data);
+        } else {
+            methodChannel.invokeMethod("map#onLongPress", data);
+        }
     }
 
     private void clearHandlers() {

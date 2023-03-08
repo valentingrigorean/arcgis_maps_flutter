@@ -828,6 +828,10 @@ extension ArcgisMapController: AGSGeoViewTouchDelegate {
         sendOnMapLongPress(screenPoint: screenPoint)
     }
 
+    public func geoView(_ geoView: AGSGeoView, didEndLongPressAtScreenPoint screenPoint: CGPoint, mapPoint: AGSPoint) {
+            sendOnMapLongPressEnd(screenPoint: screenPoint)
+        }
+
 
     private func identifyGraphicsOverlaysCallback(results: [AGSIdentifyGraphicsOverlayResult]?,
                                                   error: Error?) {
@@ -903,6 +907,12 @@ extension ArcgisMapController: AGSGeoViewTouchDelegate {
             channel.invokeMethod("map#onLongPress", arguments: ["screenPoint": screenPoint.toJSONFlutter(), "position": json])
         }
     }
+
+    private func sendOnMapLongPressEnd(screenPoint: CGPoint) {
+            if let json = mapView.screen(toLocation: screenPoint).toJSONFlutter() {
+                channel.invokeMethod("map#onLongPressEnd", arguments: ["screenPoint": screenPoint.toJSONFlutter(), "position": json])
+            }
+        }
 
     private func sendUserLocationTap() {
         channel.invokeMethod("map#onUserLocationTap", arguments: nil)

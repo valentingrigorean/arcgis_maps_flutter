@@ -484,6 +484,11 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
+  Stream<MapLongPressEndEvent> onLongPressEnd({required int mapId}) {
+    return _events(mapId).whereType<MapLongPressEndEvent>();
+  }
+
+  @override
   Stream<UserLocationTapEvent> onUserLocationTap({required int mapId}) {
     return _events(mapId).whereType<UserLocationTapEvent>();
   }
@@ -593,6 +598,18 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
         AGSPoint position = AGSPoint.fromJson(args['position'])!;
         _mapEventStreamController.add(
           MapLongPressEvent(
+            mapId,
+            screenPoint: screenPoint,
+            position: position,
+          ),
+        );
+        break;
+      case 'map#onLongPressEnd':
+        final args = call.arguments;
+        final screenPoint = _fromJson(args['screenPoint']);
+        AGSPoint position = AGSPoint.fromJson(args['position'])!;
+        _mapEventStreamController.add(
+          MapLongPressEndEvent(
             mapId,
             screenPoint: screenPoint,
             position: position,

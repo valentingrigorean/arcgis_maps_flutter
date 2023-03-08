@@ -118,6 +118,14 @@ class MapLongPressEvent extends _PositionedMapEvent<void> {
   }) : super(value: null);
 }
 
+class MapLongPressEndEvent extends _PositionedMapEvent<void> {
+  const MapLongPressEndEvent(
+      super.mapId, {
+        required super.screenPoint,
+        required super.position,
+      }) : super(value: null);
+}
+
 class ViewpointChangedEvent extends MapEvent<void> {
   const ViewpointChangedEvent(int mapId) : super(mapId, null);
 }
