@@ -246,6 +246,11 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('onLongPress() has not been implemented.');
   }
 
+  /// A Map has been long tapped at a certain [LatLng] and the long tap has ended.
+  Stream<MapLongPressEndEvent> onLongPressEnd({required int mapId}) {
+    throw UnimplementedError('onLongPressEnd() has not been implemented.');
+  }
+
   Stream<UserLocationTapEvent> onUserLocationTap({required int mapId}) {
     throw UnimplementedError('onUserLocationTap() has not been implemented.');
   }

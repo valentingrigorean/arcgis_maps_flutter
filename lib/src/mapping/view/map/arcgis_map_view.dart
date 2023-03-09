@@ -84,6 +84,7 @@ class ArcgisMapView extends StatefulWidget {
     this.contentInsets = EdgeInsets.zero,
     this.onTap,
     this.onLongPress,
+    this.onLongPressEnd,
     this.onIdentifyLayer = const {},
     this.onIdentifyLayers,
     this.onUserLocationTap,
@@ -193,6 +194,8 @@ class ArcgisMapView extends StatefulWidget {
   final GestureCallback? onTap;
 
   final GestureCallback? onLongPress;
+
+  final GestureCallback? onLongPressEnd;
 
   /// Options to configure user interactions with the view.
   final InteractionOptions interactionOptions;
@@ -408,6 +411,13 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     final onLongPress = widget.onLongPress;
     if (onLongPress != null) {
       onLongPress(screenPoint, position);
+    }
+  }
+
+  void onLongPressEnd(Offset screenPoint, AGSPoint position) {
+    final onLongPressEnd = widget.onLongPressEnd;
+    if (onLongPressEnd != null) {
+      onLongPressEnd(screenPoint, position);
     }
   }
 

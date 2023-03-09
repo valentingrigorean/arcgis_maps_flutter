@@ -313,6 +313,10 @@ class ArcgisMapController {
         (MapLongPressEvent e) =>
             _arcgisMapState.onLongPress(e.screenPoint, e.position));
 
+    ArcgisMapsFlutterPlatform.instance.onLongPressEnd(mapId: mapId).listen(
+            (MapLongPressEndEvent e) =>
+            _arcgisMapState.onLongPressEnd(e.screenPoint, e.position));
+
     ArcgisMapsFlutterPlatform.instance.onLayerLoad(mapId: mapId).listen(
         (LayerLoadedEvent e) =>
             _arcgisMapState.onLayerLoaded(e.value, e.error));
