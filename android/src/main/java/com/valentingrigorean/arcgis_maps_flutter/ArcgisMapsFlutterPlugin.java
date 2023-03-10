@@ -14,6 +14,7 @@ import com.valentingrigorean.arcgis_maps_flutter.geometry.CoordinateFormatterCon
 import com.valentingrigorean.arcgis_maps_flutter.geometry.GeometryEngineController;
 import com.valentingrigorean.arcgis_maps_flutter.map.ArcgisMapFactory;
 import com.valentingrigorean.arcgis_maps_flutter.scene.ArcgisSceneViewFactory;
+import com.valentingrigorean.arcgis_maps_flutter.service_table.ServiceTableController;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -37,6 +38,8 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
     private ArcgisNativeObjectsController nativeObjectsController;
     private MethodChannel channel;
 
+    private ServiceTableController serviceTableController;
+
     @Nullable
     private Lifecycle lifecycle;
 
@@ -56,6 +59,8 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
         coordinateFormatterController = new CoordinateFormatterController(binding.getBinaryMessenger());
 
         nativeObjectsController = new ArcgisNativeObjectsController(binding.getBinaryMessenger(), new ArcgisNativeObjectFactoryImpl(binding.getApplicationContext()));
+
+        serviceTableController = new ServiceTableController(binding.getBinaryMessenger());
     }
 
     @Override
@@ -69,6 +74,9 @@ public class ArcgisMapsFlutterPlugin implements FlutterPlugin, ActivityAware, Me
 
         nativeObjectsController.dispose();
         nativeObjectsController = null;
+
+        serviceTableController.dispose();
+        serviceTableController = null;
     }
 
     @Override

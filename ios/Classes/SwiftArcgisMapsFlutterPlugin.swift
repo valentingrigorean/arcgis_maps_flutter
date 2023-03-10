@@ -9,11 +9,14 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
     private let coordinateFormatterController: CoordinateFormatterController
     private let arcgisNativeObjectsController: ArcgisNativeObjectsController
 
+    private let serviceTableController: ArcGisServiceTableController
+
     init(with registrar: FlutterPluginRegistrar) {
         channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel", binaryMessenger: registrar.messenger())
         geometryController = GeometryEngineController(messenger: registrar.messenger())
         coordinateFormatterController = CoordinateFormatterController(messenger: registrar.messenger())
         arcgisNativeObjectsController = ArcgisNativeObjectsController(messenger: registrar.messenger(), factory: ArcgisNativeObjectFactoryImpl())
+        serviceTableController = ArcGisServiceTableController(messenger: registrar.messenger())
 
         super.init()
 

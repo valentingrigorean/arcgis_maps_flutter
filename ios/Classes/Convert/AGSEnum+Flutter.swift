@@ -230,3 +230,40 @@ extension AGSSpatialRelationship {
         }
     }
 }
+
+extension AGSStatisticType {
+    static func fromFlutter(_ value: String?) -> AGSStatisticType{
+        var staticType: AGSStatisticType = AGSStatisticType.sum
+
+        switch (value) {
+
+        case "AVERAGE":
+            staticType = AGSStatisticType.average
+            break
+
+        case "COUNT":
+            staticType = AGSStatisticType.count
+            break
+        case "MAXIMUM":
+            staticType = AGSStatisticType.maximum
+            break
+        case "MINIMUM":
+            staticType = AGSStatisticType.minimum
+            break
+        case "STANDARD_DEVIATION":
+            staticType = AGSStatisticType.standardDeviation
+            break
+        case "SUM":
+            staticType = AGSStatisticType.sum
+            break
+        case "VARIANCE":
+            staticType = AGSStatisticType.variance
+            break
+        default:
+            staticType = AGSStatisticType.sum
+            break
+        }
+
+        return staticType
+    }
+}
