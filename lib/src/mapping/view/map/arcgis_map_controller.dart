@@ -73,7 +73,7 @@ class ArcgisMapController {
     return layers;
   }
 
-  Future<List<GeoElement>> queryFeatureTableFromLayer({
+  Future<List<Feature>> queryFeatureTableFromLayer({
         required String layerName,
         Geometry? geometry,
         SpatialRelationship? spatialRelationship,

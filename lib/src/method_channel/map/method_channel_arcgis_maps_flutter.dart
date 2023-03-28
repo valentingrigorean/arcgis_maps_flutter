@@ -228,7 +228,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<List<GeoElement>> queryFeatureTableFromLayer(
+  Future<List<Feature>> queryFeatureTableFromLayer(
       {
         required int mapId,
         required String layerName,
@@ -260,7 +260,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
     );
 
     return result
-        ?.map<GeoElement>((e) => GeoElement.fromJson(e))
+        ?.map<Feature>((e) => Feature.fromJson(e))
         .toList() ??
         const [];
 
