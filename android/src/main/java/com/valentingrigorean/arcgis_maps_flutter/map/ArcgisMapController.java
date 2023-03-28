@@ -47,6 +47,7 @@ import com.valentingrigorean.arcgis_maps_flutter.layers.LayersController;
 import com.valentingrigorean.arcgis_maps_flutter.layers.LegendInfoController;
 import com.valentingrigorean.arcgis_maps_flutter.layers.MapChangeAware;
 import com.valentingrigorean.arcgis_maps_flutter.utils.AGSLoadObjects;
+import com.valentingrigorean.arcgis_maps_flutter.utils.ArcGisConvertersKt;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -428,7 +429,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                                             FeatureQueryResult queryResult = future.get();
                                             final ArrayList<Object> results = new ArrayList<>();
                                             for (Feature feature : queryResult) {
-                                                results.add(Convert.geoElementToJson(feature));
+                                                results.add(ArcGisConvertersKt.toMap(feature));
                                             }
                                             result.success(results);
                                         } catch (Exception e) {
@@ -455,7 +456,7 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                                                     FeatureQueryResult queryResult = future.get();
                                                     final ArrayList<Object> results = new ArrayList<>();
                                                     for (Feature feature : queryResult) {
-                                                        results.add(Convert.geoElementToJson(feature));
+                                                        results.add(ArcGisConvertersKt.toMap(feature));
                                                     }
 
                                                     result.success(results);
