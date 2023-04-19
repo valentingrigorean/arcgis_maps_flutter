@@ -28,9 +28,9 @@ dependencies:
 
   permission_handler: ^10.2.0
 
-  another_xlider: ^1.1.2
+  another_xlider: ^3.0.1
 
-  path_provider: ^2.0.13
+  path_provider: ^2.0.14
 
 dev_dependencies:
   flutter_test:

@@ -64,6 +64,7 @@ import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
 import com.esri.arcgisruntime.tasks.geocode.GeocodeResult;
 import com.esri.arcgisruntime.tasks.geodatabase.SyncGeodatabaseParameters;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.valentingrigorean.arcgis_maps_flutter.data.FieldTypeFlutter;
 import com.valentingrigorean.arcgis_maps_flutter.layers.FlutterLayer;
@@ -97,6 +98,9 @@ import java.util.stream.Collectors;
 public class Convert {
 
     private static final String TAG = "Convert";
+
+    private static final TypeReference<Map<String, Object>> TYPE_REFERENCE = new TypeReference<Map<String, Object>>() {
+    };
 
     protected static final SimpleDateFormat ISO8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US);
     protected static final ObjectMapper objectMapper = new ObjectMapper();
@@ -295,10 +299,10 @@ public class Convert {
     }
 
     public static Object viewpointToJson(Viewpoint viewpoint) {
-        final String json = viewpoint.toJson();
         try {
-            return objectMapper.readValue(json, Map.class);
-        } catch (JsonProcessingException e) {
+            final String json = viewpoint.toJson();
+            return objectMapper.readValue(json,TYPE_REFERENCE);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
@@ -375,7 +379,7 @@ public class Convert {
         }
 
         try {
-            return objectMapper.readValue(sb.toString(), Map.class);
+            return objectMapper.readValue(sb.toString(), TYPE_REFERENCE);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

@@ -88,10 +88,10 @@ extension WmsLayerTimeDimensionExtension on WmsLayerDimension {
         return WmsLayerTimeDimensionInfo(
           timeExtent: TimeExtent(
             startTime: parseDate,
-            endTime: Jiffy(parseDate)
+            endTime: Jiffy.parseFromDateTime(parseDate)
                 .add(months: 1)
                 .subtract(
-                  duration: const Duration(milliseconds: 1),
+                  milliseconds: 1,
                 )
                 .dateTime,
           ),
@@ -181,14 +181,14 @@ extension WmsLayerTimeDimensionExtension on WmsLayerDimension {
 
   IsoDurationValues? _toDuration(String isoString) {
     if (!RegExp(
-            r"^(-|\+)?P(?:([-+]?[0-9,.]*)Y)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)W)?(?:([-+]?[0-9,.]*)D)?(?:T(?:([-+]?[0-9,.]*)H)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)S)?)?$")
+            r"^([-+])?P(?:([-+]?[0-9,.]*)Y)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)W)?(?:([-+]?[0-9,.]*)D)?(?:T(?:([-+]?[0-9,.]*)H)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)S)?)?$")
         .hasMatch(isoString)) {
       return null;
     }
     final years = _parseTime(isoString, "Y");
     final months = _parseTime(isoString, 'M');
     // so we can get minutes aswell
-    isoString = isoString.replaceFirst(RegExp(r"(?:([-+]?[0-9,.]*)M)"), '');
+    isoString = isoString.replaceFirst(RegExp(r"([-+]?[0-9,.]*)M"), '');
 
     final weeks = _parseTime(isoString, "W");
     final days = _parseTime(isoString, "D");
@@ -222,22 +222,20 @@ extension WmsLayerTimeDimensionExtension on WmsLayerDimension {
 
 extension DateTimeExtension on DateTime {
   DateTime addDurationValues(IsoDurationValues values) {
-    return Jiffy(this)
+    return Jiffy.parseFromDateTime(this)
         .add(
           years: values.years,
           months: values.months,
-          duration: values.duration,
-        )
+        ).addDuration(values.duration)
         .dateTime;
   }
 
   DateTime subtractDurationValues(IsoDurationValues values) {
-    return Jiffy(this)
+    return Jiffy.parseFromDateTime(this)
         .subtract(
           years: values.years,
           months: values.months,
-          duration: values.duration,
-        )
+        ).addDuration(values.duration)
         .dateTime;
   }
 }
