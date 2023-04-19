@@ -90,6 +90,7 @@ class ArcgisMapView extends StatefulWidget {
     this.onUserLocationTap,
     this.minScale = 0,
     this.maxScale = 0,
+    this.onUnknownMapObjectIdError,
   })  : assert(onIdentifyLayer.isNotEmpty ? onIdentifyLayers == null : true,
             'You can use only onIdentifyLayer or onIdentifyLayers'),
         assert(onIdentifyLayers != null ? onIdentifyLayer.isEmpty : true,
@@ -216,6 +217,8 @@ class ArcgisMapView extends StatefulWidget {
   final IdentifyLayersCallback? onIdentifyLayers;
 
   final VoidCallback? onUserLocationTap;
+
+  final ValueChanged<UnknownMapObjectIdError>? onUnknownMapObjectIdError;
 
   /// The minimum scale that this map will be visible at.
   /// A value of zero indicates that there is no minimum scale and
@@ -358,7 +361,12 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     }
 
     if (layer == null) {
-      //throw UnknownMapObjectIdError('layer', layerId, 'onLayerLoaded');
+      final error = UnknownMapObjectIdError('layer', layerId, 'onLayerLoaded');
+      final callback = widget.onUnknownMapObjectIdError;
+      if (callback == null) {
+        throw error;
+      }
+      callback(error);
       return;
     }
     final completion = widget.onLayerLoaded;
@@ -370,7 +378,13 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   void onMarkerTap(MarkerId markerId) {
     final Marker? marker = _markers[markerId];
     if (marker == null) {
-      throw UnknownMapObjectIdError('marker', markerId, 'onTap');
+      final error = UnknownMapObjectIdError('marker', markerId, 'onTap');
+      final callback = widget.onUnknownMapObjectIdError;
+      if (callback == null) {
+        throw error;
+      }
+      callback(error);
+      return;
     }
     final VoidCallback? onTap = marker.onTap;
     if (onTap != null) {
@@ -381,7 +395,13 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   void onPolygonTap(PolygonId polygonId) {
     final Polygon? polygon = _polygons[polygonId];
     if (polygon == null) {
-      throw UnknownMapObjectIdError('polygon', polygonId, 'onTap');
+      final error = UnknownMapObjectIdError('polygon', polygonId, 'onTap');
+      final callback = widget.onUnknownMapObjectIdError;
+      if (callback == null) {
+        throw error;
+      }
+      callback(error);
+      return;
     }
     final VoidCallback? onTap = polygon.onTap;
     if (onTap != null) {
@@ -392,7 +412,13 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   void onPolylineTap(PolylineId polylineId) {
     final Polyline? polyline = _polylines[polylineId];
     if (polyline == null) {
-      throw UnknownMapObjectIdError('polyline', polylineId, 'onTap');
+      final error = UnknownMapObjectIdError('polyline', polylineId, 'onTap');
+      final callback = widget.onUnknownMapObjectIdError;
+      if (callback == null) {
+        throw error;
+      }
+      callback(error);
+      return;
     }
     final VoidCallback? onTap = polyline.onTap;
     if (onTap != null) {
@@ -464,7 +490,6 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
         } else if (isStarted) {
           await controller.locationDisplay.stop();
         }
-
       } catch (ex, stackTrace) {
         widget.failedToStartMyLocation?.call(ex, stackTrace);
       }
