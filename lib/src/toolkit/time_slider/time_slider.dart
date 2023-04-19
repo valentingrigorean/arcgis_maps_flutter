@@ -442,17 +442,17 @@ class _TimeSliderState extends State<TimeSlider> {
 
     if (timeExtent.startTime != null) {
       startTimeView = Text(
-        Jiffy(
-          getDate(timeExtent.startTime!),
-        ).format(widget.currentTimeExtentFormat),
+        Jiffy.parseFromDateTime(
+          getDate(timeExtent.startTime)!,
+        ).format(pattern: widget.currentTimeExtentFormat),
       );
     }
 
     if (timeExtent.endTime != null) {
       startTimeView = Text(
-        Jiffy(
+        Jiffy.parseFromDateTime(
           getDate(timeExtent.endTime)!,
-        ).format(widget.currentTimeExtentFormat),
+        ).format(pattern: widget.currentTimeExtentFormat),
       );
     }
     return Row(
@@ -516,8 +516,10 @@ class _TimeSliderState extends State<TimeSlider> {
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
-                Jiffy(getDate(controller.timeSteps[value.toInt()])!).format(
-                  _formatTooltipAndHatchMarkLabel ??
+                Jiffy.parseFromDateTime(
+                        getDate(controller.timeSteps[value.toInt()])!)
+                    .format(
+                  pattern: _formatTooltipAndHatchMarkLabel ??
                       widget.currentTimeExtentFormat,
                 ),
                 style: const TextStyle(fontSize: 24),
@@ -631,7 +633,7 @@ class _TimeSliderState extends State<TimeSlider> {
     return FlutterSliderHatchMarkLabel(
       percent: percent,
       label: Text(
-        Jiffy(getDate(date)!).format(format),
+        Jiffy.parseFromDateTime(getDate(date)!).format(pattern: format),
         style: const TextStyle(fontSize: 12),
       ),
     );
