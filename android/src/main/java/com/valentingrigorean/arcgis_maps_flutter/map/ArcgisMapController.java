@@ -834,10 +834,8 @@ final class ArcgisMapController implements DefaultLifecycleObserver, PlatformVie
                 vMap.setBasemap(baseMap);
                 changeMap(vMap);
                 break;
-            // For offline maps we use the folder not the extension
-            case "mmpk":
             default:
-                final MobileMapPackage mobileMapPackage = new MobileMapPackage(offlinePath.replace(".mmpk", ""));
+                final MobileMapPackage mobileMapPackage = new MobileMapPackage(offlinePath);
                 mobileMapPackage.addDoneLoadingListener(() -> {
                     if (mobileMapPackage.getLoadStatus() == LoadStatus.LOADED) {
                         final ArcGISMap map = mobileMapPackage.getMaps().get(mapIndex);

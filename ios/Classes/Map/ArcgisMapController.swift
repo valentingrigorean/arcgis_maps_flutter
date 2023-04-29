@@ -612,10 +612,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             let map = AGSMap(basemap: basemap)
             changeMap(map: map)
             return
-        case "mmpk":
-            // For offline maps we use the folder not the extension
-            loadMobileMapPackage(offlinePath: offlinePath.replacingOccurrences(of: ".mmpk", with: ""), mapIndex: mapIndex)
-            return
         default:
             loadMobileMapPackage(offlinePath: offlinePath, mapIndex: mapIndex)
             return
