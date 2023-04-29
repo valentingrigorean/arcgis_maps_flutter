@@ -10,7 +10,7 @@ import UIKit
 fileprivate let defaultWidth = 175
 
 class ScaleBarController: NSObject {
-    private let mapView: AGSMapView
+    private let mapView: MapView
     private let scaleBar: Scalebar
 
     private let constraintWidth: NSLayoutConstraint
@@ -36,7 +36,7 @@ class ScaleBarController: NSObject {
     private var autoHide = false
     private var hideAfterMs = 2000
 
-    init(mapView: AGSMapView) {
+    init(mapView: MapView) {
         self.mapView = mapView
         scaleBar = Scalebar(mapView: mapView)
         scaleBar.mapView = nil
@@ -181,7 +181,7 @@ class ScaleBarController: NSObject {
     }
 
 
-    private func bindToMap(map: AGSMapView) {
+    private func bindToMap(map: MapView) {
         mapScaleObservation = map.observe(\.mapScale, options: .new) { [weak self] _,
                                                                                    _ in
 

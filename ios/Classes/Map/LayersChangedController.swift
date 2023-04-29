@@ -19,7 +19,7 @@ class LayersChangedController {
 
     private var mapReferenceLayersObservation: NSKeyValueObservation?
 
-    private var map: AGSMap?
+    private var map: Map?
 
     private var isObserving: Bool = false
 
@@ -40,7 +40,7 @@ class LayersChangedController {
         self.channel = channel
         self.layersController = layersController
 
-        if let mapView = geoView as? AGSMapView {
+        if let mapView = geoView as? MapView {
             mapObservation = mapView.observe(\.map, options: [.new, .initial]) { [weak self] (_,
                                                                                               change) in
                 self?.handleMapChange(change: change)
@@ -55,8 +55,8 @@ class LayersChangedController {
         removeObservers()
     }
 
-    private func handleMapChange(change: NSKeyValueObservedChange<AGSMap?>) -> Void {
-        map = change.newValue as? AGSMap
+    private func handleMapChange(change: NSKeyValueObservedChange<Map?>) -> Void {
+        map = change.newValue as? Map
         if trackLayersChange {
             addObservers()
         }
@@ -128,7 +128,7 @@ class LayersChangedController {
 
 fileprivate extension AGSGeoView {
     var operationalLayers: [AGSLayer]? {
-        if let mapView = self as? AGSMapView {
+        if let mapView = self as? MapView {
             if let layers = mapView.map?.operationalLayers as AnyObject as? [AGSLayer] {
                 return layers
             }
@@ -141,7 +141,7 @@ fileprivate extension AGSGeoView {
     }
 
     var baseLayers: [AGSLayer]? {
-        if let mapView = self as? AGSMapView {
+        if let mapView = self as? MapView {
             if let layers = mapView.map?.basemap.baseLayers as AnyObject as? [AGSLayer] {
                 return layers
             }
@@ -154,7 +154,7 @@ fileprivate extension AGSGeoView {
     }
 
     var referenceLayers: [AGSLayer]? {
-        if let mapView = self as? AGSMapView {
+        if let mapView = self as? MapView {
             if let layers = mapView.map?.basemap.referenceLayers as AnyObject as? [AGSLayer] {
                 return layers
             }

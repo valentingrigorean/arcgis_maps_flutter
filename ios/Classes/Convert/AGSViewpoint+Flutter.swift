@@ -5,11 +5,11 @@
 import Foundation
 import ArcGIS
 
-extension AGSViewpoint {
+extension Viewpoint {
     convenience init(data: Dictionary<String, Any>) {
         let scale = data["scale"] as! Double
         let targetGeometry = data["targetGeometry"] as! Dictionary<String, Any>
 
-        self.init(center: AGSPoint(data: targetGeometry), scale: scale)
+        self.init(center: Point(data: targetGeometry), scale: scale)
     }
 }

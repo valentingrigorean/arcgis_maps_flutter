@@ -7,7 +7,7 @@ import ArcGIS
 
 public class ArcgisMapController: NSObject, FlutterPlatformView {
 
-    private let mapView: AGSMapView
+    private let mapView: MapView
     private let selectionPropertiesHandler: SelectionPropertiesHandler
 
     private let channel: FlutterMethodChannel
@@ -30,11 +30,11 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private let symbolsControllers: [SymbolsController]
 
-    private var viewpoint: AGSViewpoint?
+    private var viewpoint: Viewpoint?
 
-    private var graphicsHandle: AGSCancelable?
+    private var graphicsHandle: Cancelable?
 
-    private var layerHandle: AGSCancelable?
+    private var layerHandle: Cancelable?
 
     private var trackIdentityLayers = false
 
@@ -71,14 +71,14 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)", binaryMessenger: registrar.messenger())
 
-        mapView = AGSMapView(frame: frame)
+        mapView = MapView(frame: frame)
         mapView.selectionProperties = AGSSelectionProperties(color: UIColor.cyan)
 
         selectionPropertiesHandler = SelectionPropertiesHandler(selectionProperties: mapView.selectionProperties)
 
         symbolVisibilityFilterController = SymbolVisibilityFilterController(mapView: mapView)
 
-        let graphicsOverlay = AGSGraphicsOverlay()
+        let graphicsOverlay = GraphicsOverlay()
         polygonsController = PolygonsController(methodChannel: channel, graphicsOverlays: graphicsOverlay)
         polylinesController = PolylinesController(methodChannel: channel, graphicsOverlays: graphicsOverlay)
         markersController = MarkersController(methodChannel: channel, graphicsOverlays: graphicsOverlay)
@@ -324,7 +324,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                     operationalLayers.forEach { (opLayer) in
                         
                         // check if feature layer
-                        if let featLayer = opLayer as? AGSFeatureLayer {
+                        if let featLayer = opLayer as? FeatureLayer {
                             
                             if (queryLayerName.uppercased() == featLayer.name.uppercased()) {
                                 featLayer.featureTable?.queryFeatures(with: queryParams, completion: { (qResult:AGSFeatureQueryResult?, error:Error?) -> Void in
@@ -347,7 +347,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                         
                         for layer in groupLayer.layers {
                             
-                            guard let featureLayer = layer as? AGSFeatureLayer else {
+                            guard let featureLayer = layer as? FeatureLayer else {
                                 return
                             }
                             
@@ -375,7 +375,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             handleTimeAwareLayerInfos(result: result)
             break
         case "map#getCurrentViewpoint":
-            let type = (call.arguments as! Int).toAGSViewpointType()
+            let type = (call.arguments as! Int).toViewpointType()
             let currentViewPoint = mapView.currentViewpoint(with: type)
             if let json = try? currentViewPoint?.toJSON() {
                 result(json)
@@ -412,7 +412,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             break
         case "map#setViewpointCenter":
             if let data = call.arguments as? Dictionary<String, Any> {
-                let center = AGSPoint.fromFlutter(data: data["center"] as! Dictionary<String, Any>)! as! AGSPoint
+                let center = Point.fromFlutter(data: data["center"] as! Dictionary<String, Any>)! as! Point
                 let scale = data["scale"] as! Double
                 mapView.setViewpointCenter(center, scale: scale) { finished in
                     result(finished)
@@ -429,7 +429,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             break
         case "map#locationToScreen":
             if let mapPointData = call.arguments as? Dictionary<String, Any> {
-                let screenPoint = mapView.location(toScreen: AGSPoint(data: mapPointData))
+                let screenPoint = mapView.location(toScreen: Point(data: mapPointData))
                 result([screenPoint.x, screenPoint.y])
             } else {
                 result(nil)
@@ -441,7 +441,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 var mapPoint = mapView.screen(toLocation: CGPoint(x: mapPoints[0], y: mapPoints[1]))
                 if let spatialReference = AGSSpatialReference(data: data["spatialReference"] as! Dictionary<String, Any>) {
                     if spatialReference.wkid != mapPoint.spatialReference?.wkid {
-                        mapPoint = AGSGeometryEngine.projectGeometry(mapPoint, to: spatialReference) as! AGSPoint
+                        mapPoint = AGSGeometryEngine.projectGeometry(mapPoint, to: spatialReference) as! Point
                     }
                 }
                 result(try? mapPoint.toJSON())
@@ -594,7 +594,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             return
         }
 
-        let map = AGSMap(data: dict)
+        let map = Map(data: dict)
         changeMap(map: map)
     }
 
@@ -607,9 +607,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         switch ext {
         case "vtpk":
             // .vtpk extension is automatically added by the ArcGIS Runtime
-            let vectorTileLayer = AGSArcGISVectorTiledLayer(name: offlinePath.replacingOccurrences(of: ".vtpk", with: ""))
+            let vectorTileLayer = ArcGISVectorTiledLayer(name: offlinePath.replacingOccurrences(of: ".vtpk", with: ""))
             let basemap = AGSBasemap(baseLayer: vectorTileLayer)
-            let map = AGSMap(basemap: basemap)
+            let map = Map(basemap: basemap)
             changeMap(map: map)
             return
         default:
@@ -642,8 +642,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         }
     }
 
-    private func changeMap(map: AGSMap) {
-        let viewPoint = viewpoint ?? mapView.currentViewpoint(with: AGSViewpointType.centerAndScale)
+    private func changeMap(map: Map) {
+        let viewPoint = viewpoint ?? mapView.currentViewpoint(with: ViewpointType.centerAndScale)
         map.load { [weak self]  error in
             guard let channel = self?.channel else {
                 return
@@ -746,7 +746,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             return
         }
 
-        let newViewpoint = AGSViewpoint(data: data)
+        let newViewpoint = Viewpoint(data: data)
         viewpoint = newViewpoint
 
         guard let _ = mapView.map else {
@@ -804,7 +804,7 @@ extension ArcgisMapController: AGSGeoViewTouchDelegate {
 
     public func geoView(_ geoView: AGSGeoView,
                         didTapAtScreenPoint screenPoint: CGPoint,
-                        mapPoint: AGSPoint) {
+                        mapPoint: Point) {
         graphicsHandle?.cancel()
         layerHandle?.cancel()
 
@@ -820,11 +820,11 @@ extension ArcgisMapController: AGSGeoViewTouchDelegate {
     }
 
 
-    public func geoView(_ geoView: AGSGeoView, didLongPressAtScreenPoint screenPoint: CGPoint, mapPoint: AGSPoint) {
+    public func geoView(_ geoView: AGSGeoView, didLongPressAtScreenPoint screenPoint: CGPoint, mapPoint: Point) {
         sendOnMapLongPress(screenPoint: screenPoint)
     }
 
-    public func geoView(_ geoView: AGSGeoView, didEndLongPressAtScreenPoint screenPoint: CGPoint, mapPoint: AGSPoint) {
+    public func geoView(_ geoView: AGSGeoView, didEndLongPressAtScreenPoint screenPoint: CGPoint, mapPoint: Point) {
             sendOnMapLongPressEnd(screenPoint: screenPoint)
         }
 

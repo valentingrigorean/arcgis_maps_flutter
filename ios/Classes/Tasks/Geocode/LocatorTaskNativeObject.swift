@@ -173,7 +173,7 @@ class LocatorTaskNativeObject: BaseNativeObject<AGSLocatorTask> {
     }
 
     private func reverseGeocode(arguments: Dictionary<String, Any>, result: @escaping FlutterResult) {
-        let location = AGSGeometry.fromFlutter(data: arguments["location"] as! Dictionary<String, Any>) as! AGSPoint
+        let location = AGSGeometry.fromFlutter(data: arguments["location"] as! Dictionary<String, Any>) as! Point
         let callback = result
 
         if let params = arguments["parameters"] as? Dictionary<String, Any> {

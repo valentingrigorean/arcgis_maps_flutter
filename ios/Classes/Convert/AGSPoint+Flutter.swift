@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-extension AGSPoint {
+extension Point {
     convenience init(data: Dictionary<String, Any>) {
         let x = data["x"] as! Double
         let y = data["y"] as! Double

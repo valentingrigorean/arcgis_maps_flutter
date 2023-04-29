@@ -5,15 +5,15 @@
 import Foundation
 import ArcGIS
 
-extension AGSMap {
+extension Map {
     convenience init(data: Dictionary<String, Any>) {
         if let baseMap = data["baseMap"] as? String {
-            self.init(basemap: AGSMap.getBasemap(baseMap: baseMap))
+            self.init(basemap: Map.getBasemap(baseMap: baseMap))
             return
         }
 
         if let basemapTypeOptions = data["basemapTypeOptions"] as? Dictionary<String, Any> {
-            let basemapType = AGSMap.getBasemapType(basemapType: basemapTypeOptions["basemapType"] as! String)
+            let basemapType = Map.getBasemapType(basemapType: basemapTypeOptions["basemapType"] as! String)
             self.init(basemapType: basemapType, latitude: basemapTypeOptions["latitude"] as! Double, longitude: basemapTypeOptions["longitude"] as! Double, levelOfDetail: basemapTypeOptions["levelOfDetail"] as! Int)
             return
         }
@@ -78,7 +78,7 @@ extension AGSMap {
     }
 
 
-    private static func getBasemap(baseMap: String) -> AGSBasemap {
+    private static func getBasemap(baseMap: String) -> Basemap {
         switch baseMap {
         case "streets":
             return AGSBasemap.streets()

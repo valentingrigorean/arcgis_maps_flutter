@@ -7,7 +7,7 @@ import ArcGIS
 
 extension Int {
 
-    func toAGSViewpointType() -> AGSViewpointType {
+    func toViewpointType() -> ViewpointType {
         switch self {
         case 0:
             return .centerAndScale

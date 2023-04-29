@@ -6,7 +6,7 @@ import Foundation
 import ArcGIS
 
 
-class FlutterServiceImageTiledLayer: AGSServiceImageTiledLayer {
+class FlutterServiceImageTiledLayer: ServiceImageTiledLayer {
     private let urlTemplate: String
     private let subdomains: [String]
     private let additionalOptions: Dictionary<String, String>

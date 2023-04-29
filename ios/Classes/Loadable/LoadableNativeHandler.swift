@@ -5,10 +5,10 @@
 import Foundation
 import ArcGIS
 
-class LoadableNativeHandler: BaseNativeHandler<AGSLoadable> {
+class LoadableNativeHandler: BaseNativeHandler<Loadable> {
     var loadStatus: AGSLoadStatus
 
-    init(loadable: AGSLoadable) {
+    init(loadable: Loadable) {
         loadStatus = loadable.loadStatus
         super.init(nativeHandler: loadable)
     }

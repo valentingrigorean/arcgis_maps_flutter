@@ -7,7 +7,7 @@ import ArcGIS
 
 extension AGSGeodesicSectorParameters {
     convenience init(data: Dictionary<String, Any>) {
-        let center = AGSPoint(data: data["center"] as! Dictionary<String, Any>)
+        let center = Point(data: data["center"] as! Dictionary<String, Any>)
         let semiAxis1Length = data["semiAxis1Length"] as! Double
         let semiAxis2Length = data["semiAxis2Length"] as! Double
         let startDirection = data["startDirection"] as! Double

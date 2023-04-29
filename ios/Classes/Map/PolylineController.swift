@@ -25,7 +25,7 @@ class PolylineController: BaseGraphicController {
         polylineSymbol.style = style
     }
 
-    func setPoints(points: [AGSPoint]) {
+    func setPoints(points: [Point]) {
         graphics.geometry = AGSPolyline(points: points)
     }
 

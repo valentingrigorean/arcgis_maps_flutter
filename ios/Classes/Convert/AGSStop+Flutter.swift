@@ -7,7 +7,7 @@ import ArcGIS
 
 extension AGSStop {
     convenience init(data: Dictionary<String, Any>) {
-        let point = AGSGeometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>) as! AGSPoint
+        let point = AGSGeometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>) as! Point
         self.init(point: point)
         name = data["name"] as? String ?? ""
         stopType = AGSStopType(rawValue: data["stopType"] as! UInt) ?? .stop

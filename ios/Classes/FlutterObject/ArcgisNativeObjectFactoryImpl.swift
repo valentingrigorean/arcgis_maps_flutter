@@ -40,7 +40,7 @@ class ArcgisNativeObjectFactoryImpl: ArcgisNativeObjectFactory {
     private func createOfflineMapTask(data: [String: Any]) -> AGSOfflineMapTask {
         var offlineMapTask: AGSOfflineMapTask
         if let map = data["map"] as? Dictionary<String, Any> {
-            offlineMapTask = AGSOfflineMapTask(onlineMap: AGSMap(data: map))
+            offlineMapTask = AGSOfflineMapTask(onlineMap: Map(data: map))
         } else if let portalItem = data["portalItem"] as? Dictionary<String, Any> {
             offlineMapTask = AGSOfflineMapTask(portalItem: AGSPortalItem(data: portalItem))
         } else {

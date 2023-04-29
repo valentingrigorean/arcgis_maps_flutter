@@ -9,7 +9,7 @@ fileprivate let LOCATION_ATTRIBUTE_NAME = "my_location_attribute"
 
 class LocationDisplayController {
 
-    private let mapView: AGSMapView
+    private let mapView: MapView
     private let locationDisplay: AGSLocationDisplay
     private let locationGraphicsOverlay: AGSGraphicsOverlay
     private let locationGraphic: AGSGraphic
@@ -18,7 +18,7 @@ class LocationDisplayController {
 
     var isDisposed: Bool = false
 
-    init(methodChannel: FlutterMethodChannel, mapView: AGSMapView) {
+    init(methodChannel: FlutterMethodChannel, mapView: MapView) {
         self.methodChannel = methodChannel
         self.mapView = mapView
         locationDisplay = mapView.locationDisplay

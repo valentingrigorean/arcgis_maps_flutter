@@ -46,8 +46,8 @@ class GeometryEngineController {
                 result(nil)
                 return
             }
-            let point1 = AGSPoint(data: data["point1"] as! Dictionary<String, Any>)
-            let point2 = AGSPoint(data: data["point2"] as! Dictionary<String, Any>)
+            let point1 = Point(data: data["point1"] as! Dictionary<String, Any>)
+            let point2 = Point(data: data["point2"] as! Dictionary<String, Any>)
             let distanceUnitId = AGSLinearUnitID.fromFlutter(data["distanceUnitId"] as! Int)
             let azimuthUnitId = AGSAngularUnitID.fromFlutter(data["azimuthUnitId"] as! Int)
             let curveType = AGSGeodeticCurveType.init(rawValue: data["curveType"] as! Int)!
@@ -137,7 +137,7 @@ class GeometryEngineController {
                 return
             }
             let points = (data["points"] as! [Dictionary<String, Any>]).map {
-                AGSPoint(data: $0)
+                Point(data: $0)
             }
             let distance = data["distance"] as! Double
             let distanceUnitId = AGSLinearUnitID.fromFlutter(data["distanceUnit"] as! Int)

@@ -20,13 +20,13 @@ class SymbolVisibilityFilterController {
     private var graphicControllers = Dictionary<UInt, GraphicControllerInfo>()
     private var initialValues = Dictionary<UInt, Bool>()
 
-    private weak var mapView: AGSMapView?
+    private weak var mapView: MapView?
     private var scaleObservation: NSKeyValueObservation?
 
     private var mapScale: Double
 
 
-    init(mapView: AGSMapView) {
+    init(mapView: MapView) {
         self.mapView = mapView
         mapScale = mapView.mapScale
     }
@@ -136,14 +136,14 @@ class SymbolVisibilityFilterController {
         }
     }
 
-    private func bindToMapView(mapView: AGSMapView?) {
+    private func bindToMapView(mapView: MapView?) {
         scaleObservation = mapView?.observe(\.mapScale, options: .new) { [weak self] _,
                                                                                      _ in
             self?.mapScaleChanged()
         }
     }
 
-    private func unbindFromMapView(mapView: AGSMapView?) {
+    private func unbindFromMapView(mapView: MapView?) {
         // invalidate observations and set to nil
         scaleObservation?.invalidate()
         scaleObservation = nil

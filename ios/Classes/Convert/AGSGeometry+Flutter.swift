@@ -10,7 +10,7 @@ extension AGSGeometry {
         let geometryType = AGSGeometryType(rawValue: data["type"] as! Int)!
         switch (geometryType) {
         case .point:
-            return AGSPoint(data: data)
+            return Point(data: data)
         case .envelope:
             return AGSEnvelope(data: data)
         case .polyline, .polygon, .multipoint:

@@ -6,8 +6,8 @@ import Foundation
 import ArcGIS
 
 struct ServiceImageTiledLayerOptions: Hashable, Equatable {
-    let tileInfo: AGSTileInfo
-    let fullExtent: AGSEnvelope
+    let tileInfo: TileInfo
+    let fullExtent: Envelope
 
     let urlTemplate: String
     let subdomains: [String]
@@ -50,7 +50,7 @@ struct FlutterLayer: Hashable, Equatable {
         opacity = Float(data["opacity"] as! Double)
 
         if let credential = data["credential"] as? Dictionary<String, Any> {
-            self.credential = AGSCredential(data: credential)
+            self.credential = NetworkCredential(data: credential)
         } else {
             credential = nil
         }
@@ -97,17 +97,17 @@ struct FlutterLayer: Hashable, Equatable {
     let opacity: Float
     let isVisible: Bool
     let url: URL?
-    let tileCache: AGSTileCache?
+    let tileCache: TileCache?
     let layersName: [String]?
 
     let featureLayersIds: [Int]?
 
-    let credential: AGSCredential?
+    let credential: NetworkCredential?
 
     let serviceImageTiledLayerOptions: ServiceImageTiledLayerOptions?
     let groupLayerOptions: GroupLayerOptions?
 
-    let portalItem: AGSPortalItem?
+    let portalItem: PortalItem?
     let portalItemLayerId: Int?
 
     func hash(into hasher: inout Hasher) {
@@ -121,23 +121,24 @@ struct FlutterLayer: Hashable, Equatable {
         return true
     }
 
-    func createNativeLayer() -> AGSLayer {
+    func createNativeLayer()  ->  Layer {
         switch layerType {
         case "GeodatabaseLayer":
-            let layer = AGSGroupLayer()
-            let geodatabase = AGSGeodatabase(fileURL: url!)
+            let layer = GroupLayer()
+            let geodatabase = Geodatabase(fileURL: url!)
+            geodatabase.load()
             geodatabase.load { error in
                 if let error = error {
                     print(error.localizedDescription)
                 } else {
                     geodatabase.geodatabaseFeatureTables.forEach { table in
                         guard let featureLayersIds = featureLayersIds else {
-                            let featureLayer = AGSFeatureLayer(featureTable: table)
+                            let featureLayer = FeatureLayer(featureTable: table)
                             layer.layers.add(featureLayer)
                             return
                         }
                         if featureLayersIds.contains(table.serviceLayerID)  {
-                            let featureLayer = AGSFeatureLayer(featureTable: table)
+                            let featureLayer = FeatureLayer(featureTable: table)
                             layer.layers.add(featureLayer)
                         }
                     }
@@ -146,18 +147,18 @@ struct FlutterLayer: Hashable, Equatable {
             setupDefaultParams(layer: layer)
             return layer
         case "VectorTileLayer":
-            let layer = AGSArcGISVectorTiledLayer(url: url!)
+            let layer = ArcGISVectorTiledLayer(url: url!)
             layer.credential = credential
             setupDefaultParams(layer: layer)
             return layer
         case "FeatureLayer":
-            let featureLayer: AGSFeatureLayer
+            let featureLayer: FeatureLayer
             if let url = url {
-                let featureTable = AGSServiceFeatureTable(url: url)
+                let featureTable = ServiceFeatureTable(url: url)
                 featureTable.credential = credential
-                featureLayer = AGSFeatureLayer(featureTable: featureTable)
+                featureLayer = FeatureLayer(featureTable: featureTable)
             } else {
-                featureLayer = AGSFeatureLayer(item: portalItem!, layerID: portalItemLayerId!)
+                featureLayer = FeatureLayer(item: portalItem!, layerID: portalItemLayerId!)
             }
             setupDefaultParams(layer: featureLayer)
             return featureLayer

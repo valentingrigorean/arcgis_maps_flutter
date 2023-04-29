@@ -8,7 +8,7 @@ import ArcGIS
 class MarkersController: NSObject, SymbolsController {
 
     private var markerIdToController = Dictionary<String, MarkerController>()
-    private let graphicsOverlays: AGSGraphicsOverlay
+    private let graphicsOverlays: GraphicsOverlay
 
     private var selectedMarker: MarkerController?
 
@@ -71,7 +71,7 @@ class MarkersController: NSObject, SymbolsController {
         updateController(controller: controller, data: data)
 
         if let position = data["position"] as? Dictionary<String, Any> {
-            controller.geometry = AGSPoint(data: position)
+            controller.geometry = Point(data: position)
         }
 
         if let icon = data["icon"] as? Dictionary<String, Any> {

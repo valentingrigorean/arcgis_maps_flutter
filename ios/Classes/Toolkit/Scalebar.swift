@@ -244,7 +244,7 @@ public class Scalebar: UIView {
     // allow user to turn off/on geodetic calculations
     public var useGeodeticCalculations = true
 
-    public var mapView: AGSMapView? {
+    public var mapView: MapView? {
         didSet {
             unbindFromMapView(mapView: oldValue)
             bindToMapView(mapView: mapView)
@@ -324,7 +324,7 @@ public class Scalebar: UIView {
         sharedInitialization()
     }
 
-    public required init(mapView: AGSMapView) {
+    public required init(mapView: MapView) {
         super.init(frame: CGRect.zero)
         sharedInitialization()
         self.mapView = mapView
@@ -347,7 +347,7 @@ public class Scalebar: UIView {
     private var mapObservation: NSKeyValueObservation?
     private var visibleAreaObservation: NSKeyValueObservation?
 
-    private func bindToMapView(mapView: AGSMapView?) {
+    private func bindToMapView(mapView: MapView?) {
         mapObservation = mapView?.observe(\.map, options: .new) { [weak self] _,
                                                                               _ in
             self?.updateScaleDisplay(forceRedraw: false)
@@ -360,7 +360,7 @@ public class Scalebar: UIView {
         }
     }
 
-    private func unbindFromMapView(mapView: AGSMapView?) {
+    private func unbindFromMapView(mapView: MapView?) {
         // invalidate observations and set to nil
         mapObservation?.invalidate()
         mapObservation = nil
@@ -442,8 +442,8 @@ public class Scalebar: UIView {
 
         if useGeodeticCalculations || sr.unit is AGSAngularUnit {
             let maxLengthPlanar = unitsPerPoint * Double(maxLength)
-            let p1 = AGSPoint(x: mapCenter.x - (maxLengthPlanar * 0.5), y: mapCenter.y, spatialReference: sr)
-            let p2 = AGSPoint(x: mapCenter.x + (maxLengthPlanar * 0.5), y: mapCenter.y, spatialReference: sr)
+            let p1 = Point(x: mapCenter.x - (maxLengthPlanar * 0.5), y: mapCenter.y, spatialReference: sr)
+            let p2 = Point(x: mapCenter.x + (maxLengthPlanar * 0.5), y: mapCenter.y, spatialReference: sr)
             let polyline = AGSPolyline(points: [p1, p2])
             let baseUnits = units.baseUnits()
             let maxLengthGeodetic = AGSGeometryEngine.geodeticLength(of: polyline, lengthUnit: baseUnits, curveType: Scalebar.geodeticCurveType)
@@ -565,7 +565,7 @@ internal struct ScaleDisplay {
     var lineMapLength: Double = 0
     var displayUnit: AGSLinearUnit
     var lineDisplayLength: CGFloat = 0
-    var mapCenter: AGSPoint
+    var mapCenter: Point
     var mapLengthString: String
 }
 

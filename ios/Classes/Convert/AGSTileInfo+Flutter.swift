@@ -13,7 +13,7 @@ extension AGSTileInfo {
             AGSLevelOfDetail(data: $0 as! [Any])
         }
 
-        let origin = AGSPoint(data: data["origin"] as! Dictionary<String, Any>)
+        let origin = Point(data: data["origin"] as! Dictionary<String, Any>)
         let spatialReference = AGSSpatialReference(data: data["spatialReference"] as! Dictionary<String, Any>)!
         let tileHeight = data["tileHeight"] as! Int
         let tileWidth = data["tileWidth"] as! Int

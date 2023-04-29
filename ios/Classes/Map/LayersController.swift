@@ -61,13 +61,13 @@ class LayersController {
 
     private let methodChannel: FlutterMethodChannel
 
-    private weak var map: AGSMap?
+    private weak var map: Map?
 
     init(methodChannel: FlutterMethodChannel) {
         self.methodChannel = methodChannel
     }
 
-    public func setMap(_ map: AGSMap) {
+    public func setMap(_ map: Map) {
         clearMap()
         self.map = map
 

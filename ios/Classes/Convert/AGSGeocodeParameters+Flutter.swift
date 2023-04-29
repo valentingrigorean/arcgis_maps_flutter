@@ -27,7 +27,7 @@ extension AGSGeocodeParameters{
             self.outputSpatialReference = AGSSpatialReference(data: outputSpatialReference)
         }
         if let preferredSearchLocation = data["preferredSearchLocation"] as? [String:Any]{
-            self.preferredSearchLocation = AGSPoint(data: preferredSearchLocation)
+            self.preferredSearchLocation = Point(data: preferredSearchLocation)
         }
         if let searchArea = data["searchArea"] as? [String:Any]{
             self.searchArea = AGSGeometry.fromFlutter(data: searchArea)

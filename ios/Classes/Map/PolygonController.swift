@@ -28,7 +28,7 @@ class PolygonController : BaseGraphicController {
         polygonStrokeSymbol.color = strokeColor
     }
 
-    func setPoints(points: [AGSPoint]) {
+    func setPoints(points: [Point]) {
         graphics.geometry = AGSPolygon(points: points)
     }
 

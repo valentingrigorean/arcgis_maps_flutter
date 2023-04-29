@@ -69,9 +69,9 @@ class PolylinesController: NSObject, SymbolsController {
         }
 
         if let pointsData = data["points"] as? [Dictionary<String, Any>] {
-            var points: [AGSPoint] = []
+            var points: [Point] = []
             for data in pointsData {
-                points.append(AGSPoint(data: data))
+                points.append(Point(data: data))
             }
             controller.setPoints(points: points)
         }

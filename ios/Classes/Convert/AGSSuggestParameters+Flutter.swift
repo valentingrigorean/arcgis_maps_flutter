@@ -14,7 +14,7 @@ extension  AGSSuggestParameters{
         countryCode = data["countryCode"] as! String
         maxResults = data["maxResults"] as! Int
         if let preferredSearchLocation = data["preferredSearchLocation"] as? Dictionary<String,Any>{
-            self.preferredSearchLocation = AGSPoint(data: preferredSearchLocation)
+            self.preferredSearchLocation = Point(data: preferredSearchLocation)
         }
         if let searchArea = data["searchArea"] as? Dictionary<String,Any>{
             self.searchArea = AGSGeometry.fromFlutter(data: searchArea)
