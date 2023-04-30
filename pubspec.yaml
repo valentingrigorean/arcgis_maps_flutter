@@ -32,7 +32,7 @@ flutter:
     platforms:
       android:
         package: com.valentingrigorean.arcgis_maps_flutter
-        pluginClass: ArcgisMapsFlutterPlugin
+        pluginClass: ArcgisMapsFlutterPlugin.kt
       ios:
         pluginClass: ArcgisMapsFlutterPlugin
 

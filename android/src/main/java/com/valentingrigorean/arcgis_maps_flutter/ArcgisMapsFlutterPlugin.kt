@@ -5,6 +5,8 @@ import androidx.lifecycle.Lifecycle
 import com.arcgismaps.ApiKey
 import com.arcgismaps.ArcGISEnvironment
 import com.arcgismaps.LicenseKey
+import com.arcgismaps.LicenseStatus
+import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterValue
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.ArcgisNativeObjectFactoryImpl
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.ArcgisNativeObjectsController
 import com.valentingrigorean.arcgis_maps_flutter.geometry.CoordinateFormatterController
@@ -95,9 +97,11 @@ class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
                 Log.d(TAG, "setLicense: $licenseKey")
                 Log.d(TAG, "licenseResult: " + licenseResult?.licenseStatus)
                 val licenseStatus = licenseResult?.licenseStatus
-                val ordinalValue = licenseStatus?.ordinal ?: -1
-                result.success(licenseResult?.licenseStatus.ordinal ?: -1)
+                result.success(
+                    licenseStatus?.toFlutterValue() ?: LicenseStatus.Invalid.toFlutterValue()
+                )
             }
+
             "arcgis#getApiVersion" -> result.success(ArcGISEnvironment.apiVersion)
             else -> {
                 result.notImplemented()

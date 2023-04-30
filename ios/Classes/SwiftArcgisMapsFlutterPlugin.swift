@@ -43,10 +43,14 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
             result(ArcGISEnvironment.apiKey?.rawValue)
             break
         case "arcgis#setLicense":
-            let licenseKey = call.arguments as! String
-                let licenseResult = try ArcGISEnvironment.setLicense(from: LicenseKey(rawValue: licenseKey)
-                result(licenseResult.licenseStatus.rawValue)
-        
+            let rawLicenseKey = call.arguments as! String
+            let licenseKey = LicenseKey(rawValue: rawLicenseKey)!
+            do{
+                let licenseResult = try ArcGISEnvironment.setLicense(with: licenseKey)
+                result(licenseResult.licenseStatus.toFlutterValue())
+            }catch{
+                result(License.Status.invalid.toFlutterValue())
+            }
             break
         case "arcgis#getApiVersion":
             result("--")
