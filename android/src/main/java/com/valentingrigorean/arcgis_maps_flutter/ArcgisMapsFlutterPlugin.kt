@@ -2,7 +2,9 @@ package com.valentingrigorean.arcgis_maps_flutter
 
 import android.util.Log
 import androidx.lifecycle.Lifecycle
-import com.esri.arcgisruntime.ArcGISRuntimeEnvironment
+import com.arcgismaps.ApiKey
+import com.arcgismaps.ArcGISEnvironment
+import com.arcgismaps.LicenseKey
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.ArcgisNativeObjectFactoryImpl
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.ArcgisNativeObjectsController
 import com.valentingrigorean.arcgis_maps_flutter.geometry.CoordinateFormatterController
@@ -14,7 +16,7 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
-import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
+import io.flutter.embedding.engine.plugins.lifecycle.FlutterLifecycleAdapter
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
@@ -26,48 +28,51 @@ class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
     private var geometryEngineController: GeometryEngineController? = null
     private var coordinateFormatterController: CoordinateFormatterController? = null
     private var nativeObjectsController: ArcgisNativeObjectsController? = null
-    private var channel: MethodChannel? = null
+    private lateinit var channel: MethodChannel
     private var serviceTableController: ServiceTableController? = null
     private var lifecycle: Lifecycle? = null
     override fun onAttachedToEngine(binding: FlutterPluginBinding) {
         binding.platformViewRegistry
             .registerViewFactory(
                 VIEW_TYPE_MAP,
-                ArcgisMapFactory(binding.binaryMessenger) { lifecycle })
+                ArcgisMapFactory(binding.binaryMessenger) { lifecycle!! })
         binding.platformViewRegistry
             .registerViewFactory(
                 VIEW_TYPE_SCENE,
-                ArcgisSceneViewFactory(binding.binaryMessenger) { lifecycle })
+                ArcgisSceneViewFactory(binding.binaryMessenger) { lifecycle!! })
         channel = MethodChannel(binding.binaryMessenger, "plugins.flutter.io/arcgis_channel")
-        channel!!.setMethodCallHandler(this)
+        channel.setMethodCallHandler(this)
         geometryEngineController = GeometryEngineController(binding.binaryMessenger)
         coordinateFormatterController = CoordinateFormatterController(binding.binaryMessenger)
         nativeObjectsController = ArcgisNativeObjectsController(
             binding.binaryMessenger,
-            ArcgisNativeObjectFactoryImpl(binding.applicationContext)
+            ArcgisNativeObjectFactoryImpl(),
         )
         serviceTableController = ServiceTableController(binding.binaryMessenger)
     }
 
     override fun onDetachedFromEngine(binding: FlutterPluginBinding) {
-        channel!!.setMethodCallHandler(null)
-        geometryEngineController!!.dispose()
+        channel.setMethodCallHandler(null)
+        geometryEngineController?.dispose()
         geometryEngineController = null
-        coordinateFormatterController!!.dispose()
+        coordinateFormatterController?.dispose()
         coordinateFormatterController = null
-        nativeObjectsController!!.dispose()
+        nativeObjectsController?.dispose()
         nativeObjectsController = null
-        serviceTableController!!.dispose()
+        serviceTableController?.dispose()
         serviceTableController = null
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-        lifecycle = getActivityLifecycle(binding)
+        lifecycle = FlutterLifecycleAdapter.getActivityLifecycle(binding);
     }
 
-    override fun onDetachedFromActivityForConfigChanges() {}
+    override fun onDetachedFromActivityForConfigChanges() {
+
+    }
+
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-        onAttachedToActivity(binding)
+        lifecycle = FlutterLifecycleAdapter.getActivityLifecycle(binding);
     }
 
     override fun onDetachedFromActivity() {
@@ -77,22 +82,26 @@ class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "arcgis#setApiKey" -> {
-                val apiKey = call.arguments<String>()
-                ArcGISRuntimeEnvironment.setApiKey(apiKey)
+                val apiKey = call.arguments<String>()!!
+                ArcGISEnvironment.apiKey = ApiKey.create(apiKey)
                 Log.d(TAG, "setApiKey: $apiKey")
                 result.success(null)
             }
 
-            "arcgis#getApiKey" -> result.success(ArcGISRuntimeEnvironment.getApiKey())
+            "arcgis#getApiKey" -> result.success(ArcGISEnvironment.apiKey?.toString())
             "arcgis#setLicense" -> {
-                val licenseKey = call.arguments<String>()
-                val licenseResult = ArcGISRuntimeEnvironment.setLicense(licenseKey)
+                val licenseKey = call.arguments<String>()!!
+                val licenseResult = ArcGISEnvironment.setLicense(LicenseKey.create(licenseKey)!!)
                 Log.d(TAG, "setLicense: $licenseKey")
-                Log.d(TAG, "licenseResult: " + licenseResult.licenseStatus)
-                result.success(licenseResult.licenseStatus.ordinal)
+                Log.d(TAG, "licenseResult: " + licenseResult?.licenseStatus)
+                val licenseStatus = licenseResult?.licenseStatus
+                val ordinalValue = licenseStatus?.ordinal ?: -1
+                result.success(licenseResult?.licenseStatus.ordinal ?: -1)
             }
-
-            "arcgis#getApiVersion" -> result.success(ArcGISRuntimeEnvironment.getAPIVersion())
+            "arcgis#getApiVersion" -> result.success(ArcGISEnvironment.apiVersion)
+            else -> {
+                result.notImplemented()
+            }
         }
     }
 
@@ -100,11 +109,5 @@ class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
         const val TAG = "ArcgisMapsFlutterPlugin"
         private const val VIEW_TYPE_MAP = "plugins.flutter.io/arcgis_maps"
         private const val VIEW_TYPE_SCENE = "plugins.flutter.io/arcgis_scene"
-        private fun getActivityLifecycle(
-            activityPluginBinding: ActivityPluginBinding
-        ): Lifecycle {
-            val reference = activityPluginBinding.lifecycle as HiddenLifecycleReference
-            return reference.lifecycle
-        }
     }
 }

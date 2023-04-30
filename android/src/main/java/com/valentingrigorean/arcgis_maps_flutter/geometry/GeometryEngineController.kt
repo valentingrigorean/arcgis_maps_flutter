@@ -20,11 +20,11 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 
-class GeometryEngineController(messenger: BinaryMessenger?) : MethodCallHandler {
+class GeometryEngineController(messenger: BinaryMessenger) : MethodCallHandler {
     private val channel: MethodChannel
 
     init {
-        channel = MethodChannel(messenger!!, "plugins.flutter.io/arcgis_channel/geometry_engine")
+        channel = MethodChannel(messenger, "plugins.flutter.io/arcgis_channel/geometry_engine")
         channel.setMethodCallHandler(this)
     }
 

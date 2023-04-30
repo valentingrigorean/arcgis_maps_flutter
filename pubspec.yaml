@@ -10,9 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_plugin_android_lifecycle: ^2.0.13
   plugin_platform_interface: ^2.1.4
   stream_transform: ^2.1.0
-  collection: ^1.17.0
+  collection: ^1.17.1
   fluster: ^1.2.0
   equatable: ^2.0.5
   http: ^0.13.5

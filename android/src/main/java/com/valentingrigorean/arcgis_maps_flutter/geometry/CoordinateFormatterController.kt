@@ -8,12 +8,12 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 
-class CoordinateFormatterController(messenger: BinaryMessenger?) : MethodCallHandler {
+class CoordinateFormatterController(messenger: BinaryMessenger) : MethodCallHandler {
     private val channel: MethodChannel
 
     init {
         channel =
-            MethodChannel(messenger!!, "plugins.flutter.io/arcgis_channel/coordinate_formatter")
+            MethodChannel(messenger, "plugins.flutter.io/arcgis_channel/coordinate_formatter")
         channel.setMethodCallHandler(this)
     }
 

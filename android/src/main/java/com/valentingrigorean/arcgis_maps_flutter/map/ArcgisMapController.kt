@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import android.view.View
 import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment
 import com.esri.arcgisruntime.arcgisservices.TimeAware
@@ -27,7 +28,6 @@ import com.esri.arcgisruntime.mapping.view.TimeExtentChangedListener
 import com.esri.arcgisruntime.mapping.view.ViewpointChangedEvent
 import com.esri.arcgisruntime.mapping.view.ViewpointChangedListener
 import com.valentingrigorean.arcgis_maps_flutter.Convert
-import com.valentingrigorean.arcgis_maps_flutter.LifecycleProvider
 import com.valentingrigorean.arcgis_maps_flutter.layers.LayersChangedController
 import com.valentingrigorean.arcgis_maps_flutter.layers.LayersController
 import com.valentingrigorean.arcgis_maps_flutter.layers.LegendInfoController
@@ -44,12 +44,12 @@ import io.flutter.plugin.platform.PlatformView
 import java.util.Locale
 import java.util.concurrent.ExecutionException
 
-internal class ArcgisMapController(
+class ArcgisMapController(
     id: Int,
     private val context: Context,
     params: Map<String, Any>?,
     binaryMessenger: BinaryMessenger?,
-    private val lifecycleProvider: LifecycleProvider
+    private val lifecycleProvider: () -> Lifecycle
 ) : DefaultLifecycleObserver, PlatformView, MethodCallHandler, ViewpointChangedListener,
     TimeExtentChangedListener, LocationDisplayControllerDelegate {
     private val methodChannel: MethodChannel

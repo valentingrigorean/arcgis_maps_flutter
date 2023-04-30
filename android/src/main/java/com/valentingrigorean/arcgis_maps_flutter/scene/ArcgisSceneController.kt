@@ -7,7 +7,6 @@ import androidx.lifecycle.LifecycleOwner
 import com.esri.arcgisruntime.mapping.view.Camera
 import com.esri.arcgisruntime.mapping.view.SceneView
 import com.valentingrigorean.arcgis_maps_flutter.Convert
-import com.valentingrigorean.arcgis_maps_flutter.LifecycleProvider
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel

@@ -7,8 +7,8 @@ enum LicenseStatus {
   valid,
 }
 
-class ArcGISRuntimeEnvironment {
-  ArcGISRuntimeEnvironment._();
+class ArcGISEnvironment {
+  ArcGISEnvironment._();
 
   static Future<void> setApiKey(String apiKey) =>
       ArcgisFlutterPlatform.instance.setApiKey(apiKey);

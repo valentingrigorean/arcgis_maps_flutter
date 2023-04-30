@@ -1,11 +1,11 @@
 package com.valentingrigorean.arcgis_maps_flutter.concurrent
 
-import com.esri.arcgisruntime.concurrent.Job
+import com.arcgismaps.tasks.Job
 import com.valentingrigorean.arcgis_maps_flutter.Convert
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeHandler
 import io.flutter.plugin.common.MethodChannel
 
-class JobNativeHandler(job: Job, private val jobType: JobType) : BaseNativeHandler<Job?>(job) {
+class JobNativeHandler(job: Job, private val jobType: JobType) : BaseNativeHandler<Job>(job) {
     private val jobChangedListener: JobChangedListener
     private val progressChangedListener: ProgressChangedListener
     private var messageCount: Int

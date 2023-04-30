@@ -45,7 +45,7 @@ part 'src/dispose_scope.dart';
 part 'src/unit_system.dart';
 
 part 'src/arcgis_error.dart';
-part 'src/arcgis_runtime_environment.dart';
+part 'src/arcgis_environment.dart';
 
 part 'src/arcgisservices/level_of_detail.dart';
 part 'src/arcgisservices/tile_info.dart';

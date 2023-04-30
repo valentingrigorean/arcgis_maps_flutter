@@ -6,7 +6,7 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 
 class ArcgisNativeObjectsController(
-    messenger: BinaryMessenger?,
+    messenger: BinaryMessenger,
     factory: ArcgisNativeObjectFactory
 ) : MethodCallHandler {
     private val channel: MethodChannel
@@ -15,11 +15,11 @@ class ArcgisNativeObjectsController(
     private val storage: NativeObjectStorage
 
     init {
-        channel = MethodChannel(messenger!!, "plugins.flutter.io/arcgis_channel/native_objects")
+        channel = MethodChannel(messenger, "plugins.flutter.io/arcgis_channel/native_objects")
         this.factory = factory
         messageSink = MessageSink(channel)
         channel.setMethodCallHandler(this)
-        storage = NativeObjectStorage.Companion.getInstance()
+        storage = NativeObjectStorage.instance
     }
 
     fun dispose() {

@@ -20,6 +20,6 @@ void main() {
   });
 
   test('getPlatformVersion', () async {
-    expect(await ArcGISRuntimeEnvironment.getAPIVersion(), '42');
+    expect(await ArcGISEnvironment.getAPIVersion(), '42');
   });
 }

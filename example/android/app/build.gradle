@@ -25,17 +25,13 @@ apply plugin: 'com.android.application'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    namespace 'com.example.namespace'
-}
 
-android {
     compileSdkVersion 33
     packagingOptions {
         resources {
             excludes += ['META-INF/DEPENDENCIES']
         }
     }
-
 
     defaultConfig {
         applicationId "com.valentingrigorean.arcgis_maps_flutter_example"
