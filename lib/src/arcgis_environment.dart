@@ -1,10 +1,21 @@
 part of arcgis_maps_flutter;
 
 enum LicenseStatus {
-  invalid,
-  expired,
-  loginRequired,
-  valid,
+  invalid(0),
+  expired(1),
+  loginRequired(2),
+  valid(3);
+
+  const LicenseStatus(this.value);
+
+  factory LicenseStatus.fromValue(int value) {
+    return LicenseStatus.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => LicenseStatus.invalid,
+    );
+  }
+
+  final int value;
 }
 
 class ArcGISEnvironment {

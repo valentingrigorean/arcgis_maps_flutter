@@ -1,36 +1,40 @@
 package com.valentingrigorean.arcgis_maps_flutter.loadable
 
-import com.esri.arcgisruntime.loadable.LoadStatusChangedEvent
-import com.esri.arcgisruntime.loadable.LoadStatusChangedListener
-import com.esri.arcgisruntime.loadable.Loadable
+import com.arcgismaps.LoadStatus
+import com.arcgismaps.Loadable
 import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterValue
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeHandler
 import io.flutter.plugin.common.MethodChannel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
-class LoadableNativeHandler(loadable: Loadable) : BaseNativeHandler<Loadable?>(loadable),
-    LoadStatusChangedListener {
+class LoadableNativeHandler(loadable: Loadable) : BaseNativeHandler<Loadable>(loadable) {
     init {
-        loadable.addLoadStatusChangedListener(this)
+        loadable.loadStatus.onEach { status ->
+                // Perform any action you want to do with the message here
+                // You can send the message to the Flutter side using the sendMessage method
+                sendMessage("loadable#loadStatusChanged", status)
+            }.launchIn(scope)
     }
 
-    override fun disposeInternal() {
-        super.disposeInternal()
-        nativeHandler.removeLoadStatusChangedListener(this)
-    }
 
     override fun onMethodCall(method: String, args: Any?, result: MethodChannel.Result): Boolean {
         when (method) {
             "loadable#getLoadStatus" -> {
-                result.success(nativeHandler.getLoadStatus().ordinal)
+                result.success(nativeHandler.loadStatus.value.toFlutterValue())
                 return true
             }
 
             "loadable#getLoadError" -> {
-                result.success(
-                    Convert.Companion.arcGISRuntimeExceptionToJson(
-                        nativeHandler.getLoadError()
-                    )
-                )
+                val loadError = nativeHandler.loadStatus.value as? LoadStatus.FailedToLoad
+                if (loadError != null) {
+                    result.success(Convert.Companion.arcGISRuntimeExceptionToJson(loadError.error))
+                } else {
+                    result.success(null)
+                }
                 return true
             }
 
@@ -41,30 +45,21 @@ class LoadableNativeHandler(loadable: Loadable) : BaseNativeHandler<Loadable?>(l
             }
 
             "loadable#loadAsync" -> {
-                nativeHandler.loadAsync()
-                nativeHandler.addDoneLoadingListener(DoneListener(result))
+                scope.launch {
+                    nativeHandler.load().onSuccess { result.success(null) }
+                        .onFailure { result.error("loadable#loadAsync", it.message, it) }
+                }
                 return true
             }
 
             "loadable#retryLoadAsync" -> {
-                nativeHandler.retryLoadAsync()
-                nativeHandler.addDoneLoadingListener(DoneListener(result))
+                scope.launch {
+                    nativeHandler.retryLoad().onSuccess { result.success(null) }
+                        .onFailure { result.error("loadable#retryLoadAsync", it.message, it) }
+                }
                 return true
             }
         }
         return false
-    }
-
-    override fun loadStatusChanged(loadStatusChangedEvent: LoadStatusChangedEvent) {
-        sendMessage("loadable#loadStatusChanged", loadStatusChangedEvent.newLoadStatus.ordinal)
-    }
-
-    private inner class DoneListener(private val result: MethodChannel.Result) : Runnable {
-        override fun run() {
-            nativeHandler.removeDoneLoadingListener(this)
-            if (!isDisposed) {
-                result.success(null)
-            }
-        }
     }
 }

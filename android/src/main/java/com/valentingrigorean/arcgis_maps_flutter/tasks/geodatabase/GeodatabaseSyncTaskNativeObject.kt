@@ -1,5 +1,6 @@
 package com.valentingrigorean.arcgis_maps_flutter.tasks.geodatabase
 
+import com.arcgismaps.tasks.geodatabase.GeodatabaseSyncTask
 import com.esri.arcgisruntime.geometry.Geometry
 import com.esri.arcgisruntime.tasks.geodatabase.GeodatabaseSyncTask
 import com.esri.arcgisruntime.tasks.geodatabase.SyncGeodatabaseJob
@@ -15,7 +16,7 @@ import com.valentingrigorean.arcgis_maps_flutter.utils.toMap
 import io.flutter.plugin.common.MethodChannel
 import java.util.UUID
 
-class GeodatabaseSyncTaskNativeObject(objectId: String?, task: GeodatabaseSyncTask) :
+class GeodatabaseSyncTaskNativeObject(objectId: String, task: GeodatabaseSyncTask) :
     BaseNativeObject<GeodatabaseSyncTask?>(
         objectId, task, arrayOf<NativeHandler>(
             LoadableNativeHandler(task),

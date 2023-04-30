@@ -14,7 +14,9 @@ enum JobStatus {
   succeeded(3),
 
   /// A job that has completed and has failed.
-  failed(4);
+  failed(4),
+  canceling(5),
+  ;
 
   const JobStatus(this.value);
 
@@ -146,7 +148,6 @@ abstract class Job extends ArcgisNativeObject with RemoteResource {
   final StreamController<JobMessage> _messageController =
       StreamController<JobMessage>.broadcast();
 
-
   bool _isStarted = false;
 
   Job({
@@ -166,18 +167,6 @@ abstract class Job extends ArcgisNativeObject with RemoteResource {
       cancel();
     }
     super.dispose();
-  }
-
-  /// Error encountered during job execution, if any.
-  Future<ArcgisError?> get error async {
-    final result = await invokeMethod(
-      'job#getError',
-      parseErrors: false,
-    );
-    if (result == null) {
-      return null;
-    }
-    return ArcgisError.fromJson(result);
   }
 
   /// The type of job
@@ -236,7 +225,7 @@ abstract class Job extends ArcgisNativeObject with RemoteResource {
   @override
   @protected
   Future<void> handleMethodCall(String method, dynamic arguments) async {
-    if(isDisposed){
+    if (isDisposed) {
       return;
     }
     switch (method) {

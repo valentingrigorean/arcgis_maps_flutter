@@ -1,24 +1,19 @@
 package com.valentingrigorean.arcgis_maps_flutter.tasks.geocode
 
 import android.util.Log
-import com.esri.arcgisruntime.concurrent.ListenableFuture
-import com.esri.arcgisruntime.geometry.Point
-import com.esri.arcgisruntime.loadable.LoadStatus
-import com.esri.arcgisruntime.tasks.geocode.GeocodeResult
-import com.esri.arcgisruntime.tasks.geocode.LocatorTask
-import com.esri.arcgisruntime.tasks.geocode.SuggestResult
+import com.arcgismaps.tasks.geocode.LocatorTask
+import com.arcgismaps.tasks.geocode.SuggestResult
 import com.valentingrigorean.arcgis_maps_flutter.Convert
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.io.ApiKeyResourceNativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.io.RemoteResourceNativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.loadable.LoadableNativeHandler
-import com.valentingrigorean.arcgis_maps_flutter.utils.toMap
 import io.flutter.plugin.common.MethodChannel
 import java.util.UUID
 
-class LocatorTaskNativeObject(objectId: String?, task: LocatorTask) :
-    BaseNativeObject<LocatorTask?>(
+class LocatorTaskNativeObject(objectId: String, task: LocatorTask) :
+    BaseNativeObject<LocatorTask>(
         objectId,
         task,
         arrayOf<NativeHandler>(

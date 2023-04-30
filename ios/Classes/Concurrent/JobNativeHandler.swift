@@ -5,15 +5,15 @@
 import Foundation
 import ArcGIS
 
-class JobNativeHandler: BaseNativeHandler<AGSJob> {
+class JobNativeHandler: BaseNativeHandler<Job> {
 
-    private var status: AGSJobStatus
+    private var status: JobStatus
 
     private var messageCount: Int
     //TODO(vali): remove if manage to use KVO.I tried but didn't work....
     private var messageTimer: Timer?
 
-    init(job: AGSJob) {
+    init(job: Job) {
         status = job.status
         messageCount = job.messages.count
         super.init(nativeHandler: job)

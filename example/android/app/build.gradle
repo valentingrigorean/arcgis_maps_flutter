@@ -23,6 +23,9 @@ if (flutterVersionName == null) {
 
 apply plugin: 'com.android.application'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+android {
+    namespace 'com.example.namespace'
+}
 
 android {
 
@@ -49,7 +52,6 @@ android {
     lint {
         disable 'InvalidPackage'
     }
-    namespace 'com.valentingrigorean.arcgis_maps_flutter_example'
 }
 
 flutter {

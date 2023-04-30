@@ -6,7 +6,7 @@ import Foundation
 import ArcGIS
 
 class LoadableNativeHandler: BaseNativeHandler<Loadable> {
-    var loadStatus: AGSLoadStatus
+    var loadStatus: LoadStatus
 
     init(loadable: Loadable) {
         loadStatus = loadable.loadStatus

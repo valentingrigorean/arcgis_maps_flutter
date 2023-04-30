@@ -1,18 +1,17 @@
 part of arcgis_maps_flutter;
 
 enum LoadStatus {
-  loaded(0),
+  notLoaded(0),
   loading(1),
-  failedToLoad(2),
-  notLoaded(3),
-  unknown(-1);
+  loaded(2),
+  failed(3),
+  ;
 
   const LoadStatus(this.value);
 
   factory LoadStatus.fromValue(int value) {
     return LoadStatus.values.firstWhere(
       (e) => e.value == value,
-      orElse: () => LoadStatus.unknown,
     );
   }
 
@@ -31,7 +30,7 @@ mixin Loadable on ArcgisNativeObject {
 
   Future<LoadStatus> get loadStatus async {
     final result = await invokeMethod('loadable#getLoadStatus');
-    return LoadStatus.fromValue(result ?? LoadStatus.unknown.value);
+    return LoadStatus.fromValue(result);
   }
 
   Future<ArcgisError?> get loadError async {
