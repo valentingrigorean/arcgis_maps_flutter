@@ -1,14 +1,19 @@
 package com.valentingrigorean.arcgis_maps_flutter.tasks.geocode
 
-import android.util.Log
 import com.arcgismaps.tasks.geocode.LocatorTask
 import com.arcgismaps.tasks.geocode.SuggestResult
-import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toPointOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.geocode.toFlutterJson
+import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.geocode.toGeocodeParametersOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.geocode.toReverseGeocodeParametersOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.geocode.toSuggestParametersOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.io.ApiKeyResourceNativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.loadable.LoadableNativeHandler
 import io.flutter.plugin.common.MethodChannel
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class LocatorTaskNativeObject(objectId: String, task: LocatorTask) :
@@ -21,11 +26,6 @@ class LocatorTaskNativeObject(objectId: String, task: LocatorTask) :
         )
     ) {
     private val suggestResultsMap: MutableMap<String, SuggestResult> = HashMap()
-    override fun disposeInternal() {
-        super.disposeInternal()
-        suggestResultsMap.clear()
-    }
-
     override fun onMethodCall(method: String, args: Any?, result: MethodChannel.Result) {
         when (method) {
             "locatorTask#getLocatorInfo" -> getLocatorInfo(result)
@@ -44,165 +44,85 @@ class LocatorTaskNativeObject(objectId: String, task: LocatorTask) :
     }
 
     private fun getLocatorInfo(result: MethodChannel.Result) {
-        val locatorTask = nativeObject
-        if (locatorTask!!.loadStatus != LoadStatus.LOADED) {
-            locatorTask.loadAsync()
-        }
-        locatorTask.addDoneLoadingListener {
-            if (locatorTask.loadStatus == LoadStatus.LOADED) {
-                result.success(ConvertLocatorTask.locatorInfoToJson(locatorTask.locatorInfo))
-            } else {
-                val exception = locatorTask.loadError
-                result.error(
-                    "ERROR",
-                    if (exception != null) exception.message else "Unknown error.",
-                    null
-                )
+        scope.launch {
+            nativeObject.load().onSuccess {
+                result.success(nativeObject.locatorInfo?.toFlutterJson())
+            }.onFailure {
+                result.success(it.toFlutterJson())
             }
         }
     }
 
     private fun geocode(args: Any?, result: MethodChannel.Result) {
-        val data: Map<*, *> = Convert.Companion.toMap(
-            args!!
-        )
-        val searchText = data["searchText"].toString()
-        val parameters = data["parameters"]
-        val future: ListenableFuture<List<GeocodeResult>>
-        future = if (parameters == null) {
-            nativeObject.geocodeAsync(searchText)
-        } else {
-            nativeObject.geocodeAsync(
-                searchText,
-                ConvertLocatorTask.toGeocodeParameters(parameters)
-            )
-        }
-        future.addDoneListener {
-            try {
-                val geocodeResults = future.get()
-                result.success(ConvertLocatorTask.geocodeResultsToJson(geocodeResults))
-            } catch (e: Exception) {
-                Log.e(TAG, "geocode: ", e)
-                result.error("ERROR", e.message, null)
+        scope.launch {
+            val data: Map<*, *> = args as Map<*, *>
+            val searchText = data["searchText"].toString()
+            val parameters = data["parameters"]?.toGeocodeParametersOrNull()
+            nativeObject.geocode(searchText, parameters).onSuccess { results ->
+                result.success(results.map { it.toFlutterJson() })
+            }.onFailure {
+                result.success(it.toFlutterJson())
             }
         }
     }
 
     private fun geocodeSuggestResult(args: Any?, result: MethodChannel.Result) {
-        val data: Map<*, *> = Convert.Companion.toMap(
-            args!!
-        )
+        val data = args as Map<*, *>
         val tag = data["suggestResultId"].toString()
         val suggestResult = suggestResultsMap[tag]
         if (suggestResult == null) {
             result.error("ERROR", "SuggestResult not found", null)
             return
         }
-        val parameters = data["parameters"]
-        val future: ListenableFuture<List<GeocodeResult>>
-        future = if (parameters == null) {
-            nativeObject.geocodeAsync(suggestResult)
-        } else {
-            nativeObject.geocodeAsync(
-                suggestResult,
-                ConvertLocatorTask.toGeocodeParameters(parameters)
-            )
-        }
-        future.addDoneListener {
-            try {
-                val geocodeResults = future.get()
-                result.success(ConvertLocatorTask.geocodeResultsToJson(geocodeResults))
-            } catch (e: Exception) {
-                Log.e(TAG, "geocode: ", e)
-                result.error("ERROR", e.message, null)
+        scope.launch {
+            val parameters = data["parameters"]?.toGeocodeParametersOrNull()
+            nativeObject.geocode(suggestResult, parameters).onSuccess { results ->
+                result.success(results.map { it.toFlutterJson() })
+            }.onFailure {
+                result.success(it.toFlutterJson())
             }
         }
     }
 
     private fun geocodeSearchValues(args: Any?, result: MethodChannel.Result) {
-        val data: Map<*, *> = Convert.Companion.toMap(
-            args!!
-        )
-        val searchValues = Convert.Companion.toMap(
-            data["searchValues"]!!
-        ) as Map<String, String>
-        val parameters = data["parameters"]
-        val future: ListenableFuture<List<GeocodeResult>>
-        future = if (parameters == null) {
-            nativeObject.geocodeAsync(searchValues)
-        } else {
-            nativeObject.geocodeAsync(
-                searchValues,
-                ConvertLocatorTask.toGeocodeParameters(parameters)
-            )
-        }
-        future.addDoneListener {
-            try {
-                val geocodeResults = future.get()
-                result.success(ConvertLocatorTask.geocodeResultsToJson(geocodeResults))
-            } catch (e: Exception) {
-                Log.e(TAG, "geocode: ", e)
-                result.error("ERROR", e.message, null)
+        scope.launch {
+            val data = args as Map<*, *>
+            val searchValues = data["searchValues"] as Map<String, String>
+            val parameters = data["parameters"]?.toGeocodeParametersOrNull()
+            nativeObject.geocode(searchValues, parameters).onSuccess { results ->
+                result.success(results.map { it.toFlutterJson() })
+            }.onFailure {
+                result.success(it.toFlutterJson())
             }
         }
     }
 
     private fun reverseGeocode(args: Any?, result: MethodChannel.Result) {
-        val locatorTask = nativeObject
-        val data: Map<*, *> = Convert.Companion.toMap(
-            args!!
-        )
-        val location: Point = Convert.Companion.toPoint(
-            data["location"]
-        )
-        val parameters = data["parameters"]
-        val future: ListenableFuture<List<GeocodeResult>>
-        future = if (parameters == null) {
-            locatorTask!!.reverseGeocodeAsync(location)
-        } else {
-            locatorTask!!.reverseGeocodeAsync(
-                location,
-                ConvertLocatorTask.toReverseGeocodeParameters(parameters)
-            )
-        }
-        future.addDoneListener {
-            try {
-                val results = future.get()
-                result.success(ConvertLocatorTask.geocodeResultsToJson(results))
-            } catch (e: Exception) {
-                Log.e(TAG, "reverseGeocode: Failed to reverse geocode", e)
-                result.error("ERROR", "Failed to reverse geocode.", e.message)
+        scope.launch {
+            val data = args as Map<*, *>
+            val location = data["location"]?.toPointOrNull()
+            val parameters = data["parameters"]?.toReverseGeocodeParametersOrNull()
+            nativeObject.reverseGeocode(location!!, parameters).onSuccess { results ->
+                result.success(results.map { it.toFlutterJson() })
+            }.onFailure {
+                result.success(it.toFlutterJson())
             }
         }
     }
 
     private fun suggest(args: Any?, result: MethodChannel.Result) {
-        val locatorTask = nativeObject
-        val data: Map<*, *> = Convert.Companion.toMap(
-            args!!
-        )
-        val searchText = data["searchText"].toString()
-        val parameters = data["parameters"]
-        val future: ListenableFuture<List<SuggestResult>>
-        future = if (parameters == null) {
-            locatorTask!!.suggestAsync(searchText)
-        } else {
-            locatorTask!!.suggestAsync(
-                searchText,
-                ConvertLocatorTask.toSuggestParameters(parameters)
-            )
-        }
-        future.addDoneListener {
-            try {
-                val results = future.get()
-                result.success(ConvertLocatorTask.suggestResultsToJson(results) { suggestResult: SuggestResult ->
+        scope.launch {
+            val data = args as Map<*, *>
+            val searchText = data["searchText"].toString()
+            val parameters = data["parameters"]?.toSuggestParametersOrNull()
+            nativeObject.suggest(searchText, parameters).onSuccess { results ->
+                result.success(results.map {
                     val tag = UUID.randomUUID().toString()
-                    suggestResultsMap[tag] = suggestResult
-                    tag
+                    suggestResultsMap[tag] = it
+                    return@map it.toFlutterJson(tag)
                 })
-            } catch (e: Exception) {
-                Log.e(TAG, "suggest: Failed to suggest", e)
-                result.error("ERROR", "Failed to suggest.", e.message)
+            }.onFailure {
+                result.success(it.toFlutterJson())
             }
         }
     }
@@ -212,13 +132,9 @@ class LocatorTaskNativeObject(objectId: String, task: LocatorTask) :
             suggestResultsMap.clear()
             return
         }
-        val tags: List<*> = Convert.Companion.toList(args)
+        val tags = args as List<String>
         for (tag in tags) {
-            suggestResultsMap.remove(tag.toString())
+            suggestResultsMap.remove(tag)
         }
-    }
-
-    companion object {
-        val TAG = LocatorTaskNativeObject::class.java.simpleName
     }
 }
