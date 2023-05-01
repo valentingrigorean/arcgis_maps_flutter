@@ -9,7 +9,6 @@ import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class LoadableNativeHandler(loadable: Loadable) : BaseNativeHandler<Loadable>(loadable) {
     init {
@@ -31,7 +30,7 @@ class LoadableNativeHandler(loadable: Loadable) : BaseNativeHandler<Loadable>(lo
             "loadable#getLoadError" -> {
                 val loadError = nativeHandler.loadStatus.value as? LoadStatus.FailedToLoad
                 if (loadError != null) {
-                    result.success(Convert.Companion.arcGISRuntimeExceptionToJson(loadError.error))
+                    result.success(Convert.arcGISRuntimeExceptionToJson(loadError.error))
                 } else {
                     result.success(null)
                 }

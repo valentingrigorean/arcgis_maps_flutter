@@ -8,6 +8,7 @@ import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeHandler
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class JobNativeHandler<T>(job: Job<T>, private val jobType: JobType) :
@@ -81,9 +82,18 @@ class JobNativeHandler<T>(job: Job<T>, private val jobType: JobType) :
             }
 
             "job#cancel" -> {
-                runBlocking {
-                    result.success(nativeHandler.cancel())
+                scope.launch {
+                    nativeHandler.cancel().onSuccess {
+                        result.success(true)
+                    }.onFailure {
+                        result.error(
+                            "JobNativeHandler",
+                            "Failed to cancel job",
+                            it.localizedMessage
+                        )
+                    }
                 }
+
                 true
             }
 

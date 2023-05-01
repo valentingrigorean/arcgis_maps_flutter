@@ -6,39 +6,54 @@ import Foundation
 import ArcGIS
 
 class LoadableNativeHandler: BaseNativeHandler<Loadable> {
+    private var cancelTask : Task<Void,Never>?
+    private var loadTask : Task<Void,Never>?
+    private var retryTask : Task<Void,Never>?
     var loadStatus: LoadStatus
 
     init(loadable: Loadable) {
         loadStatus = loadable.loadStatus
         super.init(nativeHandler: loadable)
     }
+    
+    deinit{
+        cancelTask?.cancel()
+        loadTask?.cancel()
+        retryTask?.cancel()
+    }
 
     override func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) -> Bool {
         switch (method) {
         case "loadable#getLoadStatus":
-            result(nativeHandler.loadStatus.rawValue)
+            result(nativeHandler.loadStatus.toFlutterValue())
             return true
         case "loadable#getLoadError":
-            result(nativeHandler.loadError?.toJSON())
+            result(nativeHandler.loadError?.toFlutterJson())
             return true
         case "loadable#cancelLoad":
-            nativeHandler.cancelLoad()
-            result(nil)
+            cancelTask = Task{
+               await  nativeHandler.cancelLoad()
+                result(nil)
+            }
             return true
         case "loadable#loadAsync":
-            nativeHandler.load { [weak self] (error) in
-                guard let self = self else {
-                    return
+            loadTask = Task{
+                do {
+                    try await nativeHandler.load()
+                    self.onLoadCallback(error: nil, result: result)
+                }catch{
+                    self.onLoadCallback(error: error, result: result)
                 }
-                self.onLoadCallback(error: error, result: result)
             }
             return true
         case "loadable#retryLoadAsync":
-            nativeHandler.retryLoad { [weak self] (error) in
-                guard let self = self else {
-                    return
+            retryTask = Task {
+                do {
+                    try await nativeHandler.retryLoad()
+                    self.onLoadCallback(error: nil, result: result)
+                }catch{
+                    self.onLoadCallback(error: error, result: result)
                 }
-                self.onLoadCallback(error: error, result: result)
             }
             return true
         default:
@@ -51,7 +66,7 @@ class LoadableNativeHandler: BaseNativeHandler<Loadable> {
         let newStatus = nativeHandler.loadStatus
         if newStatus != loadStatus {
             loadStatus = newStatus
-            sendMessage(method: "loadable#loadStatusChanged", arguments: loadStatus.rawValue)
+            sendMessage(method: "loadable#loadStatusChanged", arguments: loadStatus.toFlutterValue())
         }
         result(nil)
     }
