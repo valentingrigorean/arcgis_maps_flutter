@@ -81,28 +81,6 @@ enum JobMessageSource {
   final int value;
 }
 
-enum JobType {
-  generateGeodatabase(0),
-  syncGeodatabase(1),
-  exportTileCache(2),
-  estimateTileCacheSize(3),
-  geoprocessingJob(4),
-  generateOfflineMap(5),
-  offlineMapSync(6),
-  downloadPreplannedOfflineMapJob(7);
-
-  const JobType(this.value);
-
-  factory JobType.fromValue(int value) {
-    return JobType.values.firstWhere(
-      (e) => e.value == value,
-      orElse: () => JobType.generateGeodatabase,
-    );
-  }
-
-  final int value;
-}
-
 class JobMessage {
   const JobMessage({
     required this.message,
@@ -169,12 +147,18 @@ abstract class Job extends ArcgisNativeObject with RemoteResource {
     super.dispose();
   }
 
-  /// The type of job
-  Future<JobType> get jobType async {
-    final result = await invokeMethod('job#getJobType');
-    return JobType.fromValue(result);
+  /// Error encountered during job execution, if any.
+  Future<ArcgisError?> get error async {
+    final result = await invokeMethod(
+      'job#getError',
+      parseErrors: false,
+    );
+    if (result == null) {
+      return null;
+    }
+    return ArcgisError.fromJson(result);
   }
-
+  
   /// Informational messages produced during execution of the job.
   Future<List<JobMessage>> get messages async {
     final result = await invokeMethod('job#getMessages');

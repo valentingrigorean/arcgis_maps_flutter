@@ -1,8 +1,8 @@
 part of arcgis_maps_flutter;
 
 @immutable
-class AGSEnvelope extends Geometry {
-  const AGSEnvelope({
+class Envelope extends Geometry {
+  const Envelope({
     required this.xMin,
     required this.yMin,
     required this.xMax,
@@ -25,7 +25,7 @@ class AGSEnvelope extends Geometry {
         spatialReference: spatialReference,
       );
 
-  static AGSEnvelope? fromJson(Map<dynamic, dynamic>? json) {
+  static Envelope? fromJson(Map<dynamic, dynamic>? json) {
     if (json == null) return null;
     late List<dynamic>? bbox;
     if (json.containsKey('bbox')) {
@@ -34,7 +34,7 @@ class AGSEnvelope extends Geometry {
       bbox = [json['xmin'], json['ymin'], json['xmax'], json['ymax']];
     }
     if (bbox == null) return null;
-    return AGSEnvelope(
+    return Envelope(
       xMin: bbox[0].toDouble(),
       yMin: bbox[1].toDouble(),
       xMax: bbox[2].toDouble(),
@@ -58,7 +58,7 @@ class AGSEnvelope extends Geometry {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is AGSEnvelope &&
+      other is Envelope &&
           runtimeType == other.runtimeType &&
           xMin == other.xMin &&
           xMax == other.xMax &&

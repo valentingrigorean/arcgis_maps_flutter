@@ -5,7 +5,7 @@
 import Foundation
 
 extension Error {
-    func toFlutterJson() -> Dictionary<String, Any> {
+    func toFlutterJson(withStackTrace: Bool = true) -> Dictionary<String, Any> {
         var dict = [String: Any]()
         dict["domain"] = 2
         if let nsError = self as NSError? {
@@ -16,6 +16,11 @@ extension Error {
             dict["code"] = -1
             dict["errorMessage"] = localizedDescription
         }
+        
+        if withStackTrace {
+            dict["nativeStackTrace"] = Thread.callStackSymbols.joined(separator: "\n")
+        }        
+        
         return dict
     }
 }

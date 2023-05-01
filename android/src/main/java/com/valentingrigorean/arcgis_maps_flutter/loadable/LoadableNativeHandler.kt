@@ -2,7 +2,7 @@ package com.valentingrigorean.arcgis_maps_flutter.loadable
 
 import com.arcgismaps.LoadStatus
 import com.arcgismaps.Loadable
-import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterValue
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeHandler
 import io.flutter.plugin.common.MethodChannel
@@ -13,12 +13,9 @@ import kotlinx.coroutines.launch
 class LoadableNativeHandler(loadable: Loadable) : BaseNativeHandler<Loadable>(loadable) {
     init {
         loadable.loadStatus.onEach { status ->
-                // Perform any action you want to do with the message here
-                // You can send the message to the Flutter side using the sendMessage method
-                sendMessage("loadable#loadStatusChanged", status)
-            }.launchIn(scope)
+            sendMessage("loadable#loadStatusChanged", status)
+        }.launchIn(scope)
     }
-
 
     override fun onMethodCall(method: String, args: Any?, result: MethodChannel.Result): Boolean {
         when (method) {
@@ -30,7 +27,7 @@ class LoadableNativeHandler(loadable: Loadable) : BaseNativeHandler<Loadable>(lo
             "loadable#getLoadError" -> {
                 val loadError = nativeHandler.loadStatus.value as? LoadStatus.FailedToLoad
                 if (loadError != null) {
-                    result.success(Convert.arcGISRuntimeExceptionToJson(loadError.error))
+                    result.success(loadError.error.toFlutterJson())
                 } else {
                     result.success(null)
                 }

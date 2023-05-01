@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-extension AGSEnvelope {
+extension Envelope {
     convenience init(data: Dictionary<String, Any>) {
         let bbox = data["bbox"] as! [Any]
 

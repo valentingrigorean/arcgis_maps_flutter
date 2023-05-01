@@ -6,20 +6,11 @@ import Foundation
 import ArcGIS
 
 class LoadableNativeHandler: BaseNativeHandler<Loadable> {
-    private var cancelTask : Task<Void,Never>?
-    private var loadTask : Task<Void,Never>?
-    private var retryTask : Task<Void,Never>?
     var loadStatus: LoadStatus
 
     init(loadable: Loadable) {
         loadStatus = loadable.loadStatus
         super.init(nativeHandler: loadable)
-    }
-    
-    deinit{
-        cancelTask?.cancel()
-        loadTask?.cancel()
-        retryTask?.cancel()
     }
 
     override func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) -> Bool {
@@ -31,15 +22,15 @@ class LoadableNativeHandler: BaseNativeHandler<Loadable> {
             result(nativeHandler.loadError?.toFlutterJson())
             return true
         case "loadable#cancelLoad":
-            cancelTask = Task{
-               await  nativeHandler.cancelLoad()
+            createTask {
+                await self.nativeHandler.cancelLoad()
                 result(nil)
             }
             return true
         case "loadable#loadAsync":
-            loadTask = Task{
+            createTask {
                 do {
-                    try await nativeHandler.load()
+                    try await self.nativeHandler.load()
                     self.onLoadCallback(error: nil, result: result)
                 }catch{
                     self.onLoadCallback(error: error, result: result)
@@ -47,9 +38,9 @@ class LoadableNativeHandler: BaseNativeHandler<Loadable> {
             }
             return true
         case "loadable#retryLoadAsync":
-            retryTask = Task {
+            createTask {
                 do {
-                    try await nativeHandler.retryLoad()
+                    try await self.nativeHandler.retryLoad()
                     self.onLoadCallback(error: nil, result: result)
                 }catch{
                     self.onLoadCallback(error: error, result: result)

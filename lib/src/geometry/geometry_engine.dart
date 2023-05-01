@@ -227,7 +227,7 @@ class GeometryEngine {
   }
 
   /// Get extent of Geometry.
-  static Future<AGSEnvelope?> getExtent(Geometry geometry) {
+  static Future<Envelope?> getExtent(Geometry geometry) {
     return GeometryEngineFlutterPlatform.instance.getExtent(geometry);
   }
 }

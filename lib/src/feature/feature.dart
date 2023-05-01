@@ -14,21 +14,22 @@ class Feature {
       ..addAll(value);
   }
 
-  Feature.named(
-      {Map<Object?, Object?> attributes = const {},
-      required this.featureTable,
-      this.geometry,
-      this.geometryJson})
-      : _attributes = attributes;
+  Feature.named({
+    Map<Object?, Object?> attributes = const {},
+    required this.featureTable,
+    this.geometry,
+    this.geometryJson,
+  }) : _attributes = attributes;
 
   Feature.fromJson(Map<Object?, Object?> json)
       : this.named(
-            featureTable: FeatureTable.fromJson(
-                json["featureTable"] as Map<Object?, Object?>),
-            attributes: json["attributes"] as Map<Object?, Object?>,
-            geometry:
-                Geometry.fromJson(json["geometry"] as Map<dynamic, dynamic>?),
-            geometryJson: json["geometryJson"] as String?);
+          featureTable: FeatureTable.fromJson(
+              json["featureTable"] as Map<Object?, Object?>),
+          attributes: json["attributes"] as Map<Object?, Object?>,
+          geometry:
+              Geometry.fromJson(json["geometry"] as Map<dynamic, dynamic>?),
+          geometryJson: json["geometryJson"] as String?,
+        );
 
   Map<dynamic, dynamic> toJson() {
     return {
@@ -64,35 +65,34 @@ class FeatureTable {
   final String? tableName;
   final String? displayName;
 
-  FeatureTable.named(
-      {List<FeatureTableField> fields = const [],
-      List<FeatureType> featureTypes = const [],
-      this.tableName,
-      this.displayName})
-      : _fields = fields,
+  FeatureTable.named({
+    List<FeatureTableField> fields = const [],
+    List<FeatureType> featureTypes = const [],
+    this.tableName,
+    this.displayName,
+  })  : _fields = fields,
         _featureTypes = featureTypes;
 
   FeatureTable.fromJson(Map<Object?, Object?> json)
       : this.named(
-            fields: ((){
+            fields: (() {
               List<FeatureTableField> result = [];
               (json["fields"] as List<Object?>?)?.forEach((e) {
-                if(e is Map<Object?, Object?>){
-                  result.add(FeatureTableField.fromJson(e)) ;
+                if (e is Map<Object?, Object?>) {
+                  result.add(FeatureTableField.fromJson(e));
                 }
               });
               return result;
             }.call()),
             tableName: json["tableName"] as String?,
             displayName: json["displayName"] as String?,
-            featureTypes: ((){
+            featureTypes: (() {
               List<FeatureType> result = [];
               (json["featureTypes"] as List<Object?>?)?.forEach((e) {
-                  result.add(FeatureType.fromJson(e as Map<Object?, Object?>)) ;
+                result.add(FeatureType.fromJson(e as Map<Object?, Object?>));
               });
               return result;
             }).call());
-
 
   Map<String, dynamic> toJson() {
     return {

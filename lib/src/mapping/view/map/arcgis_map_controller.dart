@@ -100,11 +100,11 @@ class ArcgisMapController {
     return result.expand((e) => e).toList();
   }
 
-  Future<AGSEnvelope?> getMapMaxExtend() {
+  Future<Envelope?> getMapMaxExtend() {
     return ArcgisMapsFlutterPlatform.instance.getMapMaxExtend(mapId);
   }
 
-  Future<void> setMapMaxExtent(AGSEnvelope envelope) {
+  Future<void> setMapMaxExtent(Envelope envelope) {
     return ArcgisMapsFlutterPlatform.instance.setMapMaxExtent(mapId, envelope);
   }
 

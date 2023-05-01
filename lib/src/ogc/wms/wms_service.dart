@@ -210,7 +210,7 @@ class WmsService {
     );
   }
 
-  static AGSEnvelope? _getBoundingBox(dynamic json) {
+  static Envelope? _getBoundingBox(dynamic json) {
     if (json == null) {
       return null;
     }
@@ -228,7 +228,7 @@ class WmsService {
     final miny = _getValue(json['miny']);
     final maxx = _getValue(json['maxx']);
     final maxy = _getValue(json['maxy']);
-    return AGSEnvelope(
+    return Envelope(
       xMin: double.parse(minx),
       yMin: double.parse(miny),
       xMax: double.parse(maxx),

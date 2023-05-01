@@ -28,7 +28,7 @@ class WmsLayerInfo extends Equatable {
   final String layerDescription;
 
   /// The geographic extent this layer covers
-  final AGSEnvelope? extent;
+  final Envelope? extent;
 
   /// A value indicating the height (in points) of map images the service
   /// is capable of producing. When present and nonzero, it indicates that

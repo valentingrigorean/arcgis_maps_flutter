@@ -47,12 +47,12 @@ class TileCache extends ArcgisNativeObject with Loadable {
     return TileInfo.fromJson(result);
   }
 
-  Future<AGSEnvelope?> get fullExtent async {
+  Future<Envelope?> get fullExtent async {
     final result = await invokeMethod('tileCache#getFullExtent');
     if (result == null) {
       return null;
     }
-    return AGSEnvelope.fromJson(result);
+    return Envelope.fromJson(result);
   }
 
   @override

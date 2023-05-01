@@ -54,7 +54,7 @@ class Viewpoint {
     }
     return Viewpoint._(
       targetGeometry: targetGeometry,
-      viewpointType: targetGeometry is AGSEnvelope
+      viewpointType: targetGeometry is Envelope
           ? ViewpointType.boundingGeometry
           : ViewpointType.centerAndScale,
       scale: json['scale']?.toDouble(),

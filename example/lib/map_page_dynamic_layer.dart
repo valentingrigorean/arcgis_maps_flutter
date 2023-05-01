@@ -13,7 +13,7 @@ class _MapPageDynamicLayerState extends State<MapPageDynamicLayer> {
     layerId: const LayerId('dynamicLayer'),
     urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     tileInfo: _createTileInfo(),
-    fullExtent: AGSEnvelope(
+    fullExtent: Envelope(
       xMin: -20037508.3427892,
       yMin: -20037508.3427892,
       xMax: 20037508.3427892,

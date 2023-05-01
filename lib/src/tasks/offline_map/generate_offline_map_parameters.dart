@@ -220,7 +220,7 @@ class GenerateOfflineMapParameters {
     );
   }
 
-  /// An [AGSPolygon] or [AGSEnvelope] geometry that defines the geographic area
+  /// An [AGSPolygon] or [Envelope] geometry that defines the geographic area
   /// for which the map data (features and tiles) should be taken offline.
   /// Where an [AGSPolygon] object supplied, features and tiles will be filtered
   /// according to the polygon geometry, which can help

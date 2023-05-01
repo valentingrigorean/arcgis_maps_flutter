@@ -8,14 +8,14 @@ class StatisticsQueryParameters {
   final List<String> groupByFieldNames;
   final List<OrderBy> orderByFields;
 
-  StatisticsQueryParameters(
-      {this.statisticDefinitions = const [],
-      this.groupByFieldNames = const [],
-      this.orderByFields = const [],
-      this.geometry,
-      this.whereClause,
-      this.spatialRelationship})
-      : assert(statisticDefinitions.isNotEmpty);
+  StatisticsQueryParameters({
+    this.statisticDefinitions = const [],
+    this.groupByFieldNames = const [],
+    this.orderByFields = const [],
+    this.geometry,
+    this.whereClause,
+    this.spatialRelationship,
+  }) : assert(statisticDefinitions.isNotEmpty);
 
   Map<String, dynamic> toJson() {
     return {
@@ -35,11 +35,17 @@ class StatisticDefinition {
   final StatisticType statisticType;
   final String? outputAlias;
 
-  StatisticDefinition(
-      {required this.fieldName, required this.statisticType, this.outputAlias});
+  StatisticDefinition({
+    required this.fieldName,
+    required this.statisticType,
+    this.outputAlias,
+  });
 
-  StatisticDefinition.named(
-      {required this.fieldName, required this.statisticType, this.outputAlias});
+  StatisticDefinition.named({
+    required this.fieldName,
+    required this.statisticType,
+    this.outputAlias,
+  });
 
   Map<String, dynamic> toJson() {
     return {
@@ -60,6 +66,7 @@ enum StatisticType {
   variance("VARIANCE");
 
   final String alias;
+
   const StatisticType(this.alias);
 }
 

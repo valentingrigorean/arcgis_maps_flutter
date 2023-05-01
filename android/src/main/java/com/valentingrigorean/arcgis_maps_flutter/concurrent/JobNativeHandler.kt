@@ -4,21 +4,19 @@ import com.arcgismaps.tasks.Job
 import com.arcgismaps.tasks.JobStatus
 import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.toFlutterValue
+import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeHandler
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
-class JobNativeHandler<T>(job: Job<T>, private val jobType: JobType) :
+class JobNativeHandler<T>(job: Job<T>) :
     BaseNativeHandler<Job<T>>(job) {
-    private var messageCount: Int
     private var status: JobStatus
 
     init {
         status = job.status.value
-        messageCount = job.messages.replayCache.size
         nativeHandler.messages
             .onEach { message ->
                 // Perform any action you want to do with the message here
@@ -44,15 +42,16 @@ class JobNativeHandler<T>(job: Job<T>, private val jobType: JobType) :
             .launchIn(scope)
     }
 
-    enum class JobType {
-        GENERATE_GEODATABASE, SYNC_GEO_DATABASE, EXPORT_TILE_CACHE, ESTIMATE_TILE_CACHE_SIZE, GEO_PROCESSING_JOB, GENERATE_OFFLINE_MAP, OFFLINE_MAP_SYNC, DOWNLOAD_PREPLANNED_OFFLINE_MAP_JOB
-    }
-
-
     override fun onMethodCall(method: String, args: Any?, result: MethodChannel.Result): Boolean {
         return when (method) {
-            "job#getJobType" -> {
-                result.success(jobType.ordinal)
+            "job#getError" -> {
+                scope.launch {
+                    nativeHandler.checkStatus().onSuccess {
+                        result.success(null)
+                    }.onFailure {
+                        result.success(it.toFlutterJson())
+                    }
+                }
                 true
             }
 

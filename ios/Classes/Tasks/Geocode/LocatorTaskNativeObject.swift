@@ -5,8 +5,8 @@
 import Foundation
 import ArcGIS
 
-class LocatorTaskNativeObject: BaseNativeObject<AGSLocatorTask> {
-    private var suggestResultMap = [String: AGSSuggestResult]()
+class LocatorTaskNativeObject: BaseNativeObject<LocatorTask> {
+    private var suggestResultMap = [String: SuggestResult]()
 
     init(objectId: String, task: LocatorTask, messageSink: NativeMessageSink) {
         super.init(objectId: objectId, nativeObject: task, nativeHandlers: [

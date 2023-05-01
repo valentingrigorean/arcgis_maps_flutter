@@ -28,7 +28,7 @@ abstract class Geometry {
         case GeometryType.point:
           return AGSPoint.fromJson(json);
         case GeometryType.envelope:
-          return AGSEnvelope.fromJson(json);
+          return Envelope.fromJson(json);
         case GeometryType.polyline:
           return AGSPolyline.fromJson(json);
         case GeometryType.polygon:
@@ -47,7 +47,7 @@ abstract class Geometry {
       return AGSPolygon.fromJson(json);
     }
     if (json.containsKey('xmax')) {
-      return AGSEnvelope.fromJson(json);
+      return Envelope.fromJson(json);
     }
 
     return AGSPoint.fromJson(json);

@@ -19,7 +19,7 @@ class ExportTileCacheParameters {
     );
   }
 
-  /// An [AGSPolygon] or [AGSEnvelope] geometry that defines the geographic area
+  /// An [AGSPolygon] or [Envelope] geometry that defines the geographic area
   /// for which tiles are needed. Where an @c AGSPolygon is supplied,
   /// tiles will be filtered according to the polygon geometry, which can help
   /// reduce the size of the resulting tile package. Note that the filtered set

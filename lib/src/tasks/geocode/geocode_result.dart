@@ -23,7 +23,7 @@ class GeocodeResult {
   final AGSPoint? displayLocation;
 
   /// An extent suitable for zooming the map to display the candidate.
-  final AGSEnvelope? extent;
+  final Envelope? extent;
 
   /// The [AGSPoint] provided as input to [LocatorTask.reverseGeocodeAsync]
   /// Only applicable for results of reverse-geocode operations.
@@ -47,7 +47,7 @@ class GeocodeResult {
     return GeocodeResult._(
       attributes: parseAttributes(json['attributes']),
       displayLocation: AGSPoint.fromJson(json['displayLocation']),
-      extent: AGSEnvelope.fromJson(json['extent']),
+      extent: Envelope.fromJson(json['extent']),
       inputLocation: AGSPoint.fromJson(json['inputLocation']),
       label: json['label'] as String,
       routeLocation: AGSPoint.fromJson(json['routeLocation']),
