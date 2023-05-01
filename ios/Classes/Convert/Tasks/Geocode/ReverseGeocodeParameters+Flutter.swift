@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-extension AGSReverseGeocodeParameters{
+extension ReverseGeocodeParameters{
     convenience init(data:Dictionary<String,Any>){
         self.init()
         if let resultAttributeNames = data["resultAttributeNames"] as? [String]{
