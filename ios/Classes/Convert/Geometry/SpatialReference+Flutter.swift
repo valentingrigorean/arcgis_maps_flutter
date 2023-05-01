@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-extension AGSSpatialReference {
+extension SpatialReference {
     convenience init?(data: Dictionary<String, Any>) {
         if let wkId = data["wkid"] as? Int {
             self.init(wkid: wkId)

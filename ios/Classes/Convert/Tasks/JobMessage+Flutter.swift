@@ -9,7 +9,7 @@ import Foundation
 import ArcGIS
 
 extension JobMessage {
-    func toFlutterJson() -> Any {
+    func toJSONFlutter() -> Any {
         [
             "message": text,
             "severity": severity.toFlutterValue(),

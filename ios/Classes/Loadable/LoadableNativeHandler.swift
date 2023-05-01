@@ -19,7 +19,7 @@ class LoadableNativeHandler: BaseNativeHandler<Loadable> {
             result(nativeHandler.loadStatus.toFlutterValue())
             return true
         case "loadable#getLoadError":
-            result(nativeHandler.loadError?.toFlutterJson())
+            result(nativeHandler.loadError?.toJSONFlutter())
             return true
         case "loadable#cancelLoad":
             createTask {

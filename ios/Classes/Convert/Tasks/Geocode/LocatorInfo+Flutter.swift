@@ -5,18 +5,18 @@
 import Foundation
 import ArcGIS
 
-extension AGSLocatorInfo {
+extension LocatorInfo {
     func toJSONFlutter() -> Any {
         var data = [String: Any]()
         data["name"] = name
-        data["description"] = locatorDescription
+        data["description"] = description
         data["intersectionResultAttributes"] = intersectionResultAttributes.map {
             $0.toJSONFlutter()
         }
 
-        if let properties = properties {
-            data["properties"] = properties
-        }
+       
+        data["properties"] = properties
+        
 
         data["resultAttributes"] = resultAttributes.map {
             $0.toJSONFlutter()
@@ -39,13 +39,12 @@ extension AGSLocatorInfo {
     }
 }
 
-extension AGSLocatorAttribute {
+extension LocatorAttribute {
     func toJSONFlutter() -> Any {
         var data = [String: Any]()
         data["name"] = name
         data["displayName"] = displayName
-        data["required"] = required
+        data["required"] = isRequired
         return data
     }
 }
-

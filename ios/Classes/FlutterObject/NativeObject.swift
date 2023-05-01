@@ -12,7 +12,7 @@ protocol NativeHandler {
 
 
 class BaseNativeHandler<T>: NSObject,NativeHandler {
-    private var tasks: [Int: Task<Int, Error>] = [:]
+    private var tasks: [Int: Task<Void, Error>] = [:]
     private var taskIdCounter = 0
     
     let nativeHandler: T
@@ -23,6 +23,7 @@ class BaseNativeHandler<T>: NSObject,NativeHandler {
     
     deinit {
         messageSink = nil
+        cancelAllTasks()
     }
     
     var messageSink: NativeMessageSink?
@@ -37,12 +38,11 @@ class BaseNativeHandler<T>: NSObject,NativeHandler {
     }
     
     @discardableResult
-    func createTask(operation: @escaping @Sendable () async throws -> Void) -> Task<Int, Error> {
+    func createTask(operation: @escaping @Sendable () async throws -> Void) -> Task<Void, Error> {
         let taskId = taskIdCounter
-        let task = Task<Int, Error> {
+        let task = Task {
             do {
                 try await operation()
-                return taskId
             } catch {
                 throw error
             }
@@ -91,6 +91,8 @@ public class NativeObjectMessageSink: NativeMessageSink {
 
 class BaseNativeObject<T>: NativeMessageSink, NativeObject {
     private var nativeObjectMessageSink: NativeObjectMessageSink
+    private var tasks: [Int: Task<Void, Error>] = [:]
+    private var taskIdCounter = 0
     
     private var isDisposed: Bool = false
     private let nativeHandlers: [NativeHandler]
@@ -115,6 +117,7 @@ class BaseNativeObject<T>: NativeMessageSink, NativeObject {
     
     deinit {
         isDisposed = true
+        cancelAllTasks()
     }
     
     var storage: NativeObjectStorage {
@@ -138,5 +141,28 @@ class BaseNativeObject<T>: NativeMessageSink, NativeObject {
             }
         }
         result(FlutterMethodNotImplemented)
+    }
+
+    @discardableResult
+    func createTask(operation: @escaping @Sendable () async throws -> Void) -> Task<Void, Error> {
+        let taskId = taskIdCounter
+        let task = Task<Void, Error> {
+            do {
+                try await operation()
+            } catch {
+                throw error
+            }
+        }
+        tasks[taskId] = task
+        taskIdCounter += 1
+        return task
+    }
+
+    
+    private func cancelAllTasks() {
+        for (_, task) in tasks {
+            task.cancel()
+        }
+        tasks.removeAll()
     }
 }

@@ -7,20 +7,14 @@ import ArcGIS
 
 class LocatorTaskNativeObject: BaseNativeObject<LocatorTask> {
     private var suggestResultMap = [String: SuggestResult]()
-
+    
     init(objectId: String, task: LocatorTask, messageSink: NativeMessageSink) {
         super.init(objectId: objectId, nativeObject: task, nativeHandlers: [
             LoadableNativeHandler(loadable: task),
-            RemoteResourceNativeHandler(remoteResource: task),
             ApiKeyResourceNativeHandler(apiKeyResource: task)
         ], messageSink: messageSink)
     }
-
-    override func dispose() {
-        super.dispose()
-        suggestResultMap.removeAll()
-    }
-
+    
     override func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) {
         switch (method) {
         case "locatorTask#getLocatorInfo":
@@ -49,135 +43,71 @@ class LocatorTaskNativeObject: BaseNativeObject<LocatorTask> {
             super.onMethodCall(method: method, arguments: arguments, result: result)
         }
     }
-
-
+    
     private func getLocatorInfo(result: @escaping FlutterResult) {
-        nativeObject.load(completion: { [weak self] (error) in
-            if let error = error {
-                result(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))
-                return
+        createTask{
+            do {
+                try await self.nativeObject.load()
+                result(self.nativeObject.locatorInfo?.toJSONFlutter())
+            } catch {
+                result(error.toJSONFlutter())
             }
-            result(self?.nativeObject.locatorInfo?.toJSONFlutter())
-        })
+        }
     }
-
+        
     private func geocode(arguments: Dictionary<String, Any>, result: @escaping FlutterResult) {
-        let searchTerm = arguments["searchText"] as! String
-        let callback = result
-        if let params = arguments["parameters"] as? Dictionary<String, Any> {
-            let geocodeParameters = AGSGeocodeParameters(data: params)
-            nativeObject.geocode(withSearchText: searchTerm, parameters: geocodeParameters) { (results, error) in
-                if let error = error {
-                    callback(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))
-                } else {
-                    if let results = results {
-                        let result = results.map {
-                            $0.toJSONFlutter()
-                        }
-                        callback(result)
-                    } else {
-                        callback([])
-                    }
-                }
-            }
-        } else {
-            nativeObject.geocode(withSearchText: searchTerm) { (results, error) in
-                if let error = error {
-                    callback(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))
-                } else {
-                    if let results = results {
-                        let result = results.map {
-                            $0.toJSONFlutter()
-                        }
-                        callback(result)
-                    } else {
-                        callback([])
-                    }
-                }
+        createTask {
+            let searchTerm = arguments["searchText"] as! String
+            let paramsRaw = arguments["parameters"] as? Dictionary<String, Any>
+            let params = paramsRaw == nil ? nil : GeocodeParameters(data: paramsRaw!)
+            do {
+                let results = try await self.nativeObject.geocode(forSearchText: searchTerm,using:params)
+                result(results.map{ $0.toJSONFlutter()})
+            }catch{
+                result(error.toJSONFlutter())
             }
         }
     }
-
+    
     private func geocodeSuggestResult(arguments: [String: Any], result: @escaping FlutterResult) {
-        let suggestResult = suggestResultMap[arguments["suggestResultId"] as! String]!
-        let callback = result
-        if let params = arguments["parameters"] as? Dictionary<String, Any> {
-            let geocodeParameters = AGSGeocodeParameters(data: params)
-            nativeObject.geocode(with: suggestResult, parameters: geocodeParameters) { (results, error) in
-                if let error = error {
-                    callback(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))
-                } else {
-                    if let results = results {
-                        let result = results.map {
-                            $0.toJSONFlutter()
-                        }
-                        callback(result)
-                    } else {
-                        callback([])
-                    }
-                }
-            }
-        } else {
-            nativeObject.geocode(with: suggestResult) { (results, error) in
-                if let error = error {
-                    callback(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))
-                } else {
-                    if let results = results {
-                        let result = results.map {
-                            $0.toJSONFlutter()
-                        }
-                        callback(result)
-                    } else {
-                        callback([])
-                    }
-                }
+        createTask {
+            let suggestResult = self.suggestResultMap[arguments["suggestResultId"] as! String]!
+            let paramsRaw = arguments["parameters"] as? Dictionary<String, Any>
+            let params = paramsRaw == nil ? nil : GeocodeParameters(data: paramsRaw!)
+            do {
+                let results = try await self.nativeObject.geocode(forSuggestResult: suggestResult,using:params)
+                result(results.map{ $0.toJSONFlutter()})
+            }catch{
+                result(error.toJSONFlutter())
             }
         }
     }
-
+    
     private func geocodeSearchValues(arguments: [String: Any], result: @escaping FlutterResult) {
-        let searchValues = arguments["searchValues"] as! [String: String]
-        let callback = result
-        if let params = arguments["parameters"] as? Dictionary<String, Any> {
-            let geocodeParameters = AGSGeocodeParameters(data: params)
-            nativeObject.geocode(withSearchValues: searchValues, parameters: geocodeParameters) { (results, error) in
-                if let error = error {
-                    callback(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))
-                } else {
-                    if let results = results {
-                        let result = results.map {
-                            $0.toJSONFlutter()
-                        }
-                        callback(result)
-                    } else {
-                        callback([])
-                    }
-                }
-            }
-        } else {
-            nativeObject.geocode(withSearchValues: searchValues) { (results, error) in
-                if let error = error {
-                    callback(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))
-                } else {
-                    if let results = results {
-                        let result = results.map {
-                            $0.toJSONFlutter()
-                        }
-                        callback(result)
-                    } else {
-                        callback([])
-                    }
-                }
+        createTask {
+            let searchValues = arguments["searchValues"] as! [String: String]
+            let paramsRaw = arguments["parameters"] as? Dictionary<String, Any>
+            let params = paramsRaw == nil ? nil : GeocodeParameters(data: paramsRaw!)
+            do {
+                let results = try await self.nativeObject.geocode(forSearchValues: searchValues,using:params)
+                result(results.map{ $0.toJSONFlutter()})
+            }catch{
+                result(error.toJSONFlutter())
             }
         }
     }
-
+    
     private func reverseGeocode(arguments: Dictionary<String, Any>, result: @escaping FlutterResult) {
-        let location = AGSGeometry.fromFlutter(data: arguments["location"] as! Dictionary<String, Any>) as! Point
+        
+        
+        createTask {
+            let location = Geometry.fromFlutter(data: arguments["location"] as! Dictionary<String, Any>) as! Point
+        }
+        
         let callback = result
-
+        
         if let params = arguments["parameters"] as? Dictionary<String, Any> {
-            let reverseGeocodeParameters = AGSReverseGeocodeParameters(data: params)
+            let reverseGeocodeParameters = ReverseGeocodeParameters(data: params)
             nativeObject.reverseGeocode(withLocation: location, parameters: reverseGeocodeParameters) { (results, error) in
                 if let error = error {
                     callback(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))
@@ -209,7 +139,7 @@ class LocatorTaskNativeObject: BaseNativeObject<LocatorTask> {
             }
         }
     }
-
+    
     private func suggest(arguments: Dictionary<String, Any>, result: @escaping FlutterResult) {
         let searchTerm = arguments["searchText"] as! String
         let callback = result
@@ -250,7 +180,7 @@ class LocatorTaskNativeObject: BaseNativeObject<LocatorTask> {
             }
         }
     }
-
+    
     private func releaseSuggestResults(arguments: Any?) {
         if arguments == nil {
             suggestResultMap.removeAll()

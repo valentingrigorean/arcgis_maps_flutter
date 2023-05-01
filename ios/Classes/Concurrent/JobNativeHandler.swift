@@ -28,14 +28,14 @@ class JobNativeHandler<T: Job & JobProtocol > : BaseNativeHandler<T> {
                     let output = try await self.nativeHandler.result.get()
                     result(nil)
                 } catch {
-                    result(error.toFlutterJson())
+                    result(error.toJSONFlutter())
                 }
             }
             return true
         case "job#getMessages":
             createTask {
                 let messages = await self.getCurrentMessages()
-                result(messages.map({ $0.toFlutterJson() }))
+                result(messages.map({ $0.toJSONFlutter() }))
             }
             return true
         case "job#serverJobId":

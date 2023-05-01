@@ -5,32 +5,36 @@
 import Foundation
 import ArcGIS
 
-extension AGSGeocodeParameters{
+extension GeocodeParameters{
     convenience init(data:Dictionary<String,Any>){
         self.init()
         if let resultAttributeNames = data["resultAttributeNames"] as? [String]{
-            self.resultAttributeNames = resultAttributeNames
+            for attr in resultAttributeNames{
+                addResultAttributeName(attr)
+            }
         }
         if let categories = data["categories"] as? [String]{
-            self.categories = categories
+            for categorie in categories{
+                addCategory(categorie)
+            }
         }
         if let countryCode = data["countryCode"] as? String{
             self.countryCode = countryCode
         }
-        forStorage = data["forStorage"] as! Bool
+        isForStorage = data["forStorage"] as! Bool
         maxResults = data["maxResults"] as! Int
         minScore = data["minScore"] as! Double
         if let outputLanguageCode = data["outputLanguageCode"] as? String{
             self.outputLanguageCode = outputLanguageCode
         }
         if let outputSpatialReference = data["outputSpatialReference"] as? [String:Any]{
-            self.outputSpatialReference = AGSSpatialReference(data: outputSpatialReference)
+            self.outputSpatialReference = SpatialReference(data: outputSpatialReference)
         }
         if let preferredSearchLocation = data["preferredSearchLocation"] as? [String:Any]{
             self.preferredSearchLocation = Point(data: preferredSearchLocation)
         }
         if let searchArea = data["searchArea"] as? [String:Any]{
-            self.searchArea = AGSGeometry.fromFlutter(data: searchArea)
+            self.searchArea = Geometry.fromFlutter(data: searchArea)
         }
     }
 }

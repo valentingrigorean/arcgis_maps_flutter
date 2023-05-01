@@ -5,12 +5,12 @@
 import Foundation
 import ArcGIS
 
-extension AGSGeocodeResult {
+extension GeocodeResult {
     func toJSONFlutter() -> Any {
         var data = [String: Any]()
-        if let attributes = attributes {
-            data["attributes"] = attributes.toFlutterTypes()
-        }
+        
+        data["attributes"] = attributes.toFlutterTypes()
+        
         if let displayLocation = displayLocation {
             data["displayLocation"] = displayLocation.toJSONFlutter()
         }
