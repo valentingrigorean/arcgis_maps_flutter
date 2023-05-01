@@ -153,7 +153,6 @@ const List<MapTypeOptions> _supportedMapsTypes = [
 final LocatorTask _geodataLocator = LocatorTask(
   url:
   'https://services.geodataonline.no/arcgis/rest/services/Geosok/GeosokLokasjon2/GeocodeServer',
-  credential: geodataCredentials,
 );
 
 final LocatorTask _esriLocator = LocatorTask(

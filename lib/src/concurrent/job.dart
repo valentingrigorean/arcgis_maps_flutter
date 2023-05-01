@@ -158,7 +158,7 @@ abstract class Job extends ArcgisNativeObject with RemoteResource {
     }
     return ArcgisError.fromJson(result);
   }
-  
+
   /// Informational messages produced during execution of the job.
   Future<List<JobMessage>> get messages async {
     final result = await invokeMethod('job#getMessages');

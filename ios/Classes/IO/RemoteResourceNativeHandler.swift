@@ -5,9 +5,9 @@
 import Foundation
 import ArcGIS
 
-class RemoteResourceNativeHandler: BaseNativeHandler<AGSRemoteResource> {
+class RemoteResourceNativeHandler: BaseNativeHandler<RemoteResource> {
 
-    init(remoteResource: AGSRemoteResource) {
+    init(remoteResource: RemoteResource) {
         super.init(nativeHandler: remoteResource)
     }
 

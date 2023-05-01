@@ -5,8 +5,8 @@
 import Foundation
 import ArcGIS
 
-extension AGSGeometry {
-    static func fromFlutter(data: Dictionary<String, Any>) -> AGSGeometry? {
+extension Geometry {
+    static func fromFlutter(data: Dictionary<String, Any>) -> Geometry? {
         let geometryType = AGSGeometryType(rawValue: data["type"] as! Int)!
         switch (geometryType) {
         case .point:

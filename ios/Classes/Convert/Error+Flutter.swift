@@ -19,7 +19,7 @@ extension Error {
         
         if withStackTrace {
             dict["nativeStackTrace"] = Thread.callStackSymbols.joined(separator: "\n")
-        }        
+        }
         
         return dict
     }

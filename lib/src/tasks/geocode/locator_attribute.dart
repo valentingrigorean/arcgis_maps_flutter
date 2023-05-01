@@ -1,12 +1,6 @@
 part of arcgis_maps_flutter;
 
-enum LocatorAttributeType {
-  integer,
-  double,
-  string,
-  boolean,
-  unknown,
-}
+
 
 @immutable
 class LocatorAttribute {
@@ -14,7 +8,6 @@ class LocatorAttribute {
     required this.name,
     required this.displayName,
     required this.required,
-    this.type = LocatorAttributeType.unknown,
   });
 
   static LocatorAttribute fromJson(Map<dynamic, dynamic> json) {
@@ -22,9 +15,6 @@ class LocatorAttribute {
       name: json['name'] as String,
       displayName: json['displayName'] as String,
       required: json['required'] as bool,
-      type: json.containsKey('type')
-          ? LocatorAttributeType.values[json['type'] as int]
-          : LocatorAttributeType.unknown,
     );
   }
 
@@ -37,10 +27,8 @@ class LocatorAttribute {
   /// Whether the attribute is mandatory to be specified as input.
   final bool required;
 
-  final LocatorAttributeType type;
-
   @override
   String toString() {
-    return 'LocatorAttribute{name: $name, displayName: $displayName, required: $required, type: $type}';
+    return 'LocatorAttribute{name: $name, displayName: $displayName, required: $required}';
   }
 }

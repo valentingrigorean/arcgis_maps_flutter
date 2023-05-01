@@ -1,17 +1,11 @@
 part of arcgis_maps_flutter;
 
-class LocatorTask extends ArcgisNativeObject
-    with Loadable, RemoteResource, ApiKeyResource {
+class LocatorTask extends ArcgisNativeObject with Loadable, ApiKeyResource {
   final String _url;
 
   LocatorTask({
     required String url,
-    Credential? credential,
-  }) : _url = url {
-    if (credential != null) {
-      setCredential(credential);
-    }
-  }
+  }) : _url = url;
 
   @override
   String get type => 'LocatorTask';

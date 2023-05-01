@@ -1,32 +1,35 @@
 package com.valentingrigorean.arcgis_maps_flutter.flutterobject
 
 import io.flutter.plugin.common.MethodChannel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 
 abstract class BaseNativeObject<T> protected constructor(
-    override val objectId: String,
+    final override val objectId: String,
     val nativeObject: T,
     private val nativeHandlers: Array<NativeHandler>
 ) : NativeObject, NativeMessageSink {
-    private var nativeObjectMessageSink: NativeObjectMessageSink? = null
-    private var messageSink: NativeMessageSink? = null
+    private val messageSinkImpl = NativeObjectMessageSinkImpl(objectId)
     private var isDisposed = false
+    private val coroutineJob = Job()
+    protected val scope = CoroutineScope(Dispatchers.Main + coroutineJob)
 
     init {
         for (nativeHandler in nativeHandlers) {
-            nativeHandler.setMessageSink(this)
+            nativeHandler.setMessageSink(messageSinkImpl)
         }
     }
 
     override fun send(method: String, args: Any?) {
-        if (messageSink == null || isDisposed) {
+        if (isDisposed) {
             return
         }
-        nativeObjectMessageSink!!.send(method, args)
+        messageSinkImpl.send(method, args)
     }
 
     override fun setMessageSink(messageSink: NativeMessageSink?) {
-        this.messageSink = messageSink
-        nativeObjectMessageSink = messageSink?.let { NativeObjectMessageSink(objectId, it) }
+        messageSinkImpl.setMessageSink(messageSink)
     }
 
     override fun dispose() {
@@ -34,7 +37,7 @@ abstract class BaseNativeObject<T> protected constructor(
             return
         }
         isDisposed = true
-        disposeInternal()
+        coroutineJob.cancel()
         for (nativeHandler in nativeHandlers) {
             nativeHandler.setMessageSink(null)
             nativeHandler.dispose()
@@ -50,11 +53,33 @@ abstract class BaseNativeObject<T> protected constructor(
         result.notImplemented()
     }
 
-    protected open fun disposeInternal() {}
-    protected fun getMessageSink(): NativeMessageSink? {
-        return messageSink
+    protected fun getMessageSink(): NativeMessageSink {
+        return messageSinkImpl
     }
 
     protected val nativeObjectStorage: NativeObjectStorage
-        protected get() = NativeObjectStorage.instance
+        get() = NativeObjectStorage.instance
+}
+
+private class NativeObjectMessageSinkImpl(
+    private val objectId: String,
+    private var messageSink: NativeMessageSink? = null,
+) : NativeMessageSink {
+
+    private val data = HashMap<String, Any?>(3)
+
+    override fun send(method: String, args: Any?) {
+       if(messageSink == null){
+           return
+       }
+        data.clear()
+        data["objectId"] = objectId
+        data["method"] = method
+        data["arguments"] = args
+        messageSink!!.send("messageNativeObject", data)
+    }
+
+    fun setMessageSink(messageSink: NativeMessageSink?) {
+        this.messageSink = messageSink
+    }
 }

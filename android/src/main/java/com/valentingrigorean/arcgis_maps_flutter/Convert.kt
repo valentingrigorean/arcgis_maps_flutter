@@ -10,6 +10,8 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.util.TypedValue
 import com.arcgismaps.BuildConfig
+import com.arcgismaps.geometry.GeometryType
+import com.arcgismaps.geometry.SpatialReference
 import com.esri.arcgisruntime.ArcGISRuntimeException
 import com.esri.arcgisruntime.UnitSystem
 import com.esri.arcgisruntime.arcgisservices.LevelOfDetail
@@ -240,68 +242,7 @@ open class Convert {
             return null
         }
 
-        fun toGeometryType(o: Any?): GeometryType {
-            return when (toInt(o)) {
-                1 -> GeometryType.POINT
-                2 -> GeometryType.ENVELOPE
-                3 -> GeometryType.POLYLINE
-                4 -> GeometryType.POLYGON
-                5 -> GeometryType.MULTIPOINT
-                else -> GeometryType.UNKNOWN
-            }
-        }
 
-        fun GeometryTypeToJson(geometryType: GeometryType?): Int {
-            return when (geometryType) {
-                GeometryType.POINT -> 1
-                GeometryType.ENVELOPE -> 2
-                GeometryType.POLYLINE -> 3
-                GeometryType.POLYGON -> 4
-                GeometryType.MULTIPOINT -> 5
-                GeometryType.UNKNOWN -> -1
-                else -> -1
-            }
-        }
-
-        fun toGeometry(o: Any?): Geometry? {
-            val data = toMap(
-                o!!
-            )
-            val geometryType = toGeometryType(
-                data["type"]
-            )
-            return when (geometryType) {
-                GeometryType.POINT -> toPoint(data)
-                GeometryType.UNKNOWN -> null
-                GeometryType.ENVELOPE -> toEnvelope(data)
-                GeometryType.POLYLINE, GeometryType.POLYGON, GeometryType.MULTIPOINT -> try {
-                    val json = objectMapper.writeValueAsString(data)
-                    Geometry.fromJson(json)
-                } catch (e: Exception) {
-                    Log.e(TAG, "toGeometry: ", e)
-                    throw RuntimeException("Not implemented")
-                }
-            }
-            return null
-        }
-
-        fun geometryToJson(geometry: Geometry?): Any? {
-            if (geometry == null) {
-                return null
-            }
-            val sb = StringBuilder(geometry.toJson())
-            /// account for empty geometries
-            if (sb.length > 2) {
-                val geometryType = ",\"type\":" + GeometryTypeToJson(geometry.geometryType)
-                sb.insert(sb.length - 1, geometryType)
-            }
-            try {
-                return objectMapper.readValue(sb.toString(), TYPE_REFERENCE)
-            } catch (e: JsonProcessingException) {
-                e.printStackTrace()
-            }
-            return null
-        }
 
         fun geoElementToJson(element: GeoElement): Any? {
             val attributes: MutableMap<String, Any> = HashMap(element.attributes.size)
@@ -314,55 +255,6 @@ open class Convert {
             return elementData
         }
 
-        fun toPoint(o: Any?): com.esri.arcgisruntime.geometry.Point {
-            val data = toMap(
-                o!!
-            )
-            val x = toDouble(Objects.requireNonNull(data)["x"])
-            val y = toDouble(data["y"])
-            var z: Double? = null
-            var m: Double? = null
-            if (data.containsKey("z")) z = toDouble(
-                data["z"]
-            )
-            if (data.containsKey("m")) m = toDouble(
-                data["m"]
-            )
-            val spatialReference = toSpatialReference(
-                data["spatialReference"]
-            )
-            if (z != null && m != null && spatialReference != null) {
-                return com.esri.arcgisruntime.geometry.Point.createWithM(
-                    x,
-                    y,
-                    z,
-                    m,
-                    spatialReference
-                )
-            }
-            if (m != null) {
-                if (spatialReference != null) {
-                    return com.esri.arcgisruntime.geometry.Point.createWithM(
-                        x,
-                        y,
-                        m,
-                        spatialReference
-                    )
-                }
-                return if (z != null) {
-                    com.esri.arcgisruntime.geometry.Point.createWithM(x, y, z, m)
-                } else com.esri.arcgisruntime.geometry.Point.createWithM(x, y, m)
-            }
-            if (z == null && spatialReference == null) return com.esri.arcgisruntime.geometry.Point(
-                x,
-                y
-            )
-            return if (spatialReference == null) com.esri.arcgisruntime.geometry.Point(
-                x,
-                y,
-                z!!
-            ) else com.esri.arcgisruntime.geometry.Point(x, y, spatialReference)
-        }
 
         fun toEnvelope(o: Any): Envelope? {
             val data = toMap(o)
@@ -1000,30 +892,6 @@ open class Convert {
             return results
         }
 
-        fun geocodeResultToJson(result: GeocodeResult): Any {
-            val data: MutableMap<String, Any?> = HashMap(6)
-            val attributes: MutableMap<String, Any> = HashMap(result.attributes.size)
-            result.attributes.forEach { (k: String, v: Any?) ->
-                attributes[k] = toFlutterFieldType(v)
-            }
-            data["attributes"] = attributes
-            if (result.displayLocation != null) {
-                data["displayLocation"] = geometryToJson(result.displayLocation)
-            }
-            if (result.extent != null) {
-                data["extent"] = geometryToJson(result.extent)
-            }
-            if (result.inputLocation != null) {
-                data["inputLocation"] = geometryToJson(result.inputLocation)
-            }
-            data["label"] = result.label
-            if (result.routeLocation != null) {
-                data["routeLocation"] = geometryToJson(result.routeLocation)
-            }
-            data["score"] = result.score
-            return data
-        }
-
         fun editResultToJson(editResult: EditResult): Any {
             val data: MutableMap<String, Any?> = HashMap(6)
             data["completedWithErrors"] = editResult.hasCompletedWithErrors()
@@ -1159,27 +1027,6 @@ open class Convert {
             if (allowMagnifierToPan != null) {
                 interactionOptions.setCanMagnifierPanMap(toBoolean(allowMagnifierToPan))
             }
-        }
-
-        fun toSpatialReference(o: Any?): SpatialReference? {
-            if (o == null) {
-                return null
-            }
-            val data = toMap(o)
-            val wkId = data["wkid"]
-            if (wkId != null) {
-                return SpatialReference.create(toInt(wkId))
-            }
-            val wkText = data["wkText"]
-            return if (wkText != null) {
-                SpatialReference.create(wkText as String?)
-            } else null
-        }
-
-        fun spatialReferenceToJson(spatialReference: SpatialReference): Any {
-            val data: MutableMap<String, Any> = HashMap(1)
-            data["wkid"] = spatialReference.wkid
-            return data
         }
 
         private fun toSimpleLineStyle(rawValue: Int): SimpleLineSymbol.Style {
