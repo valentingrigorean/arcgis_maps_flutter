@@ -5,7 +5,7 @@ import com.valentingrigorean.arcgis_maps_flutter.concurrent.JobNativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.io.RemoteResourceNativeHandler
-import com.valentingrigorean.arcgis_maps_flutter.tasks.geodatabase.ConvertGeodatabase
+import com.valentingrigorean.arcgis_maps_flutter.convert.geodatabase.ConvertGeodatabase
 import io.flutter.plugin.common.MethodChannel
 
 class OfflineMapSyncJobNativeObject(objectId: String?, job: OfflineMapSyncJob) :

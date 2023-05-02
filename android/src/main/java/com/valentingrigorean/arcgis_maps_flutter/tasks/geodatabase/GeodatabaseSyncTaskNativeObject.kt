@@ -2,17 +2,16 @@ package com.valentingrigorean.arcgis_maps_flutter.tasks.geodatabase
 
 import com.arcgismaps.tasks.geodatabase.GeodatabaseSyncTask
 import com.esri.arcgisruntime.geometry.Geometry
-import com.esri.arcgisruntime.tasks.geodatabase.GeodatabaseSyncTask
 import com.esri.arcgisruntime.tasks.geodatabase.SyncGeodatabaseJob
 import com.esri.arcgisruntime.tasks.geodatabase.SyncGeodatabaseParameters
 import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.convert.geodatabase.ConvertGeodatabase
 import com.valentingrigorean.arcgis_maps_flutter.data.GeodatabaseNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.io.ApiKeyResourceNativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.io.RemoteResourceNativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.loadable.LoadableNativeHandler
-import com.valentingrigorean.arcgis_maps_flutter.utils.toMap
 import io.flutter.plugin.common.MethodChannel
 import java.util.UUID
 

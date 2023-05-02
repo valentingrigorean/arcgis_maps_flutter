@@ -2,6 +2,7 @@ package com.valentingrigorean.arcgis_maps_flutter.tasks.geodatabase
 
 import com.esri.arcgisruntime.tasks.geodatabase.SyncGeodatabaseJob
 import com.valentingrigorean.arcgis_maps_flutter.concurrent.JobNativeHandler
+import com.valentingrigorean.arcgis_maps_flutter.convert.geodatabase.ConvertGeodatabase
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.io.RemoteResourceNativeHandler

@@ -140,25 +140,7 @@ open class Convert {
             }
         }
 
-        fun toSyncDirection(o: Any?): SyncGeodatabaseParameters.SyncDirection {
-            return when (toInt(o)) {
-                0 -> SyncGeodatabaseParameters.SyncDirection.NONE
-                1 -> SyncGeodatabaseParameters.SyncDirection.DOWNLOAD
-                2 -> SyncGeodatabaseParameters.SyncDirection.UPLOAD
-                3 -> SyncGeodatabaseParameters.SyncDirection.BIDIRECTIONAL
-                else -> throw IllegalStateException("Unexpected value: $o")
-            }
-        }
 
-        fun syncDirectionToJson(syncDirection: SyncGeodatabaseParameters.SyncDirection): Int {
-            return when (syncDirection) {
-                SyncGeodatabaseParameters.SyncDirection.NONE -> 0
-                SyncGeodatabaseParameters.SyncDirection.DOWNLOAD -> 1
-                SyncGeodatabaseParameters.SyncDirection.UPLOAD -> 2
-                SyncGeodatabaseParameters.SyncDirection.BIDIRECTIONAL -> 3
-                else -> throw IllegalStateException("Unexpected value: $syncDirection")
-            }
-        }
 
         fun toSpatialRelationship(o: Any): QueryParameters.SpatialRelationship {
             return when (toInt(o)) {

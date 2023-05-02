@@ -11,7 +11,7 @@ class GenerateGeodatabaseJobNativeObject(
     messageSink: NativeMessageSink
 ) : BaseNativeObject<GenerateGeodatabaseJob>(
     objectId, job, arrayOf(
-        JobNativeHandler(job, JobNativeHandler.JobType.GENERATE_GEODATABASE)
+        JobNativeHandler(job)
     )
 ) {
     init {

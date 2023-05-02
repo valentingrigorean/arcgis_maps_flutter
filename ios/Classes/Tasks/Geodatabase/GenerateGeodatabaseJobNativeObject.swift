@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-class GenerateGeodatabaseJobNativeObject: BaseNativeObject<AGSGenerateGeodatabaseJob> {
+class GenerateGeodatabaseJobNativeObject: BaseNativeObject<GenerateGeodatabaseJob> {
     init(objectId: String, job: AGSGenerateGeodatabaseJob, messageSink: NativeMessageSink) {
         super.init(objectId: objectId, nativeObject: job, nativeHandlers: [
             JobNativeHandler(job: job),

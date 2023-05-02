@@ -1,5 +1,8 @@
-package com.valentingrigorean.arcgis_maps_flutter.tasks.geodatabase
+package com.valentingrigorean.arcgis_maps_flutter.convert.geodatabase
 
+import com.arcgismaps.tasks.geodatabase.GenerateLayerOption
+import com.arcgismaps.tasks.geodatabase.SyncLayerOption
+import com.arcgismaps.tasks.geodatabase.SyncLayerResult
 import com.esri.arcgisruntime.data.SyncModel
 import com.esri.arcgisruntime.tasks.geodatabase.GenerateGeodatabaseParameters
 import com.esri.arcgisruntime.tasks.geodatabase.GenerateLayerOption
@@ -9,34 +12,8 @@ import com.esri.arcgisruntime.tasks.geodatabase.SyncLayerOption
 import com.esri.arcgisruntime.tasks.geodatabase.SyncLayerResult
 import com.esri.arcgisruntime.tasks.geodatabase.UtilityNetworkSyncMode
 import com.valentingrigorean.arcgis_maps_flutter.Convert
-import com.valentingrigorean.arcgis_maps_flutter.utils.toMap
 
 object ConvertGeodatabase : Convert() {
-    fun geodatabaseDeltaInfoToJson(geodatabaseDeltaInfo: GeodatabaseDeltaInfo): Any {
-        val data = HashMap<String, Any>(4)
-        if (geodatabaseDeltaInfo.downloadDeltaPath != null) {
-            data["downloadDeltaFileUrl"] = geodatabaseDeltaInfo.downloadDeltaPath
-        }
-        data["featureServiceUrl"] = geodatabaseDeltaInfo.featureServiceUrl
-        data["geodatabaseFileUrl"] = geodatabaseDeltaInfo.geodatabasePath
-        if (geodatabaseDeltaInfo.uploadDeltaPath != null) {
-            data["uploadDeltaFileUrl"] = geodatabaseDeltaInfo.uploadDeltaPath
-        }
-        return data
-    }
-
-    fun syncGeodatabaseParametersToJson(syncGeodatabaseParameters: SyncGeodatabaseParameters): Any {
-        val data = HashMap<String, Any>(4)
-        data["keepGeodatabaseDeltas"] = syncGeodatabaseParameters.isKeepGeodatabaseDeltas
-        data["geodatabaseSyncDirection"] =
-            Convert.Companion.syncDirectionToJson(
-                syncGeodatabaseParameters.syncDirection
-            )
-        data["layerOptions"] =
-            syncLayerOptionsToJson(syncGeodatabaseParameters.layerOptions)
-        data["rollbackOnFailure"] = syncGeodatabaseParameters.isRollbackOnFailure
-        return data
-    }
 
     fun toSyncGeodatabaseParameters(o: Any?): SyncGeodatabaseParameters {
         val data: Map<*, *> = Convert.Companion.toMap(
@@ -144,24 +121,6 @@ object ConvertGeodatabase : Convert() {
         return data
     }
 
-    private fun syncLayerOptionToJson(syncLayerOption: SyncLayerOption): Any {
-        val data = HashMap<String, Any>(2)
-        data["layerId"] = syncLayerOption.layerId
-        data["syncDirection"] =
-            Convert.Companion.syncDirectionToJson(syncLayerOption.syncDirection)
-        return data
-    }
-
-    private fun toSyncLayerOption(json: Any): SyncLayerOption {
-        val data: Map<*, *> = Convert.Companion.toMap(json)
-        val layerId = data["layerId"]
-        val syncDirection = data["syncDirection"]
-        return SyncLayerOption(
-            Convert.Companion.toInt(layerId).toLong(),
-            Convert.Companion.toSyncDirection(syncDirection)
-        )
-    }
-
     private fun syncLayerResultToJson(syncResult: SyncLayerResult): Any {
         val json = HashMap<String, Any>(3)
         val editsResults = ArrayList<Any>(syncResult.editResults.size)
@@ -182,40 +141,5 @@ object ConvertGeodatabase : Convert() {
         json["useGeometry"] = layerOption.isUseGeometry
         json["whereClause"] = layerOption.whereClause
         return json
-    }
-
-    private fun toGenerateLayerOption(json: Any): GenerateLayerOption {
-        val data: Map<*, *> = Convert.Companion.toMap(json)
-        val layerOption = GenerateLayerOption()
-        layerOption.layerId = Convert.Companion.toLong(
-            data["layerId"]
-        )
-        layerOption.isIncludeRelated = Convert.Companion.toBoolean(
-            data["includeRelated"]!!
-        )
-        layerOption.queryOption = GenerateLayerOption.QueryOption.values()[Convert.Companion.toInt(
-            data["queryOption"]
-        )]
-        layerOption.isUseGeometry = Convert.Companion.toBoolean(
-            data["useGeometry"]!!
-        )
-        layerOption.whereClause = data["whereClause"] as String?
-        return layerOption
-    }
-
-    private fun attachmentSyncDirectionToJson(direction: GenerateGeodatabaseParameters.AttachmentSyncDirection): Int {
-        return when (direction) {
-            GenerateGeodatabaseParameters.AttachmentSyncDirection.UPLOAD -> 1
-            GenerateGeodatabaseParameters.AttachmentSyncDirection.BIDIRECTIONAL -> 2
-            else -> 0
-        }
-    }
-
-    private fun toAttachmentSyncDirection(direction: Any?): GenerateGeodatabaseParameters.AttachmentSyncDirection {
-        return when (Convert.Companion.toInt(direction)) {
-            1 -> GenerateGeodatabaseParameters.AttachmentSyncDirection.UPLOAD
-            2 -> GenerateGeodatabaseParameters.AttachmentSyncDirection.BIDIRECTIONAL
-            else -> GenerateGeodatabaseParameters.AttachmentSyncDirection.NONE
-        }
     }
 }
