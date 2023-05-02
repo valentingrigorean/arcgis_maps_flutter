@@ -12,14 +12,14 @@ class SyncLayerResult {
       editResults: (json['editResults'] as List<dynamic>)
           .map((e) => EditResult.fromJson(e as Map<dynamic, dynamic>))
           .toList(),
-      layerId: json['layerId'] as int,
+      layerId: json['layerId'] as int?,
       tableName: json['tableName'] as String,
     );
   }
 
   final List<EditResult> editResults;
 
-  final int layerId;
+  final int? layerId;
 
   final String tableName;
 

@@ -1,25 +1,27 @@
 package com.valentingrigorean.arcgis_maps_flutter.tasks.geodatabase
 
 import com.arcgismaps.tasks.geodatabase.GeodatabaseSyncTask
-import com.esri.arcgisruntime.geometry.Geometry
-import com.esri.arcgisruntime.tasks.geodatabase.SyncGeodatabaseJob
-import com.esri.arcgisruntime.tasks.geodatabase.SyncGeodatabaseParameters
+import com.arcgismaps.tasks.geodatabase.SyncGeodatabaseJob
 import com.valentingrigorean.arcgis_maps_flutter.Convert
-import com.valentingrigorean.arcgis_maps_flutter.convert.geodatabase.ConvertGeodatabase
+import com.valentingrigorean.arcgis_maps_flutter.convert.geodatabase.toFlutterJson
+import com.valentingrigorean.arcgis_maps_flutter.convert.geodatabase.toGenerateGeodatabaseParametersOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.geodatabase.toSyncDirection
+import com.valentingrigorean.arcgis_maps_flutter.convert.geodatabase.toSyncGeodatabaseParametersOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.data.GeodatabaseNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.io.ApiKeyResourceNativeHandler
-import com.valentingrigorean.arcgis_maps_flutter.io.RemoteResourceNativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.loadable.LoadableNativeHandler
 import io.flutter.plugin.common.MethodChannel
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class GeodatabaseSyncTaskNativeObject(objectId: String, task: GeodatabaseSyncTask) :
-    BaseNativeObject<GeodatabaseSyncTask?>(
+    BaseNativeObject<GeodatabaseSyncTask>(
         objectId, task, arrayOf<NativeHandler>(
             LoadableNativeHandler(task),
-            RemoteResourceNativeHandler(task),
             ApiKeyResourceNativeHandler(task)
         )
     ) {
@@ -44,98 +46,84 @@ class GeodatabaseSyncTaskNativeObject(objectId: String, task: GeodatabaseSyncTas
     }
 
     private fun defaultGenerateGeodatabaseParameters(args: Any?, result: MethodChannel.Result) {
-        val areaOfInterest: Geometry = Convert.Companion.toGeometry(args)
-        val future = nativeObject.createDefaultGenerateGeodatabaseParametersAsync(areaOfInterest)
-        future.addDoneListener {
-            try {
-                result.success(ConvertGeodatabase.generateGeodatabaseParametersToJson(future.get()))
-            } catch (e: Exception) {
-                result.error("defaultGenerateGeodatabaseParameters", e.message, null)
+        scope.launch {
+            val areaOfInterest = args!!.toGeometryOrNull()!!
+            nativeObject.createDefaultGenerateGeodatabaseParameters(areaOfInterest).onSuccess {
+                result.success(it.toFlutterJson())
+            }.onFailure {
+                result.success(it.toFlutterJson())
             }
         }
     }
 
     private fun importDelta(args: Any?, result: MethodChannel.Result) {
-        val data: Map<*, *> = Convert.Companion.toMap(
-            args!!
-        )
-        val deltaFilePath = data["deltaFilePath"] as String?
-        val geodatabaseId = data["geodatabase"] as String?
-        val geodatabase =
-            nativeObjectStorage.getNativeObject(geodatabaseId) as GeodatabaseNativeObject
-        val future = GeodatabaseSyncTask.importDeltaAsync(geodatabase.nativeObject, deltaFilePath)
-        future.addDoneListener {
-            try {
-                result.success(ConvertGeodatabase.syncLayerResultsToJson(future.get()))
-            } catch (e: Exception) {
-                result.success(null)
-            }
+        scope.launch {
+            val data = args as Map<*, *>
+            val deltaFilePath = data["deltaFilePath"] as String
+            val geodatabaseId = data["geodatabase"] as String
+            val geodatabase =
+                nativeObjectStorage.getNativeObject<GeodatabaseNativeObject>(geodatabaseId)
+            GeodatabaseSyncTask.importDelta(geodatabase.nativeObject, deltaFilePath)
+                .onSuccess { results ->
+                    result.success(results.map { it.toFlutterJson() })
+                }.onFailure {
+                    result.success(it.toFlutterJson())
+                }
         }
     }
 
     private fun generateJob(args: Any?, result: MethodChannel.Result) {
-        val data: Map<*, *> = Convert.Companion.toMap(
-            args!!
-        )
-        val parameters = ConvertGeodatabase.toGenerateGeodatabaseParameters(data["parameters"])
-        val fileNameWithPath = data["fileNameWithPath"] as String?
-        val job = nativeObject.generateGeodatabase(parameters, fileNameWithPath)
+        val data = args as Map<*, *>
+        val parameters = data["parameters"]?.toGenerateGeodatabaseParametersOrNull()!!
+        val fileNameWithPath = data["fileNameWithPath"] as String
+        val job = nativeObject.createGenerateGeodatabaseJob(parameters, fileNameWithPath)
         val jobId = UUID.randomUUID().toString()
-        val jobNativeObject = GenerateGeodatabaseJobNativeObject(jobId, job, messageSink)
+        val jobNativeObject = GenerateGeodatabaseJobNativeObject(jobId, job, getMessageSink())
         nativeObjectStorage.addNativeObject(jobNativeObject)
         result.success(jobId)
     }
 
     private fun defaultSyncGeodatabaseParameters(args: Any?, result: MethodChannel.Result) {
-        val geodatabaseId = (args as String?)!!
-        val geodatabase =
-            nativeObjectStorage.getNativeObject(geodatabaseId) as GeodatabaseNativeObject
-        val future =
-            nativeObject.createDefaultSyncGeodatabaseParametersAsync(geodatabase.nativeObject)
-        future.addDoneListener {
-            try {
-                result.success(ConvertGeodatabase.syncGeodatabaseParametersToJson(future.get()))
-            } catch (e: Exception) {
-                result.success(Convert.Companion.exceptionToJson(e))
-            }
+        scope.launch {
+            val geodatabaseId = args as String
+            val geodatabase =
+                nativeObjectStorage.getNativeObject<GeodatabaseNativeObject>(geodatabaseId)
+
+            nativeObject.createDefaultSyncGeodatabaseParameters(geodatabase.nativeObject)
+                .onSuccess {
+                    result.success(it.toFlutterJson())
+                }.onFailure {
+                    result.success(it.toFlutterJson())
+                }
         }
     }
 
     private fun syncJob(args: Any?, result: MethodChannel.Result) {
-        val data: Map<*, *> = Convert.Companion.toMap(
-            args!!
-        )
-        val parameters = ConvertGeodatabase.toSyncGeodatabaseParameters(data["parameters"])
-        val geodatabaseId = data["geodatabase"] as String?
+        val data = args as Map<*, *>
+        val parameters = data["parameters"]?.toSyncGeodatabaseParametersOrNull()!!
+        val geodatabaseId = data["geodatabase"] as String
         val geodatabase =
-            nativeObjectStorage.getNativeObject(geodatabaseId) as GeodatabaseNativeObject
-        val job = nativeObject.syncGeodatabase(parameters, geodatabase.nativeObject)
+            nativeObjectStorage.getNativeObject<GeodatabaseNativeObject>(geodatabaseId)
+        val job = nativeObject.createSyncGeodatabaseJob(parameters, geodatabase.nativeObject)
         createSyncJob(job, result)
     }
 
     private fun syncJobWithSyncDirection(args: Any?, result: MethodChannel.Result) {
-        val data: Map<*, *> = Convert.Companion.toMap(
-            args!!
-        )
-        val syncDirection: SyncGeodatabaseParameters.SyncDirection =
-            Convert.Companion.toSyncDirection(
-                data["syncDirection"]
-            )
-        val rollbackOnFailure: Boolean = Convert.Companion.toBoolean(
-            data["rollbackOnFailure"]!!
-        )
-        val geodatabaseId = data["geodatabase"] as String?
+        val data = args as Map<*, *>
+        val syncDirection = (data["syncDirection"] as Int).toSyncDirection()
+        val rollbackOnFailure = data["rollbackOnFailure"] as Boolean
+        val geodatabaseId = data["geodatabase"] as String
         val geodatabase =
-            nativeObjectStorage.getNativeObject(geodatabaseId) as GeodatabaseNativeObject
+            nativeObjectStorage.getNativeObject<GeodatabaseNativeObject>(geodatabaseId)
         val job =
-            nativeObject.syncGeodatabase(syncDirection, rollbackOnFailure, geodatabase.nativeObject)
+            nativeObject.createSyncGeodatabaseJob(syncDirection, rollbackOnFailure, geodatabase.nativeObject)
         createSyncJob(job, result)
     }
 
     private fun createSyncJob(job: SyncGeodatabaseJob, result: MethodChannel.Result) {
         val jobId = UUID.randomUUID().toString()
         val jobNativeObject = SyncGeodatabaseJobNativeObject(jobId, job)
-        jobNativeObject.setMessageSink(messageSink)
+        jobNativeObject.setMessageSink(getMessageSink())
         nativeObjectStorage.addNativeObject(jobNativeObject)
         result.success(jobId)
     }

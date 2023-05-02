@@ -9,7 +9,6 @@ import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.geocode.toReverse
 import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.geocode.toSuggestParametersOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject
-import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.io.ApiKeyResourceNativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.loadable.LoadableNativeHandler
 import io.flutter.plugin.common.MethodChannel
@@ -20,7 +19,7 @@ class LocatorTaskNativeObject(objectId: String, task: LocatorTask) :
     BaseNativeObject<LocatorTask>(
         objectId,
         task,
-        arrayOf<NativeHandler>(
+        arrayOf(
             LoadableNativeHandler(task),
             ApiKeyResourceNativeHandler(task)
         )

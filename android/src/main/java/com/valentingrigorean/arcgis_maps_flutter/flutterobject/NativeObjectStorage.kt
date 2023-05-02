@@ -15,8 +15,8 @@ class NativeObjectStorage private constructor() {
         `object`?.dispose()
     }
 
-    fun getNativeObject(objectId: String): NativeObject? {
-        return nativeObjects[objectId]
+    fun<T : NativeObject> getNativeObject(objectId: String): T {
+        return nativeObjects[objectId] as T
     }
 
     fun clearAll() {

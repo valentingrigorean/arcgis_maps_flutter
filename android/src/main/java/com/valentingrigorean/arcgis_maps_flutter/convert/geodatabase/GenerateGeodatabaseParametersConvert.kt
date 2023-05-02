@@ -1,13 +1,25 @@
 package com.valentingrigorean.arcgis_maps_flutter.convert.geodatabase
 
 import com.arcgismaps.tasks.geodatabase.GenerateGeodatabaseParameters
-import com.arcgismaps.tasks.geodatabase.SyncModel
-import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toSpatialReferenceOrNull
 
 fun GenerateGeodatabaseParameters.toFlutterJson(): Any {
-
+    val data: MutableMap<String, Any> = HashMap(8)
+    data["attachmentSyncDirection"] = attachmentSyncDirection.toFlutterValue()
+    if (extent != null) {
+        data["extent"] = extent!!.toFlutterJson()!!
+    }
+    data["layerOptions"] = layerOptions.map { it.toFlutterJson() }
+    if (outSpatialReference != null) {
+        data["outSpatialReference"] = outSpatialReference!!.toFlutterJson()
+    }
+    data["returnAttachments"] = returnAttachments
+    data["shouldSyncContingentValues"] = syncContingentValues
+    data["syncModel"] = syncModel.toFlutterValue()
+    data["utilityNetworkSyncMode"] = utilityNetworkSyncMode.toFlutterValue()
+    return data
 }
 
 fun Any.toGenerateGeodatabaseParametersOrNull(): GenerateGeodatabaseParameters? {
@@ -24,8 +36,8 @@ fun Any.toGenerateGeodatabaseParametersOrNull(): GenerateGeodatabaseParameters? 
     parameters.outSpatialReference = data["outSpatialReference"]?.toSpatialReferenceOrNull()
     parameters.returnAttachments = data["returnAttachments"] as Boolean
     parameters.syncContingentValues = data["shouldSyncContingentValues"] as Boolean
-    parameters.syncModel = SyncModel.values()[Convert.Companion.toInt(syncModel)]
+    parameters.syncModel = (data["syncModel"] as Int).toSyncModel()
     parameters.utilityNetworkSyncMode =
-        UtilityNetworkSyncMode.values()[Convert.Companion.toInt(utilityNetworkSyncMode)]
+        (data["utilityNetworkSyncMode"] as Int).toUtilityNetworkSyncMode()
     return parameters
 }

@@ -27,7 +27,9 @@ enum UtilityNetworkSyncMode {
   none(0),
 
   /// Utility Network system tables will be synced.
-  syncSystemTables(1);
+  syncSystemTables(1),
+  syncSystemAndTopologyTables(2),
+  ;
 
   const UtilityNetworkSyncMode(this.value);
 

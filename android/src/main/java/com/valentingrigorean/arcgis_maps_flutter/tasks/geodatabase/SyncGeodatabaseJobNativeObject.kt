@@ -1,37 +1,37 @@
 package com.valentingrigorean.arcgis_maps_flutter.tasks.geodatabase
 
-import com.esri.arcgisruntime.tasks.geodatabase.SyncGeodatabaseJob
+import com.arcgismaps.tasks.geodatabase.SyncGeodatabaseJob
 import com.valentingrigorean.arcgis_maps_flutter.concurrent.JobNativeHandler
-import com.valentingrigorean.arcgis_maps_flutter.convert.geodatabase.ConvertGeodatabase
+import com.valentingrigorean.arcgis_maps_flutter.convert.geodatabase.toFlutterJson
+import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject
-import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler
-import com.valentingrigorean.arcgis_maps_flutter.io.RemoteResourceNativeHandler
 import io.flutter.plugin.common.MethodChannel
+import kotlinx.coroutines.launch
 
-class SyncGeodatabaseJobNativeObject(objectId: String?, job: SyncGeodatabaseJob) :
-    BaseNativeObject<SyncGeodatabaseJob?>(
-        objectId, job, arrayOf<NativeHandler>(
-            JobNativeHandler(job, JobNativeHandler.JobType.SYNC_GEO_DATABASE),
-            RemoteResourceNativeHandler(job)
+class SyncGeodatabaseJobNativeObject(objectId: String, job: SyncGeodatabaseJob) :
+    BaseNativeObject<SyncGeodatabaseJob>(
+        objectId, job, arrayOf(
+            JobNativeHandler(job),
         )
     ) {
     override fun onMethodCall(method: String, args: Any?, result: MethodChannel.Result) {
         when (method) {
             "syncGeodatabaseJob#getGeodatabaseDeltaInfo" -> {
-                val deltaInfo = nativeObject.getGeodatabaseDeltaInfo()
+                val deltaInfo = nativeObject.geodatabaseDeltaInfo
                 if (deltaInfo == null) {
                     result.success(null)
                 } else {
-                    result.success(ConvertGeodatabase.geodatabaseDeltaInfoToJson(deltaInfo))
+                    result.success(deltaInfo.toFlutterJson())
                 }
             }
 
             "syncGeodatabaseJob#getResult" -> {
-                val syncResults = nativeObject.getResult()
-                if (syncResults == null) {
-                    result.success(null)
-                } else {
-                    result.success(ConvertGeodatabase.syncLayerResultsToJson(syncResults))
+                scope.launch {
+                    nativeObject.result().onSuccess { results ->
+                        result.success(results.map { it.toFlutterJson() })
+                    }.onFailure {
+                        result.success(it.toFlutterJson())
+                    }
                 }
             }
 
