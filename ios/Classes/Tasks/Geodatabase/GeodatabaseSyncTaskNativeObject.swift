@@ -12,7 +12,7 @@ class GeodatabaseSyncTaskNativeObject: BaseNativeObject<GeodatabaseSyncTask> {
             ApiKeyResourceNativeHandler(apiKeyResource: task)
         ], messageSink: messageSink)
     }
-
+    
     override func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) {
         switch (method) {
         case "geodatabaseSyncTask#defaultGenerateGeodatabaseParameters":
@@ -37,8 +37,7 @@ class GeodatabaseSyncTaskNativeObject: BaseNativeObject<GeodatabaseSyncTask> {
             super.onMethodCall(method: method, arguments: arguments, result: result)
         }
     }
-
-
+    
     private func defaultGenerateGeodatabaseParameters(arguments: Any?, result: @escaping FlutterResult) {
         createTask {
             let areaOfInterest = Geometry.fromFlutter(data: arguments as! [String: Any])!
@@ -50,67 +49,68 @@ class GeodatabaseSyncTaskNativeObject: BaseNativeObject<GeodatabaseSyncTask> {
             }
         }
     }
-
+    
     private func importDelta(arguments: Any?, result: @escaping FlutterResult) {
         createTask {
             let data = arguments as! [String: Any]
             let deltaFilePath = data["deltaFilePath"] as! String
             let geodatabaseId = data["geodatabase"] as! String
-            let geodatabase = storage.getNativeObject(objectId: geodatabaseId) as! GeodatabaseNativeObject
+            let geodatabase = self.storage.getNativeObject(objectId: geodatabaseId) as! GeodatabaseNativeObject
             do{
-                let layers = try await GeodatabaseSyncTask.importDelta(from: URL(filePath: deltaFilePath), into: geodatabase)
+                let layers = try await GeodatabaseSyncTask.importDelta(from:URL(fileURLWithPath: deltaFilePath), into: geodatabase.nativeObject)
                 result(layers.map{ $0.toJSONFlutter() })
             }catch{
                 result(error.toJSONFlutter())
             }
         }
     }
-
+    
     private func generateJob(arguments: Any?, result: @escaping FlutterResult) {
         let data = arguments as! [String: Any]
-        let parameters = AGSGenerateGeodatabaseParameters(data: data["parameters"] as! [String: Any])
+        let parameters = GenerateGeodatabaseParameters(data: data["parameters"] as! [String: Any])
         let fileNameWithPath = data["fileNameWithPath"] as! String
-        let job = nativeObject.generateJob(with: parameters, downloadFileURL: URL(string: fileNameWithPath)!)
+        let job = nativeObject.makeGenerateGeodatabaseJob(parameters: parameters, downloadFileURL: URL(fileURLWithPath: fileNameWithPath))
         let jobId = NSUUID().uuidString
         let jobNativeObject = GenerateGeodatabaseJobNativeObject(objectId: jobId, job: job, messageSink: messageSink)
         storage.addNativeObject(object: jobNativeObject)
         result(jobId)
     }
-
+    
     private func defaultSyncGeodatabaseParameters(arguments: Any?, result: @escaping FlutterResult) {
-        let geodatabaseId = arguments as! String
-
-        let geodatabase = storage.getNativeObject(objectId: geodatabaseId) as! GeodatabaseNativeObject;
-
-        nativeObject.defaultSyncGeodatabaseParameters(with: geodatabase.nativeObject) { parameters, error in
-            if let params = parameters {
-                result(params.toJSONFlutter())
-            } else {
-                result(error?.toJSON())
+        createTask {
+            let geodatabaseId = arguments as! String
+            
+            let geodatabase = self.storage.getNativeObject(objectId: geodatabaseId) as! GeodatabaseNativeObject;
+            
+            do{
+                let parameters = try await self.nativeObject.makeDefaultSyncGeodatabaseParameters(geodatabase: geodatabase.nativeObject)
+                result(parameters.toJSONFlutter())
+            }catch{
+                result(error.toJSONFlutter())
             }
         }
     }
-
+    
     private func syncJob(arguments: Any?, result: @escaping FlutterResult) {
         let data = arguments as! [String: Any]
-        let parameters = AGSSyncGeodatabaseParameters(data: data["parameters"] as! [String: Any])
+        let parameters = SyncGeodatabaseParameters(data: data["parameters"] as! [String: Any])
         let geodatabaseId = data["geodatabase"] as! String
         let geodatabase = storage.getNativeObject(objectId: geodatabaseId) as! GeodatabaseNativeObject
-        let job = nativeObject.syncJob(with: parameters, geodatabase: geodatabase.nativeObject)
+        let job = nativeObject.makeSyncGeodatabaseJob(parameters: parameters, geodatabase: geodatabase.nativeObject)
         createSyncJob(job: job, result: result)
     }
-
+    
     private func syncJobWithSyncDirection(arguments: Any?, result: @escaping FlutterResult) {
         let data = arguments as! [String: Any]
-        let syncDirection = AGSSyncDirection(rawValue: data["syncDirection"] as! Int)!
+        let syncDirection = SyncDirection.fromFlutter(flutterValue: data["syncDirection"] as! Int)
         let rollbackOnFailure = data["rollbackOnFailure"] as! Bool
         let geodatabaseId = data["geodatabase"] as! String
         let geodatabase = storage.getNativeObject(objectId: geodatabaseId) as! GeodatabaseNativeObject
-        let job = nativeObject.syncJob(with: syncDirection, rollbackOnFailure: rollbackOnFailure, geodatabase: geodatabase.nativeObject)
+        let job = nativeObject.makeSyncGeodatabaseJob(syncDirection: syncDirection, rollbackOnFailure: rollbackOnFailure, geodatabase: geodatabase.nativeObject)
         createSyncJob(job: job, result: result)
     }
-
-    private func createSyncJob(job: AGSSyncGeodatabaseJob, result: @escaping FlutterResult) {
+    
+    private func createSyncJob(job: SyncGeodatabaseJob, result: @escaping FlutterResult) {
         let jobId = NSUUID().uuidString
         let jobNativeObject = SyncGeodatabaseJobNativeObject(objectId: jobId, job: job, messageSink: messageSink)
         storage.addNativeObject(object: jobNativeObject)

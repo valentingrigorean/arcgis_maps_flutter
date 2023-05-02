@@ -5,9 +5,9 @@
 import Foundation
 import ArcGIS
 
-class GeodatabaseNativeObject: BaseNativeObject<AGSGeodatabase> {
+class GeodatabaseNativeObject: BaseNativeObject<Geodatabase> {
 
-    init(objectId: String, geodatabase: AGSGeodatabase, messageSink: NativeMessageSink) {
+    init(objectId: String, geodatabase: Geodatabase, messageSink: NativeMessageSink) {
         super.init(objectId: objectId, nativeObject: geodatabase, nativeHandlers: [
             LoadableNativeHandler(loadable: geodatabase)
         ], messageSink: messageSink)
