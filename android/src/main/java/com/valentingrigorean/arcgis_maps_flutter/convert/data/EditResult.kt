@@ -3,8 +3,6 @@ package com.valentingrigorean.arcgis_maps_flutter.convert.data
 import com.arcgismaps.data.EditOperation
 import com.arcgismaps.data.EditResult
 import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
-
-
 fun EditOperation.toFlutterValue(): Int {
     return when (this) {
         EditOperation.Add -> 0
@@ -13,7 +11,6 @@ fun EditOperation.toFlutterValue(): Int {
         else -> -1
     }
 }
-
 
 fun EditResult.toFlutterJson(): Any {
     val data = HashMap<String, Any>(6)

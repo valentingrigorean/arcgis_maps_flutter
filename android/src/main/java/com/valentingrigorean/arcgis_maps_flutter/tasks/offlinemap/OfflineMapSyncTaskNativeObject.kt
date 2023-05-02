@@ -9,7 +9,6 @@ import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeMessageSink
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeObject
-import com.valentingrigorean.arcgis_maps_flutter.io.RemoteResourceNativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.loadable.LoadableNativeHandler
 import io.flutter.plugin.common.MethodChannel
 import java.util.UUID

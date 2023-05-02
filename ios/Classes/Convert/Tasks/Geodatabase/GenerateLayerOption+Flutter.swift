@@ -5,21 +5,21 @@
 import Foundation
 import ArcGIS
 
-extension AGSGenerateLayerOption {
+extension GenerateLayerOption {
     convenience init(data: Dictionary<String, Any>) {
         self.init(layerID: data["layerId"] as! Int)
-        includeRelated = data["includeRelated"] as! Bool
-        queryOption = AGSGenerateLayerQueryOption(rawValue: data["queryOption"] as! Int)!
-        useGeometry = data["useGeometry"] as! Bool
+        includesRelated = data["includeRelated"] as! Bool
+        queryOption = GenerateLayerOption.QueryOption.fromFlutter(flutterValue: data["queryOption"] as! Int)
+        usesGeometry = data["useGeometry"] as! Bool
         whereClause = data["whereClause"] as! String
     }
 
     func toJSONFlutter() -> Any {
         var json = [String: Any]()
         json["layerId"] = layerID
-        json["includeRelated"] = includeRelated
-        json["queryOption"] = queryOption.rawValue
-        json["useGeometry"] = useGeometry
+        json["includeRelated"] = includesRelated
+        json["queryOption"] = queryOption.toFlutterValue()
+        json["useGeometry"] = usesGeometry
         json["whereClause"] = whereClause
         return json
     }

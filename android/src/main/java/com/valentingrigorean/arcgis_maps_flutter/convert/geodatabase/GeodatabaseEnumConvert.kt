@@ -1,8 +1,6 @@
 package com.valentingrigorean.arcgis_maps_flutter.convert.geodatabase
 
-import com.arcgismaps.data.EditResult
 import com.arcgismaps.tasks.geodatabase.AttachmentSyncDirection
-import com.arcgismaps.tasks.geodatabase.GenerateGeodatabaseParameters
 import com.arcgismaps.tasks.geodatabase.GenerateLayerQueryOption
 import com.arcgismaps.tasks.geodatabase.SyncDirection
 import com.arcgismaps.tasks.geodatabase.SyncModel

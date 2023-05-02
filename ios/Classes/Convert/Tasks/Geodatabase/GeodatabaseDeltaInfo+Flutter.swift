@@ -5,16 +5,16 @@
 import Foundation
 import ArcGIS
 
-extension AGSGeodatabaseDeltaInfo {
+extension GeodatabaseDeltaInfo {
     func toJSONFlutter() -> Any {
         var json = [String: Any]()
 
-        if let downloadDeltaFileUrl = downloadDeltaFileURL {
+        if let downloadDeltaFileUrl = downloadDeltaURL {
             json["downloadDeltaFileUrl"] = downloadDeltaFileUrl.absoluteString
         }
         json["featureServiceUrl"] = featureServiceURL.absoluteString
-        json["geodatabaseFileUrl"] = geodatabaseFileURL.absoluteString
-        if let uploadDeltaFileUrl = uploadDeltaFileURL {
+        json["geodatabaseFileUrl"] = geodatabaseURL.absoluteString
+        if let uploadDeltaFileUrl = uploadDeltaURL {
             json["uploadDeltaFileUrl"] = uploadDeltaFileUrl.absoluteString
         }
 

@@ -5,11 +5,10 @@
 import Foundation
 import ArcGIS
 
-class GeodatabaseSyncTaskNativeObject: BaseNativeObject<AGSGeodatabaseSyncTask> {
-    init(objectId: String, task: AGSGeodatabaseSyncTask, messageSink: NativeMessageSink) {
+class GeodatabaseSyncTaskNativeObject: BaseNativeObject<GeodatabaseSyncTask> {
+    init(objectId: String, task: GeodatabaseSyncTask, messageSink: NativeMessageSink) {
         super.init(objectId: objectId, nativeObject: task, nativeHandlers: [
             LoadableNativeHandler(loadable: task),
-            RemoteResourceNativeHandler(remoteResource: task),
             ApiKeyResourceNativeHandler(apiKeyResource: task)
         ], messageSink: messageSink)
     }
@@ -41,26 +40,28 @@ class GeodatabaseSyncTaskNativeObject: BaseNativeObject<AGSGeodatabaseSyncTask> 
 
 
     private func defaultGenerateGeodatabaseParameters(arguments: Any?, result: @escaping FlutterResult) {
-        let areaOfInterest = AGSGeometry.fromFlutter(data: arguments as! [String: Any])!
-        nativeObject.defaultGenerateGeodatabaseParameters(withExtent: areaOfInterest) { parameters, error in
-            if let params = parameters {
+        createTask {
+            let areaOfInterest = Geometry.fromFlutter(data: arguments as! [String: Any])!
+            do{
+                let params = try await self.nativeObject.makeDefaultGenerateGeodatabaseParameters(extent: areaOfInterest)
                 result(params.toJSONFlutter())
-            } else {
-                result(error?.toJSON())
+            }catch{
+                result(error.toJSONFlutter())
             }
         }
     }
 
     private func importDelta(arguments: Any?, result: @escaping FlutterResult) {
-        let data = arguments as! [String: Any]
-        let deltaFilePath = data["deltaFilePath"] as! String
-        let geodatabaseId = data["geodatabase"] as! String
-        let geodatabase = storage.getNativeObject(objectId: geodatabaseId) as! GeodatabaseNativeObject
-        nativeObject.importDelta(with: geodatabase.nativeObject, inputPath: deltaFilePath) { layerResults, error  in
-            if let layerRes = layerResults {
-                result(layerRes.map({$0.toJSONFlutter()}))
-            } else {
-                result(nil)
+        createTask {
+            let data = arguments as! [String: Any]
+            let deltaFilePath = data["deltaFilePath"] as! String
+            let geodatabaseId = data["geodatabase"] as! String
+            let geodatabase = storage.getNativeObject(objectId: geodatabaseId) as! GeodatabaseNativeObject
+            do{
+                let layers = try await GeodatabaseSyncTask.importDelta(from: URL(filePath: deltaFilePath), into: geodatabase)
+                result(layers.map{ $0.toJSONFlutter() })
+            }catch{
+                result(error.toJSONFlutter())
             }
         }
     }

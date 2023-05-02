@@ -5,14 +5,18 @@
 import Foundation
 import ArcGIS
 
-extension AGSSyncLayerResult {
+extension SyncLayerResult {
     func toJSONFlutter() -> Any {
-        [
+        var json = [
             "editResults": editResults.map {
                 $0.toJSONFlutterEx()
-            },
-            "layerId": layerID,
+            },            
             "tableName": tableName,
-        ]
+        ] as [String:Any]
+        
+        if let layerID = layerID{
+            json["layerId"] = layerID
+        }
+        return json
     }
 }

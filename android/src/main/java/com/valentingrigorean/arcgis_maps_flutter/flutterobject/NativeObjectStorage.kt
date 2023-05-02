@@ -32,7 +32,7 @@ class NativeObjectStorage private constructor() {
             )
             val objectId = data["nativeObjectId"] as String?
             if (objectId != null) {
-                val nativeObject = instance.getNativeObject(objectId)
+                val nativeObject = instance.getNativeObject<NativeObject>(objectId)
                 if (nativeObject != null) {
                     val baseNativeObject = nativeObject as BaseNativeObject<T>
                     return baseNativeObject.nativeObject
