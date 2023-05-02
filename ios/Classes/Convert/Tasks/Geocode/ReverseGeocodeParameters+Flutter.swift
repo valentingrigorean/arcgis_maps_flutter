@@ -9,16 +9,20 @@ extension ReverseGeocodeParameters{
     convenience init(data:Dictionary<String,Any>){
         self.init()
         if let resultAttributeNames = data["resultAttributeNames"] as? [String]{
-            self.resultAttributeNames = resultAttributeNames
+            for attr in resultAttributeNames{
+                addResultAttributeName(attr)
+            }
         }
         if let featureTypes = data["featureTypes"] as? [String]{
-            self.featureTypes = featureTypes
+            for featureType in featureTypes{
+                addFeatureType(featureType)
+            }
         }
-        forStorage = data["forStorage"] as! Bool
-        maxDistance = data["maxDistance"] as! Double
+        isForStorage = data["forStorage"] as! Bool
+        maxDistance = data["maxDistance"] as? Double
         maxResults = data["maxResults"] as! Int
         if let outputSpatialReference = data["outputSpatialReference"] as? Dictionary<String,Any>{
-            self.outputSpatialReference = AGSSpatialReference(data: outputSpatialReference)
+            self.outputSpatialReference = SpatialReference(data: outputSpatialReference)
         }
         outputLanguageCode = data["outputLanguageCode"] as! String
     }

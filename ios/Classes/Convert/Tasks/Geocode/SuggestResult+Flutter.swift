@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-extension AGSSuggestResult {
+extension SuggestResult {
     func toJSONFlutter(suggestResultId: String) -> Dictionary<String, Any> {
         var result = Dictionary<String, Any>()
         result["label"] = label

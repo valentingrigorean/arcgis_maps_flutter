@@ -13,7 +13,6 @@ extension LocatorInfo {
         data["intersectionResultAttributes"] = intersectionResultAttributes.map {
             $0.toJSONFlutter()
         }
-
        
         data["properties"] = properties
         

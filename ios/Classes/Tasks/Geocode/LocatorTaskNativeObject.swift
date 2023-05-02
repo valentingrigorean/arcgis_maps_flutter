@@ -54,7 +54,7 @@ class LocatorTaskNativeObject: BaseNativeObject<LocatorTask> {
             }
         }
     }
-        
+    
     private func geocode(arguments: Dictionary<String, Any>, result: @escaping FlutterResult) {
         createTask {
             let searchTerm = arguments["searchText"] as! String
@@ -98,85 +98,35 @@ class LocatorTaskNativeObject: BaseNativeObject<LocatorTask> {
     }
     
     private func reverseGeocode(arguments: Dictionary<String, Any>, result: @escaping FlutterResult) {
-        
-        
         createTask {
             let location = Geometry.fromFlutter(data: arguments["location"] as! Dictionary<String, Any>) as! Point
-        }
-        
-        let callback = result
-        
-        if let params = arguments["parameters"] as? Dictionary<String, Any> {
-            let reverseGeocodeParameters = ReverseGeocodeParameters(data: params)
-            nativeObject.reverseGeocode(withLocation: location, parameters: reverseGeocodeParameters) { (results, error) in
-                if let error = error {
-                    callback(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))
-                } else {
-                    if let results = results {
-                        let result = results.map {
-                            $0.toJSONFlutter()
-                        }
-                        callback(result)
-                    } else {
-                        callback([])
-                    }
-                }
+            let paramsRaw = arguments["parameters"] as? Dictionary<String, Any>
+            let params = paramsRaw == nil ? nil : ReverseGeocodeParameters(data: paramsRaw!)
+            do {
+                let results = try await  self.nativeObject.reverseGeocode(forLocation: location,parameters:params)
+                result(results.map{ $0.toJSONFlutter()})
             }
-        } else {
-            nativeObject.reverseGeocode(withLocation: location) { (results, error) in
-                if let error = error {
-                    callback(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))
-                } else {
-                    if let results = results {
-                        let result = results.map {
-                            $0.toJSONFlutter()
-                        }
-                        callback(result)
-                    } else {
-                        callback([])
-                    }
-                }
+            catch{
+                result(error.toJSONFlutter())
             }
         }
     }
     
     private func suggest(arguments: Dictionary<String, Any>, result: @escaping FlutterResult) {
-        let searchTerm = arguments["searchText"] as! String
-        let callback = result
-        if let params = arguments["parameters"] as? Dictionary<String, Any> {
-            let suggestParameters = AGSSuggestParameters(data: params)
-            nativeObject.suggest(withSearchText: searchTerm, parameters: suggestParameters) { (results, error) in
-                if let error = error {
-                    callback(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))
-                } else {
-                    if let results = results {
-                        let result = results.map {
-                            let suggestResultId = UUID().uuidString
-                            self.suggestResultMap[suggestResultId] = $0
-                            return $0.toJSONFlutter(suggestResultId: suggestResultId)
-                        }
-                        callback(result)
-                    } else {
-                        callback([])
-                    }
-                }
+        createTask {
+            let searchTerm = arguments["searchText"] as! String
+            let paramsRaw = arguments["parameters"] as? Dictionary<String, Any>
+            let params = paramsRaw == nil ? nil : SuggestParameters(data: paramsRaw!)
+            do {
+                let results = try await  self.nativeObject.suggest(forSearchText: searchTerm,parameters:params)
+                result(results.map{
+                    let suggestResultId = UUID().uuidString
+                    self.suggestResultMap[suggestResultId] = $0
+                    return $0.toJSONFlutter(suggestResultId: suggestResultId)
+                })
             }
-        } else {
-            nativeObject.suggest(withSearchText: searchTerm) { (results, error) in
-                if let error = error {
-                    callback(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))
-                } else {
-                    if let results = results {
-                        let result = results.map {
-                            let suggestResultId = UUID().uuidString
-                            self.suggestResultMap[suggestResultId] = $0
-                            return $0.toJSONFlutter(suggestResultId: suggestResultId)
-                        }
-                        callback(result)
-                    } else {
-                        callback([])
-                    }
-                }
+            catch{
+                result(error.toJSONFlutter())
             }
         }
     }
