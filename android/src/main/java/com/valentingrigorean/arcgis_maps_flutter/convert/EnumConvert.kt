@@ -1,9 +1,10 @@
 package com.valentingrigorean.arcgis_maps_flutter.convert
 
 import com.arcgismaps.LoadStatus
+import com.arcgismaps.UnitSystem
 
-fun LoadStatus.toFlutterValue() {
-    when (this) {
+fun LoadStatus.toFlutterValue(): Int {
+    return when (this) {
         LoadStatus.NotLoaded -> 0
         LoadStatus.Loading -> 1
         LoadStatus.Loaded -> 2
@@ -11,8 +12,16 @@ fun LoadStatus.toFlutterValue() {
     }
 }
 
-fun LoadStatus.FailedToLoad.toFlutterJson(): Map<String, Any?> {
+fun LoadStatus.FailedToLoad.toFlutterJson(): Any {
     return mapOf(
         "errorMessage" to this.error.message,
     )
+}
+
+
+fun UnitSystem.toFlutterValue(): Int {
+    return when (this) {
+        UnitSystem.Imperial -> 0
+        UnitSystem.Metric -> 1
+    }
 }

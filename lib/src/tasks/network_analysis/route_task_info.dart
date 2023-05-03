@@ -42,10 +42,10 @@ class RouteTaskInfo {
         costAttributes: costAttributes,
         defaultTravelModeName: json['defaultTravelModeName'] as String,
         directionsDistanceUnits: json.containsKey('directionsDistanceUnits')
-            ? UnitSystem.values[json['directionsDistanceUnits']]
-            : UnitSystem.unknown,
+            ? UnitSystem.fromValue(json['directionsDistanceUnits'])
+            : UnitSystem.metric,
         directionsLanguage: json['directionsLanguage'] as String,
-        directionsStyle: DirectionsStyle.values[json['directionsStyle']],
+        directionsStyle: DirectionsStyle.fromValue(json['directionsStyle']),
         findBestSequence: json['findBestSequence'] as bool,
         maxLocatingDistance: json['maxLocatingDistance'] as double,
         startTime: parseDateTimeSafeNullable(json['startTime']),
@@ -57,7 +57,7 @@ class RouteTaskInfo {
         preserveFirstStop: json['preserveFirstStop'] as bool,
         preserveLastStop: json['preserveLastStop'] as bool,
         restrictionAttributes: restrictionAttributes,
-        routeShapeType: RouteShapeType.values[json['routeShapeType']],
+        routeShapeType: RouteShapeType.fromValue(json['routeShapeType']),
         supportedLanguages:
             (json['supportedLanguages'] as List<dynamic>).cast<String>(),
         supportedRestrictionUsageParameterValues:

@@ -28,9 +28,9 @@ class RouteParameters {
       accumulateAttributeNames:
           (json['accumulateAttributeNames'] as List<dynamic>).cast<String>(),
       directionsDistanceUnits:
-          UnitSystem.values[json['directionsDistanceUnits'] as int],
+          UnitSystem.fromValue(json['directionsDistanceUnits'] as int),
       directionsLanguage: json['directionsLanguage'] as String,
-      directionsStyle: DirectionsStyle.values[json['directionsStyle'] as int],
+      directionsStyle: DirectionsStyle.fromValue(json['directionsStyle'] as int),
       findBestSequence: json['findBestSequence'] as bool,
       startTime: parseDateTimeSafeNullable(json['startTime']),
       outputSpatialReference: json['outputSpatialReference'] != null
@@ -44,7 +44,7 @@ class RouteParameters {
       returnPolylineBarriers: json['returnPolylineBarriers'] as bool,
       returnRoutes: json['returnRoutes'] as bool,
       returnStops: json['returnStops'] as bool,
-      routeShapeType: RouteShapeType.values[json['routeShapeType'] as int],
+      routeShapeType: RouteShapeType.fromValue(json['routeShapeType'] as int),
       travelMode: json['travelMode'] != null
           ? TravelMode.fromJson(json['travelMode'])
           : null,
@@ -181,9 +181,9 @@ class RouteParameters {
   Object toJson() {
     var json = <String, dynamic>{};
     json['accumulateAttributeNames'] = accumulateAttributeNames;
-    json['directionsDistanceUnits'] = directionsDistanceUnits.index;
+    json['directionsDistanceUnits'] = directionsDistanceUnits.value;
     json['directionsLanguage'] = directionsLanguage;
-    json['directionsStyle'] = directionsStyle.index;
+    json['directionsStyle'] = directionsStyle.value;
     json['findBestSequence'] = findBestSequence;
     json['startTime'] = startTime;
     if (outputSpatialReference != null) {

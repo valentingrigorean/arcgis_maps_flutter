@@ -32,7 +32,7 @@ class TravelMode {
       timeAttributeName: json['timeAttributeName'] as String,
       type: json['type'] as String,
       useHierarchy: json['useHierarchy'] as bool,
-      uTurnPolicy: UTurnPolicy.values[json['uTurnPolicy'] as int],
+      uTurnPolicy: UTurnPolicy.fromValue(json['uTurnPolicy'] as int),
     );
   }
 

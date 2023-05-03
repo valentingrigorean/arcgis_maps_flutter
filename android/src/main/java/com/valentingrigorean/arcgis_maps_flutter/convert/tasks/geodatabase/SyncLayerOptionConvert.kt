@@ -1,4 +1,4 @@
-package com.valentingrigorean.arcgis_maps_flutter.convert.geodatabase
+package com.valentingrigorean.arcgis_maps_flutter.convert.tasks.geodatabase
 
 import com.arcgismaps.tasks.geodatabase.SyncLayerOption
 

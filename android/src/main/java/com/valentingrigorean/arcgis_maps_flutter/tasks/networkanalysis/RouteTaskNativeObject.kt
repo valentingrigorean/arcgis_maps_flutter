@@ -3,13 +3,14 @@ package com.valentingrigorean.arcgis_maps_flutter.tasks.networkanalysis
 import android.util.Log
 import com.arcgismaps.tasks.networkanalysis.RouteTask
 import com.esri.arcgisruntime.loadable.LoadStatus
+import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.networkanalysis.ConvertRouteTask
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.io.ApiKeyResourceNativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.loadable.LoadableNativeHandler
 import io.flutter.plugin.common.MethodChannel
 
-class RouteTaskNativeObject(objectId: String, task: RouteTask) : BaseNativeObject<RouteTask?>(
+class RouteTaskNativeObject(objectId: String, task: RouteTask) : BaseNativeObject<RouteTask>(
     objectId,
     task,
     arrayOf<NativeHandler>(

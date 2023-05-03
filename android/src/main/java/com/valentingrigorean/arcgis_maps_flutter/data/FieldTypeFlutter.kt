@@ -3,7 +3,9 @@ package com.valentingrigorean.arcgis_maps_flutter.data
 import android.icu.text.SimpleDateFormat
 import com.arcgismaps.geometry.Geometry
 import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.convert.fromFlutterDateTime
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toFlutterJson
+import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull
 import java.nio.ByteBuffer
 import java.util.GregorianCalendar
 import java.util.Locale
@@ -51,4 +53,26 @@ fun Any.toFlutterFieldType(): Any {
     data["type"] = fieldTypeFlutter.value
     data["value"] = obj
     return data
+}
+
+fun Any.fromFlutterFieldOrNull() : Any?{
+    val data: Map<*, *> = this as Map<*, *>? ?: return null
+    val fieldTypeFlutter = FieldTypeFlutter.values()[Convert.toInt(
+        data["type"]
+    )]
+    var value = data["value"]
+    when (fieldTypeFlutter) {
+        FieldTypeFlutter.DATE -> try {
+            value = value.toString().fromFlutterDateTime()
+        } catch (e: Exception) {
+            // no op
+        }
+
+        FieldTypeFlutter.GEOMETRY -> if (value != null) {
+            value = value.toGeometryOrNull()
+        }
+
+        else -> {}
+    }
+    return value
 }

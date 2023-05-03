@@ -2,11 +2,20 @@ part of arcgis_maps_flutter;
 
 enum UnitSystem {
   ///  Used for imperial units, e.g. miles
-  imperial,
+  imperial(0),
 
   ///  Used for metric units, e.g. kilometers
-  metric,
+  metric(1),
+  ;
 
-  /// Unknown.
-  unknown,
+  const UnitSystem(this.value);
+
+  factory UnitSystem.fromValue(int value) {
+    return UnitSystem.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => UnitSystem.imperial,
+    );
+  }
+
+  final int value;
 }

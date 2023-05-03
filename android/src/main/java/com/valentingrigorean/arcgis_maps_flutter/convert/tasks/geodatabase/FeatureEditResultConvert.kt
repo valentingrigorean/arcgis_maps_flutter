@@ -1,4 +1,4 @@
-package com.valentingrigorean.arcgis_maps_flutter.convert.geodatabase
+package com.valentingrigorean.arcgis_maps_flutter.convert.tasks.geodatabase
 
 import com.arcgismaps.data.FeatureEditResult
 import com.valentingrigorean.arcgis_maps_flutter.convert.data.toFlutterJson

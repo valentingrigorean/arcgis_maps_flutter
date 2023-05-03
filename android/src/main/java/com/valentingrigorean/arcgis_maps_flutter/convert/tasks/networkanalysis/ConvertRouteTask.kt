@@ -1,4 +1,4 @@
-package com.valentingrigorean.arcgis_maps_flutter.tasks.networkanalysis
+package com.valentingrigorean.arcgis_maps_flutter.convert.tasks.networkanalysis
 
 import com.esri.arcgisruntime.UnitSystem
 import com.esri.arcgisruntime.tasks.networkanalysis.AttributeParameterValue
@@ -17,7 +17,6 @@ import com.esri.arcgisruntime.tasks.networkanalysis.Stop
 import com.esri.arcgisruntime.tasks.networkanalysis.TravelMode
 import com.esri.arcgisruntime.tasks.networkanalysis.UTurnPolicy
 import com.valentingrigorean.arcgis_maps_flutter.Convert
-import com.valentingrigorean.arcgis_maps_flutter.utils.toMap
 import java.util.function.Consumer
 
 object ConvertRouteTask : Convert() {
@@ -140,38 +139,7 @@ object ConvertRouteTask : Convert() {
         return routeParameters
     }
 
-    fun routeParametersToJson(routeParameters: RouteParameters): Any {
-        val json: MutableMap<String, Any?> = HashMap(17)
-        json["accumulateAttributeNames"] = routeParameters.accumulateAttributeNames
-        json["directionsDistanceUnits"] = routeParameters.directionsDistanceUnits.ordinal
-        json["directionsLanguage"] = routeParameters.directionsLanguage
-        json["directionsStyle"] = routeParameters.directionsStyle.ordinal
-        json["findBestSequence"] = routeParameters.isFindBestSequence
-        if (routeParameters.startTime != null) {
-            json["startTime"] = Convert.Companion.toCalendarFromISO8601(
-                routeParameters.startTime
-            )
-        }
-        if (routeParameters.outputSpatialReference != null) {
-            json["outputSpatialReference"] =
-                Convert.Companion.spatialReferenceToJson(
-                    routeParameters.outputSpatialReference
-                )
-        }
-        json["preserveFirstStop"] = routeParameters.isPreserveFirstStop
-        json["preserveLastStop"] = routeParameters.isPreserveLastStop
-        json["returnDirections"] = routeParameters.isReturnDirections
-        json["returnPointBarriers"] = routeParameters.isReturnPointBarriers
-        json["returnPolygonBarriers"] = routeParameters.isReturnPolygonBarriers
-        json["returnPolylineBarriers"] = routeParameters.isReturnPolylineBarriers
-        json["returnRoutes"] = routeParameters.isReturnRoutes
-        json["returnStops"] = routeParameters.isReturnStops
-        json["routeShapeType"] = routeParameters.routeShapeType.ordinal
-        if (routeParameters.travelMode != null) {
-            json["travelMode"] = travelModeToJson(routeParameters.travelMode)
-        }
-        return json
-    }
+
 
     fun routeResultToJson(routeResult: RouteResult): Any {
         val json: MutableMap<String, Any> = HashMap(3)
@@ -384,29 +352,6 @@ object ConvertRouteTask : Convert() {
         return travelMode
     }
 
-    private fun travelModeToJson(travelMode: TravelMode): Any {
-        val json: MutableMap<String, Any> = HashMap(11)
-        val attributeParameterValues: MutableList<Any> =
-            ArrayList(travelMode.attributeParameterValues.size)
-        travelMode.attributeParameterValues.forEach(Consumer { attributeParameterValue: AttributeParameterValue ->
-            attributeParameterValues.add(
-                attributeParameterValueToJson(attributeParameterValue)
-            )
-        })
-        json["attributeParameterValues"] = attributeParameterValues
-        json["travelModeDescription"] = travelMode.description
-        json["distanceAttributeName"] = travelMode.distanceAttributeName
-        json["impedanceAttributeName"] = travelMode.impedanceAttributeName
-        json["name"] = travelMode.name
-        json["outputGeometryPrecision"] = travelMode.outputGeometryPrecision
-        json["restrictionAttributeNames"] = travelMode.restrictionAttributeNames
-        json["timeAttributeName"] = travelMode.timeAttributeName
-        json["type"] = travelMode.type
-        json["useHierarchy"] = travelMode.isUseHierarchy
-        json["uTurnPolicy"] = travelMode.uTurnPolicy.ordinal
-        return json
-    }
-
     private fun costAttributeToJson(costAttribute: CostAttribute): Any {
         val json: MutableMap<String, Any> = HashMap(2)
         if (costAttribute.parameterValues != null) {
@@ -435,25 +380,6 @@ object ConvertRouteTask : Convert() {
         return json
     }
 
-    private fun toAttributeParameterValue(o: Any): AttributeParameterValue {
-        val data: Map<*, *> = Convert.Companion.toMap(o)
-        val attributeParameterValue = AttributeParameterValue()
-        attributeParameterValue.attributeName = data["attributeName"] as String?
-        attributeParameterValue.parameterName = data["parameterName"] as String?
-        attributeParameterValue.parameterValue =
-            Convert.Companion.fromFlutterField(data["parameterValue"])
-        return attributeParameterValue
-    }
-
-    private fun attributeParameterValueToJson(attributeParameterValue: AttributeParameterValue): Any {
-        val json: MutableMap<String, Any> = HashMap(3)
-        json["attributeName"] = attributeParameterValue.attributeName
-        json["parameterName"] = attributeParameterValue.parameterName
-        json["parameterValue"] = Convert.Companion.toFlutterFieldType(
-            attributeParameterValue.parameterValue
-        )
-        return json
-    }
 
     private fun toCurbApproach(o: Any?): CurbApproach {
         val ordinal: Int = Convert.Companion.toInt(o)
