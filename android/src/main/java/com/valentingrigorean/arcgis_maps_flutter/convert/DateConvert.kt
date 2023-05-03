@@ -7,7 +7,7 @@ fun Instant.toFlutterValue() : String{
     return formatter.format(this)
 }
 
-fun String.fromFlutterDateTime() : Instant{
+fun String.fromFlutterInstant() : Instant{
     val formatter = DateTimeFormatter.ISO_INSTANT
     return formatter.parse(this, Instant::from)
 }

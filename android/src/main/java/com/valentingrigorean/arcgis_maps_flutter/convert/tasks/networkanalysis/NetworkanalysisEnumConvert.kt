@@ -1,9 +1,11 @@
 package com.valentingrigorean.arcgis_maps_flutter.convert.tasks.networkanalysis
 
 import com.arcgismaps.tasks.networkanalysis.AttributeUnit
+import com.arcgismaps.tasks.networkanalysis.CurbApproach
 import com.arcgismaps.tasks.networkanalysis.DirectionsStyle
 import com.arcgismaps.tasks.networkanalysis.NetworkDirectionsSupport
 import com.arcgismaps.tasks.networkanalysis.RouteShapeType
+import com.arcgismaps.tasks.networkanalysis.StopType
 import com.arcgismaps.tasks.networkanalysis.UTurnPolicy
 
 fun DirectionsStyle.toFlutterValue(): Int {
@@ -11,6 +13,15 @@ fun DirectionsStyle.toFlutterValue(): Int {
         DirectionsStyle.Desktop -> 0
         DirectionsStyle.Navigation -> 1
         DirectionsStyle.Campus -> 2
+    }
+}
+
+fun Int.toDirectionsStyle(): DirectionsStyle {
+    return when (this) {
+        0 -> DirectionsStyle.Desktop
+        1 -> DirectionsStyle.Navigation
+        2 -> DirectionsStyle.Campus
+        else -> throw IllegalStateException("Unexpected value: $this")
     }
 }
 
@@ -84,10 +95,49 @@ fun Int.toAttributeUnit(): AttributeUnit {
     }
 }
 
-fun NetworkDirectionsSupport.toFlutterValue(): Int{
+fun NetworkDirectionsSupport.toFlutterValue(): Int {
     return when (this) {
         NetworkDirectionsSupport.Unknown -> 0
         NetworkDirectionsSupport.Unsupported -> 1
         NetworkDirectionsSupport.Supported -> 2
+    }
+}
+
+
+fun StopType.toFlutterValue(): Int {
+    return when (this) {
+        StopType.Stop -> 0
+        StopType.Waypoint -> 1
+        StopType.RestBreak -> 2
+    }
+}
+
+fun Int.toStopType(): StopType {
+    return when (this) {
+        0 -> StopType.Stop
+        1 -> StopType.Waypoint
+        2 -> StopType.RestBreak
+        else -> throw IllegalStateException("Unexpected value: $this")
+    }
+}
+
+fun CurbApproach.toFlutterValue(): Int{
+    return when (this) {
+        CurbApproach.Unknown -> -1
+        CurbApproach.EitherSide -> 0
+        CurbApproach.LeftSide -> 1
+        CurbApproach.RightSide -> 2
+        CurbApproach.NoUTurn -> 3
+    }
+}
+
+fun Int.toCurbApproach(): CurbApproach {
+    return when (this) {
+        -1 -> CurbApproach.Unknown
+        0 -> CurbApproach.EitherSide
+        1 -> CurbApproach.LeftSide
+        2 -> CurbApproach.RightSide
+        3 -> CurbApproach.NoUTurn
+        else -> throw IllegalStateException("Unexpected value: $this")
     }
 }

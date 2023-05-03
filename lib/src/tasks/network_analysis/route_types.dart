@@ -16,8 +16,7 @@ enum AttributeUnit {
   minutes(12),
   hours(13),
   days(14),
-  decimeters(15)
-  ;
+  decimeters(15);
 
   const AttributeUnit(this.value);
 
@@ -240,20 +239,32 @@ enum UTurnPolicy {
 }
 
 enum CurbApproach {
+  /// An unknown type, used when approach is not determined.
+  unknown(-1),
+
   /// An either side curb approach.
-  eitherSide,
+  eitherSide(0),
 
   /// A left side curb approach.
-  leftSide,
+  leftSide(1),
 
   /// A right side curb approach.
-  rightSide,
+  rightSide(2),
 
   /// A no U-Turn curb approach.
-  noUTurn,
+  noUTurn(3),
+  ;
 
-  /// An unknown type, used when approach is not determined.
-  unknown,
+  const CurbApproach(this.value);
+
+  factory CurbApproach.fromValue(int value) {
+    return CurbApproach.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => CurbApproach.unknown,
+    );
+  }
+
+  final int value;
 }
 
 enum LocationStatus {
@@ -274,11 +285,23 @@ enum LocationStatus {
 
 enum StopType {
   /// A location where a vehicle would arrive and/or depart.
-  stop,
+  stop(0),
 
   /// A location between stops that a route must pass through.
-  waypoint,
+  waypoint(1),
 
   /// A location where a route pauses e.g. for a required lunch break.
-  restBreak
+  restBreak(2),
+  ;
+
+  const StopType(this.value);
+
+  factory StopType.fromValue(int value) {
+    return StopType.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => StopType.stop,
+    );
+  }
+
+  final int value;
 }

@@ -244,33 +244,6 @@ object ConvertRouteTask : Convert() {
         return json
     }
 
-    private fun toStop(o: Any): Stop {
-        val data: Map<*, *> = Convert.Companion.toMap(o)
-        val stop = Stop(
-            Convert.Companion.toPoint(
-                data["geometry"]
-            )
-        )
-        val name = data["name"]
-        if (name != null) {
-            stop.name = name as String?
-        }
-        stop.type = Stop.Type.values()[Convert.Companion.toInt(
-            data["stopType"]
-        )]
-        val routeName = data["routeName"]
-        if (routeName != null) {
-            stop.routeName = routeName as String?
-        }
-        stop.curbApproach = toCurbApproach(data["curbApproach"])
-        stop.currentBearingTolerance =
-            Convert.Companion.toDouble(data["currentBearingTolerance"])
-        stop.navigationLatency =
-            Convert.Companion.toDouble(data["navigationLatency"])
-        stop.navigationSpeed =
-            Convert.Companion.toDouble(data["navigationSpeed"])
-        return stop
-    }
 
     private fun stopToJson(stop: Stop): Any {
         val json: MutableMap<String, Any?> = HashMap()

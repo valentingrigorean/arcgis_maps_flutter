@@ -50,9 +50,9 @@ class Stop {
 
   factory Stop.fromJson(Map<String, dynamic> json) {
     return Stop._(
-      arrivalCurbApproach: CurbApproach.values[json['arrivalCurbApproach']],
-      departureCurbApproach: CurbApproach.values[json['departureCurbApproach']],
-      curbApproach: CurbApproach.values[json['curbApproach']],
+      arrivalCurbApproach: CurbApproach.fromValue(json['arrivalCurbApproach']),
+      departureCurbApproach: CurbApproach.fromValue(json['departureCurbApproach']),
+      curbApproach: CurbApproach.fromValue(json['curbApproach']),
       currentBearing: json['currentBearing'],
       currentBearingTolerance: json['currentBearingTolerance'],
       distanceToNetworkLocation: json['distanceToNetworkLocation'],
@@ -67,7 +67,7 @@ class Stop {
       timeWindowEnd: parseDateTimeSafeNullable(json['timeWindowEnd']),
       locationStatus: LocationStatus.values[json['locationStatus']],
       name: json['name'],
-      stopType: StopType.values[json['stopType']],
+      stopType: StopType.fromValue(json['stopType']),
       stopID: json['stopID'],
       navigationLatency: json['navigationLatency'],
       navigationSpeed: json['navigationSpeed'],

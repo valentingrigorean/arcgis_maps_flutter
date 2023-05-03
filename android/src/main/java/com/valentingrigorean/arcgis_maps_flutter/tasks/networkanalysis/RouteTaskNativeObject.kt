@@ -4,6 +4,7 @@ import android.util.Log
 import com.arcgismaps.tasks.networkanalysis.RouteTask
 import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.networkanalysis.ConvertRouteTask
 import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.networkanalysis.toFlutterJson
+import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.networkanalysis.toRouteParametersOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler
@@ -51,18 +52,11 @@ class RouteTaskNativeObject(objectId: String, task: RouteTask) : BaseNativeObjec
 
     private fun solveRoute(args: Any?, result: MethodChannel.Result) {
         scope.launch {
-            val routeParameters = ConvertRouteTask.toRouteParameters(
-                args!!
-            )
-            val future = nativeObject.solveRoute(routeParameters)
-            future.addDoneListener {
-                try {
-                    val routeResult = future.get()
-                    result.success(ConvertRouteTask.routeResultToJson(routeResult))
-                } catch (e: Exception) {
-                    Log.e(TAG, "Failed to solve route.", e)
-                    result.error("ERROR", "Failed to solve route.", e.message)
-                }
+            val routeParameters =  args!!.toRouteParametersOrNull()!!
+            nativeObject.solveRoute(routeParameters).onSuccess {
+                result.success(ConvertRouteTask.routeResultToJson(it))
+            }.onFailure {
+                result.success(it.toFlutterJson())
             }
         }
     }
