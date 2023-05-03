@@ -11,7 +11,7 @@ class CostAttribute {
     return CostAttribute._(
       parameterValues: parseAttributes(json['parameterValues']),
       unit: json.containsKey('unit')
-          ? AttributeUnit.values[json['unit'] as int]
+          ? AttributeUnit.fromValue(json['unit'] as int)
           : AttributeUnit.unknown,
     );
   }

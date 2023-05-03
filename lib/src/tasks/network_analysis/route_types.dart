@@ -1,21 +1,34 @@
 part of arcgis_maps_flutter;
 
 enum AttributeUnit {
-  unknown,
-  inches,
-  feet,
-  yards,
-  miles,
-  millimeters,
-  centimeters,
-  meters,
-  kilometers,
-  nauticalMiles,
-  decimalDegrees,
-  seconds,
-  minutes,
-  hours,
-  days,
+  unknown(0),
+  inches(1),
+  feet(2),
+  yards(3),
+  miles(4),
+  millimeters(5),
+  centimeters(6),
+  meters(7),
+  kilometers(8),
+  nauticalMiles(9),
+  decimalDegrees(10),
+  seconds(11),
+  minutes(12),
+  hours(13),
+  days(14),
+  decimeters(15)
+  ;
+
+  const AttributeUnit(this.value);
+
+  factory AttributeUnit.fromValue(int value) {
+    return AttributeUnit.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => AttributeUnit.unknown,
+    );
+  }
+
+  final int value;
 }
 
 enum DirectionManeuverType {
@@ -163,13 +176,25 @@ enum DirectionsStyle {
 
 enum NetworkDirectionsSupport {
   /// Directions support is unknown.
-  unknown,
+  unknown(0),
 
   /// Directions are unsupported.
-  unsupported,
+  unsupported(1),
 
   /// Directions are supported.
-  supported,
+  supported(2),
+  ;
+
+  const NetworkDirectionsSupport(this.value);
+
+  factory NetworkDirectionsSupport.fromValue(int value) {
+    return NetworkDirectionsSupport.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => NetworkDirectionsSupport.unknown,
+    );
+  }
+
+  final int value;
 }
 
 enum RouteShapeType {

@@ -64,7 +64,7 @@ class RouteTaskInfo {
             (json['supportedRestrictionUsageParameterValues'] as List<dynamic>)
                 .cast<String>(),
         directionsSupport:
-            NetworkDirectionsSupport.values[json['directionsSupport']],
+            NetworkDirectionsSupport.fromValue(json['directionsSupport']),
         travelModes: TravelMode.fromJsonList(json['travelModes']),
         supportsRerouting: json['supportsRerouting'] as bool);
   }

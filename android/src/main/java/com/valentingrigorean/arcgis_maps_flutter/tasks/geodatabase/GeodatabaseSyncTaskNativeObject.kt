@@ -2,16 +2,14 @@ package com.valentingrigorean.arcgis_maps_flutter.tasks.geodatabase
 
 import com.arcgismaps.tasks.geodatabase.GeodatabaseSyncTask
 import com.arcgismaps.tasks.geodatabase.SyncGeodatabaseJob
-import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.geodatabase.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.geodatabase.toGenerateGeodatabaseParametersOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.geodatabase.toSyncDirection
 import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.geodatabase.toSyncGeodatabaseParametersOrNull
-import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.data.GeodatabaseNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject
-import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.io.ApiKeyResourceNativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.loadable.LoadableNativeHandler
 import io.flutter.plugin.common.MethodChannel
@@ -20,7 +18,7 @@ import java.util.UUID
 
 class GeodatabaseSyncTaskNativeObject(objectId: String, task: GeodatabaseSyncTask) :
     BaseNativeObject<GeodatabaseSyncTask>(
-        objectId, task, arrayOf<NativeHandler>(
+        objectId, task, arrayOf(
             LoadableNativeHandler(task),
             ApiKeyResourceNativeHandler(task)
         )

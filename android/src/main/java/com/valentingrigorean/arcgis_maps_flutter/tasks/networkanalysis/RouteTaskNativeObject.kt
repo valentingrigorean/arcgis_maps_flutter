@@ -2,13 +2,15 @@ package com.valentingrigorean.arcgis_maps_flutter.tasks.networkanalysis
 
 import android.util.Log
 import com.arcgismaps.tasks.networkanalysis.RouteTask
-import com.esri.arcgisruntime.loadable.LoadStatus
 import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.networkanalysis.ConvertRouteTask
+import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.networkanalysis.toFlutterJson
+import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.io.ApiKeyResourceNativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.loadable.LoadableNativeHandler
 import io.flutter.plugin.common.MethodChannel
+import kotlinx.coroutines.launch
 
 class RouteTaskNativeObject(objectId: String, task: RouteTask) : BaseNativeObject<RouteTask>(
     objectId,
@@ -28,52 +30,44 @@ class RouteTaskNativeObject(objectId: String, task: RouteTask) : BaseNativeObjec
     }
 
     private fun getRouteTaskInfo(result: MethodChannel.Result) {
-        val routeTask = nativeObject
-        routeTask!!.loadAsync()
-        routeTask.addDoneLoadingListener {
-            if (routeTask.loadStatus == LoadStatus.LOADED) {
-                result.success(ConvertRouteTask.routeTaskInfoToJson(routeTask.routeTaskInfo))
-            } else if (routeTask.loadStatus == LoadStatus.FAILED_TO_LOAD) {
-                val exception = routeTask.loadError
-                result.error(
-                    "ERROR",
-                    if (exception != null) exception.message else "Unknown error.",
-                    null
-                )
+        scope.launch {
+            nativeObject.load().onSuccess {
+                result.success(nativeObject.getRouteTaskInfo().toFlutterJson())
+            }.onFailure {
+                result.success(it.toFlutterJson())
             }
         }
     }
 
     private fun createDefaultParameters(result: MethodChannel.Result) {
-        val future = nativeObject.createDefaultParametersAsync()
-        future.addDoneListener {
-            try {
-                val routeParameters = future.get()
-                result.success(ConvertRouteTask.routeParametersToJson(routeParameters))
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to create default parameters.", e)
-                result.error("ERROR", "Failed to create default parameters.", e.message)
+        scope.launch {
+            nativeObject.createDefaultParameters().onSuccess {
+                result.success(it.toFlutterJson())
+            }.onFailure {
+                result.success(it.toFlutterJson())
             }
         }
     }
 
     private fun solveRoute(args: Any?, result: MethodChannel.Result) {
-        val routeParameters = ConvertRouteTask.toRouteParameters(
-            args!!
-        )
-        val future = nativeObject.solveRouteAsync(routeParameters)
-        future.addDoneListener {
-            try {
-                val routeResult = future.get()
-                result.success(ConvertRouteTask.routeResultToJson(routeResult))
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to solve route.", e)
-                result.error("ERROR", "Failed to solve route.", e.message)
+        scope.launch {
+            val routeParameters = ConvertRouteTask.toRouteParameters(
+                args!!
+            )
+            val future = nativeObject.solveRoute(routeParameters)
+            future.addDoneListener {
+                try {
+                    val routeResult = future.get()
+                    result.success(ConvertRouteTask.routeResultToJson(routeResult))
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to solve route.", e)
+                    result.error("ERROR", "Failed to solve route.", e.message)
+                }
             }
         }
     }
 
     companion object {
-        val TAG = RouteTaskNativeObject::class.java.simpleName
+        val TAG: String = RouteTaskNativeObject::class.java.simpleName!!
     }
 }

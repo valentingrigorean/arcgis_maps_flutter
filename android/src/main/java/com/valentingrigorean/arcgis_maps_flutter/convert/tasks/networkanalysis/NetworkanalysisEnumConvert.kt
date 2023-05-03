@@ -1,6 +1,8 @@
 package com.valentingrigorean.arcgis_maps_flutter.convert.tasks.networkanalysis
 
+import com.arcgismaps.tasks.networkanalysis.AttributeUnit
 import com.arcgismaps.tasks.networkanalysis.DirectionsStyle
+import com.arcgismaps.tasks.networkanalysis.NetworkDirectionsSupport
 import com.arcgismaps.tasks.networkanalysis.RouteShapeType
 import com.arcgismaps.tasks.networkanalysis.UTurnPolicy
 
@@ -29,12 +31,63 @@ fun UTurnPolicy.toFlutterValue(): Int {
     }
 }
 
-fun Int.toUTurnPolicy() : UTurnPolicy{
+fun Int.toUTurnPolicy(): UTurnPolicy {
     return when (this) {
         0 -> UTurnPolicy.NotAllowed
         1 -> UTurnPolicy.AllowedAtDeadEnds
         2 -> UTurnPolicy.AllowedAtIntersections
         3 -> UTurnPolicy.AllowedAtDeadEndsAndIntersections
         else -> throw IllegalStateException("Unexpected value: $this")
+    }
+}
+
+fun AttributeUnit.toFlutterValue(): Int {
+    return when (this) {
+        AttributeUnit.Unknown -> 0
+        AttributeUnit.Inches -> 1
+        AttributeUnit.Feet -> 2
+        AttributeUnit.Yards -> 3
+        AttributeUnit.Miles -> 4
+        AttributeUnit.Millimeters -> 5
+        AttributeUnit.Centimeters -> 6
+        AttributeUnit.Meters -> 7
+        AttributeUnit.Kilometers -> 8
+        AttributeUnit.NauticalMiles -> 9
+        AttributeUnit.DecimalDegrees -> 10
+        AttributeUnit.Seconds -> 11
+        AttributeUnit.Minutes -> 12
+        AttributeUnit.Hours -> 13
+        AttributeUnit.Days -> 14
+        AttributeUnit.Decimeters -> 15
+    }
+}
+
+fun Int.toAttributeUnit(): AttributeUnit {
+    return when (this) {
+        0 -> AttributeUnit.Unknown
+        1 -> AttributeUnit.Inches
+        2 -> AttributeUnit.Feet
+        3 -> AttributeUnit.Yards
+        4 -> AttributeUnit.Miles
+        5 -> AttributeUnit.Millimeters
+        6 -> AttributeUnit.Centimeters
+        7 -> AttributeUnit.Meters
+        8 -> AttributeUnit.Kilometers
+        9 -> AttributeUnit.NauticalMiles
+        10 -> AttributeUnit.DecimalDegrees
+        11 -> AttributeUnit.Seconds
+        12 -> AttributeUnit.Minutes
+        13 -> AttributeUnit.Hours
+        14 -> AttributeUnit.Days
+        15 -> AttributeUnit.Decimeters
+        else -> throw IllegalStateException("Unexpected value: $this")
+    }
+}
+
+fun NetworkDirectionsSupport.toFlutterValue(): Int{
+    return when (this) {
+        NetworkDirectionsSupport.Unknown -> 0
+        NetworkDirectionsSupport.Unsupported -> 1
+        NetworkDirectionsSupport.Supported -> 2
     }
 }
