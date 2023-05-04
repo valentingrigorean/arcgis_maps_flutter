@@ -47,6 +47,18 @@ extension RouteShapeType {
             fatalError("Unexpected value: $this")
         }
     }
+    
+    static func fromFlutter(_ flutterValue: Int) -> RouteShapeType {
+        switch flutterValue {
+        case 1:
+            return .straightLine
+        case 2:
+            return .trueShapeWithMeasures
+        default:
+            fatalError("Unexpected flutterValue: \(flutterValue)")
+        }
+    }
+    
 }
 
 extension TravelMode.UTurnPolicy {
@@ -321,3 +333,22 @@ extension DirectionManeuver.Kind {
         }
     }
 }
+
+extension LocationStatus{
+    func toFlutterValue() -> Int {
+        switch self{
+        case .notLocated :
+            return 0
+        case .onClosest:
+            return 1
+        case .onClosestNotRestricted:
+            return 2
+        case .notReached:
+            return 3
+        @unknown default:
+            fatalError("Unexpected value: \(self)")
+        }
+    }
+}
+
+

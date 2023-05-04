@@ -65,7 +65,7 @@ class Stop {
       departureTimeShift: json['departureTimeShift'],
       timeWindowStart: parseDateTimeSafeNullable(json['timeWindowStart']),
       timeWindowEnd: parseDateTimeSafeNullable(json['timeWindowEnd']),
-      locationStatus: LocationStatus.values[json['locationStatus']],
+      locationStatus: LocationStatus.fromValue(json['locationStatus']),
       name: json['name'],
       stopType: StopType.fromValue(json['stopType']),
       stopID: json['stopID'],

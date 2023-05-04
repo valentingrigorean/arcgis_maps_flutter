@@ -293,18 +293,30 @@ enum CurbApproach {
 
 enum LocationStatus {
   /// The element's location on the network dataset can't be determined.
-  notLocated,
+  notLocated(0),
 
   /// The element has been located on the closest network location
-  onClosest,
+  onClosest(1),
 
   /// The closest network location to the element is not traversable because
   /// of a restriction or barrier, so the element has been located
   /// on the closest traversable network feature instead.
-  onClosestNotRestricted,
+  onClosestNotRestricted(2),
 
   ///  The element can't be reached during analysis.
-  notReached
+  notReached(3),
+  ;
+
+  const LocationStatus(this.value);
+
+  factory LocationStatus.fromValue(int value) {
+    return LocationStatus.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => LocationStatus.notLocated,
+    );
+  }
+
+  final int value;
 }
 
 enum StopType {

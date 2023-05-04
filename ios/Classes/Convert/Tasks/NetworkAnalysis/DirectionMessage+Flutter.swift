@@ -5,11 +5,11 @@
 import Foundation
 import ArcGIS
 
-extension AGSDirectionMessage {
+extension DirectionMessage {
     func toJSONFlutter() -> Any {
         [
-            "type": type.rawValue,
+            "type": kind.toFlutterValue(),
             "text": text,
-        ]
+        ] as [String : Any]
     }
 }

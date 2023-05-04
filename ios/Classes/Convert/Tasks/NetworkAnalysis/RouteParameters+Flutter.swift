@@ -13,56 +13,55 @@ extension RouteParameters {
         }
         directionsDistanceUnits = UnitSystem.fromFlutter(data["directionsDistanceUnits"] as! Int)
         directionsLanguage = data["directionsLanguage"] as! String
-        directionsStyle = DirectionsStyle(rawValue: data["directionsStyle"] as! Int)!
-        findBestSequence = data["findBestSequence"] as! Bool
+        directionsStyle = DirectionsStyle.fromFlutter(data["directionsStyle"] as! Int)
+        findsBestSequence = data["findBestSequence"] as! Bool
         if let startTime = data["startTime"] as? String {
-            self.startTime = startTime.toDateFromIso8601()
+            self.startDate = startTime.toDateFromIso8601()
         }
         if let outputSpatialReference = data["outputSpatialReference"] as? Dictionary<String, Any> {
-            self.outputSpatialReference = AGSSpatialReference(data: outputSpatialReference)
+            self.outputSpatialReference = SpatialReference(data: outputSpatialReference)
         }
-        preserveFirstStop = data["preserveFirstStop"] as! Bool
-        preserveLastStop = data["preserveLastStop"] as! Bool
-        returnDirections = data["returnDirections"] as! Bool
-        returnPointBarriers = data["returnPointBarriers"] as! Bool
-        returnPolygonBarriers = data["returnPolygonBarriers"] as! Bool
-        returnPolylineBarriers = data["returnPolylineBarriers"] as! Bool
-        returnRoutes = data["returnRoutes"] as! Bool
-        returnStops = data["returnStops"] as! Bool
-        routeShapeType = AGSRouteShapeType(rawValue: data["routeShapeType"] as! Int)!
+        preservesFirstStop = data["preserveFirstStop"] as! Bool
+        preservesLastStop = data["preserveLastStop"] as! Bool
+        returnsDirections = data["returnDirections"] as! Bool
+        returnsPointBarriers = data["returnPointBarriers"] as! Bool
+        returnsPolygonBarriers = data["returnPolygonBarriers"] as! Bool
+        returnsPolylineBarriers = data["returnPolylineBarriers"] as! Bool
+        returnsRoutes = data["returnRoutes"] as! Bool
+        returnsStops = data["returnStops"] as! Bool
+        routeShapeType = RouteShapeType.fromFlutter(data["routeShapeType"] as! Int)
         if let travelMode = data["travelMode"] as? Dictionary<String, Any> {
-            self.travelMode = AGSTravelMode(data: travelMode)
+            self.travelMode = TravelMode(data: travelMode)
         }
         if let stops = data["stops"] as? [Dictionary<String, Any>] {
             setStops(stops.map {
-                AGSStop(data: $0)
+                Stop(data: $0)
             })
         }
     }
 
-
     func toJSONFlutter() -> Any {
         var json = [String: Any]()
         json["accumulateAttributeNames"] = accumulateAttributeNames
-        json["directionsDistanceUnits"] = directionsDistanceUnits == .unknown ? 2 : directionsDistanceUnits.rawValue
+        json["directionsDistanceUnits"] = directionsDistanceUnits.toFlutterValue()
         json["directionsLanguage"] = directionsLanguage
-        json["directionsStyle"] = directionsStyle.rawValue
-        json["findBestSequence"] = findBestSequence
-        if let startTime = startTime {
+        json["directionsStyle"] = directionsStyle.toFlutterValue()
+        json["findBestSequence"] = findsBestSequence
+        if let startTime = startDate {
             json["startTime"] = startTime.toIso8601String()
         }
         if let outputSpatialReference = outputSpatialReference {
             json["outputSpatialReference"] = outputSpatialReference.toJSONFlutter()
         }
-        json["preserveFirstStop"] = preserveFirstStop
-        json["preserveLastStop"] = preserveLastStop
-        json["returnDirections"] = returnDirections
-        json["returnPointBarriers"] = returnPointBarriers
-        json["returnPolygonBarriers"] = returnPolygonBarriers
-        json["returnPolylineBarriers"] = returnPolylineBarriers
-        json["returnRoutes"] = returnRoutes
-        json["returnStops"] = returnStops
-        json["routeShapeType"] = routeShapeType.rawValue
+        json["preserveFirstStop"] = preservesFirstStop
+        json["preserveLastStop"] = preservesLastStop
+        json["returnDirections"] = returnsDirections
+        json["returnPointBarriers"] = returnsPointBarriers
+        json["returnPolygonBarriers"] = returnsPolygonBarriers
+        json["returnPolylineBarriers"] = returnsPolylineBarriers
+        json["returnRoutes"] = returnsRoutes
+        json["returnStops"] = returnsStops
+        json["routeShapeType"] = routeShapeType?.toFlutterValue()
         if let travelMode = travelMode {
             json["travelMode"] = travelMode.toJSONFlutter()
         }

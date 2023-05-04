@@ -9,7 +9,7 @@ extension TravelMode{
 
     convenience init(data:Dictionary<String,Any>){
         self.init()
-        attributeParameterValues = (data["attributeParameterValues"] as? [Dictionary<String,Any>])!.map { AGSAttributeParameterValue(data: $0) }
+        attributeParameterValues = (data["attributeParameterValues"] as? [Dictionary<String,Any>])!.map { AttributeParameterValue(data: $0) }
         travelModeDescription = data["travelModeDescription"] as! String
         distanceAttributeName = data["distanceAttributeName"] as! String
         impedanceAttributeName = data["impedanceAttributeName"] as! String

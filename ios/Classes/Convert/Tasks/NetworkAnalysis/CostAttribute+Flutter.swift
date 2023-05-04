@@ -8,10 +8,8 @@ import ArcGIS
 extension CostAttribute {
     func toJSONFlutter() -> Any {
         var json = [String: Any]()
-        if let parameterValues = parameterValues {
-            json["parameterValues"] = parameterValues.toFlutterTypes()
-        }
-        json["unit"] = unit.rawValue
+        json["parameterValues"] = parameterValues.toFlutterTypes()
+        json["unit"] = unit?.toFlutterValue()
         return json
     }
 }

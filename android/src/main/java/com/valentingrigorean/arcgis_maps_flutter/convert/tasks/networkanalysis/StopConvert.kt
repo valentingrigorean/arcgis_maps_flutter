@@ -3,18 +3,35 @@ package com.valentingrigorean.arcgis_maps_flutter.convert.tasks.networkanalysis
 import com.arcgismaps.tasks.networkanalysis.Stop
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toPointOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterValue
 
 fun Stop.toFlutterJson(): Any {
     val data = HashMap<String, Any>(7)
+    data["arrivalCurbApproach"] = arrivalCurbApproach.toFlutterValue()
+    data["departureCurbApproach"] = departureCurbApproach.toFlutterValue()
+    data["currentBearingTolerance"] = currentBearingTolerance
+    data["distanceToNetworkLocation"] = distanceToNetworkLocation
     if (geometry != null)
         data["geometry"] = geometry!!.toFlutterJson()!!
+    if (arrivalTime != null)
+        data["arrivalTime"] = arrivalTime!!.toFlutterValue()
+    data["arrivalTimeShift"] = arrivalTimeShift
+    if(departureTime != null)
+        data["departureTime"] = departureTime!!.toFlutterValue()
+    if(timeWindowStart != null)
+        data["timeWindowStart"] = timeWindowStart!!.toFlutterValue()
+    if(timeWindowEnd != null)
+        data["timeWindowEnd"] = timeWindowEnd!!.toFlutterValue()
+    data["locationStatus"] = locationStatus.toFlutterValue()
     data["name"] = name
     data["stopType"] = stopType.toFlutterValue()
-    data["routeName"] = routeName
-    data["curbApproach"] = curbApproach.toFlutterValue()
-    data["currentBearingTolerance"] = currentBearingTolerance
+    data["stopID"] = stopId
     data["navigationLatency"] = navigationLatency
     data["navigationSpeed"] = navigationSpeed
+    data["routeName"] = routeName
+    data["sequence"] = sequence
+    data["violationTime"] = violationTime
+    data["waitTime"] = waitTime
     return data
 }
 

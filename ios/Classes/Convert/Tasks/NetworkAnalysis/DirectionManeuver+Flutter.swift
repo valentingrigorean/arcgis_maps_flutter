@@ -23,7 +23,7 @@ extension DirectionManeuver {
         if let geometry = geometry {
             json["geometry"] = geometry.toJSONFlutter()
         }
-        json["maneuverType"] = maneuverType.rawValue
+        json["maneuverType"] = kind?.toFlutterValue()
         json["toLevel"] = toLevel
         json["length"] = length
         json["duration"] = duration

@@ -5,6 +5,7 @@ import com.arcgismaps.tasks.networkanalysis.CurbApproach
 import com.arcgismaps.tasks.networkanalysis.DirectionManeuverType
 import com.arcgismaps.tasks.networkanalysis.DirectionMessageType
 import com.arcgismaps.tasks.networkanalysis.DirectionsStyle
+import com.arcgismaps.tasks.networkanalysis.LocationStatus
 import com.arcgismaps.tasks.networkanalysis.NetworkDirectionsSupport
 import com.arcgismaps.tasks.networkanalysis.RouteShapeType
 import com.arcgismaps.tasks.networkanalysis.StopType
@@ -192,3 +193,11 @@ fun DirectionManeuverType.toFlutterValue(): Int {
     }
 }
 
+fun LocationStatus.toFlutterValue():Int {
+    return when (this){
+        LocationStatus.NotLocated -> 0
+        LocationStatus.OnClosest -> 1
+        LocationStatus.OnClosestNotRestricted -> 2
+        LocationStatus.NotReached -> 3
+    }
+}

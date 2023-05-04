@@ -5,13 +5,11 @@
 import Foundation
 import ArcGIS
 
-extension AGSRestrictionAttribute {
+extension RestrictionAttribute {
     func toJSONFlutter() -> Any {
         var json = [String: Any]()
         json["restrictionUsageParameterName"] = restrictionUsageParameterName
-        if let parameterValues = parameterValues {
-            json["parameterValues"] = parameterValues.toFlutterTypes()
-        }
+        json["parameterValues"] = parameterValues.toFlutterTypes()
         return json
     }
 }
