@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-extension AGSTravelMode{
+extension TravelMode{
 
     convenience init(data:Dictionary<String,Any>){
         self.init()

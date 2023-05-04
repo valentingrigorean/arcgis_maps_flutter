@@ -48,8 +48,30 @@ public func toScalebarUnits(rawValue: Int) -> ScalebarUnits {
     }
 }
 
-extension AGSLinearUnitID {
-    static func fromFlutter(_ index: Int) -> AGSLinearUnitID {
+extension UnitSystem {
+    func toFlutterValue()->Int{
+        switch self{
+        case .imperial:
+            return 0
+        case .metric:
+            return 1
+        @unknown default:
+            <#fatalError()#>        
+        }
+    }
+    
+    static func fromFlutter(_ flutterValue: Int) -> UnitSystem{
+        switch flutterValue{
+        case 0:
+            return UnitSystem.imperial
+        case 1:
+            return UnitSystem.metric
+        }
+    }
+}
+
+extension LinearUnit.ID {
+    static func fromFlutter(_ index: Int) -> LinearUnit.ID {
         switch index {
         case 0:
             return .centimeters
@@ -97,7 +119,7 @@ extension AGSLinearUnitID {
 }
 
 
-extension AGSAngularUnitID {
+extension AngularUnitID {
 
     static func fromFlutter(_ index: Int) -> AGSAngularUnitID {
         switch index {
@@ -231,8 +253,8 @@ extension AGSSpatialRelationship {
     }
 }
 
-extension AGSStatisticType {
-    static func fromFlutter(_ value: String?) -> AGSStatisticType{
+extension StatisticType {
+    static func fromFlutter(_ value: String?) -> StatisticType{
         var staticType: AGSStatisticType = AGSStatisticType.sum
 
         switch (value) {

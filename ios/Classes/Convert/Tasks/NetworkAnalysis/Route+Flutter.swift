@@ -5,28 +5,28 @@
 import Foundation
 import ArcGIS
 
-extension AGSRoute {
+extension Route {
     func toJSONFlutter() -> Any {
         var json = [String: Any]()
         json["directionManeuvers"] = directionManeuvers.map {
             $0.toJSONFlutter()
         }
-        if let startTime = startTime {
-            json["startTime"] = startTime.toIso8601String()
+        if let startDate = startDate {
+            json["startTime"] = startDate.toIso8601String()
         }
-        json["startTimeShift"] = startTimeShift
-        if let endTime = endTime {
-            json["endTime"] = endTime.toIso8601String()
+        json["startTimeShift"] = startDateShift
+        if let endDate = endDate {
+            json["endTime"] = endDate.toIso8601String()
         }
-        json["endTimeShift"] = endTimeShift
+        json["endTimeShift"] = endDateShift
         json["totalLength"] = totalLength
-        if let routeGeometry = routeGeometry {
+        if let routeGeometry = geometry {
             json["routeGeometry"] = routeGeometry.toJSONFlutter()
         }
         json["stops"] = stops.map {
             $0.toJSONFlutter()
         }
-        json["routeName"] = routeName
+        json["routeName"] = name
         json["totalTime"] = totalTime
         json["travelTime"] = travelTime
         json["violationTime"] = violationTime

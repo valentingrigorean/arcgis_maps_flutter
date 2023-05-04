@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-extension AGSRouteTaskInfo {
+extension RouteTaskInfo {
     func toJSONFlutter() -> Any {
         var json = [String: Any]()
         json["accumulateAttributeNames"] = accumulateAttributeNames

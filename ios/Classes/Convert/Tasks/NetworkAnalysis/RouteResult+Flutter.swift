@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-extension AGSRouteResult {
+extension RouteResult {
     func toJSONFlutter() -> Any {
         var json = [String: Any]()
         json["directionsLanguage"] = directionsLanguage

@@ -5,15 +5,14 @@
 import Foundation
 import ArcGIS
 
-class RouteTaskNativeObject: BaseNativeObject<AGSRouteTask> {
-    init(objectId: String, task: AGSRouteTask, messageSink: NativeMessageSink) {
+class RouteTaskNativeObject: BaseNativeObject<RouteTask> {
+    init(objectId: String, task: RouteTask, messageSink: NativeMessageSink) {
         super.init(objectId: objectId, nativeObject: task, nativeHandlers: [
             LoadableNativeHandler(loadable: task),
-            RemoteResourceNativeHandler(remoteResource: task),
             ApiKeyResourceNativeHandler(apiKeyResource: task)
         ], messageSink: messageSink)
     }
-
+    
     override func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) {
         switch (method) {
         case "routeTask#getRouteTaskInfo":
@@ -29,36 +28,40 @@ class RouteTaskNativeObject: BaseNativeObject<AGSRouteTask> {
             super.onMethodCall(method: method, arguments: arguments, result: result)
         }
     }
-
+    
     private func getRouteTaskInfo(result: @escaping FlutterResult) {
-        nativeObject.load(completion: { [weak self] (error) in
-            if let error = error {
-                result(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))
-                return
+        createTask {
+            do {
+                try await self.nativeObject.load()
+                result(self.nativeObject.info.toJSONFlutter())
+            }catch{
+                result(error.toJSONFlutter())
             }
-            result(self?.nativeObject.routeTaskInfo().toJSONFlutter())
-        })
+        }
     }
-
+    
     private func createDefaultParameters(result: @escaping FlutterResult) {
-        nativeObject.defaultRouteParameters(completion: { (defaultParams, error) in
-            if let error = error {
-                result(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))
-                return
+        createTask {
+            do{
+                let params = try await self.nativeObject.makeDefaultParameters()
+                result(params.toJSONFlutter())
+            }catch{
+                result(error.toJSONFlutter())
             }
-            result(defaultParams!.toJSONFlutter())
-        })
+        }
+        
     }
-
+    
     private func solveRoute(arguments: Any?, result: @escaping FlutterResult) {
-        let parameters = AGSRouteParameters(data: arguments as! [String: Any])
-        nativeObject.solveRoute(with: parameters, completion: { (routeResult, error) in
-            if let error = error {
-                result(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))
-                return
+        createTask {
+            let parameters = RouteParameters(data: arguments as! [String: Any])
+            do{
+                let route = try await self.nativeObject.solveRoute(using: parameters)
+                result(route.toJSONFlutter())
+            }catch{
+                result(error.toJSONFlutter())
             }
-            result(routeResult!.toJSONFlutter())
-        })
+        }
     }
-
+    
 }

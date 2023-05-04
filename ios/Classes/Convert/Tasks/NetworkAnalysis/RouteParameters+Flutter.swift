@@ -5,13 +5,15 @@
 import Foundation
 import ArcGIS
 
-extension AGSRouteParameters {
+extension RouteParameters {
     convenience init(data: Dictionary<String, Any>) {
         self.init()
-        accumulateAttributeNames = data["accumulateAttributeNames"] as! [String]
-        directionsDistanceUnits = AGSUnitSystem(rawValue: data["directionsDistanceUnits"] as! Int) ?? .unknown
+        for accumlateAttributeName in data["accumulateAttributeNames"] as! [String]{
+            addAccumulateAttributeName(accumlateAttributeName)
+        }
+        directionsDistanceUnits = UnitSystem.fromFlutter(data["directionsDistanceUnits"] as! Int)
         directionsLanguage = data["directionsLanguage"] as! String
-        directionsStyle = AGSDirectionsStyle(rawValue: data["directionsStyle"] as! Int)!
+        directionsStyle = DirectionsStyle(rawValue: data["directionsStyle"] as! Int)!
         findBestSequence = data["findBestSequence"] as! Bool
         if let startTime = data["startTime"] as? String {
             self.startTime = startTime.toDateFromIso8601()

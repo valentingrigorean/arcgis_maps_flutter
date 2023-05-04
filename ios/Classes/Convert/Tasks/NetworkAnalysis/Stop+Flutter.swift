@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-extension AGSStop {
+extension Stop {
     convenience init(data: Dictionary<String, Any>) {
         let point = AGSGeometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>) as! Point
         self.init(point: point)

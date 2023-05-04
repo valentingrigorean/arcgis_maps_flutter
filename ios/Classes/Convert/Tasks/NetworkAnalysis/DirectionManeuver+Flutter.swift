@@ -5,18 +5,18 @@
 import Foundation
 import ArcGIS
 
-extension AGSDirectionManeuver {
+extension DirectionManeuver {
     func toJSONFlutter() -> Any {
         var json = [String: Any]()
-        json["directionEvents"] = directionEvents.map {
+        json["directionEvents"] = events.map {
             $0.toJSONFlutter()
         }
-        json["directionText"] = directionText
-        if let estimatedArriveTime = estimatedArriveTime {
-            json["estimatedArriveTime"] = estimatedArriveTime.toIso8601String()
+        json["directionText"] = text
+        if let estimatedArrivalDate = estimatedArrivalDate {
+            json["estimatedArriveTime"] = estimatedArrivalDate.toIso8601String()
         }
-        json["estimatedArrivalTimeShift"] = estimatedArrivalTimeShift
-        json["maneuverMessages"] = maneuverMessages.map {
+        json["estimatedArrivalTimeShift"] = estimatedArrivalDateShift
+        json["maneuverMessages"] = messages.map {
             $0.toJSONFlutter()
         }
         json["fromLevel"] = fromLevel

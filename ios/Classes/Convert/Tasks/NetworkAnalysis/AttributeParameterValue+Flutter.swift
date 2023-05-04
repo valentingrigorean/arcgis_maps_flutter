@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-extension AGSAttributeParameterValue {
+extension AttributeParameterValue {
 
     convenience init(data: Dictionary<String, Any>) {
         self.init()

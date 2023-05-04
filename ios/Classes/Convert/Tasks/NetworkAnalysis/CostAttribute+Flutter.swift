@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-extension AGSCostAttribute {
+extension CostAttribute {
     func toJSONFlutter() -> Any {
         var json = [String: Any]()
         if let parameterValues = parameterValues {

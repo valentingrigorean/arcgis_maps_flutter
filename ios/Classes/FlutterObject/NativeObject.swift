@@ -133,7 +133,6 @@ class BaseNativeObject<T>: NativeMessageSink, NativeObject {
         nativeObjectMessageSink.send(method: method, arguments: arguments)
     }
     
-    
     func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) {
         for handler in nativeHandlers {
             if handler.onMethodCall(method: method, arguments: arguments, result: result) {
