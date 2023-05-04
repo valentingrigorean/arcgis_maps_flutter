@@ -1,5 +1,6 @@
-package com.valentingrigorean.arcgis_maps_flutter.tasks.offlinemap
+package com.valentingrigorean.arcgis_maps_flutter.convert.tasks.offlinemap
 
+import com.arcgismaps.tasks.offlinemaptask.GenerateOfflineMapParameters
 import com.esri.arcgisruntime.geometry.Geometry
 import com.esri.arcgisruntime.tasks.geodatabase.GenerateGeodatabaseParameters
 import com.esri.arcgisruntime.tasks.offlinemap.GenerateOfflineMapParameters
@@ -13,7 +14,6 @@ import com.esri.arcgisruntime.tasks.offlinemap.OfflineUpdateAvailability
 import com.esri.arcgisruntime.tasks.offlinemap.PreplannedScheduledUpdatesOption
 import com.esri.arcgisruntime.tasks.vectortilecache.EsriVectorTilesDownloadOption
 import com.valentingrigorean.arcgis_maps_flutter.Convert
-import com.valentingrigorean.arcgis_maps_flutter.utils.toMap
 
 object ConvertOfflineMap : Convert() {
     fun generateOfflineMapParametersToJson(parameters: GenerateOfflineMapParameters): Any {

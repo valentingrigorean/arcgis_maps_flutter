@@ -1,16 +1,16 @@
 package com.valentingrigorean.arcgis_maps_flutter.tasks.offlinemap
 
-import com.esri.arcgisruntime.tasks.offlinemap.OfflineMapSyncJob
+import com.arcgismaps.tasks.offlinemaptask.OfflineMapSyncJob
 import com.valentingrigorean.arcgis_maps_flutter.concurrent.JobNativeHandler
+import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.offlinemap.ConvertOfflineMap
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler
 import io.flutter.plugin.common.MethodChannel
 
-class OfflineMapSyncJobNativeObject(objectId: String?, job: OfflineMapSyncJob) :
-    BaseNativeObject<OfflineMapSyncJob?>(
+class OfflineMapSyncJobNativeObject(objectId: String, job: OfflineMapSyncJob) :
+    BaseNativeObject<OfflineMapSyncJob>(
         objectId, job, arrayOf<NativeHandler>(
-            JobNativeHandler(job, JobNativeHandler.JobType.OFFLINE_MAP_SYNC),
-            RemoteResourceNativeHandler(job)
+            JobNativeHandler(job),
         )
     ) {
     override fun onMethodCall(method: String, args: Any?, result: MethodChannel.Result) {
