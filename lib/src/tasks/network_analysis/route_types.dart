@@ -32,122 +32,146 @@ enum AttributeUnit {
 
 enum DirectionManeuverType {
   ///An unknown maneuver type.
-  unknown,
+  unknown(-1),
 
   ///A stop maneuver.
-  stop,
+  stop(0),
 
   ///A moving straight.
-  straight,
+  straight(1),
 
   ///A bear left.
-  bearLeft,
+  bearLeft(2),
 
   ///A bear right.
-  bearRight,
+  bearRight(3),
 
   ///A turn left.
-  turnLeft,
+  turnLeft(4),
 
   ///A turn right.
-  turnRight,
+  turnRight(5),
 
   ///A sharp turn left.
-  sharpLeft,
+  sharpLeft(6),
 
   ///A sharp turn right.
-  sharpRight,
+  sharpRight(7),
 
   ///A u-turn.
-  uTurn,
+  uTurn(8),
 
   ///A maneuver connected with a ferry.
-  ferry,
+  ferry(9),
 
   ///A maneuver via roundabout.
-  roundabout,
+  roundabout(10),
 
   ///A merge of several highways.
-  highwayMerge,
+  highwayMerge(11),
 
   ///An exit from highway.
-  highwayExit,
+  highwayExit(12),
 
   ///A change of highway.
-  highwayChange,
+  highwayChange(13),
 
   ///A straight at fork.
-  forkCenter,
+  forkCenter(14),
 
   ///A maneuver to the left at fork.
-  forkLeft,
+  forkLeft(15),
 
   ///A maneuver to the right at fork.
-  forkRight,
+  forkRight(16),
 
   ///A departure.
-  depart,
+  depart(17),
 
   ///A connected with trip planning.
-  tripItem,
+  tripItem(18),
 
   ///An end of ferry transfer.
-  endOfFerry,
+  endOfFerry(19),
 
   ///A maneuver to the right on ramp.
-  rampRight,
+  rampRight(20),
 
   ///A maneuver to the left on ramp.
-  rampLeft,
+  rampLeft(21),
 
   ///A complex maneuver: turn left, then right.
-  turnLeftRight,
+  turnLeftRight(22),
 
   ///A complex maneuver: turn right, then left.
-  turnRightLeft,
+  turnRightLeft(23),
 
   ///A complex maneuver: turn right, then right.
-  turnRightRight,
+  turnRightRight(24),
 
   ///A complex maneuver: turn left, then left.
-  turnLeftLeft,
+  turnLeftLeft(25),
 
   ///A maneuver via pedestrian ramp.
-  pedestrianRamp,
+  pedestrianRamp(26),
 
   ///A maneuver using elevator.
-  elevator,
+  elevator(27),
 
   ///A maneuver using escalator.
-  escalator,
+  escalator(28),
 
   ///A maneuver using stairs.
-  stairs,
+  stairs(29),
 
   ///A passing through a door.
-  doorPassage,
+  doorPassage(30),
+  ;
+
+  const DirectionManeuverType(this.value);
+
+  factory DirectionManeuverType.fromValue(int value) {
+    return DirectionManeuverType.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => DirectionManeuverType.unknown,
+    );
+  }
+
+  final int value;
 }
 
 enum DirectionMessageType {
-  unknown,
+  unknown(-1),
 
   /// A street name.
-  streetName,
+  streetName(0),
 
   /// An alternative street name.
-  alternativeName,
+  alternativeName(1),
 
   /// A signpost branch.
-  branch,
+  branch(2),
 
   /// A signpost toward.
-  toward,
+  toward(3),
 
   /// An intersected street name.
-  crossStreet,
+  crossStreet(4),
 
   /// A signpost exit.
-  exit
+  exit(5),
+  ;
+
+  const DirectionMessageType(this.value);
+
+  factory DirectionMessageType.fromValue(int value) {
+    return DirectionMessageType.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => DirectionMessageType.unknown,
+    );
+  }
+
+  final int value;
 }
 
 enum DirectionsStyle {

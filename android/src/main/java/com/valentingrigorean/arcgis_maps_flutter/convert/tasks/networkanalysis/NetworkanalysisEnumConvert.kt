@@ -2,6 +2,8 @@ package com.valentingrigorean.arcgis_maps_flutter.convert.tasks.networkanalysis
 
 import com.arcgismaps.tasks.networkanalysis.AttributeUnit
 import com.arcgismaps.tasks.networkanalysis.CurbApproach
+import com.arcgismaps.tasks.networkanalysis.DirectionManeuverType
+import com.arcgismaps.tasks.networkanalysis.DirectionMessageType
 import com.arcgismaps.tasks.networkanalysis.DirectionsStyle
 import com.arcgismaps.tasks.networkanalysis.NetworkDirectionsSupport
 import com.arcgismaps.tasks.networkanalysis.RouteShapeType
@@ -141,3 +143,52 @@ fun Int.toCurbApproach(): CurbApproach {
         else -> throw IllegalStateException("Unexpected value: $this")
     }
 }
+
+fun DirectionMessageType.toFlutterValue() : Int{
+    return when (this){
+        DirectionMessageType.StreetName -> 0
+        DirectionMessageType.AlternativeName -> 1
+        DirectionMessageType.Branch -> 2
+        DirectionMessageType.Toward -> 3
+        DirectionMessageType.CrossStreet -> 4
+        DirectionMessageType.Exit -> 5
+    }
+}
+
+fun DirectionManeuverType.toFlutterValue(): Int {
+    return when (this) {
+        DirectionManeuverType.Unknown -> -1
+        DirectionManeuverType.Stop -> 0
+        DirectionManeuverType.Straight -> 1
+        DirectionManeuverType.BearLeft -> 2
+        DirectionManeuverType.BearRight -> 3
+        DirectionManeuverType.TurnLeft -> 4
+        DirectionManeuverType.TurnRight -> 5
+        DirectionManeuverType.SharpLeft -> 6
+        DirectionManeuverType.SharpRight -> 7
+        DirectionManeuverType.UTurn -> 8
+        DirectionManeuverType.Ferry -> 9
+        DirectionManeuverType.Roundabout -> 10
+        DirectionManeuverType.HighwayMerge -> 11
+        DirectionManeuverType.HighwayExit -> 12
+        DirectionManeuverType.HighwayChange -> 13
+        DirectionManeuverType.ForkCenter -> 14
+        DirectionManeuverType.ForkLeft -> 15
+        DirectionManeuverType.ForkRight -> 16
+        DirectionManeuverType.Depart -> 17
+        DirectionManeuverType.TripItem -> 18
+        DirectionManeuverType.EndOfFerry -> 19
+        DirectionManeuverType.RampRight -> 20
+        DirectionManeuverType.RampLeft -> 21
+        DirectionManeuverType.TurnLeftRight -> 22
+        DirectionManeuverType.TurnRightLeft -> 23
+        DirectionManeuverType.TurnRightRight -> 24
+        DirectionManeuverType.TurnLeftLeft -> 25
+        DirectionManeuverType.PedestrianRamp -> 26
+        DirectionManeuverType.Elevator -> 27
+        DirectionManeuverType.Escalator -> 28
+        DirectionManeuverType.Stairs -> 29
+        DirectionManeuverType.DoorPassage -> 30
+    }
+}
+

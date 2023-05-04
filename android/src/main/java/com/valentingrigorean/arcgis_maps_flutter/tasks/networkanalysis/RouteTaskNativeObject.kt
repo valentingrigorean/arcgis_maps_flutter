@@ -1,13 +1,10 @@
 package com.valentingrigorean.arcgis_maps_flutter.tasks.networkanalysis
 
-import android.util.Log
 import com.arcgismaps.tasks.networkanalysis.RouteTask
-import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.networkanalysis.ConvertRouteTask
 import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.networkanalysis.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.networkanalysis.toRouteParametersOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject
-import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.io.ApiKeyResourceNativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.loadable.LoadableNativeHandler
 import io.flutter.plugin.common.MethodChannel
@@ -16,7 +13,7 @@ import kotlinx.coroutines.launch
 class RouteTaskNativeObject(objectId: String, task: RouteTask) : BaseNativeObject<RouteTask>(
     objectId,
     task,
-    arrayOf<NativeHandler>(
+    arrayOf(
         LoadableNativeHandler(task),
         ApiKeyResourceNativeHandler(task)
     )
@@ -52,16 +49,12 @@ class RouteTaskNativeObject(objectId: String, task: RouteTask) : BaseNativeObjec
 
     private fun solveRoute(args: Any?, result: MethodChannel.Result) {
         scope.launch {
-            val routeParameters =  args!!.toRouteParametersOrNull()!!
+            val routeParameters = args!!.toRouteParametersOrNull()!!
             nativeObject.solveRoute(routeParameters).onSuccess {
-                result.success(ConvertRouteTask.routeResultToJson(it))
+                result.success(it.toFlutterJson())
             }.onFailure {
                 result.success(it.toFlutterJson())
             }
         }
-    }
-
-    companion object {
-        val TAG: String = RouteTaskNativeObject::class.java.simpleName!!
     }
 }
