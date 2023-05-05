@@ -15,7 +15,7 @@ class BaseNativeHandler<T>: NSObject,NativeHandler {
     private var tasks: [Int: Task<Void, Error>] = [:]
     private var taskIdCounter = 0
     
-    let nativeHandler: T
+    var nativeHandler: T
     
     init(nativeHandler: T) {
         self.nativeHandler = nativeHandler
@@ -33,7 +33,6 @@ class BaseNativeHandler<T>: NSObject,NativeHandler {
     }
     
     func sendMessage(method: String, arguments: Any?) {
-        print("BaseNativeHandler.sendMessage: \(method)")
         messageSink?.send(method: method, arguments: arguments)
     }
     

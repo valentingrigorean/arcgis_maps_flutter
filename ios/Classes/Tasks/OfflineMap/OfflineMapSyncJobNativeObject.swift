@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-class AGSOfflineMapSyncJobNativeObject: BaseNativeObject<OfflineMapSyncJob> {
+class OfflineMapSyncJobNativeObject: BaseNativeObject<OfflineMapSyncJob> {
     init(objectId: String, job: OfflineMapSyncJob, messageSink: NativeMessageSink) {
         super.init(objectId: objectId, nativeObject: job, nativeHandlers: [
             JobNativeHandler(job: job),

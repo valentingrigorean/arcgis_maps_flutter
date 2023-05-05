@@ -67,7 +67,7 @@ extension GenerateLayerOption.QueryOption{
 
 
 extension Geodatabase.SyncModel{
-    static func fromFlutter(flutterValue:Int) -> Geodatabase.SyncModel{
+    static func fromFlutter(_ flutterValue:Int) -> Geodatabase.SyncModel{
         switch flutterValue{
         case 1:
             return Geodatabase.SyncModel.geodatabase
@@ -124,7 +124,7 @@ extension UtilityNetworkSyncMode{
 
 
 extension SyncDirection{
-    static func fromFlutter(flutterValue:Int) -> SyncDirection{
+    static func fromFlutter(_ flutterValue:Int) -> SyncDirection{
         switch flutterValue{
         case 1:
             return SyncDirection.download

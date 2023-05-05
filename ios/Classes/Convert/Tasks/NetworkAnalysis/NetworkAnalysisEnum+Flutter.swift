@@ -36,6 +36,8 @@ extension DirectionsStyle{
         }
     }
 }
+
+
 extension RouteShapeType {
     func toFlutterValue() -> Int {
         switch self {

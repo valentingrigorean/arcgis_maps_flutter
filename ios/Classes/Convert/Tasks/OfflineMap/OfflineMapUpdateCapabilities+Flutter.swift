@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-extension AGSOfflineMapUpdateCapabilities {
+extension OfflineMapUpdateCapabilities {
     func toJSONFlutter() -> Any {
         [
             "supportsScheduledUpdatesForFeatures": supportsScheduledUpdatesForFeatures,

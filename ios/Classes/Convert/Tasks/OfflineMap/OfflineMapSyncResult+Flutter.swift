@@ -6,11 +6,11 @@ import Foundation
 import ArcGIS
 
 
-extension AGSOfflineMapSyncResult {
+extension OfflineMapSyncResult {
     func toJSONFlutter() -> Any {
         [
             "hasErrors": hasErrors,
-            "isMobileMapPackageReopenRequired": isMobileMapPackageReopenRequired,
+            "isMobileMapPackageReopenRequired": mobileMapPackageReopenIsRequired,
         ]
     }
 }

@@ -5,11 +5,10 @@
 import Foundation
 import ArcGIS
 
-class GenerateOfflineMapJobNativeObject: BaseNativeObject<AGSGenerateOfflineMapJob> {
-    init(objectId: String, job: AGSGenerateOfflineMapJob, messageSink: NativeMessageSink) {
+class GenerateOfflineMapJobNativeObject: BaseNativeObject<GenerateOfflineMapJob> {
+    init(objectId: String, job: GenerateOfflineMapJob, messageSink: NativeMessageSink) {
         super.init(objectId: objectId, nativeObject: job, nativeHandlers: [
             JobNativeHandler(job: job),
-            RemoteResourceNativeHandler(remoteResource: job)
         ], messageSink: messageSink)
     }
 }

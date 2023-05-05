@@ -70,8 +70,8 @@ private struct MethodCall {
     let result: FlutterResult
 }
 
-fileprivate class OfflineMapSyncTaskNativeObjectWrapper: BaseNativeObject<AGSOfflineMapSyncTask> {
-    init(objectId: String, task: AGSOfflineMapSyncTask, messageSink: NativeMessageSink) {
+fileprivate class OfflineMapSyncTaskNativeObjectWrapper: BaseNativeObject<OfflineMapSyncTask> {
+    init(objectId: String, task: OfflineMapSyncTask, messageSink: NativeMessageSink) {
         super.init(objectId: objectId, nativeObject: task, nativeHandlers: [
             LoadableNativeHandler(loadable: task),
         ], messageSink: messageSink)
