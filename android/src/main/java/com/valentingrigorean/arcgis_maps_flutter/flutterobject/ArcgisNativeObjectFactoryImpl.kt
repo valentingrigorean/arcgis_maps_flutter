@@ -20,7 +20,7 @@ import com.valentingrigorean.arcgis_maps_flutter.tasks.offlinemap.OfflineMapTask
 import com.valentingrigorean.arcgis_maps_flutter.tasks.tilecache.ExportTileCacheTaskNativeObject
 import java.util.Objects
 
-class ArcgisNativeObjectFactoryImpl() : ArcgisNativeObjectFactory {
+class ArcgisNativeObjectFactoryImpl : ArcgisNativeObjectFactory {
     override fun createNativeObject(
         objectId: String,
         type: String,

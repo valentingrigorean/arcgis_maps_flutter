@@ -1,9 +1,7 @@
 package com.valentingrigorean.arcgis_maps_flutter.tasks.offlinemap
 
-import com.esri.arcgisruntime.ArcGISRuntimeException
-import com.esri.arcgisruntime.loadable.LoadStatus
-import com.esri.arcgisruntime.mapping.MobileMapPackage
-import com.esri.arcgisruntime.tasks.offlinemap.OfflineMapSyncTask
+import com.arcgismaps.mapping.MobileMapPackage
+import com.arcgismaps.tasks.offlinemaptask.OfflineMapSyncTask
 import com.valentingrigorean.arcgis_maps_flutter.Convert
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler
@@ -14,7 +12,7 @@ import io.flutter.plugin.common.MethodChannel
 import java.util.UUID
 
 class OfflineMapSyncTaskNativeObject(
-    private override val objectId: String,
+    override val objectId: String,
     private val offlineMapPath: String
 ) : NativeObject {
     private val pendingCalls = ArrayList<MethodCall>()
@@ -24,10 +22,6 @@ class OfflineMapSyncTaskNativeObject(
 
     init {
         loadOfflineMap()
-    }
-
-    override fun getObjectId(): String {
-        return objectId
     }
 
     override fun dispose() {
@@ -80,7 +74,8 @@ class OfflineMapSyncTaskNativeObject(
             } else {
                 var exception = mobileMapPackage.loadError
                 if (exception == null) {
-                    exception = ArcGISRuntimeException(
+                    exception =
+                        ArcGISRuntimeException(
                         -1,
                         ArcGISRuntimeException.ErrorDomain.UNKNOWN,
                         "No maps in the package",
@@ -103,12 +98,11 @@ class OfflineMapSyncTaskNativeObject(
     )
 
     private inner class OfflineMapSyncTaskNativeObjectWrapper(
-        objectId: String?,
+        objectId: String,
         task: OfflineMapSyncTask
-    ) : BaseNativeObject<OfflineMapSyncTask?>(
+    ) : BaseNativeObject<OfflineMapSyncTask>(
         objectId, task, arrayOf<NativeHandler>(
             LoadableNativeHandler(task),
-            RemoteResourceNativeHandler(task)
         )
     ) {
         override fun onMethodCall(method: String, args: Any?, result: MethodChannel.Result) {
