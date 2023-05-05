@@ -5,7 +5,6 @@ import com.esri.arcgisruntime.loadable.LoadStatus
 import com.esri.arcgisruntime.mapping.MobileMapPackage
 import com.esri.arcgisruntime.tasks.offlinemap.OfflineMapSyncTask
 import com.valentingrigorean.arcgis_maps_flutter.Convert
-import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.offlinemap.ConvertOfflineMap
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeMessageSink
@@ -27,7 +26,7 @@ class OfflineMapSyncTaskNativeObject(
         loadOfflineMap()
     }
 
-    override fun getObjectId(): String? {
+    override fun getObjectId(): String {
         return objectId
     }
 

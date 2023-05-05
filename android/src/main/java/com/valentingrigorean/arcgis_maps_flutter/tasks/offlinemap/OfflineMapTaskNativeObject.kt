@@ -1,12 +1,14 @@
 package com.valentingrigorean.arcgis_maps_flutter.tasks.offlinemap
 
 import com.arcgismaps.tasks.offlinemaptask.OfflineMapTask
-import com.valentingrigorean.arcgis_maps_flutter.Convert
-import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.offlinemap.ConvertOfflineMap
+import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.offlinemap.toFlutterJson
+import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.loadable.LoadableNativeHandler
 import io.flutter.plugin.common.MethodChannel
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class OfflineMapTaskNativeObject(objectId: String, task: OfflineMapTask) :
@@ -19,17 +21,13 @@ class OfflineMapTaskNativeObject(objectId: String, task: OfflineMapTask) :
         when (method) {
             "offlineMapTask#defaultGenerateOfflineMapParameters" -> {
                 defaultGenerateOfflineMapParameters(
-                    Convert.Companion.toMap(
-                        args!!
-                    ), result
+                    args as Map<*, *>, result
                 )
             }
 
             "offlineMapTask#generateOfflineMap" -> {
                 generateOfflineMap(
-                    Convert.Companion.toMap(
-                        args!!
-                    ), result
+                    args as Map<*, *>, result
                 )
             }
 
@@ -38,27 +36,22 @@ class OfflineMapTaskNativeObject(objectId: String, task: OfflineMapTask) :
     }
 
     private fun defaultGenerateOfflineMapParameters(data: Map<*, *>, result: MethodChannel.Result) {
-        val areaOfInterest: Geometry = Convert.Companion.toGeometry(
-            data["areaOfInterest"]
-        )
-        val minScale = data["minScale"]
-        val maxScale = data["maxScale"]
-        val future: ListenableFuture<GenerateOfflineMapParameters>
-        future = if (minScale == null) {
-            nativeObject.createDefaultGenerateOfflineMapParametersAsync(areaOfInterest)
-        } else {
-            nativeObject.createDefaultGenerateOfflineMapParametersAsync(
-                areaOfInterest,
-                minScale as Double,
-                maxScale as Double
-            )
-        }
-        future.addDoneListener {
-            try {
-                val parameters = future.get()
-                result.success(ConvertOfflineMap.generateOfflineMapParametersToJson(parameters))
-            } catch (e: Exception) {
-                result.error("defaultGenerateOfflineMapParameters", e.message, null)
+        scope.launch {
+            val areaOfInterest = data["areaOfInterest"]?.toGeometryOrNull()!!
+            val minScale = data["minScale"] as Double?
+            val maxScale = data["maxScale"] as Double?
+            if (minScale == null) {
+                nativeObject.createDefaultGenerateOfflineMapParameters(areaOfInterest)
+            } else {
+                nativeObject.createDefaultGenerateOfflineMapParameters(
+                    areaOfInterest,
+                    minScale,
+                    maxScale!!
+                )
+            }.onSuccess {
+                result.success(it.toFlutterJson())
+            }.onFailure {
+                result.success(it.toFlutterJson())
             }
         }
     }
