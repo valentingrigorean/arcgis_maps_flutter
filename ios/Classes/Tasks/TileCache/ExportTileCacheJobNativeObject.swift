@@ -5,12 +5,11 @@
 import Foundation
 import ArcGIS
 
-class ExportTileCacheJobNativeObject: BaseNativeObject<AGSExportTileCacheJob> {
+class ExportTileCacheJobNativeObject: BaseNativeObject<ExportTileCacheJob> {
 
-    init(objectId: String, job: AGSExportTileCacheJob, messageSink: NativeMessageSink) {
+    init(objectId: String, job: ExportTileCacheJob, messageSink: NativeMessageSink) {
         super.init(objectId: objectId, nativeObject: job, nativeHandlers: [
             JobNativeHandler(job: job),
-            RemoteResourceNativeHandler(remoteResource: job)
         ], messageSink: messageSink)
 
     }

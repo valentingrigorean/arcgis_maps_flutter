@@ -5,12 +5,11 @@
 import Foundation
 import ArcGIS
 
-class EstimateTileCacheSizeJobNativeObject: BaseNativeObject<AGSEstimateTileCacheSizeJob> {
+class EstimateTileCacheSizeJobNativeObject: BaseNativeObject<EstimateTileCacheSizeJob> {
 
-    init(objectId: String, job: AGSEstimateTileCacheSizeJob, messageSink: NativeMessageSink) {
+    init(objectId: String, job: EstimateTileCacheSizeJob, messageSink: NativeMessageSink) {
         super.init(objectId: objectId, nativeObject: job, nativeHandlers: [
             JobNativeHandler(job: job),
-            RemoteResourceNativeHandler(remoteResource: job)
         ], messageSink: messageSink)
     }
 }

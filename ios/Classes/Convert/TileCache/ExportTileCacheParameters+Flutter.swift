@@ -5,14 +5,14 @@
 import Foundation
 import ArcGIS
 
-extension AGSExportTileCacheParameters {
+extension ExportTileCacheParameters {
     convenience init(data: Dictionary<String, Any>) {
         self.init()
         if let geometry = data["geometry"] as? Dictionary<String, Any> {
-            areaOfInterest = AGSGeometry.fromFlutter(data: geometry)
+            areaOfInterest = Geometry.fromFlutter(data: geometry)
         }
         compressionQuality = data["compressionQuality"] as! Float
-        levelIDs = (data["levelIds"] as! [Int]).map({ NSNumber(value: $0) })
+        addLevelIDs(data["levelIds"] as! [Int])
     }
 
     func toJSONFlutter() -> Any {
@@ -21,7 +21,7 @@ extension AGSExportTileCacheParameters {
             json["areaOfInterest"] = areaOfInterest.toJSONFlutter()
         }
         json["compressionQuality"] = compressionQuality
-        json["levelIds"] = levelIDs.map({ $0.intValue })
+        json["levelIds"] = levelIDs
         return json
     }
 }
