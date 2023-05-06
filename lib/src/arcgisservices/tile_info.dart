@@ -45,7 +45,7 @@ class TileInfo {
       levelOfDetails: (json['levelOfDetails'] as List<dynamic>)
           .map((e) => LevelOfDetail.fromJson(e))
           .toList(),
-      origin: AGSPoint.fromJson(json['origin'])!,
+      origin: Point.fromJson(json['origin'])!,
       spatialReference: SpatialReference.fromJson(json['spatialReference'])!,
       tileHeight: json['tileHeight'] as int,
       tileWidth: json['tileWidth'] as int,
@@ -60,7 +60,7 @@ class TileInfo {
   final List<LevelOfDetail> levelOfDetails;
 
   /// The tiling scheme origin which specifies the starting location of Row 0 and Column 0.
-  final AGSPoint origin;
+  final Point origin;
 
   final SpatialReference spatialReference;
 

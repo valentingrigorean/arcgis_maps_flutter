@@ -7,7 +7,7 @@ class Utils {
 
   Utils._();
 
-  static AGSPoint getRandomLocation(AGSPoint point, int radius) {
+  static Point getRandomLocation(Point point, int radius) {
     double x0 = point.latitude;
     double y0 = point.longitude;
 
@@ -26,6 +26,6 @@ class Utils {
     double foundLatitude = newX + x0;
     double foundLongitude = y + y0;
 
-    return AGSPoint.fromLatLng(latitude: foundLatitude, longitude: foundLongitude);
+    return Point.fromLatLng(latitude: foundLatitude, longitude: foundLongitude);
   }
 }

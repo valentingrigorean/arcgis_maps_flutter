@@ -9,13 +9,13 @@ class MethodChannelCoordinateFormatterFlutter
 
   @override
   Future<String?> latitudeLongitudeString({
-    required AGSPoint from,
+    required Point from,
     required LatitudeLongitudeFormat format,
     required int decimalPlaces,
   }) async {
     return _channel.invokeMethod('latitudeLongitudeString', {
       "from": from.toJson(),
-      "format": format.index,
+      "format": format.value,
       "decimalPlaces": decimalPlaces,
     });
   }

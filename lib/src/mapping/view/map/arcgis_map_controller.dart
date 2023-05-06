@@ -160,7 +160,7 @@ class ArcgisMapController {
         .setViewpointGeometry(mapId, geometry, padding);
   }
 
-  Future<bool> setViewpointCenter(AGSPoint center, {double? scale}) async {
+  Future<bool> setViewpointCenter(Point center, {double? scale}) async {
     scale ??= await getMapScale();
     return ArcgisMapsFlutterPlatform.instance
         .setViewpointCenter(mapId, center, scale);
@@ -196,11 +196,11 @@ class ArcgisMapController {
     return ArcgisMapsFlutterPlatform.instance.getInitialViewpoint(mapId);
   }
 
-  Future<Offset?> locationToScreen(AGSPoint mapPoint) {
+  Future<Offset?> locationToScreen(Point mapPoint) {
     return ArcgisMapsFlutterPlatform.instance.locationToScreen(mapId, mapPoint);
   }
 
-  Future<AGSPoint?> screenToLocation(Offset screenPoint,
+  Future<Point?> screenToLocation(Offset screenPoint,
       {SpatialReference? spatialReference}) {
     return ArcgisMapsFlutterPlatform.instance.screenToLocation(
       mapId,

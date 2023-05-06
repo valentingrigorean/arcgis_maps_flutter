@@ -8,10 +8,7 @@ class SymbolVisibilityFilter(val minZoom: Double, val maxZoom: Double) {
         if (this === o) return true
         if (o == null || javaClass != o.javaClass) return false
         val that = o as SymbolVisibilityFilter
-        return java.lang.Double.compare(
-            that.minZoom,
-            minZoom
-        ) == 0 && java.lang.Double.compare(that.maxZoom, maxZoom) == 0
+        return that.minZoom.compareTo(minZoom) == 0 && that.maxZoom.compareTo(maxZoom) == 0
     }
 
     override fun hashCode(): Int {

@@ -18,7 +18,7 @@ class DirectionEvent {
       eventMessages: (json['eventMessages'] as List<String>),
       eventText: json['eventText'] as String,
       geometry: Geometry.fromJson(json['geometry'] as Map<String, dynamic>)
-          as AGSPoint?,
+          as Point?,
     );
   }
 
@@ -39,5 +39,5 @@ class DirectionEvent {
   final String eventText;
 
   /// Location of the event
-  final AGSPoint? geometry;
+  final Point? geometry;
 }

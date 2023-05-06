@@ -59,11 +59,11 @@ part 'src/data/sync_model.dart';
 part 'src/data/tile_key.dart';
 part 'src/data/query_parameters.dart';
 
-part 'src/geometry/ags_polygon.dart';
-part 'src/geometry/ags_polyline.dart';
+part 'src/geometry/polygon.dart';
+part 'src/geometry/polyline.dart';
 part 'src/geometry/envelope.dart';
-part 'src/geometry/ags_multipoint.dart';
-part 'src/geometry/ags_point.dart';
+part 'src/geometry/multipoint.dart';
+part 'src/geometry/point.dart';
 part 'src/geometry/coordinate_formatter.dart';
 part 'src/geometry/geodesic_sector_parameters.dart';
 part 'src/geometry/spatial_references.dart';
@@ -136,8 +136,8 @@ part 'src/security/user_credential.dart';
 
 part 'src/symbology/bitmap_descriptor.dart';
 part 'src/symbology/marker.dart';
-part 'src/symbology/polygon.dart';
-part 'src/symbology/polyline.dart';
+part 'src/symbology/polygon_marker.dart';
+part 'src/symbology/polyline_marker.dart';
 part 'src/symbology/symbol.dart';
 part 'src/symbology/symbol_visibility_filter.dart';
 

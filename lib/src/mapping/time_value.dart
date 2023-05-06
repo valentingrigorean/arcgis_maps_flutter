@@ -1,17 +1,29 @@
 part of arcgis_maps_flutter;
 
 enum TimeUnit {
-  unknown,
-  centuries,
-  days,
-  decades,
-  hours,
-  milliseconds,
-  minutes,
-  months,
-  seconds,
-  weeks,
-  years
+  unknown(0),
+  centuries(1),
+  days(2),
+  decades(3),
+  hours(4),
+  milliseconds(5),
+  minutes(6),
+  months(7),
+  seconds(8),
+  weeks(9),
+  years(10),
+  ;
+
+  const TimeUnit(this.value);
+
+  factory TimeUnit.fromValue(int value) {
+    return TimeUnit.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => TimeUnit.unknown,
+    );
+  }
+
+  final int value;
 }
 
 @immutable
@@ -35,7 +47,7 @@ class TimeValue {
   Object toJson() {
     final Map<String, Object> json = {};
     json['duration'] = duration;
-    json['unit'] = unit.index;
+    json['unit'] = unit.value;
     return json;
   }
 

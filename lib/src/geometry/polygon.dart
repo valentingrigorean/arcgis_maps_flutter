@@ -1,8 +1,8 @@
 part of arcgis_maps_flutter;
 
 @immutable
-class AGSPolygon extends Geometry {
-  const AGSPolygon._({
+class Polygon extends Geometry {
+  const Polygon._({
     required this.points,
     required this.hasZ,
     required this.hasM,
@@ -12,8 +12,8 @@ class AGSPolygon extends Geometry {
           geometryType: GeometryType.polygon,
         );
 
-  AGSPolygon({
-    required List<List<AGSPoint>> points,
+  Polygon({
+    required List<List<Point>> points,
     SpatialReference? spatialReference,
   }) : this._(
           points: points,
@@ -25,12 +25,14 @@ class AGSPolygon extends Geometry {
   final bool hasZ;
   final bool hasM;
 
-  final List<List<AGSPoint>> points;
+  final List<List<Point>> points;
 
-  static AGSPolygon? fromJson(Map<dynamic, dynamic>? json) {
+  static Polygon? fromJson(Map<dynamic, dynamic>? json) {
     if (json == null) {
       return null;
     }
+
+    PolygonMarker q;
 
     final bool hasZ = json['hasZ'] ?? false;
     final bool hasM = json['hasM'] ?? false;
@@ -40,8 +42,8 @@ class AGSPolygon extends Geometry {
     final SpatialReference? spatialReference =
         SpatialReference.fromJson(json['spatialReference']);
 
-    return AGSPolygon._(
-      points: AGSPoint.fromJsonList(rings, hasZ: hasZ, hasM: hasM),
+    return Polygon._(
+      points: Point.fromJsonList(rings, hasZ: hasZ, hasM: hasM),
       hasZ: hasZ,
       hasM: hasM,
       spatialReference: spatialReference,
@@ -69,7 +71,7 @@ class AGSPolygon extends Geometry {
       final results = <List<Object>>[];
       for (final part in points) {
         final List<Object> pointsRaw = <Object>[];
-        for (final AGSPoint point in part) {
+        for (final Point point in part) {
           pointsRaw.add(pointToList(point, hasZ: hasZ, hasM: hasM));
         }
         results.add(pointsRaw);
@@ -85,7 +87,7 @@ class AGSPolygon extends Geometry {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is AGSPolygon &&
+      other is Polygon &&
           runtimeType == other.runtimeType &&
           hasZ == other.hasZ &&
           hasM == other.hasM &&

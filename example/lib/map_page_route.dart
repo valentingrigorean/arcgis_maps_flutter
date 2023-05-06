@@ -17,7 +17,7 @@ class _MapPageRouteState extends State<MapPageRoute> {
   final Set<Marker> _markers = {
     Marker(
       markerId: const MarkerId('start'),
-      position: AGSPoint(
+      position: Point(
         x: -117.15083257944445,
         y: 32.741123367963446,
         spatialReference: SpatialReference.wgs84(),
@@ -27,7 +27,7 @@ class _MapPageRouteState extends State<MapPageRoute> {
     ),
     Marker(
       markerId: const MarkerId('end'),
-      position: AGSPoint(
+      position: Point(
         x: -117.15557279683529,
         y: 32.703360305883045,
         spatialReference: SpatialReference.wgs84(),
@@ -38,7 +38,7 @@ class _MapPageRouteState extends State<MapPageRoute> {
   };
 
   late final ArcgisMapController _mapController;
-  final Set<Polyline> _routeLines = {};
+  final Set<PolylineMarker> _routeLines = {};
   final List<DirectionManeuver> _directions = [];
 
   @override
@@ -100,14 +100,14 @@ class _MapPageRouteState extends State<MapPageRoute> {
     final defaultParam = (await _routeTask.createDefaultParameters())
         .copyWith(returnDirections: true, stops: [
       Stop(
-        point: AGSPoint(
+        point: Point(
           x: -117.15083257944445,
           y: 32.741123367963446,
           spatialReference: SpatialReference.wgs84(),
         ),
       ),
       Stop(
-        point: AGSPoint(
+        point: Point(
           x: -117.15557279683529,
           y: 32.703360305883045,
           spatialReference: SpatialReference.wgs84(),
@@ -126,7 +126,7 @@ class _MapPageRouteState extends State<MapPageRoute> {
       }
       _routeLines.clear();
       _routeLines.add(
-        Polyline(
+        PolylineMarker(
           polylineId: const PolylineId('route'),
           points: route.routeGeometry!.points.first
               .map((e) => e.copyWithSpatialReference(

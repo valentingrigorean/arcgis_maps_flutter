@@ -1,14 +1,15 @@
 package com.valentingrigorean.arcgis_maps_flutter.layers
 
 import android.net.Uri
-import com.esri.arcgisruntime.arcgisservices.TileInfo
+import com.arcgismaps.arcgisservices.TileKey
+import com.arcgismaps.geometry.Envelope
+import com.arcgismaps.mapping.layers.ServiceImageTiledLayer
+import com.arcgismaps.mapping.layers.TileInfo
 import com.esri.arcgisruntime.data.TileKey
-import com.esri.arcgisruntime.geometry.Envelope
-import com.esri.arcgisruntime.layers.ServiceImageTiledLayer
 
 class FlutterServiceImageTiledLayer(
-    tileInfo: TileInfo?,
-    fullExtent: Envelope?,
+    tileInfo: TileInfo,
+    fullExtent: Envelope,
     private val urlTemplate: String,
     private val subdomains: List<String?>?,
     private val additionalOptions: Map<String?, String?>?

@@ -14,7 +14,7 @@ class MapPageGeodeticDistance extends StatefulWidget {
 
 class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance> {
   PermissionStatus _permissionStatus = PermissionStatus.denied;
-  AGSPoint? _userLocation;
+  Point? _userLocation;
 
   StreamSubscription? _locationSubscription;
 
@@ -50,7 +50,7 @@ class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance> {
             }
           });
         },
-        onTap: (_, AGSPoint point) async {
+        onTap: (_, Point point) async {
           if (_userLocation == null) {
             return;
           }
@@ -58,10 +58,10 @@ class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance> {
               _userLocation?.spatialReference?.wkId) {
             if (_userLocation!.spatialReference == null) {
               _userLocation = await GeometryEngine.project(
-                  _userLocation!, point.spatialReference!) as AGSPoint;
+                  _userLocation!, point.spatialReference!) as Point;
             } else {
               point = await GeometryEngine.project(
-                  point, _userLocation!.spatialReference!) as AGSPoint;
+                  point, _userLocation!.spatialReference!) as Point;
             }
           }
           final result = await GeometryEngine.distanceGeodetic(

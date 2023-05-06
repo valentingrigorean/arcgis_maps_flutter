@@ -78,7 +78,7 @@ class LocatorTask extends ArcgisNativeObject with Loadable, ApiKeyResource {
   }
 
   Future<List<GeocodeResult>> reverseGeocode({
-    required AGSPoint location,
+    required Point location,
     ReverseGeocodeParameters? parameters,
   }) async {
     final List<dynamic> result = await invokeMethod(

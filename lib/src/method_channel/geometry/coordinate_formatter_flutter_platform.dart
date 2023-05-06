@@ -20,7 +20,7 @@ abstract class CoordinateFormatterFlutterPlatform extends PlatformInterface {
   }
 
   Future<String?> latitudeLongitudeString({
-    required AGSPoint from,
+    required Point from,
     required LatitudeLongitudeFormat format,
     required int decimalPlaces,
   }) {

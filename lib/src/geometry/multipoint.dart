@@ -1,8 +1,8 @@
 part of arcgis_maps_flutter;
 
 @immutable
-class AGSMultipoint extends Geometry {
-  const AGSMultipoint._({
+class Multipoint extends Geometry {
+  const Multipoint._({
     required this.points,
     SpatialReference? spatialReference,
   }) : super(
@@ -10,14 +10,14 @@ class AGSMultipoint extends Geometry {
     geometryType: GeometryType.multipoint,
   );
 
-  const AGSMultipoint({
-    required List<AGSPoint> points,
+  const Multipoint({
+    required List<Point> points,
     SpatialReference? spatialReference,
   }) : this._(points: points, spatialReference: spatialReference);
 
-  final List<AGSPoint> points;
+  final List<Point> points;
 
-  static AGSMultipoint? fromJson(Map<dynamic, dynamic>? json) {
+  static Multipoint? fromJson(Map<dynamic, dynamic>? json) {
     if (json == null) {
       return null;
     }
@@ -30,9 +30,9 @@ class AGSMultipoint extends Geometry {
     var validPoints =
     points.where((element) => (element as List<dynamic>?)?.length == 2);
 
-    return AGSMultipoint._(
+    return Multipoint._(
       points: validPoints
-          .map((e) => AGSPoint(x: toDoubleSafe(e[0]), y: toDoubleSafe(e[1])))
+          .map((e) => Point(x: toDoubleSafe(e[0]), y: toDoubleSafe(e[1])))
           .toList(),
       spatialReference: spatialReference,
     );
@@ -63,7 +63,7 @@ class AGSMultipoint extends Geometry {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is AGSMultipoint &&
+          other is Multipoint &&
               runtimeType == other.runtimeType &&
               points == other.points;
 

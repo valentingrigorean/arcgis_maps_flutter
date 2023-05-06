@@ -12,7 +12,7 @@ class MapPageScreenLocation extends StatefulWidget {
 
 class _MapPageScreenLocationState extends State<MapPageScreenLocation> {
   ArcgisMapController? _arcgisMapController;
-  AGSPoint? _onLastClickDetails;
+  Point? _onLastClickDetails;
 
   @override
   Widget build(BuildContext context) {

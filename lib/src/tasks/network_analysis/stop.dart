@@ -29,7 +29,7 @@ class Stop {
   });
 
   const Stop({
-    required AGSPoint point,
+    required Point point,
     String name = '',
     StopType stopType = StopType.stop,
     String routeName = '',
@@ -57,7 +57,7 @@ class Stop {
       currentBearingTolerance: json['currentBearingTolerance'],
       distanceToNetworkLocation: json['distanceToNetworkLocation'],
       geometry: json.containsKey('geometry')
-          ? Geometry.fromJson(json['geometry']) as AGSPoint
+          ? Geometry.fromJson(json['geometry']) as Point
           : null,
       arrivalTime: parseDateTimeSafeNullable(json['arrivalTime']),
       arrivalTimeShift: json['arrivalTimeShift'],
@@ -112,7 +112,7 @@ class Stop {
   final double distanceToNetworkLocation;
 
   /// Location the stop should be placed.
-  final AGSPoint? geometry;
+  final Point? geometry;
 
   /// Time of arrival at the stop.
   final DateTime? arrivalTime;
@@ -179,9 +179,9 @@ class Stop {
     return {
       'geometry': geometry!.toJson(),
       'name': name,
-      'stopType': stopType.index,
+      'stopType': stopType.value,
       'routeName': routeName,
-      'curbApproach': curbApproach.index,
+      'curbApproach': curbApproach.value,
       'currentBearingTolerance': currentBearingTolerance,
       'navigationLatency': navigationLatency,
       'navigationSpeed': navigationSpeed,

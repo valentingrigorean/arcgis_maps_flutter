@@ -58,7 +58,7 @@ class _MapPageMarkersState extends State<MapPageMarkers> {
       final int color = _random.nextInt(4);
       final Marker marker = Marker(
         markerId: MarkerId(i.toString()),
-        position: AGSPoint.fromLatLng(
+        position: Point.fromLatLng(
           latitude: _random.nextDouble() * 360 - 180,
           longitude: _random.nextDouble() * 180 - 90,
         ),

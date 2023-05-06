@@ -10,6 +10,9 @@ import android.util.Log
 import android.util.LruCache
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import com.arcgismaps.mapping.symbology.PictureMarkerSymbol
+import com.arcgismaps.mapping.symbology.SimpleMarkerSymbol
+import com.arcgismaps.mapping.symbology.Symbol
 import com.esri.arcgisruntime.concurrent.ListenableFuture
 import com.esri.arcgisruntime.internal.jni.CoreImage
 import com.esri.arcgisruntime.internal.jni.CorePictureMarkerSymbol
@@ -25,12 +28,12 @@ import java.util.concurrent.ExecutionException
 import java.util.stream.Collectors
 
 object BitmapDescriptorFactory {
-    private val _bitmapDescriptorFutures =
+    private val bitmapDescriptorFutures =
         ConcurrentHashMap<BitmapDescriptorOptions, ListenableFuture<PictureMarkerSymbol>>()
-    private var _cache: LruCacheEx? = null
-    fun fromRawData(context: Context?, o: Any?): BitmapDescriptor? {
+    private var cache: LruCacheEx? = null
+    fun fromRawData(context: Context, o: Any?): BitmapDescriptor? {
         val data = o as Map<*, *>? ?: return null
-        if (_cache == null) {
+        if (cache == null) {
             createCache(context)
         }
         val fromBytes = data["fromBytes"]
@@ -41,14 +44,10 @@ object BitmapDescriptorFactory {
         if (fromAsset != null) {
             return AssetBitmapDescriptor(context, BitmapDescriptorOptions(context, data))
         }
-        val styleMarker = data["styleMarker"]
+        val styleMarker = (data["styleMarker"] as Int?)?.toSimpleMarkerSymbolStyle()
         if (styleMarker != null) {
-            val color: Int = Convert.Companion.toInt(
-                data["color"]
-            )
-            val size: Float = Convert.Companion.toFloat(
-                data["size"]
-            )
+            val color = data["color"] as Int
+            val size = data["size"] as Float
             val style: SimpleMarkerSymbol.Style = Convert.Companion.toSimpleMarkerSymbolStyle(
                 Convert.Companion.toInt(styleMarker)
             )
@@ -74,26 +73,16 @@ object BitmapDescriptorFactory {
         _cache = LruCacheEx(limitKb)
     }
 
-    private class RawBitmapDescriptor(context: Context?, data: Any) : BitmapDescriptor {
+    private class RawBitmapDescriptor(context: Context, data: Any) : BitmapDescriptor {
         private val bitmap: BitmapDrawable
 
         init {
-            bitmap = BitmapDrawable(context!!.resources, Convert.Companion.toBitmap(data))
+            bitmap = BitmapDrawable(context.resources, Convert.Companion.toBitmap(data))
         }
 
         override fun createSymbolAsync(loader: BitmapDescriptorListener) {
-            val future = PictureMarkerSymbol.createAsync(bitmap)
-            future.addDoneListener {
-                try {
-                    loader.onLoaded(future.get())
-                } catch (e: ExecutionException) {
-                    e.printStackTrace()
-                    loader.onFailed()
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                    loader.onFailed()
-                }
-            }
+            val symbol = PictureMarkerSymbol.createWithImage(bitmap)
+            loader.onLoaded(symbol)
         }
     }
 
@@ -176,7 +165,7 @@ object BitmapDescriptorFactory {
         private val bitmapDescriptors: Collection<BitmapDescriptor?>,
         private val listener: BitmapDescriptorListener
     ) {
-        private val symbols = ArrayList<Symbol?>()
+        private val symbols = ArrayList<Symbol>()
         private var currentSymbols = 0
 
         init {

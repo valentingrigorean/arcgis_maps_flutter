@@ -52,7 +52,7 @@ class _MapPageDynamicLayerState extends State<MapPageDynamicLayer> {
       dpi: 96,
       imageFormat: ImageFormat.png,
       levelOfDetails: levels,
-      origin: AGSPoint(
+      origin: Point(
         x: -20037508.3427892,
         y: 20037508.3427892,
         spatialReference: SpatialReference.webMercator(),

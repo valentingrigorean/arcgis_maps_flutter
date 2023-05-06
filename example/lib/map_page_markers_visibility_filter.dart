@@ -47,7 +47,7 @@ class _MapPageMarkersVisibilityFilterState
       return Marker(
         markerId: MarkerId(index.toString()),
         position: Utils.getRandomLocation(
-            AGSPoint.fromLatLng(latitude: 59.91, longitude: 10.76), 200000),
+            Point.fromLatLng(latitude: 59.91, longitude: 10.76), 200000),
         icon: BitmapDescriptor.fromStyleMarker(
           style: _styleMap[index % 4]!,
           color: _colorMap[index % 4]!,

@@ -38,7 +38,7 @@ class SuggestParameters {
   /// use [searchArea] instead. The preferred search location is only intended
   /// to influence the sort order of results so that the most locationally-relevant
   /// candidates are returned first.
-  final AGSPoint? preferredSearchLocation;
+  final Point? preferredSearchLocation;
 
   /// The search area used to spatially filter the geocoded results.
   /// Only results that lie within this area are included.
@@ -48,7 +48,7 @@ class SuggestParameters {
     List<String>? categories,
     String? countryCode,
     int? maxResults,
-    AGSPoint? preferredSearchLocation,
+    Point? preferredSearchLocation,
     Geometry? searchArea,
   }) {
     return SuggestParameters(

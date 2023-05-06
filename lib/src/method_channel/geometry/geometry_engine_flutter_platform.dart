@@ -26,8 +26,8 @@ abstract class GeometryEngineFlutterPlatform extends PlatformInterface {
   }
 
   Future<GeodeticDistanceResult?> distanceGeodetic({
-    required AGSPoint point1,
-    required AGSPoint point2,
+    required Point point1,
+    required Point point2,
     required LinearUnitId distanceUnitId,
     required AngularUnitId azimuthUnitId,
     required GeodeticCurveType curveType,
@@ -35,12 +35,12 @@ abstract class GeometryEngineFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('distanceGeodetic() has not been implemented.');
   }
 
-  Future<AGSPolygon?> bufferGeometry(
+  Future<Polygon?> bufferGeometry(
       {required Geometry geometry, required double distance}) {
     throw UnimplementedError('bufferGeometry() has not been implemented.');
   }
 
-  Future<AGSPolygon?> geodeticBufferGeometry({
+  Future<Polygon?> geodeticBufferGeometry({
     required Geometry geometry,
     required double distance,
     required LinearUnitId distanceUnit,
@@ -67,8 +67,8 @@ abstract class GeometryEngineFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('geodesicSector() has not been implemented.');
   }
 
-  Future<List<AGSPoint>> geodeticMove({
-    required List<AGSPoint> points,
+  Future<List<Point>> geodeticMove({
+    required List<Point> points,
     required double distance,
     required LinearUnitId distanceUnit,
     required double azimuth,

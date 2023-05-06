@@ -43,8 +43,8 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     Set<Layer> baseLayers = const <Layer>{},
     Set<Layer> referenceLayers = const <Layer>{},
     Set<Marker> markers = const <Marker>{},
-    Set<Polygon> polygons = const <Polygon>{},
-    Set<Polyline> polylines = const <Polyline>{},
+    Set<PolygonMarker> polygons = const <PolygonMarker>{},
+    Set<PolylineMarker> polylines = const <PolylineMarker>{},
     Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers,
     Map<String, dynamic> mapOptions = const <String, dynamic>{},
   }) {
@@ -59,7 +59,7 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('getLocation() has not been implemented.');
   }
 
-  Future<AGSPoint?> getMapLocation(int mapId) {
+  Future<Point?> getMapLocation(int mapId) {
     throw UnimplementedError('getMapLocation() has not been implemented.');
   }
 
@@ -148,7 +148,7 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('setViewpointGeometry() has not been implemented.');
   }
 
-  Future<bool> setViewpointCenter(int mapId, AGSPoint center, double scale) {
+  Future<bool> setViewpointCenter(int mapId, Point center, double scale) {
     throw UnimplementedError('setViewpointCenter() has not been implemented.');
   }
 
@@ -170,11 +170,11 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
         'setViewpointScale() has not been implemented.');
   }
 
-  Future<Offset?> locationToScreen(int mapId, AGSPoint mapPoint) {
+  Future<Offset?> locationToScreen(int mapId, Point mapPoint) {
     throw UnimplementedError('locationToScreen() has not been implemented.');
   }
 
-  Future<AGSPoint?> screenToLocation(
+  Future<Point?> screenToLocation(
       int mapId, Offset screenPoint, SpatialReference spatialReference) {
     throw UnimplementedError('screenToLocation() has not been implemented.');
   }
@@ -226,12 +226,12 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('onMarkerTap() has not been implemented.');
   }
 
-  /// A [Polygon] has been tapped.
+  /// A [PolygonMarker] has been tapped.
   Stream<PolygonTapEvent> onPolygonTap({required int mapId}) {
     throw UnimplementedError('onPolygonTap() has not been implemented.');
   }
 
-  /// A [Polyline] has been tapped.
+  /// A [PolylineMarker] has been tapped.
   Stream<PolylineTapEvent> onPolylineTap({required int mapId}) {
     throw UnimplementedError('onPolylineTap() has not been implemented.');
   }

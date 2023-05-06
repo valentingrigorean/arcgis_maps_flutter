@@ -197,7 +197,7 @@ class RouteParameters {
     json['returnPolylineBarriers'] = returnPolylineBarriers;
     json['returnRoutes'] = returnRoutes;
     json['returnStops'] = returnStops;
-    json['routeShapeType'] = routeShapeType.index;
+    json['routeShapeType'] = routeShapeType.value;
     if (travelMode != null) {
       json['travelMode'] = travelMode!.toJson();
     }

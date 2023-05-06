@@ -1,8 +1,5 @@
 package com.valentingrigorean.arcgis_maps_flutter.map
 
-import com.esri.arcgisruntime.mapping.view.MapScaleChangedEvent
-import com.esri.arcgisruntime.mapping.view.MapScaleChangedListener
-
 class SymbolVisibilityFilterController(private val flutterMapViewDelegate: FlutterMapViewDelegate) :
     MapScaleChangedListener {
     private val graphicControllers: MutableMap<GraphicControllerSink, SymbolVisibilityFilter?> =

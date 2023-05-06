@@ -26,30 +26,30 @@ abstract class Geometry {
       final geometryType = GeometryType.fromValue(json['type']);
       switch (geometryType) {
         case GeometryType.point:
-          return AGSPoint.fromJson(json);
+          return Point.fromJson(json);
         case GeometryType.envelope:
           return Envelope.fromJson(json);
         case GeometryType.polyline:
-          return AGSPolyline.fromJson(json);
+          return Polyline.fromJson(json);
         case GeometryType.polygon:
-          return AGSPolygon.fromJson(json);
+          return Polygon.fromJson(json);
         case GeometryType.multipoint:
-          return AGSMultipoint.fromJson(json);
+          return Multipoint.fromJson(json);
         case GeometryType.unknown:
           break;
       }
     }
 
     if (json.containsKey('paths')) {
-      return AGSPolyline.fromJson(json);
+      return Polyline.fromJson(json);
     }
     if (json.containsKey('rings')) {
-      return AGSPolygon.fromJson(json);
+      return Polygon.fromJson(json);
     }
     if (json.containsKey('xmax')) {
       return Envelope.fromJson(json);
     }
 
-    return AGSPoint.fromJson(json);
+    return Point.fromJson(json);
   }
 }

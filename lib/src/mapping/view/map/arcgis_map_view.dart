@@ -12,13 +12,13 @@ typedef MapLoadedCallback = void Function(ArcgisError? error);
 
 typedef LayerLoadedCallback = void Function(Layer layer, ArcgisError? error);
 
-typedef GestureCallback = void Function(Offset screenPoint, AGSPoint poisition);
+typedef GestureCallback = void Function(Offset screenPoint, Point poisition);
 
 typedef IdentifyLayerCallback = void Function(
-    Offset screenPoint, AGSPoint position, IdentifyLayerResult result);
+    Offset screenPoint, Point position, IdentifyLayerResult result);
 
 typedef IdentifyLayersCallback = void Function(
-    Offset screenPoint, AGSPoint position, List<IdentifyLayerResult> results);
+    Offset screenPoint, Point position, List<IdentifyLayerResult> results);
 
 /// Callback function taking a single argument.
 typedef ArgumentCallback<T> = void Function(T argument);
@@ -75,8 +75,8 @@ class ArcgisMapView extends StatefulWidget {
     this.baseLayers = const <Layer>{},
     this.referenceLayers = const <Layer>{},
     this.markers = const <Marker>{},
-    this.polygons = const <Polygon>{},
-    this.polylines = const <Polyline>{},
+    this.polygons = const <PolygonMarker>{},
+    this.polylines = const <PolylineMarker>{},
     this.myLocationEnabled = false,
     this.failedToStartMyLocation,
     this.insetsContentInsetFromSafeArea = true,
@@ -138,10 +138,10 @@ class ArcgisMapView extends StatefulWidget {
   final Set<Marker> markers;
 
   /// Polygons to be placed on the map.
-  final Set<Polygon> polygons;
+  final Set<PolygonMarker> polygons;
 
   /// Polylines to be placed on the map.
-  final Set<Polyline> polylines;
+  final Set<PolylineMarker> polylines;
 
   final MapLoadedCallback? onMapLoaded;
 
@@ -246,8 +246,8 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   Map<LayerId, Layer> _baseLayers = <LayerId, Layer>{};
   Map<LayerId, Layer> _referenceLayers = <LayerId, Layer>{};
   Map<MarkerId, Marker> _markers = <MarkerId, Marker>{};
-  Map<PolygonId, Polygon> _polygons = <PolygonId, Polygon>{};
-  Map<PolylineId, Polyline> _polylines = <PolylineId, Polyline>{};
+  Map<PolygonId, PolygonMarker> _polygons = <PolygonId, PolygonMarker>{};
+  Map<PolylineId, PolylineMarker> _polylines = <PolylineId, PolylineMarker>{};
   Set<LayerId> _identifyLayerAsync = <LayerId>{};
 
   late _ArcgisMapOptions _arcgisMapOptions;
@@ -393,7 +393,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   }
 
   void onPolygonTap(PolygonId polygonId) {
-    final Polygon? polygon = _polygons[polygonId];
+    final PolygonMarker? polygon = _polygons[polygonId];
     if (polygon == null) {
       final error = UnknownMapObjectIdError('polygon', polygonId, 'onTap');
       final callback = widget.onUnknownMapObjectIdError;
@@ -410,7 +410,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   }
 
   void onPolylineTap(PolylineId polylineId) {
-    final Polyline? polyline = _polylines[polylineId];
+    final PolylineMarker? polyline = _polylines[polylineId];
     if (polyline == null) {
       final error = UnknownMapObjectIdError('polyline', polylineId, 'onTap');
       final callback = widget.onUnknownMapObjectIdError;
@@ -426,28 +426,28 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     }
   }
 
-  void onTap(Offset screenPoint, AGSPoint position) {
+  void onTap(Offset screenPoint, Point position) {
     final onTap = widget.onTap;
     if (onTap != null) {
       onTap(screenPoint, position);
     }
   }
 
-  void onLongPress(Offset screenPoint, AGSPoint position) {
+  void onLongPress(Offset screenPoint, Point position) {
     final onLongPress = widget.onLongPress;
     if (onLongPress != null) {
       onLongPress(screenPoint, position);
     }
   }
 
-  void onLongPressEnd(Offset screenPoint, AGSPoint position) {
+  void onLongPressEnd(Offset screenPoint, Point position) {
     final onLongPressEnd = widget.onLongPressEnd;
     if (onLongPressEnd != null) {
       onLongPressEnd(screenPoint, position);
     }
   }
 
-  void onIdentifyLayer(LayerId layerId, Offset screenMap, AGSPoint position,
+  void onIdentifyLayer(LayerId layerId, Offset screenMap, Point position,
       IdentifyLayerResult result) {
     final callback = widget.onIdentifyLayer[layerId];
     if (callback != null) {
@@ -456,7 +456,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   }
 
   void onIdentifyLayers(
-      Offset screenMap, AGSPoint position, List<IdentifyLayerResult> results) {
+      Offset screenMap, Point position, List<IdentifyLayerResult> results) {
     final callback = widget.onIdentifyLayers;
     if (callback != null) {
       callback(screenMap, position, results);

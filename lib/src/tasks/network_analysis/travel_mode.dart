@@ -102,7 +102,7 @@ class TravelMode {
       'timeAttributeName': timeAttributeName,
       'type': type,
       'useHierarchy': useHierarchy,
-      'uTurnPolicy': uTurnPolicy.index,
+      'uTurnPolicy': uTurnPolicy.value,
     };
   }
 }

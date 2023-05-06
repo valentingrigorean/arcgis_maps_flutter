@@ -10,7 +10,7 @@ class Viewpoint {
   });
 
   factory Viewpoint.fromPoint({
-    required AGSPoint point,
+    required Point point,
     required double scale,
   }) =>
       Viewpoint._(
@@ -27,7 +27,7 @@ class Viewpoint {
       Viewpoint._(
         scale: scale,
         targetGeometry:
-            AGSPoint.fromLatLng(latitude: latitude, longitude: longitude),
+            Point.fromLatLng(latitude: latitude, longitude: longitude),
         viewpointType: ViewpointType.centerAndScale,
       );
 

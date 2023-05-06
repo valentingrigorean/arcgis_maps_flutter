@@ -51,7 +51,7 @@ abstract class LocationDisplay {
 
   /// Position of the location symbol, as provided by the most recent location
   /// update, projected to the map's spatial reference.
-  Future<AGSPoint?> get mapLocation;
+  Future<Point?> get mapLocation;
 
   /// Heading relative to the geographic North Pole. The value 0 means
   /// the device is pointed toward true north, 90 means it is pointed due east,

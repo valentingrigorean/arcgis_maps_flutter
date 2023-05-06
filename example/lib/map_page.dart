@@ -73,7 +73,7 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
       markers: {
         Marker(
           markerId: const MarkerId("markerId"),
-          position: AGSPoint.fromLatLng(latitude: 0, longitude: 0),
+          position: Point.fromLatLng(latitude: 0, longitude: 0),
           onTap: () => print('On marker tap'),
           consumeTapEvents: true,
           icon: BitmapDescriptor.fromStyleMarker(

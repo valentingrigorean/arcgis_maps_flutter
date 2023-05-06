@@ -4,12 +4,12 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group("create objects", () {
     test('createMultiPoints fromNullJson ExpectedNull', () {
-      var result = AGSMultipoint.fromJson(null);
+      var result = Multipoint.fromJson(null);
       assert(result == null);
     });
 
     test('createMultiPoints fromJson ExpectedData', () {
-      var result = AGSMultipoint.fromJson({
+      var result = Multipoint.fromJson({
         "spatialReference": {"wkid": 4326, "wktext": "wktext"},
         "points": [
           [1.0, 2.0],
@@ -19,23 +19,23 @@ void main() {
       expect(result?.spatialReference, SpatialReference.wgs84());
       expect(result?.geometryType, GeometryType.multipoint);
       expect(result?.points,
-          [const AGSPoint(x: 1.0, y: 2.0), const AGSPoint(x: 3.0, y: 4.0)]);
+          [const Point(x: 1.0, y: 2.0), const Point(x: 3.0, y: 4.0)]);
     });
 
     test('createMultiPoints fromPoints ExpectedData', () {
-      var result = AGSMultipoint(
-          points: const [AGSPoint(x: 1.0, y: 2.0), AGSPoint(x: 3.0, y: 4.0)],
+      var result = Multipoint(
+          points: const [Point(x: 1.0, y: 2.0), Point(x: 3.0, y: 4.0)],
           spatialReference: SpatialReference.wgs84());
       expect(result.spatialReference, SpatialReference.wgs84());
       expect(result.points,
-          [const AGSPoint(x: 1.0, y: 2.0), const AGSPoint(x: 3.0, y: 4.0)]);
+          [const Point(x: 1.0, y: 2.0), const Point(x: 3.0, y: 4.0)]);
     });
   });
 
   group("multiPoint to Json", () {
     test('multiPoint toJson ExpectedData', () {
-      var data = AGSMultipoint(
-          points: const [AGSPoint(x: 1.0, y: 2.0), AGSPoint(x: 3.0, y: 4.0)],
+      var data = Multipoint(
+          points: const [Point(x: 1.0, y: 2.0), Point(x: 3.0, y: 4.0)],
           spatialReference: SpatialReference.wgs84());
 
       var result = data.toJson();

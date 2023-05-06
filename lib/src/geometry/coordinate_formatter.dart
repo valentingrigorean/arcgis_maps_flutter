@@ -2,13 +2,32 @@ part of arcgis_maps_flutter;
 
 enum LatitudeLongitudeFormat {
   /// The geographical coordinates are represented in decimal degrees.
-  decimalDegrees,
+  decimalDegrees(0),
 
   /// The geographical coordinates are represented in degrees and decimal minutes.
-  degreesDecimalMinutes,
+  degreesDecimalMinutes(1),
 
   /// The geographical coordinates are represented in degrees and minutes and decimal seconds.
-  degreesMinutesSeconds
+  degreesMinutesSeconds(2),
+  ;
+
+
+  const LatitudeLongitudeFormat(this.value);
+
+  factory LatitudeLongitudeFormat.fromValue(int value) {
+    switch (value) {
+      case 0:
+        return LatitudeLongitudeFormat.decimalDegrees;
+      case 1:
+        return LatitudeLongitudeFormat.degreesDecimalMinutes;
+      case 2:
+        return LatitudeLongitudeFormat.degreesMinutesSeconds;
+      default:
+        throw ArgumentError.value(value, 'value', 'Invalid value for LatitudeLongitudeFormat');
+    }
+  }
+
+  final int value;
 }
 
 class CoordinateFormatter {
@@ -23,7 +42,7 @@ class CoordinateFormatter {
   /// of each value. The precision of the output is controlled by both
   /// the [format] and [decimalPlaces] parameters.
   static Future<String?> latitudeLongitudeString({
-    required AGSPoint from,
+    required Point from,
     required LatitudeLongitudeFormat format,
     required int decimalPlaces,
   }) {

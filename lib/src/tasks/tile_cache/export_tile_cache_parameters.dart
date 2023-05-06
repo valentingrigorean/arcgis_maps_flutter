@@ -19,12 +19,12 @@ class ExportTileCacheParameters {
     );
   }
 
-  /// An [AGSPolygon] or [Envelope] geometry that defines the geographic area
+  /// An [Polygon] or [Envelope] geometry that defines the geographic area
   /// for which tiles are needed. Where an @c AGSPolygon is supplied,
   /// tiles will be filtered according to the polygon geometry, which can help
   /// reduce the size of the resulting tile package. Note that the filtered set
   /// of tiles may vary, depending on the underlying service.
-  /// [AGSPoint] and [AGSPolyline] geometries are not supported.
+  /// [Point] and [Polyline] geometries are not supported.
   /// If this is not specified, the full extent of the service will be used.
   final Geometry? areaOfInterest;
 

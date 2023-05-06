@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/geometry/geometry_engine_flutter_platform.dart';
 import 'package:flutter/services.dart';
@@ -23,8 +21,8 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
 
   @override
   Future<GeodeticDistanceResult?> distanceGeodetic({
-    required AGSPoint point1,
-    required AGSPoint point2,
+    required Point point1,
+    required Point point2,
     required LinearUnitId distanceUnitId,
     required AngularUnitId azimuthUnitId,
     required GeodeticCurveType curveType,
@@ -32,9 +30,9 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
     final result = await _channel.invokeMethod("distanceGeodetic", {
       "point1": point1.toJson(),
       "point2": point2.toJson(),
-      "distanceUnitId": distanceUnitId.index,
-      "azimuthUnitId": azimuthUnitId.index,
-      "curveType": curveType.index,
+      "distanceUnitId": distanceUnitId.value,
+      "azimuthUnitId": azimuthUnitId.value,
+      "curveType": curveType.value,
     });
     if (result == null) {
       return null;
@@ -43,7 +41,7 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
   }
 
   @override
-  Future<AGSPolygon?> bufferGeometry({
+  Future<Polygon?> bufferGeometry({
     required Geometry geometry,
     required double distance,
   }) {
@@ -54,12 +52,12 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
       if (result == null) {
         return null;
       }
-      return AGSPolygon.fromJson(result);
+      return Polygon.fromJson(result);
     });
   }
 
   @override
-  Future<AGSPolygon?> geodeticBufferGeometry({
+  Future<Polygon?> geodeticBufferGeometry({
     required Geometry geometry,
     required double distance,
     required LinearUnitId distanceUnit,
@@ -69,14 +67,14 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
     return _channel.invokeMethod("geodeticBufferGeometry", {
       "geometry": geometry.toJson(),
       "distance": distance,
-      "distanceUnit": distanceUnit.index,
+      "distanceUnit": distanceUnit.value,
       "maxDeviation": maxDeviation,
-      "curveType": curveType.index,
+      "curveType": curveType.value,
     }).then((result) {
       if (result == null) {
         return null;
       }
-      return AGSPolygon.fromJson(result);
+      return Polygon.fromJson(result);
     });
   }
 
@@ -129,8 +127,8 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
   }
 
   @override
-  Future<List<AGSPoint>> geodeticMove({
-    required List<AGSPoint> points,
+  Future<List<Point>> geodeticMove({
+    required List<Point> points,
     required double distance,
     required LinearUnitId distanceUnit,
     required double azimuth,
@@ -140,17 +138,17 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
     final result = await _channel.invokeMethod("geodeticMove", {
       "points": points.map((e) => e.toJson()).toList(),
       "distance": distance,
-      "distanceUnit": distanceUnit.index,
+      "distanceUnit": distanceUnit.value,
       "azimuth": azimuth,
-      "azimuthUnit": azimuthUnit.index,
-      "curveType": curveType.index,
+      "azimuthUnit": azimuthUnit.value,
+      "curveType": curveType.value,
     });
     if (result == null) {
       return const [];
     }
-    List<AGSPoint> pointList = [];
+    List<Point> pointList = [];
     for (var json in result) {
-      AGSPoint? point = AGSPoint.fromJson(json);
+      Point? point = Point.fromJson(json);
       if (point != null) {
         pointList.add(point);
       }
@@ -171,43 +169,46 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
   }
 
   @override
-  Future<Geometry?> densifyGeodetic(
-      {required Geometry geometry,
-      required double maxSegmentLength,
-      required LinearUnitId lengthUnit,
-      required GeodeticCurveType curveType}) async {
+  Future<Geometry?> densifyGeodetic({
+    required Geometry geometry,
+    required double maxSegmentLength,
+    required LinearUnitId lengthUnit,
+    required GeodeticCurveType curveType,
+  }) async {
     final result = await _channel.invokeMethod("densifyGeodetic", {
       "geometry": geometry.toJson(),
       "maxSegmentLength": maxSegmentLength,
-      "lengthUnit": lengthUnit.index,
-      "curveType": curveType.index
+      "lengthUnit": lengthUnit.value,
+      "curveType": curveType.value
     });
     return Geometry.fromJson(result);
   }
 
   @override
-  Future<num?> lengthGeodetic(
-      {required Geometry geometry,
-      required LinearUnitId lengthUnit,
-      required GeodeticCurveType curveType}) async {
+  Future<num?> lengthGeodetic({
+    required Geometry geometry,
+    required LinearUnitId lengthUnit,
+    required GeodeticCurveType curveType,
+  }) async {
     final result = await _channel.invokeMethod("lengthGeodetic", {
       "geometry": geometry.toJson(),
-      "lengthUnit": lengthUnit.index,
-      "curveType": curveType.index
+      "lengthUnit": lengthUnit.value,
+      "curveType": curveType.value
     });
 
     return result;
   }
 
   @override
-  Future<num?> areaGeodetic(
-      {required Geometry geometry,
-      required AreaUnitId areaUnit,
-      required GeodeticCurveType curveType}) async {
+  Future<num?> areaGeodetic({
+    required Geometry geometry,
+    required AreaUnitId areaUnit,
+    required GeodeticCurveType curveType,
+  }) async {
     final result = await _channel.invokeMethod("areaGeodetic", {
       "geometry": geometry.toJson(),
-      "areaUnit": areaUnit.index,
-      "curveType": curveType.index
+      "areaUnit": areaUnit.value,
+      "curveType": curveType.value
     });
 
     return result;
@@ -215,11 +216,10 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
 
   @override
   Future<Envelope?> getExtent(Geometry geometry) async {
-    final extent = await _channel.invokeMethod("getExtent", {
-      "geometry": geometry.toJson()
-    });
+    final extent = await _channel
+        .invokeMethod("getExtent", {"geometry": geometry.toJson()});
     Envelope? result;
-    if(extent is Envelope){
+    if (extent is Envelope) {
       result = extent;
     }
     return result;

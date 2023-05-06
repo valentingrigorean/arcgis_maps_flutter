@@ -11,7 +11,7 @@ class MapPageBuffer extends StatefulWidget {
 
 class _MapPageBufferState extends State<MapPageBuffer> {
   int _currentBufferType = 0;
-  Polygon? _polygon;
+  PolygonMarker? _polygon;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class _MapPageBufferState extends State<MapPageBuffer> {
             map: ArcGISMap.imagery(),
             polygons: _polygon == null ? const {} : {_polygon!},
             onTap: (screenPoint, position) async {
-              AGSPolygon? polygon;
+              Polygon? polygon;
               if (_currentBufferType == 0) {
                 polygon = await GeometryEngine.bufferGeometry(
                     geometry: position, distance: 1000);
@@ -42,7 +42,7 @@ class _MapPageBufferState extends State<MapPageBuffer> {
               if (polygon == null) {
                 _polygon = null;
               } else {
-                _polygon = Polygon(
+                _polygon = PolygonMarker(
                   polygonId: const PolygonId('buffer'),
                   points: polygon.points.first,
                   fillColor: Colors.red,

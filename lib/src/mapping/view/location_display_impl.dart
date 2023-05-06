@@ -46,7 +46,7 @@ class LocationDisplayImpl extends LocationDisplay {
       return;
     }
     _autoPanMode = mode;
-    _channel.invokeMethod('setAutoPanMode', mode.index);
+    _channel.invokeMethod('setAutoPanMode', mode.value);
   }
 
   @override
@@ -91,9 +91,9 @@ class LocationDisplayImpl extends LocationDisplay {
       .then((value) => value == null ? null : Location.fromJson(value));
 
   @override
-  Future<AGSPoint?> get mapLocation => _channel
+  Future<Point?> get mapLocation => _channel
       .invokeMethod('getMapLocation')
-      .then((value) => value == null ? null : AGSPoint.fromJson(value));
+      .then((value) => value == null ? null : Point.fromJson(value));
 
   @override
   Future<double> get heading => _channel

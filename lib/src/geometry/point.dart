@@ -1,8 +1,8 @@
 part of arcgis_maps_flutter;
 
 @immutable
-class AGSPoint extends Geometry {
-  const AGSPoint({
+class Point extends Geometry {
+  const Point({
     required this.x,
     required this.y,
     this.z,
@@ -13,17 +13,17 @@ class AGSPoint extends Geometry {
           geometryType: GeometryType.point,
         );
 
-  factory AGSPoint.fromLatLng({
+  factory Point.fromLatLng({
     required double latitude,
     required double longitude,
   }) =>
-      AGSPoint(
+      Point(
         x: longitude,
         y: latitude,
         spatialReference: SpatialReference.wgs84(),
       );
 
-  static AGSPoint? fromJson(Map<dynamic, dynamic>? json) {
+  static Point? fromJson(Map<dynamic, dynamic>? json) {
     if (json == null) {
       return null;
     }
@@ -32,7 +32,7 @@ class AGSPoint extends Geometry {
       return null;
     }
 
-    return AGSPoint(
+    return Point(
       x: json['x'].toDouble(),
       y: json['y'].toDouble(),
       z: json['z']?.toDouble(),
@@ -41,15 +41,15 @@ class AGSPoint extends Geometry {
     );
   }
 
-  static List<List<AGSPoint>> fromJsonList(
+  static List<List<Point>> fromJsonList(
     List<dynamic> json, {
     required bool hasZ,
     bool hasM = false,
   }) {
-    List<List<AGSPoint>> result = [];
+    List<List<Point>> result = [];
 
     for (final path in json) {
-      final List<AGSPoint> points = [];
+      final List<Point> points = [];
       for (final point in path) {
         final double x = toDoubleSafe(point[0]);
         final double y = toDoubleSafe(point[1]);
@@ -59,7 +59,7 @@ class AGSPoint extends Geometry {
                 ? toDoubleSafeNullable(point[3])
                 : toDoubleSafeNullable(point[2])
             : null;
-        points.add(AGSPoint(x: x, y: y, z: z, m: m));
+        points.add(Point(x: x, y: y, z: z, m: m));
       }
       result.add(points);
     }
@@ -79,8 +79,8 @@ class AGSPoint extends Geometry {
 
   double get longitude => x;
 
-  AGSPoint copyWithSpatialReference(SpatialReference? spatialReference) {
-    return AGSPoint(
+  Point copyWithSpatialReference(SpatialReference? spatialReference) {
+    return Point(
       x: x,
       y: y,
       z: z,
@@ -109,7 +109,7 @@ class AGSPoint extends Geometry {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is AGSPoint &&
+      other is Point &&
           runtimeType == other.runtimeType &&
           x == other.x &&
           y == other.y &&

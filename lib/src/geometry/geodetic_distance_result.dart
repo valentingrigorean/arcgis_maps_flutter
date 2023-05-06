@@ -1,46 +1,80 @@
 part of arcgis_maps_flutter;
 
 enum LinearUnitId {
-  centimeter,
-  feet,
-  inches,
-  kilometers,
-  meters,
-  miles,
-  nauticalMiles,
-  yards,
-  other
+  centimeter(0),
+  feet(1),
+  inches(2),
+  kilometers(3),
+  meters(4),
+  miles(5),
+  nauticalMiles(6),
+  yards(7),
+  other(8),
+  ;
+
+  const LinearUnitId(this.value);
+
+  factory LinearUnitId.fromValue(int value) {
+    return LinearUnitId.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => LinearUnitId.other,
+    );
+  }
+
+  final int value;
 }
 
 enum AngularUnitId {
-  degrees,
-  minutes,
-  seconds,
-  grads,
-  radians,
-  other,
+  degrees(0),
+  minutes(1),
+  seconds(2),
+  grads(3),
+  radians(4),
+  other(5),
+  ;
+
+  const AngularUnitId(this.value);
+
+  factory AngularUnitId.fromValue(int value) {
+    return AngularUnitId.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => AngularUnitId.other,
+    );
+  }
+
+  final int value;
 }
 
 enum GeodeticCurveType {
-
   /// The shortest line between any two points on the Earth's surface
   /// on a spheroid (ellipsoid).
-  geodesic,
+  geodesic(0),
 
   /// A line of constant bearing, or azimuth.
-  loxodrome,
+  loxodrome(1),
 
   /// The line on a spheroid (ellipsoid) defined by the intersection at
   /// the surface by a plane that passes through the center of the spheroid
   /// and the start and end points of a segment. This is also known
   /// as a great circle when a sphere is used.
-  greatElliptic,
+  greatElliptic(2),
 
   /// A normal section.
-  normalSection,
+  normalSection(3),
 
   /// Keeps the original shape of the geometry or curve.
-  shapePreserving,
+  shapePreserving(4),
+  ;
+
+  const GeodeticCurveType(this.value);
+
+  factory GeodeticCurveType.fromValue(int value) {
+    return GeodeticCurveType.values.firstWhere(
+      (e) => e.value == value,
+    );
+  }
+
+  final int value;
 }
 
 @immutable

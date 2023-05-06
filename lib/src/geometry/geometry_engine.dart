@@ -24,8 +24,8 @@ class GeometryEngine {
   }
 
   static Future<GeodeticDistanceResult?> distanceGeodetic({
-    required AGSPoint point1,
-    required AGSPoint point2,
+    required Point point1,
+    required Point point2,
     required LinearUnitId distanceUnitId,
     required AngularUnitId azimuthUnitId,
     required GeodeticCurveType curveType,
@@ -51,7 +51,7 @@ class GeometryEngine {
   ///  [geometry] Specifies the input geometry.
   ///  [distance] The distance (in the unit of the geometry's spatial reference)
   ///  by which to buffer the geometry.
-  static Future<AGSPolygon?> bufferGeometry({
+  static Future<Polygon?> bufferGeometry({
     required Geometry geometry,
     required double distance,
   }) {
@@ -76,7 +76,7 @@ class GeometryEngine {
   /// Can be [double.nan] for default behavior, or must be a value between 0.001 and 0.5*abs [distance].
   /// [curveType] The type of geodetic curve. [GeodeticCurveType.shapePreserving]
   /// is a good option for most cases.
-  static Future<AGSPolygon?> geodeticBufferGeometry({
+  static Future<Polygon?> geodeticBufferGeometry({
     required Geometry geometry,
     required double distance,
     required LinearUnitId distanceUnit,
@@ -130,7 +130,7 @@ class GeometryEngine {
   /// and is defined by it's 2 axes and the length of it's longest axis.
   /// The first radius angle is defined by the startDirection angle and the
   /// second radius angle is the sum of the startDirection and the sectorAngle. T
-  /// he sector is constructed as a [AGSPolygon], [AGSPolyline] or [AGSMultipoint] geometry.
+  /// he sector is constructed as a [Polygon], [Polyline] or [Multipoint] geometry.
   /// [params] Specifies the parameters for constructing the sector.
   /// Returns The sector is returned in the format specified by the geometryType
   /// and is generalized according to the arcVertexCount and the radiusVertexCount parameters.
@@ -142,8 +142,8 @@ class GeometryEngine {
   /// There must be the same spatial reference on each point in the input array of points.
   /// The returned array is in the same order as the input, but with new points at their destination locations.
   /// Specifying a negative distance moves points in the opposite direction from azimuth.
-  static Future<List<AGSPoint>> geodeticMove({
-    required List<AGSPoint> points,
+  static Future<List<Point>> geodeticMove({
+    required List<Point> points,
     required double distance,
     required LinearUnitId distanceUnit,
     required double azimuth,
@@ -169,13 +169,13 @@ class GeometryEngine {
   }
 
   /// Indicates if this Geometry is topologically simple (in other words, is topologically correct).
-  /// [AGSPoint] geometries are always simple.
+  /// [Point] geometries are always simple.
   ///
-  /// [AGSMultipoint] geometries cannot have any points with exactly equal x and y values.
+  /// [Multipoint] geometries cannot have any points with exactly equal x and y values.
   ///
-  /// [AGSPolyline]  can have no degenerate segments.
+  /// [Polyline]  can have no degenerate segments.
   ///
-  /// For [AGSPolygon], the following must be true for the polygon to be considered simple:
+  /// For [Polygon], the following must be true for the polygon to be considered simple:
   ///
   /// - Exterior rings must be clockwise, and holes must be counterclockwise.
   /// - Rings can touch other rings only at a finite number of vertices.

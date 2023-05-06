@@ -19,7 +19,7 @@ class Location {
       lastKnown: json['lastKnown'] as bool,
       position: json['position'] == null
           ? null
-          : AGSPoint.fromJson(json['position'] as Map<dynamic, dynamic>),
+          : Point.fromJson(json['position'] as Map<dynamic, dynamic>),
       velocity: json['velocity'] as double,
       timestamp: json['timestamp'] == null
           ? null
@@ -46,7 +46,7 @@ class Location {
   final bool lastKnown;
 
   /// The coordinates of the location.
-  final AGSPoint? position;
+  final Point? position;
 
   /// The speed of the device in meters per second.
   final double velocity;

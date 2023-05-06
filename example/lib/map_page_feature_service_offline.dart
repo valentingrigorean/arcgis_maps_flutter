@@ -55,7 +55,7 @@ class _MapPageFeatureServiceOfflineState
       body: ArcgisMapView(
         map: ArcGISMap.topographic(),
         viewpoint: Viewpoint.fromPoint(
-          point: AGSPoint.fromLatLng(
+          point: Point.fromLatLng(
             latitude: 41.774317,
             longitude: -88.149655,
           ),
@@ -118,22 +118,22 @@ class _MapPageFeatureServiceOfflineState
     });
 
     final params = await _task.defaultGenerateGeodatabaseParameters(
-      areaOfInterest: AGSPolygon(
+      areaOfInterest: Polygon(
         points: [
           [
-            AGSPoint.fromLatLng(
+            Point.fromLatLng(
               latitude: 41.778064,
               longitude: -88.153245,
             ),
-            AGSPoint.fromLatLng(
+            Point.fromLatLng(
               latitude: 41.778870,
               longitude: -88.146708,
             ),
-            AGSPoint.fromLatLng(
+            Point.fromLatLng(
               latitude: 41.769764,
               longitude: -88.145878,
             ),
-            AGSPoint.fromLatLng(
+            Point.fromLatLng(
               latitude: 41.770330,
               longitude: -88.153431,
             ),

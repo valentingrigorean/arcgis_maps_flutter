@@ -30,7 +30,7 @@ class _ScenePageState extends State<ScenePage> {
         scene: _scene,
         surface: _surface,
         initialCamera: Camera.fromPoint(
-            AGSPoint(
+            Point(
                 x: -118.794,
                 y: 33.909,
                 z: 5330.0,

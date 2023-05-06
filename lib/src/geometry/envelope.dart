@@ -19,7 +19,7 @@ class Envelope extends Geometry {
   final double yMin;
   final double yMax;
 
-  AGSPoint get center => AGSPoint(
+  Point get center => Point(
         x: (xMin + xMax) / 2,
         y: (yMin + yMax) / 2,
         spatialReference: spatialReference,

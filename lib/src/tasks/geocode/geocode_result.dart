@@ -20,14 +20,14 @@ class GeocodeResult {
   /// Location of the candidate suitable for display on a map.
   /// For example, this may provide a more precise rooftop location of a house,
   /// whereas [routeLocation] represents the nearest street location.
-  final AGSPoint? displayLocation;
+  final Point? displayLocation;
 
   /// An extent suitable for zooming the map to display the candidate.
   final Envelope? extent;
 
-  /// The [AGSPoint] provided as input to [LocatorTask.reverseGeocodeAsync]
+  /// The [Point] provided as input to [LocatorTask.reverseGeocodeAsync]
   /// Only applicable for results of reverse-geocode operations.
-  final AGSPoint? inputLocation;
+  final Point? inputLocation;
 
   /// User-friendly text that describes this result.
   final String label;
@@ -36,7 +36,7 @@ class GeocodeResult {
   /// Use this location if you want to use the candidate as a stop in a route.
   /// For example [displayLocation] may provide a more precise rooftop location of a house,
   /// whereas [routeLocation] represents the nearest street location.
-  final AGSPoint? routeLocation;
+  final Point? routeLocation;
 
   /// A value that indicates how well the address was matched.
   /// The score is in a range between 0 (no match) and 100 (perfect match).
@@ -46,11 +46,11 @@ class GeocodeResult {
   static GeocodeResult fromJson(Map<dynamic, dynamic> json) {
     return GeocodeResult._(
       attributes: parseAttributes(json['attributes']),
-      displayLocation: AGSPoint.fromJson(json['displayLocation']),
+      displayLocation: Point.fromJson(json['displayLocation']),
       extent: Envelope.fromJson(json['extent']),
-      inputLocation: AGSPoint.fromJson(json['inputLocation']),
+      inputLocation: Point.fromJson(json['inputLocation']),
       label: json['label'] as String,
-      routeLocation: AGSPoint.fromJson(json['routeLocation']),
+      routeLocation: Point.fromJson(json['routeLocation']),
       score: json['score'] as double,
     );
   }

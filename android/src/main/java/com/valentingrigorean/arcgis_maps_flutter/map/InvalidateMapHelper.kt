@@ -2,12 +2,6 @@ package com.valentingrigorean.arcgis_maps_flutter.map
 
 import android.util.Log
 import android.view.Choreographer
-import com.esri.arcgisruntime.mapping.view.DrawStatus
-import com.esri.arcgisruntime.mapping.view.DrawStatusChangedEvent
-import com.esri.arcgisruntime.mapping.view.DrawStatusChangedListener
-import com.esri.arcgisruntime.mapping.view.LayerViewStateChangedEvent
-import com.esri.arcgisruntime.mapping.view.LayerViewStateChangedListener
-import com.esri.arcgisruntime.mapping.view.LayerViewStatus
 
 class InvalidateMapHelper(private val flutterMapViewDelegate: FlutterMapViewDelegate) :
     DrawStatusChangedListener, LayerViewStateChangedListener {

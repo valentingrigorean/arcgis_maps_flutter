@@ -9,8 +9,8 @@ class MapPageGeodesicSector extends StatefulWidget {
 }
 
 class _MapPageGeodesicSectorState extends State<MapPageGeodesicSector> {
-  final Set<Polygon> polygons = {};
-  final Set<Polyline> polylines = {};
+  final Set<PolygonMarker> polygons = {};
+  final Set<PolylineMarker> polylines = {};
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +32,10 @@ class _MapPageGeodesicSectorState extends State<MapPageGeodesicSector> {
             ),
           );
 
-          if (geometry is AGSPolygon) {
+          if (geometry is Polygon) {
             final polygon = geometry;
             polygons.add(
-              Polygon(
+              PolygonMarker(
                 polygonId: PolygonId(polygons.length.toString()),
                 points: polygon.points
                     .expand((e) => e)
@@ -48,10 +48,10 @@ class _MapPageGeodesicSectorState extends State<MapPageGeodesicSector> {
               ),
             );
           }
-          if (geometry is AGSPolyline) {
+          if (geometry is Polyline) {
             final polyline = geometry;
             polylines.add(
-              Polyline(
+              PolylineMarker(
                 polylineId: PolylineId(polylines.length.toString()),
                 points: polyline.points
                     .expand((e) => e)

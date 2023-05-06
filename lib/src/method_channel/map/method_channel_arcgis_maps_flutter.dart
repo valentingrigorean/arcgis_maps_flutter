@@ -83,8 +83,8 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
     Set<Layer> baseLayers = const <Layer>{},
     Set<Layer> referenceLayers = const <Layer>{},
     Set<Marker> markers = const <Marker>{},
-    Set<Polygon> polygons = const <Polygon>{},
-    Set<Polyline> polylines = const <Polyline>{},
+    Set<PolygonMarker> polygons = const <PolygonMarker>{},
+    Set<PolylineMarker> polylines = const <PolylineMarker>{},
     Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers,
     Map<String, dynamic> mapOptions = const <String, dynamic>{},
   }) {
@@ -160,12 +160,12 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<AGSPoint?> getMapLocation(int mapId) async {
+  Future<Point?> getMapLocation(int mapId) async {
     final result = await channel(mapId).invokeMapMethod('map#getMapLocation');
     if (result == null) {
       return null;
     }
-    return AGSPoint.fromJson(result);
+    return Point.fromJson(result);
   }
 
   @override
@@ -353,7 +353,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
 
   @override
   Future<bool> setViewpointCenter(
-      int mapId, AGSPoint center, double scale) async {
+      int mapId, Point center, double scale) async {
     final result = await channel(mapId).invokeMethod<bool>(
       'map#setViewpointCenter',
       {
@@ -382,7 +382,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<Offset?> locationToScreen(int mapId, AGSPoint mapPoint) async {
+  Future<Offset?> locationToScreen(int mapId, Point mapPoint) async {
     final result = await channel(mapId)
         .invokeListMethod<double>('map#locationToScreen', mapPoint.toJson());
     if (result == null) {
@@ -398,13 +398,13 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<AGSPoint?> screenToLocation(
+  Future<Point?> screenToLocation(
       int mapId, Offset screenPoint, SpatialReference spatialReference) async {
     final result = await channel(mapId).invokeMethod('map#screenToLocation', {
       'position': [screenPoint.dx, screenPoint.dy],
       'spatialReference': spatialReference.toJson(),
     });
-    return AGSPoint.fromJson(result);
+    return Point.fromJson(result);
   }
 
   @override
@@ -583,7 +583,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
       case 'map#onTap':
         final args = call.arguments;
         final screenPoint = _fromJson(args['screenPoint']);
-        AGSPoint position = AGSPoint.fromJson(args['position'])!;
+        Point position = Point.fromJson(args['position'])!;
         _mapEventStreamController.add(
           MapTapEvent(
             mapId,
@@ -595,7 +595,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
       case 'map#onLongPress':
         final args = call.arguments;
         final screenPoint = _fromJson(args['screenPoint']);
-        AGSPoint position = AGSPoint.fromJson(args['position'])!;
+        Point position = Point.fromJson(args['position'])!;
         _mapEventStreamController.add(
           MapLongPressEvent(
             mapId,
@@ -607,7 +607,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
       case 'map#onLongPressEnd':
         final args = call.arguments;
         final screenPoint = _fromJson(args['screenPoint']);
-        AGSPoint position = AGSPoint.fromJson(args['position'])!;
+        Point position = Point.fromJson(args['position'])!;
         _mapEventStreamController.add(
           MapLongPressEndEvent(
             mapId,
@@ -619,7 +619,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
       case 'map#onIdentifyLayers':
         final Map<dynamic, dynamic> args = call.arguments;
         final screenPoint = _fromJson(args['screenPoint']);
-        final position = AGSPoint.fromJson(args['position'])!;
+        final position = Point.fromJson(args['position'])!;
         final List<IdentifyLayerResult> results = [];
         for (var item in args['results']) {
           final String layerName = item['layerName']!;

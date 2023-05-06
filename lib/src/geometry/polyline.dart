@@ -1,9 +1,9 @@
 part of arcgis_maps_flutter;
 
 @immutable
-class AGSPolyline extends Geometry {
+class Polyline extends Geometry {
 
-  const AGSPolyline._({
+  const Polyline._({
     required this.points,
     required this.hasZ,
     required this.hasM,
@@ -13,8 +13,8 @@ class AGSPolyline extends Geometry {
     geometryType: GeometryType.polyline,
   );
 
-  AGSPolyline({
-    required List<List<AGSPoint>> points,
+  Polyline({
+    required List<List<Point>> points,
     SpatialReference? spatialReference,
   }) : this._(
     points: points,
@@ -26,9 +26,9 @@ class AGSPolyline extends Geometry {
   final bool hasZ;
   final bool hasM;
 
-  final List<List<AGSPoint>> points;
+  final List<List<Point>> points;
 
-  static AGSPolyline? fromJson(Map<dynamic, dynamic>? json) {
+  static Polyline? fromJson(Map<dynamic, dynamic>? json) {
     if (json == null) {
       return null;
     }
@@ -41,8 +41,8 @@ class AGSPolyline extends Geometry {
     final SpatialReference? spatialReference =
     SpatialReference.fromJson(json['spatialReference']);
 
-    return AGSPolyline._(
-      points: AGSPoint.fromJsonList(paths, hasZ: hasZ, hasM: hasM),
+    return Polyline._(
+      points: Point.fromJsonList(paths, hasZ: hasZ, hasM: hasM),
       hasZ: hasZ,
       hasM: hasM,
       spatialReference: spatialReference,
@@ -70,7 +70,7 @@ class AGSPolyline extends Geometry {
       final results = <List<Object>>[];
       for (final part in points) {
         final List<Object> pointsRaw = <Object>[];
-        for (final AGSPoint point in part) {
+        for (final Point point in part) {
           pointsRaw.add(pointToList(point, hasZ: hasZ, hasM: hasM));
         }
         results.add(pointsRaw);
@@ -85,7 +85,7 @@ class AGSPolyline extends Geometry {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is AGSPolyline &&
+      other is Polyline &&
           runtimeType == other.runtimeType &&
           hasZ == other.hasZ &&
           hasM == other.hasM &&

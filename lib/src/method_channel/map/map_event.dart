@@ -27,7 +27,7 @@ class MarkerTapEvent extends MapEvent<MarkerId> {
   ) : super(mapId, markerId);
 }
 
-/// An event fired when a [Polygon] is tapped.
+/// An event fired when a [PolygonMarker] is tapped.
 class PolygonTapEvent extends MapEvent<PolygonId> {
   /// Build a PolygonTap Event triggered from the map represented by `mapId`.
   ///
@@ -62,7 +62,7 @@ class IdentifyLayerEvent extends MapEvent<LayerId> {
   }) : super(mapId, layerId);
 
   final Offset screenPoint;
-  final AGSPoint position;
+  final Point position;
 
   final IdentifyLayerResult result;
 }
@@ -76,7 +76,7 @@ class IdentifyLayersEvent extends MapEvent<void> {
   }) : super(mapId, null);
 
   final Offset screenPoint;
-  final AGSPoint position;
+  final Point position;
 
   final List<IdentifyLayerResult> results;
 }
@@ -162,7 +162,7 @@ class _PositionedMapEvent<T> extends MapEvent<T> {
   }) : super(mapId, value);
 
   /// The position where this event happened.
-  final AGSPoint position;
+  final Point position;
 
   final Offset screenPoint;
 }

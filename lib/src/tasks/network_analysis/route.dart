@@ -27,7 +27,7 @@ class Route {
       endTime: parseDateTimeSafeNullable(json['endTime']),
       endTimeShift: json['endTimeShift'] as double,
       totalLength: json['totalLength'] as double,
-      routeGeometry: Geometry.fromJson(json['routeGeometry']) as AGSPolyline?,
+      routeGeometry: Geometry.fromJson(json['routeGeometry']) as Polyline?,
       routeName: json['routeName'] as String,
       totalTime: json['totalTime'] as double,
       travelTime: json['travelTime'] as double,
@@ -65,7 +65,7 @@ class Route {
   final double totalLength;
 
   /// The route geometry.
-  final AGSPolyline? routeGeometry;
+  final Polyline? routeGeometry;
 
   /// The stops visited along this route.
   /// Only available if [RouteParameters.returnStop] was enabled.

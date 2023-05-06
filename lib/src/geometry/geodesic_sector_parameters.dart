@@ -15,8 +15,8 @@ class GeodesicSectorParameters {
     this.maxPointCount = 65536,
   });
 
-  /// The center [AGSPoint] of the ellipse. The ellipse is used to construct the sector's arc.
-  final AGSPoint center;
+  /// The center [Point] of the ellipse. The ellipse is used to construct the sector's arc.
+  final Point center;
 
   /// The length of the semi-major or the semi-minor axis of the ellipse.
   /// The ellipse is used to construct the sector's arc.
@@ -62,8 +62,8 @@ class GeodesicSectorParameters {
       'center': center.toJson(),
       'semiAxis1Length': semiAxis1Length,
       'semiAxis2Length': semiAxis2Length,
-      'linearUnit': linearUnit.index,
-      'angularUnit': angularUnit.index,
+      'linearUnit': linearUnit.value,
+      'angularUnit': angularUnit.value,
       'axisDirection': axisDirection,
       'startDirection': startDirection,
       'sectorAngle': sectorAngle,
@@ -74,7 +74,7 @@ class GeodesicSectorParameters {
   }
 
   GeodesicSectorParameters copyWith({
-    AGSPoint? center,
+    Point? center,
     double? semiAxis1Length,
     double? semiAxis2Length,
     LinearUnitId? linearUnit,

@@ -1,32 +1,15 @@
 package com.valentingrigorean.arcgis_maps_flutter.layers
 
 import android.util.Log
-import com.esri.arcgisruntime.arcgisservices.TileInfo
-import com.esri.arcgisruntime.data.Geodatabase
-import com.esri.arcgisruntime.data.ServiceFeatureTable
-import com.esri.arcgisruntime.data.TileCache
-import com.esri.arcgisruntime.geometry.Envelope
-import com.esri.arcgisruntime.io.RemoteResource
-import com.esri.arcgisruntime.layers.ArcGISMapImageLayer
-import com.esri.arcgisruntime.layers.ArcGISTiledLayer
-import com.esri.arcgisruntime.layers.ArcGISVectorTiledLayer
-import com.esri.arcgisruntime.layers.FeatureLayer
-import com.esri.arcgisruntime.layers.GroupLayer
-import com.esri.arcgisruntime.layers.GroupVisibilityMode
-import com.esri.arcgisruntime.layers.Layer
-import com.esri.arcgisruntime.layers.WmsLayer
-import com.esri.arcgisruntime.loadable.LoadStatus
-import com.esri.arcgisruntime.portal.PortalItem
-import com.esri.arcgisruntime.security.Credential
+import com.arcgismaps.mapping.layers.TileCache
 import com.valentingrigorean.arcgis_maps_flutter.Convert
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeObjectStorage
-import com.valentingrigorean.arcgis_maps_flutter.utils.toMap
 import java.util.Objects
 import java.util.function.Function
 import java.util.stream.Collectors
 
 class FlutterLayer(private val data: Map<*, *>) {
-    val layerId: String?
+    val layerId: String
     private val layerType: String?
     private var url: String? = null
     private var credential: Credential? = null
@@ -39,7 +22,7 @@ class FlutterLayer(private val data: Map<*, *>) {
     private var portalItemLayerId: Long = 0
 
     init {
-        layerId = data["layerId"] as String?
+        layerId = data["layerId"] as String
         layerType = data["layerType"] as String?
         if (data.containsKey("url")) {
             url = data["url"] as String?

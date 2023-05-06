@@ -1,8 +1,8 @@
 package com.valentingrigorean.arcgis_maps_flutter.map
 
 import android.graphics.Color
-import com.esri.arcgisruntime.geometry.Geometry
-import com.esri.arcgisruntime.mapping.view.GraphicsOverlay
+import com.arcgismaps.geometry.Geometry
+import com.arcgismaps.mapping.view.GraphicsOverlay
 
 interface GraphicControllerSink {
     fun add(graphicsOverlay: GraphicsOverlay)

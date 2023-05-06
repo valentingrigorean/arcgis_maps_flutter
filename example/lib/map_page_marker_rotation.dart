@@ -26,7 +26,7 @@ class _MapPageMarkerRotationState extends State<MapPageMarkerRotation> {
             markers: {
               Marker(
                 markerId: const MarkerId('test'),
-                position: AGSPoint.fromLatLng(
+                position: Point.fromLatLng(
                   latitude: 0.0,
                   longitude: 0.0,
                 ),

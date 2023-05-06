@@ -1,5 +1,7 @@
 package com.valentingrigorean.arcgis_maps_flutter.layers
 
+import com.arcgismaps.arcgisservices.TimeAware
+import com.arcgismaps.mapping.layers.Layer
 import com.esri.arcgisruntime.arcgisservices.TimeAware
 import com.esri.arcgisruntime.layers.Layer
 import com.esri.arcgisruntime.mapping.ArcGISMap
@@ -16,9 +18,9 @@ class LayersController(private val methodChannel: MethodChannel) : MapChangeAwar
     private val operationalLayers: MutableSet<FlutterLayer> = HashSet()
     private val baseLayers: MutableSet<FlutterLayer> = HashSet()
     private val referenceLayers: MutableSet<FlutterLayer> = HashSet()
-    private val flutterOperationalLayersMap: MutableMap<String?, Layer?> = HashMap()
-    private val flutterBaseLayersMap: MutableMap<String?, Layer?> = HashMap()
-    private val flutterReferenceLayersMap: MutableMap<String?, Layer?> = HashMap()
+    private val flutterOperationalLayersMap: MutableMap<String?, Layer> = HashMap()
+    private val flutterBaseLayersMap: MutableMap<String?, Layer> = HashMap()
+    private val flutterReferenceLayersMap: MutableMap<String?, Layer> = HashMap()
     private var map: ArcGISMap? = null
     override fun onMapChange(map: ArcGISMap?) {
         clearMap()

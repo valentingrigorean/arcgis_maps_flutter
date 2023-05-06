@@ -40,7 +40,7 @@ DateTime? parseDateTimeSafeNullable(dynamic o) {
 }
 
 List<Object> pointToList(
-  AGSPoint point, {
+  Point point, {
   required bool hasZ,
   required bool hasM,
 }) {

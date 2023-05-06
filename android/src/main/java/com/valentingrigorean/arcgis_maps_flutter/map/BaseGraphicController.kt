@@ -1,9 +1,9 @@
 package com.valentingrigorean.arcgis_maps_flutter.map
 
 import android.graphics.Color
-import com.esri.arcgisruntime.geometry.Geometry
-import com.esri.arcgisruntime.mapping.view.Graphic
-import com.esri.arcgisruntime.mapping.view.GraphicsOverlay
+import com.arcgismaps.geometry.Geometry
+import com.arcgismaps.mapping.view.Graphic
+import com.arcgismaps.mapping.view.GraphicsOverlay
 
 abstract class BaseGraphicController : GraphicControllerSink {
     private var selectionPropertiesHandler: SelectionPropertiesHandler? = null

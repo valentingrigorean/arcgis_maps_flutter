@@ -1,23 +1,23 @@
 part of arcgis_maps_flutter;
 
-/// Uniquely identifies a [Polygon] among [ArcgisMapView] polygons.
+/// Uniquely identifies a [PolygonMarker] among [ArcgisMapView] polygons.
 ///
 /// This does not have to be globally unique, only unique among the list.
 @immutable
-class PolygonId extends SymbolId<Polygon> {
-  /// Creates an immutable identifier for a [Polygon].
+class PolygonId extends SymbolId<PolygonMarker> {
+  /// Creates an immutable identifier for a [PolygonMarker].
   const PolygonId(String value) : super(value);
 }
 
 /// Draws a polygon through geographical locations on the map.
 @immutable
-class Polygon extends Symbol {
+class PolygonMarker extends Symbol {
   /// Creates an immutable representation of a polygon through geographical locations on the map.
-  const Polygon({
+  const PolygonMarker({
     required this.polygonId,
     this.consumeTapEvents = false,
     this.fillColor = Colors.black,
-    this.points = const <AGSPoint>[],
+    this.points = const <Point>[],
     this.strokeColor = Colors.black,
     this.strokeWidth = 10,
     this.strokeStyle = SimpleLineSymbolStyle.solid,
@@ -28,10 +28,10 @@ class Polygon extends Symbol {
     this.visibilityFilter,
   }) : super(symbolId: polygonId);
 
-  /// Uniquely identifies a [Polygon].
+  /// Uniquely identifies a [PolygonMarker].
   final PolygonId polygonId;
 
-  /// True if the [Polygon] consumes tap events.
+  /// True if the [PolygonMarker] consumes tap events.
   ///
   /// If this is false, [onTap] callback will not be triggered.
   final bool consumeTapEvents;
@@ -40,7 +40,7 @@ class Polygon extends Symbol {
   final Color fillColor;
 
   /// The vertices of the polygon to be drawn.
-  final List<AGSPoint> points;
+  final List<Point> points;
 
   /// True if the marker is visible.
   final bool visible;
@@ -71,12 +71,12 @@ class Polygon extends Symbol {
 
   final SymbolVisibilityFilter? visibilityFilter;
 
-  /// Creates a new [Polygon] object whose values are the same as this instance,
+  /// Creates a new [PolygonMarker] object whose values are the same as this instance,
   /// unless overwritten by the specified parameters.
-  Polygon copyWith(
+  PolygonMarker copyWith(
       {bool? consumeTapEventsParam,
       Color? fillColorParam,
-      List<AGSPoint>? pointsParam,
+      List<Point>? pointsParam,
       Color? strokeColorParam,
       int? strokeWidthParam,
       SimpleLineSymbolStyle? strokeStyleParam,
@@ -86,7 +86,7 @@ class Polygon extends Symbol {
       Color? selectedColorParam,
       SymbolVisibilityFilter? visibilityFilterParam,
       }) {
-    return Polygon(
+    return PolygonMarker(
       polygonId: polygonId,
       consumeTapEvents: consumeTapEventsParam ?? consumeTapEvents,
       fillColor: fillColorParam ?? fillColor,
@@ -104,7 +104,7 @@ class Polygon extends Symbol {
 
   @override
   clone() {
-    return copyWith(pointsParam: List<AGSPoint>.of(points));
+    return copyWith(pointsParam: List<Point>.of(points));
   }
 
   @override
@@ -122,7 +122,7 @@ class Polygon extends Symbol {
     addIfPresent('fillColor', fillColor.value);
     addIfPresent('strokeColor', strokeColor.value);
     addIfPresent('strokeWidth', strokeWidth);
-    addIfPresent('strokeStyle', strokeStyle.index);
+    addIfPresent('strokeStyle', strokeStyle.value);
     addIfPresent('visible', visible);
     addIfPresent('zIndex', zIndex);
     addIfPresent('selectedColor', selectedColor?.value);
@@ -139,7 +139,7 @@ class Polygon extends Symbol {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Polygon &&
+      other is PolygonMarker &&
           runtimeType == other.runtimeType &&
           polygonId == other.polygonId &&
           consumeTapEvents == other.consumeTapEvents &&

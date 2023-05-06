@@ -1,12 +1,31 @@
 part of arcgis_maps_flutter;
 
-enum SimpleLineSymbolStyle { dash, dashDot, dashDotDot, dot, none, solid }
+enum SimpleLineSymbolStyle {
+  dash(0),
+  dashDot(1),
+  dashDotDot(2),
+  dot(3),
+  none(4),
+  solid(5),
+  ;
 
-/// Uniquely identifies a [Polyline] among [ArcgisMapView] polylines.
+  const SimpleLineSymbolStyle(this.value);
+
+  factory SimpleLineSymbolStyle.fromValue(int value) {
+    return SimpleLineSymbolStyle.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => SimpleLineSymbolStyle.none,
+    );
+  }
+
+  final int value;
+}
+
+/// Uniquely identifies a [PolylineMarker] among [ArcgisMapView] polylines.
 ///
 /// This does not have to be globally unique, only unique among the list.
 @immutable
-class PolylineId extends SymbolId<Polyline> {
+class PolylineId extends SymbolId<PolylineMarker> {
   /// Creates an immutable object representing a [PolylineId] among [ArcgisMapView] polylines.
   ///
   /// An [AssertionError] will be thrown if [value] is null.
@@ -14,14 +33,14 @@ class PolylineId extends SymbolId<Polyline> {
 }
 
 @immutable
-class Polyline extends Symbol {
+class PolylineMarker extends Symbol {
   /// Creates an immutable object representing a line drawn through geographical locations on the map.
-  const Polyline({
+  const PolylineMarker({
     required this.polylineId,
     this.consumeTapEvents = false,
     this.color = Colors.black,
     this.style = SimpleLineSymbolStyle.solid,
-    this.points = const <AGSPoint>[],
+    this.points = const <Point>[],
     this.visible = true,
     this.width = 10,
     this.zIndex = 0,
@@ -31,10 +50,10 @@ class Polyline extends Symbol {
     this.visibilityFilter,
   }) : super(symbolId: polylineId);
 
-  /// Uniquely identifies a [Polyline].
+  /// Uniquely identifies a [PolylineMarker].
   final PolylineId polylineId;
 
-  /// True if the [Polyline] consumes tap events.
+  /// True if the [PolylineMarker] consumes tap events.
   ///
   /// If this is false, [onTap] callback will not be triggered.
   final bool consumeTapEvents;
@@ -46,7 +65,7 @@ class Polyline extends Symbol {
   final SimpleLineSymbolStyle style;
 
   /// The vertices of the polygon to be drawn.
-  final List<AGSPoint> points;
+  final List<Point> points;
 
   /// True if the marker is visible.
   final bool visible;
@@ -74,13 +93,13 @@ class Polyline extends Symbol {
 
   final SymbolVisibilityFilter? visibilityFilter;
 
-  /// Creates a new [Polyline] object whose values are the same as this instance,
+  /// Creates a new [PolylineMarker] object whose values are the same as this instance,
   /// unless overwritten by the specified parameters.
-  Polyline copyWith({
+  PolylineMarker copyWith({
     bool? consumeTapEventsParam,
     Color? colorParam,
     SimpleLineSymbolStyle? styleParam,
-    List<AGSPoint>? pointsParam,
+    List<Point>? pointsParam,
     bool? visibleParam,
     int? widthParam,
     int? zIndexParam,
@@ -89,7 +108,7 @@ class Polyline extends Symbol {
     Color? selectedColorParam,
     SymbolVisibilityFilter? visibilityFilterParam,
   }) {
-    return Polyline(
+    return PolylineMarker(
       polylineId: polylineId,
       color: colorParam ?? color,
       consumeTapEvents: consumeTapEventsParam ?? consumeTapEvents,
@@ -108,7 +127,7 @@ class Polyline extends Symbol {
   @override
   clone() {
     return copyWith(
-      pointsParam: List<AGSPoint>.of(points),
+      pointsParam: List<Point>.of(points),
     );
   }
 
@@ -125,7 +144,7 @@ class Polyline extends Symbol {
     addIfPresent('polylineId', polylineId.value);
     addIfPresent('consumeTapEvents', consumeTapEvents);
     addIfPresent('color', color.value);
-    addIfPresent('style', style.index);
+    addIfPresent('style', style.value);
     json['points'] = _pointsToJson();
     addIfPresent('visible', visible);
     addIfPresent('width', width);
@@ -142,7 +161,7 @@ class Polyline extends Symbol {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Polyline &&
+      other is PolylineMarker &&
           runtimeType == other.runtimeType &&
           polylineId == other.polylineId &&
           consumeTapEvents == other.consumeTapEvents &&
@@ -158,7 +177,7 @@ class Polyline extends Symbol {
 
   Object _pointsToJson() {
     final List<Object> result = <Object>[];
-    for (final AGSPoint point in points) {
+    for (final Point point in points) {
       result.add(point.toJson());
     }
     return result;
