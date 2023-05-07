@@ -7,9 +7,10 @@ enum LinearUnitId {
   kilometers(3),
   meters(4),
   miles(5),
-  nauticalMiles(6),
-  yards(7),
-  other(8),
+  millimeters(6),
+  nauticalMiles(7),
+  yards(8),
+  other(9),
   ;
 
   const LinearUnitId(this.value);
@@ -100,10 +101,10 @@ class GeodeticDistanceResult extends Equatable {
   factory GeodeticDistanceResult.fromJson(Map<dynamic, dynamic> json) {
     return GeodeticDistanceResult(
       distance: json['distance'],
-      distanceUnitId: LinearUnitId.values[json['distanceUnitId']],
+      distanceUnitId: LinearUnitId.fromValue(json['distanceUnitId']),
       azimuth1: json['azimuth1'],
       azimuth2: json['azimuth2'],
-      angularUnitId: AngularUnitId.values[json['angularUnitId']],
+      angularUnitId: AngularUnitId.fromValue(json['angularUnitId']),
     );
   }
 

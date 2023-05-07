@@ -192,38 +192,48 @@ class GeometryEngine {
   /// Densifies the input geometry by creating additional vertices along the geometry, using a geodesic curve.
   ///
   /// Return the geodesic densified geometry.
-  static Future<Geometry?> densifyGeodetic(
-      {required Geometry geometry,
-      required double maxSegmentLength,
-      LinearUnitId lengthUnit = LinearUnitId.meters,
-      required GeodeticCurveType curveType}) {
+  static Future<Geometry?> densifyGeodetic({
+    required Geometry geometry,
+    required double maxSegmentLength,
+    LinearUnitId lengthUnit = LinearUnitId.meters,
+    required GeodeticCurveType curveType,
+  }) {
     return GeometryEngineFlutterPlatform.instance.densifyGeodetic(
-        geometry: geometry,
-        maxSegmentLength: maxSegmentLength,
-        lengthUnit: lengthUnit,
-        curveType: curveType);
+      geometry: geometry,
+      maxSegmentLength: maxSegmentLength,
+      lengthUnit: lengthUnit,
+      curveType: curveType,
+    );
   }
 
   /// Calculates the geodesic length of the geometry. Supports true curves, calculating the result by densifying curves.
   ///
   /// Returns the geodesic length of the given geometry.
-  static Future<num?> lengthGeodetic(
-      {required Geometry geometry,
-      LinearUnitId lengthUnit = LinearUnitId.meters,
-      required GeodeticCurveType curveType}) {
+  static Future<num?> lengthGeodetic({
+    required Geometry geometry,
+    LinearUnitId lengthUnit = LinearUnitId.meters,
+    required GeodeticCurveType curveType,
+  }) {
     return GeometryEngineFlutterPlatform.instance.lengthGeodetic(
-        geometry: geometry, lengthUnit: lengthUnit, curveType: curveType);
+      geometry: geometry,
+      lengthUnit: lengthUnit,
+      curveType: curveType,
+    );
   }
 
   /// Calculates the geodesic area of the given geometry. Supports true curves, calculating the result by densifying curves.
   ///
   /// Returns the calculated geodesic area in the requested unit.
-  static Future<num?> areaGeodetic(
-      {required Geometry geometry,
-      AreaUnitId areaUnit = AreaUnitId.squareMeters,
-      required GeodeticCurveType curveType}) {
+  static Future<num?> areaGeodetic({
+    required Geometry geometry,
+    AreaUnitId areaUnit = AreaUnitId.squareMeters,
+    required GeodeticCurveType curveType,
+  }) {
     return GeometryEngineFlutterPlatform.instance.areaGeodetic(
-        geometry: geometry, areaUnit: areaUnit, curveType: curveType);
+      geometry: geometry,
+      areaUnit: areaUnit,
+      curveType: curveType,
+    );
   }
 
   /// Get extent of Geometry.

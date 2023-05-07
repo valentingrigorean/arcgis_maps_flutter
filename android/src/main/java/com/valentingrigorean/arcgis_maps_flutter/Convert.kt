@@ -10,7 +10,9 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.util.TypedValue
 import com.arcgismaps.BuildConfig
+import com.arcgismaps.geometry.GeodesicSectorParameters
 import com.arcgismaps.geometry.GeometryType
+import com.arcgismaps.geometry.LinearUnitId
 import com.arcgismaps.geometry.SpatialReference
 import com.esri.arcgisruntime.ArcGISRuntimeException
 import com.esri.arcgisruntime.UnitSystem
@@ -779,25 +781,6 @@ open class Convert {
                     )
                 )
             )
-        }
-
-        fun toTimeValue(o: Any?): TimeValue? {
-            if (o == null) {
-                return null
-            }
-            val data = toMap(o)
-            val duration = toDouble(
-                data["duration"]
-            )
-            val unit = toInt(data["unit"])
-            return TimeValue(duration, TimeUnit.values()[unit])
-        }
-
-        fun timeValueToJson(timeValue: TimeValue): Any {
-            val json: MutableMap<Any, Any> = HashMap(2)
-            json["duration"] = timeValue.duration
-            json["unit"] = timeValue.timeUnit.ordinal
-            return json
         }
 
         fun markerIdToJson(markerId: String?): Any? {

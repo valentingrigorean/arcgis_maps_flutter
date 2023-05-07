@@ -86,29 +86,32 @@ abstract class GeometryEngineFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('isSimple() has not been implemented.');
   }
 
-  Future<Geometry?> densifyGeodetic(
-      {required Geometry geometry,
-      required double maxSegmentLength,
-      required LinearUnitId lengthUnit,
-      required GeodeticCurveType curveType}) {
+  Future<Geometry?> densifyGeodetic({
+    required Geometry geometry,
+    required double maxSegmentLength,
+    required LinearUnitId lengthUnit,
+    required GeodeticCurveType curveType,
+  }) {
     throw UnimplementedError('densifyGeodetic() has not been implemented.');
   }
 
-  Future<num?> lengthGeodetic(
-      {required Geometry geometry,
-      required LinearUnitId lengthUnit,
-      required GeodeticCurveType curveType}) {
+  Future<num?> lengthGeodetic({
+    required Geometry geometry,
+    required LinearUnitId lengthUnit,
+    required GeodeticCurveType curveType,
+  }) {
     throw UnimplementedError('lengthGeodetic() has not been implemented.');
   }
 
-  Future<num?> areaGeodetic(
-      {required Geometry geometry,
-      required AreaUnitId areaUnit,
-      required GeodeticCurveType curveType}) {
+  Future<num?> areaGeodetic({
+    required Geometry geometry,
+    required AreaUnitId areaUnit,
+    required GeodeticCurveType curveType,
+  }) {
     throw UnimplementedError('areaGeodetic() has not been implemented.');
   }
 
-  Future<Envelope?> getExtent(Geometry geometry){
+  Future<Envelope?> getExtent(Geometry geometry) {
     throw UnimplementedError('getExtent() has not been implemented.');
   }
 }

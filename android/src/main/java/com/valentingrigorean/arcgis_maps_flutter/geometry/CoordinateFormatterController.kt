@@ -1,8 +1,10 @@
 package com.valentingrigorean.arcgis_maps_flutter.geometry
 
 import com.arcgismaps.geometry.CoordinateFormatter
+import com.arcgismaps.geometry.GeodesicSectorParameters
 import com.arcgismaps.geometry.Point
-import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toLatitudeLongitudeFormat
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -24,20 +26,14 @@ class CoordinateFormatterController(messenger: BinaryMessenger) : MethodCallHand
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "latitudeLongitudeString" -> {
-                val data: Map<*, *> = Convert.Companion.toMap(call.arguments)
-                val from = Convert.Companion.toGeometry(
-                    data["from"]
-                ) as Point
-                val format: Int = Convert.Companion.toInt(
-                    data["format"]
-                )
-                val decimalPlaces: Int = Convert.Companion.toInt(
-                    data["decimalPlaces"]
-                )
+                val data = call.arguments as Map<*, *>
+                val from =  data["from"]?.toGeometryOrNull()!! as Point
+                val format = (data["format"] as Int).toLatitudeLongitudeFormat()
+                val decimalPlaces = data["decimalPlaces"] as Int
                 result.success(
-                    CoordinateFormatter.fromLatitudeLongitudeOrNull(
+                    CoordinateFormatter.toLatitudeLongitudeOrNull(
                         from,
-                        CoordinateFormatter.LatitudeLongitudeFormat.values()[format],
+                        format,
                         decimalPlaces
                     )
                 )
@@ -45,9 +41,5 @@ class CoordinateFormatterController(messenger: BinaryMessenger) : MethodCallHand
 
             else -> result.notImplemented()
         }
-    }
-
-    companion object {
-        private const val TAG = "CoordinateFormatterController"
     }
 }
