@@ -1,7 +1,7 @@
 package com.valentingrigorean.arcgis_maps_flutter.convert.arcgisservices
 
+import com.arcgismaps.arcgisservices.CacheStorageFormat
 import com.arcgismaps.arcgisservices.TimeUnit
-import com.arcgismaps.geometry.LinearUnitId
 
 fun TimeUnit.toFlutterValue() : Int{
     return when(this){
@@ -33,5 +33,25 @@ fun Int.toTimeUnit() : TimeUnit{
         9 -> TimeUnit.Weeks
         10 -> TimeUnit.Years
         else -> TimeUnit.Unknown
+    }
+}
+
+
+fun CacheStorageFormat.toFlutterValue() : Int{
+    return when(this){
+        CacheStorageFormat.Unknown -> -1
+        CacheStorageFormat.Compact -> 0
+        CacheStorageFormat.CompactV2 -> 1
+        CacheStorageFormat.Exploded -> 2
+    }
+}
+
+fun Int.toCacheStorageFormat() : CacheStorageFormat{
+    return when(this){
+        -1 -> CacheStorageFormat.Unknown
+        0 -> CacheStorageFormat.Compact
+        1 -> CacheStorageFormat.CompactV2
+        2 -> CacheStorageFormat.Exploded
+        else -> CacheStorageFormat.Unknown
     }
 }

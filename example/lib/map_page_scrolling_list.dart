@@ -18,7 +18,7 @@ class MapPageScrollingList extends StatelessWidget {
           return SizedBox(
             height: 300,
             child: ArcgisMapView(
-              map: ArcGISMap.imageryWithLabels(),
+              map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
               gestureRecognizers: {
                 Factory<OneSequenceGestureRecognizer>(
                   () => HorizontalDragGestureRecognizer(),

@@ -27,7 +27,7 @@ class _MapPageExportImageState extends State<MapPageExportImage> {
         children: [
           Positioned.fill(
             child: ArcgisMapView(
-              map: ArcGISMap.imagery(),
+              map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
               onMapCreated: (controller) {
                 setState(() {
                   _mapController = controller;

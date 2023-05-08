@@ -9,7 +9,9 @@ class ScenePage extends StatefulWidget {
 }
 
 class _ScenePageState extends State<ScenePage> {
-  final ArcGISScene _scene = ArcGISScene.fromBasemap(Basemap.createImagery());
+  final ArcGISScene _scene = ArcGISScene.fromBasemap(
+    const Basemap.fromStyle(basemapStyle: BasemapStyle.arcGISImageryLabels),
+  );
   final Surface _surface = Surface(
       surfaceId: const SurfaceId("my_surface"),
       elevationSources: <ElevationSource>{

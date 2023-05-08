@@ -33,9 +33,7 @@ class _MapPageOfflineMapState extends State<MapPageOfflineMap> {
 
   final _map = ArcGISMap.fromPortalItem(
     PortalItem(
-      portal: Portal.arcGISOnline(
-        withLoginRequired: false,
-      ),
+      portal: Portal.arcGISOnline(connection: PortalConnection.anonymous),
       itemId: 'acc027394bc84c2fb04d1ed317aac674',
     ),
   );

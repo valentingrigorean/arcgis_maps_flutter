@@ -60,7 +60,7 @@ void main() {
     var baseTileLayer = BaseTileLayerMock.fromPortalItem(
         layerId: const LayerId('layerId'),
         portalItem: PortalItem(
-          portal: Portal.arcGISOnline(withLoginRequired: false),
+          portal: Portal.arcGISOnline(connection: PortalConnection.anonymous),
           itemId: 'itemId',
         ));
 

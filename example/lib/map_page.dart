@@ -36,7 +36,7 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
 
   final bool _trackCamera = false;
 
-  ArcGISMap map = ArcGISMap.openStreetMap();
+  ArcGISMap map = const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImagery);
 
   ArcgisMapController? _mapController;
 
@@ -110,7 +110,7 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
 
   // ignore: unused_element
   Widget _buildMapsTypes(ScrollController scrollController) {
-    var items = BasemapType.values;
+    var items = BasemapStyle.values;
 
     return Container(
       color: Colors.white,
@@ -124,11 +124,8 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
             ),
             onTap: () {
               setState(() {
-                map = ArcGISMap.fromBasemapType(
-                  basemapType: items[index],
-                  longitude: 41.3678,
-                  latitude: 28.5588,
-                  levelOfDetail: 10,
+                map = ArcGISMap.fromBasemapStyle(
+                 items[index],
                 );
               });
               Navigator.pop(_scaffoldKey.currentContext!);

@@ -63,7 +63,7 @@ class _MapPageLocatorState extends State<MapPageLocator> {
           IgnorePointer(
             ignoring: _isLoading,
             child: ArcgisMapView(
-              map: ArcGISMap.imageryWithLabelsVector(),
+              map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
               onTap: (_, point) async {
                 setState(() {
                   _isLoading = true;

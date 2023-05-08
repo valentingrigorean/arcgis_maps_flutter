@@ -11,12 +11,12 @@ class MapPagePortal extends StatelessWidget {
         title: const Text('Portal'),
       ),
       body: ArcgisMapView(
-        map: ArcGISMap.openStreetMap(),
+        map:const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
         operationalLayers: {
           FeatureLayer.fromPortalItem(
             layerId: const LayerId('LayerId'),
             portalItem: PortalItem(
-              portal: Portal.arcGISOnline(withLoginRequired: false),
+              portal: Portal.arcGISOnline(connection: PortalConnection.anonymous),
               itemId: 'af1ad38816814b7eba3fe74a3b84412d',
             ),
             portalItemLayerId: 0,

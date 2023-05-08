@@ -15,7 +15,7 @@ class MapPageMaxExtent extends StatelessWidget {
         map: ArcGISMap.fromPortalItem(
           PortalItem(
             portal: Portal.arcGISOnline(
-              withLoginRequired: false,
+              connection: PortalConnection.anonymous,
             ),
             itemId: 'acc027394bc84c2fb04d1ed317aac674',
           ),

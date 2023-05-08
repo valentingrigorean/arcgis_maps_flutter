@@ -41,7 +41,7 @@ class _MapPageMarkersState extends State<MapPageMarkers> {
         title: const Text('Markers'),
       ),
       body: ArcgisMapView(
-        map: ArcGISMap.imagery(),
+        map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
         markers: _markers,
       ),
       floatingActionButton: FloatingActionButton(

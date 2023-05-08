@@ -17,7 +17,7 @@ class _MapPageGestureState extends State<MapPageGesture> {
       body: Stack(
         children: [
           ArcgisMapView(
-            map: ArcGISMap.imagery(),
+            map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
             onTap: (_,point) {
               setState(() {
                 text = 'OnTap: $point';

@@ -3,10 +3,12 @@ package com.valentingrigorean.arcgis_maps_flutter.data
 import android.icu.text.SimpleDateFormat
 import com.arcgismaps.geometry.Geometry
 import com.valentingrigorean.arcgis_maps_flutter.Convert
-import com.valentingrigorean.arcgis_maps_flutter.convert.fromFlutterDateTime
+import com.valentingrigorean.arcgis_maps_flutter.convert.fromFlutterInstant
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterValue
 import java.nio.ByteBuffer
+import java.time.Instant
 import java.util.GregorianCalendar
 import java.util.Locale
 import java.util.UUID
@@ -31,6 +33,9 @@ fun Any.toFlutterFieldType(): Any {
         obj = ISO8601Format.format(
             obj.time
         )
+    } else if (obj is Instant) {
+        fieldTypeFlutter = FieldTypeFlutter.DATE
+        obj = obj.toFlutterValue()
     } else if (obj is UUID) {
         fieldTypeFlutter = FieldTypeFlutter.TEXT
         obj = obj.toString()
@@ -41,9 +46,7 @@ fun Any.toFlutterFieldType(): Any {
         }
     } else if (obj is Geometry) {
         fieldTypeFlutter = FieldTypeFlutter.GEOMETRY
-        if (obj != null) {
-            obj = obj.toFlutterJson()!!
-        }
+        obj = obj.toFlutterJson()!!
     } else if (obj == null) {
         fieldTypeFlutter = FieldTypeFlutter.NULLABLE
     } else {
@@ -55,7 +58,7 @@ fun Any.toFlutterFieldType(): Any {
     return data
 }
 
-fun Any.fromFlutterFieldOrNull() : Any?{
+fun Any.fromFlutterFieldOrNull(): Any? {
     val data: Map<*, *> = this as Map<*, *>? ?: return null
     val fieldTypeFlutter = FieldTypeFlutter.values()[Convert.toInt(
         data["type"]
@@ -63,7 +66,7 @@ fun Any.fromFlutterFieldOrNull() : Any?{
     var value = data["value"]
     when (fieldTypeFlutter) {
         FieldTypeFlutter.DATE -> try {
-            value = value.toString().fromFlutterDateTime()
+            value = value.toString().fromFlutterInstant()
         } catch (e: Exception) {
             // no op
         }

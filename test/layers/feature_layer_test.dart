@@ -29,11 +29,7 @@ void main() {
       portalItemLayerId: 0,
       portalItem: PortalItem(
         portal: Portal.arcGISOnline(
-          withLoginRequired: false,
-          credential: const UserCredential.createUserCredential(
-            username: 'username',
-            password: 'password',
-          ),
+          connection: PortalConnection.anonymous,
         ),
         itemId: 'itemId',
       ),

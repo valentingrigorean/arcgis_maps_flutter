@@ -70,7 +70,7 @@ class _MapPageTimeSliderState extends State<MapPageTimeSlider> {
 
   Widget _buildMap() {
     return ArcgisMapView(
-      map: ArcGISMap.imageryWithLabelsVector(),
+      map:const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
       operationalLayers: radarLayers,
       onMapCreated: (controller) async {
         _controller = TimeSliderController(

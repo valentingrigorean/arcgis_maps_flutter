@@ -30,7 +30,7 @@ class _MapPageMarkerFromWidgetState extends State<MapPageMarkerFromWidget> {
         title: const Text('Markers from widget'),
       ),
       body: ArcgisMapView(
-        map: ArcGISMap.imagery(),
+        map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
         markers: _markers,
         onTap: (_,point) async {
           final bitmapDescriptor = await BitmapDescriptor.fromWidget(

@@ -1,39 +1,47 @@
 part of arcgis_maps_flutter;
 
+enum PortalConnection {
+  anonymous(0),
+  authenticated(1),
+  ;
+
+  const PortalConnection(this.value);
+
+  factory PortalConnection.fromValue(int value) {
+    return PortalConnection.values.firstWhere(
+      (e) => e.value == value,
+    );
+  }
+
+  final int value;
+}
+
 @immutable
 class Portal extends Equatable {
   const Portal({
-    required this.postalUrl,
-    required this.loginRequired,
-    this.credential,
+    required this.url,
+    this.connection = PortalConnection.anonymous,
   });
 
   factory Portal.arcGISOnline({
-    required bool withLoginRequired,
-    Credential? credential,
+    required PortalConnection connection,
   }) =>
       Portal(
-        postalUrl: 'https://www.arcgis.com',
-        loginRequired: withLoginRequired,
-        credential: credential,
+        url: 'https://www.arcgis.com',
+        connection: connection,
       );
 
-  final String postalUrl;
+  final String url;
 
-  final bool loginRequired;
-
-  final Credential? credential;
+  final PortalConnection connection;
 
   Object toJson() {
     final Map<String, Object> json = <String, Object>{};
-    json['postalUrl'] = postalUrl;
-    json['loginRequired'] = loginRequired;
-    if (credential != null) {
-      json['credential'] = credential!.toJson();
-    }
+    json['url'] = url;
+    json['connection'] = connection.value;
     return json;
   }
 
   @override
-  List<Object?> get props => [postalUrl, loginRequired, credential];
+  List<Object?> get props => [url, connection];
 }

@@ -6,8 +6,7 @@ import 'package:flutter/material.dart';
 
 
 const Portal _kSnlaArcgisPortal = Portal(
-  postalUrl: 'https://snla.maps.arcgis.com/',
-  loginRequired: false,
+  url: 'https://snla.maps.arcgis.com/'
 );
 
 Map<GeomapTransportType, Layer> _geomapLayersMap = {
@@ -192,10 +191,10 @@ class ArcgisMapsUtils {
   static ArcGISMap createMap(
       MapTypeOptions mapTypeOptions, Brightness brightness) {
     if (mapTypeOptions.mapType == MapType.satelitWorld) {
-      return ArcGISMap.imageryWithLabelsVector();
+      return const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels);
     }
     final layer = _createBasemapLayer(mapTypeOptions, brightness);
-    return ArcGISMap.fromBaseLayer(layer);
+    return ArcGISMap.fromBasemap(Basemap.fromBaseLayer(layer));
   }
 
 

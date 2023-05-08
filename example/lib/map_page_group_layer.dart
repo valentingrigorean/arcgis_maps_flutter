@@ -11,7 +11,7 @@ class MapPageGroupLayer extends StatelessWidget {
         title: const Text('Group Layer'),
       ),
       body: ArcgisMapView(
-        map: ArcGISMap.openStreetMap(),
+        map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
         operationalLayers: {
           GroupLayer(
             layerId: const LayerId('Group'),

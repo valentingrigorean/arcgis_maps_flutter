@@ -27,7 +27,7 @@ class _MapPageCurrentLocationTapState extends State<MapPageCurrentLocationTap> {
 
     if (_permissionStatus == PermissionStatus.granted) {
       body = ArcgisMapView(
-        map: ArcGISMap.topographic(),
+        map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
         myLocationEnabled: true,
         onUserLocationTap: () async {
           final point = await _locationDisplay.mapLocation;

@@ -503,50 +503,6 @@ open class Convert {
             throw UnsupportedOperationException("Not implemented!")
         }
 
-        fun toGeodesicSectorParameters(o: Any): GeodesicSectorParameters {
-            val data = toMap(o)
-            val center = toPoint(data["center"])
-            val semiAxis1Length = toDouble(
-                data["semiAxis1Length"]
-            )
-            val semiAxis2Length = toDouble(
-                data["semiAxis2Length"]
-            )
-            val startDirection = toDouble(
-                data["startDirection"]
-            )
-            val sectorAngle = toDouble(
-                data["sectorAngle"]
-            )
-            val geodesicSectorParameters = GeodesicSectorParameters(
-                center,
-                semiAxis1Length,
-                semiAxis2Length,
-                startDirection,
-                sectorAngle
-            )
-            geodesicSectorParameters.linearUnit = LinearUnit(
-                toLinearUnitId(data["linearUnit"])
-            )
-            geodesicSectorParameters.angularUnit = AngularUnit(
-                toAngularUnitId(data["angularUnit"])
-            )
-            geodesicSectorParameters.axisDirection =
-                toDouble(data["axisDirection"])
-            val maxSegmentLength = data["maxSegmentLength"]
-            if (maxSegmentLength != null) {
-                geodesicSectorParameters.maxSegmentLength =
-                    toDouble(maxSegmentLength)
-            }
-            geodesicSectorParameters.geometryType =
-                toGeometryType(data["geometryType"])
-            geodesicSectorParameters.setMaxPointCount(
-                toInt(
-                    data["maxPointCount"]
-                )
-            )
-            return geodesicSectorParameters
-        }
 
         fun interpretMapViewOptions(o: Any, flutterMapViewDelegate: FlutterMapViewDelegate) {
             val data = toMap(o)

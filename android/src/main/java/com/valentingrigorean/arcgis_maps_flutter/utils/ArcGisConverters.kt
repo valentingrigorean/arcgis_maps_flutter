@@ -1,25 +1,24 @@
 package com.valentingrigorean.arcgis_maps_flutter.utils
 
-import com.esri.arcgisruntime.data.ArcGISFeature
-import com.esri.arcgisruntime.data.Feature
-import com.esri.arcgisruntime.data.Field
-import com.esri.arcgisruntime.data.StatisticType
+import com.arcgismaps.data.Field
+import com.arcgismaps.data.FieldType
+import com.arcgismaps.data.StatisticType
 import com.valentingrigorean.arcgis_maps_flutter.Convert
 import java.util.*
 
 
 internal fun String?.toStatisticType(): StatisticType = when (this) {
-    "AVERAGE" -> StatisticType.AVERAGE
-    "COUNT" -> StatisticType.COUNT
-    "MAXIMUM" -> StatisticType.MAXIMUM
-    "MINIMUM" -> StatisticType.MINIMUM
-    "STANDARD_DEVIATION" -> StatisticType.STANDARD_DEVIATION
-    "SUM" -> StatisticType.SUM
-    "VARIANCE" -> StatisticType.VARIANCE
-    else -> StatisticType.SUM
+    "AVERAGE" -> StatisticType.Average
+    "COUNT" -> StatisticType.Count
+    "MAXIMUM" -> StatisticType.Maximum
+    "MINIMUM" -> StatisticType.Minimum
+    "STANDARD_DEVIATION" -> StatisticType.StandardDeviation
+    "SUM" -> StatisticType.Sum
+    "VARIANCE" -> StatisticType.Variance
+    else -> StatisticType.Sum
 }
 
-fun (Field.Type).toFlutterType(): String {
+fun (FieldType).toFlutterType(): String {
     return when (this) {
         Field.Type.UNKNOWN -> "unknown"
         Field.Type.GUID -> "guid"

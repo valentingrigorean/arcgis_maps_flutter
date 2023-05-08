@@ -1,6 +1,10 @@
 package com.valentingrigorean.arcgis_maps_flutter.layers
 
 import android.util.Log
+import com.arcgismaps.io.RemoteResource
+import com.arcgismaps.mapping.PortalItem
+import com.arcgismaps.mapping.layers.GroupLayer
+import com.arcgismaps.mapping.layers.Layer
 import com.arcgismaps.mapping.layers.TileCache
 import com.valentingrigorean.arcgis_maps_flutter.Convert
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeObjectStorage
@@ -9,10 +13,9 @@ import java.util.function.Function
 import java.util.stream.Collectors
 
 class FlutterLayer(private val data: Map<*, *>) {
-    val layerId: String
-    private val layerType: String?
+    val layerId: String = data["layerId"] as String
+    private val layerType: String? = data["layerType"] as String?
     private var url: String? = null
-    private var credential: Credential? = null
     private val isVisible: Boolean
     private val opacity: Float
     private var serviceImageTiledLayerOptions: ServiceImageTiledLayerOptions? = null
@@ -22,8 +25,6 @@ class FlutterLayer(private val data: Map<*, *>) {
     private var portalItemLayerId: Long = 0
 
     init {
-        layerId = data["layerId"] as String
-        layerType = data["layerType"] as String?
         if (data.containsKey("url")) {
             url = data["url"] as String?
             portalItem = null
@@ -47,13 +48,6 @@ class FlutterLayer(private val data: Map<*, *>) {
         }
         isVisible = Convert.Companion.toBoolean(data["isVisible"]!!)
         opacity = Convert.Companion.toFloat(data["opacity"])
-        credential = if (data.containsKey("credential")) {
-            Convert.Companion.toCredentials(
-                data["credential"]
-            )
-        } else {
-            null
-        }
         when (layerType) {
             "ServiceImageTiledLayer" -> {
                 serviceImageTiledLayerOptions = Convert.Companion.toServiceImageTiledLayerOptions(

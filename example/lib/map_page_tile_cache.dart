@@ -51,7 +51,7 @@ class _MapPageTileCacheState extends State<MapPageTileCache> {
         title: const Text('Tile Cache'),
       ),
       body: ArcgisMapView(
-        map: ArcGISMap.imagery(),
+        map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
         onMapCreated: (controller) {
           _mapController = controller;
         },

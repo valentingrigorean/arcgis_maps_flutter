@@ -22,7 +22,7 @@ class _MapPageBufferState extends State<MapPageBuffer> {
       body: Stack(
         children: [
           ArcgisMapView(
-            map: ArcGISMap.imagery(),
+            map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
             polygons: _polygon == null ? const {} : {_polygon!},
             onTap: (screenPoint, position) async {
               Polygon? polygon;

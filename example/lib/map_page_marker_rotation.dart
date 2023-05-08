@@ -22,7 +22,7 @@ class _MapPageMarkerRotationState extends State<MapPageMarkerRotation> {
       body: Stack(
         children: [
           ArcgisMapView(
-            map: ArcGISMap.imageryWithLabelsVector(),
+            map:const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
             markers: {
               Marker(
                 markerId: const MarkerId('test'),

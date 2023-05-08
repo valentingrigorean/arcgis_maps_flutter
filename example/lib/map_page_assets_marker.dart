@@ -22,7 +22,7 @@ class _MapPageASsetsMarkerState extends State<MapPageASsetsMarker> {
       body: Stack(
         children: [
           ArcgisMapView(
-            map: ArcGISMap.imageryWithLabelsVector(),
+            map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
             markers: {
               Marker(
                 markerId: const MarkerId('test'),

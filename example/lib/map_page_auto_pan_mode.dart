@@ -37,7 +37,7 @@ class _MapPageAutoPanModeState extends State<MapPageAutoPanMode> {
     late Widget body;
     if (_permissionStatus == PermissionStatus.granted) {
       body = ArcgisMapView(
-        map: ArcGISMap.topographic(),
+        map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
         myLocationEnabled: true,
         onMapCreated: (controller) {
           _locationDisplay = controller.locationDisplay;

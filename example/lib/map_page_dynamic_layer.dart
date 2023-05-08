@@ -30,7 +30,9 @@ class _MapPageDynamicLayerState extends State<MapPageDynamicLayer> {
         title: const Text('Dynamic Layer'),
       ),
       body: ArcgisMapView(
-        map: ArcGISMap.fromBaseLayer(_dynamicLayer),
+        map: ArcGISMap.fromBasemap(
+          Basemap.fromBaseLayer(_dynamicLayer),
+        ),
       ),
     );
   }

@@ -38,7 +38,7 @@ class ServiceTableController(messenger: BinaryMessenger) :
             "queryFeatureCount" -> {
                 queryFeatureCount(call, result)
             }
-            else -> {}
+            else -> result.notImplemented()
         }
     }
 

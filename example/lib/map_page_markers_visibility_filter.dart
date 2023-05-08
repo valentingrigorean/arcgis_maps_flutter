@@ -65,7 +65,7 @@ class _MapPageMarkersVisibilityFilterState
         title: const Text('Visibility Filter'),
       ),
       body: ArcgisMapView(
-        map: ArcGISMap.imagery(),
+        map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
         markers: _markers,
       ),
     );

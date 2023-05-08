@@ -38,7 +38,7 @@ class _MapPageScreenLocationState extends State<MapPageScreenLocation> {
               children: [
                 Positioned.fill(
                   child: ArcgisMapView(
-                    map: ArcGISMap.openStreetMap(),
+                    map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
                     onMapCreated: (controller) async {
                       _arcgisMapController = controller;
                     },

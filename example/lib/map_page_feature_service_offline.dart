@@ -53,7 +53,7 @@ class _MapPageFeatureServiceOfflineState
         title: const Text('Future service Cache'),
       ),
       body: ArcgisMapView(
-        map: ArcGISMap.topographic(),
+        map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
         viewpoint: Viewpoint.fromPoint(
           point: Point.fromLatLng(
             latitude: 41.774317,
