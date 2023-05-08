@@ -1,13 +1,39 @@
 part of arcgis_maps_flutter;
 
-class StatisticsQueryParameters {
-  final Iterable<StatisticDefinition> statisticDefinitions;
-  final Geometry? geometry;
-  final String? whereClause;
-  final SpatialRelationship? spatialRelationship;
-  final List<String> groupByFieldNames;
-  final List<OrderBy> orderByFields;
+enum StatisticType {
+  average(0),
+  count(1),
+  maximum(2),
+  minimum(3),
+  standardDeviation(4),
+  sum(5),
+  variance(6);
 
+  final int value;
+
+  const StatisticType(this.value);
+}
+
+@immutable
+class OrderBy {
+  final String fieldName;
+  final SortOrder sortOrder;
+
+  const OrderBy({
+    required this.fieldName,
+    required this.sortOrder,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      "fieldName": fieldName,
+      "sortOrder": sortOrder.value,
+    };
+  }
+}
+
+@immutable
+class StatisticsQueryParameters {
   StatisticsQueryParameters({
     this.statisticDefinitions = const [],
     this.groupByFieldNames = const [],
@@ -16,6 +42,13 @@ class StatisticsQueryParameters {
     this.whereClause,
     this.spatialRelationship,
   }) : assert(statisticDefinitions.isNotEmpty);
+
+  final List<StatisticDefinition> statisticDefinitions;
+  final Geometry? geometry;
+  final String? whereClause;
+  final SpatialRelationship? spatialRelationship;
+  final List<String> groupByFieldNames;
+  final List<OrderBy> orderByFields;
 
   Map<String, dynamic> toJson() {
     return {
@@ -50,33 +83,8 @@ class StatisticDefinition {
   Map<String, dynamic> toJson() {
     return {
       "fieldName": fieldName,
-      "statisticType": statisticType.alias,
+      "statisticType": statisticType.value,
       "outputAlias": outputAlias
     };
-  }
-}
-
-enum StatisticType {
-  average("AVERAGE"),
-  count("COUNT"),
-  maximum("MAXIMUM"),
-  minimum("MINIMUM"),
-  standardDeviation("STANDARD_DEVIATION"),
-  sum("SUM"),
-  variance("VARIANCE");
-
-  final String alias;
-
-  const StatisticType(this.alias);
-}
-
-class OrderBy {
-  final String fieldName;
-  final SortOrder sortOrder;
-
-  OrderBy(this.fieldName, this.sortOrder);
-
-  Map<String, dynamic> toJson() {
-    return {"fieldName": fieldName, "sortOrder": sortOrder.alias};
   }
 }

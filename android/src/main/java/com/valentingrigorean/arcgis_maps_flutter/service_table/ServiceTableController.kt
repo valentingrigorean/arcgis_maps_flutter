@@ -1,12 +1,10 @@
 package com.valentingrigorean.arcgis_maps_flutter.service_table
 
-import android.util.Log
-import com.esri.arcgisruntime.concurrent.ListenableFuture
-import com.esri.arcgisruntime.data.*
-import com.esri.arcgisruntime.data.QueryParameters.OrderBy
-import com.esri.arcgisruntime.geometry.Geometry
+import com.arcgismaps.data.QueryParameters
+import com.arcgismaps.data.ServiceFeatureTable
 import com.valentingrigorean.arcgis_maps_flutter.Convert
-import com.valentingrigorean.arcgis_maps_flutter.utils.toFlutterType
+import com.valentingrigorean.arcgis_maps_flutter.convert.data.toSpatialRelationship
+import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull
 import com.valentingrigorean.arcgis_maps_flutter.utils.toMap
 import com.valentingrigorean.arcgis_maps_flutter.utils.toStatisticType
 import io.flutter.plugin.common.BinaryMessenger
@@ -24,7 +22,6 @@ class ServiceTableController(messenger: BinaryMessenger) :
         channel.setMethodCallHandler(this)
     }
 
-    private val listenableResult: MutableList<ListenableFuture<*>> = mutableListOf()
     private val cachedServiceTable: MutableMap<String, ServiceFeatureTable> = mutableMapOf()
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
@@ -32,12 +29,15 @@ class ServiceTableController(messenger: BinaryMessenger) :
             "queryFeatures" -> {
                 queryFeatures(call, result)
             }
+
             "queryStatisticsAsync" -> {
                 queryStatisticsAsync(call, result)
             }
+
             "queryFeatureCount" -> {
                 queryFeatureCount(call, result)
             }
+
             else -> result.notImplemented()
         }
     }
@@ -56,31 +56,20 @@ class ServiceTableController(messenger: BinaryMessenger) :
             cachedServiceTable[url] = serviceFeatureTable
         }
         if (serviceFeatureTable == null) {
-            result.error("-999", "can not get sServiceFeatureTable", "url ${url}")
+            result.error("-999", "can not get sServiceFeatureTable", "url $url")
             return
         }
 
         val queryParametersMap: Map<Any, Any> =
             call.argument<Map<Any, Any>?>("queryParameters").orEmpty()
         val whereClauseParam: String? = queryParametersMap["whereClause"] as String?
-        val spatialRelationshipParam: QueryParameters.SpatialRelationship? =
-            with(queryParametersMap["spatialRelationship"]) {
-                if (this != null) {
-                    Convert.toSpatialRelationship(this)
-                } else {
-                    null
-                }
-            }
+        val spatialRelationshipParam =
+            (queryParametersMap["spatialRelationship"] as Int?)?.toSpatialRelationship()
 
-        val geometryParamJson = queryParametersMap["geometry"]
-
-        var geometryParam: Geometry? = null
-        if (geometryParamJson != null) {
-            geometryParam = Convert.toGeometry(geometryParamJson)
-        }
+        val geometryParam = queryParametersMap["geometry"]?.toGeometryOrNull()
 
         val query = QueryParameters().apply {
-            isReturnGeometry = queryParametersMap["isReturnGeometry"] as Boolean
+            returnGeometry = queryParametersMap["isReturnGeometry"] as Boolean
 
             if (geometryParam != null) {
                 geometry = geometryParam
@@ -101,7 +90,7 @@ class ServiceTableController(messenger: BinaryMessenger) :
             "LOAD_ALL" -> ServiceFeatureTable.QueryFeatureFields.LOAD_ALL
             else -> ServiceFeatureTable.QueryFeatureFields.LOAD_ALL
         }
-        val future = serviceFeatureTable.queryFeaturesAsync(query, queryFields)
+        val future = serviceFeatureTable.queryFeatures(query, queryFields)
         listenableResult.add(future)
         future.addDoneListener {
 

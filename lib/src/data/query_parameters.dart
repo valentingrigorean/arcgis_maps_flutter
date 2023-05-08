@@ -1,12 +1,12 @@
 part of arcgis_maps_flutter;
 
 enum SortOrder {
-  ascending("ASCENDING"),
-  descending("DESCENDING");
+  ascending(0),
+  descending(1);
 
-  final String alias;
+  final int value;
 
-  const SortOrder(this.alias);
+  const SortOrder(this.value);
 }
 
 enum SpatialRelationship {
@@ -36,54 +36,42 @@ enum SpatialRelationship {
 }
 
 class QueryParameters {
-  SpatialRelationship? spatialRelationship;
-
-  String get type => "QueryParameters";
-
+  final SpatialRelationship? spatialRelationship;
   final bool isReturnGeometry;
   final Geometry? geometry;
-  int _maxFeatures = 0;
-
-  int get maxFeatures => _maxFeatures;
+  final int maxFeatures;
   final int resultOffset;
 
-  set maxFeatures(int value) {
-    if (value > 0) {
-      _maxFeatures = value;
-    } else {
-      throw ArgumentError("Max features cannot be less than 0.");
-    }
-  }
+  final String whereClause;
 
-  final String? whereClause;
-
-  QueryParameters(
-      {this.isReturnGeometry = false,
-      this.geometry,
-      this.resultOffset = 0,
-      this.spatialRelationship,
-      this.whereClause,
-      int maxFeatures = 0})
-      : assert(maxFeatures >= 0),
-        _maxFeatures = maxFeatures;
+  const QueryParameters({
+    this.isReturnGeometry = false,
+    this.geometry,
+    this.resultOffset = 0,
+    this.spatialRelationship,
+    this.whereClause = '',
+    this.maxFeatures = 0,
+  }) : assert(maxFeatures >= 0);
 
   QueryParameters.fromJson(Map<dynamic, dynamic> json)
       : this(
-            isReturnGeometry: json["isReturnGeometry"],
-            geometry: Geometry.fromJson(json["geometry"]),
-            resultOffset: json["resultOffset"],
-            maxFeatures: json["maxFeatures"],
-            spatialRelationship:
-                SpatialRelationship.fromValue(json["spatialRelationship"]),
-            whereClause: json["whereClause"]);
+          isReturnGeometry: json["isReturnGeometry"],
+          geometry: Geometry.fromJson(json["geometry"]),
+          resultOffset: json["resultOffset"],
+          maxFeatures: json["maxFeatures"],
+          spatialRelationship:
+              SpatialRelationship.fromValue(json["spatialRelationship"]),
+          whereClause: json["whereClause"],
+        );
 
   Map<String, dynamic> toJson() {
     return {
       "isReturnGeometry": isReturnGeometry,
-      "geometry": geometry?.toJson(),
+      if (geometry != null) "geometry": geometry?.toJson(),
       "resultOffset": resultOffset,
       "maxFeatures": maxFeatures,
-      "spatialRelationship": spatialRelationship?.value,
+      if (spatialRelationship != null)
+        "spatialRelationship": spatialRelationship?.value,
       "whereClause": whereClause
     };
   }

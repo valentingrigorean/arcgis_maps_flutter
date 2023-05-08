@@ -1,9 +1,7 @@
 package com.valentingrigorean.arcgis_maps_flutter.map
 
-import com.esri.arcgisruntime.symbology.CompositeSymbol
-import com.esri.arcgisruntime.symbology.PictureFillSymbol
-import com.esri.arcgisruntime.symbology.PictureMarkerSymbol
-import com.esri.arcgisruntime.symbology.Symbol
+import com.arcgismaps.mapping.symbology.Symbol
+
 
 class ScaleSymbol(val symbol: Symbol) : Symbol(
     symbol.internal

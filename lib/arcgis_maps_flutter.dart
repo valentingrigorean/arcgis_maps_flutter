@@ -37,7 +37,6 @@ import 'dart:math' as math;
 import 'package:http/http.dart' as http;
 import 'package:xml2json/xml2json.dart';
 import 'package:jiffy/jiffy.dart';
-import 'src/method_channel/service_table/method_channel_service_table_flutter.dart';
 
 part 'src/dispose_scope.dart';
 
@@ -51,12 +50,17 @@ part 'src/arcgisservices/tile_info.dart';
 
 part 'src/concurrent/job.dart';
 
+part 'src/data/statistic.dart';
+part 'src/data/statistic_record.dart';
 part 'src/data/edit_result.dart';
+part 'src/data/feature.dart';
+part 'src/data/feature_table.dart';
 part 'src/data/tile_cache.dart';
 part 'src/data/geodatabase.dart';
 part 'src/data/sync_model.dart';
 part 'src/data/tile_key.dart';
 part 'src/data/query_parameters.dart';
+part 'src/data/service_feature_table.dart';
 
 part 'src/geometry/polygon.dart';
 part 'src/geometry/polyline.dart';
@@ -190,7 +194,3 @@ part 'src/toolkit/compass.dart';
 part 'src/toolkit/time_slider/time_slider.dart';
 part 'src/toolkit/time_slider/time_slider_data_provider.dart';
 
-part 'src/data/statistic/statistic.dart';
-part 'src/data/statistic/statistic_result.dart';
-part 'src/feature/feature.dart';
-part 'src/service_table/service_table.dart';

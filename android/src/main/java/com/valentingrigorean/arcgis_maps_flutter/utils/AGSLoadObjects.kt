@@ -1,8 +1,5 @@
 package com.valentingrigorean.arcgis_maps_flutter.utils
 
-import com.esri.arcgisruntime.loadable.LoadStatus
-import com.esri.arcgisruntime.loadable.Loadable
-import com.esri.arcgisruntime.mapping.LayerList
 
 object AGSLoadObjects {
     fun load(array: LayerList, callback: LoadObjectsResult?) {

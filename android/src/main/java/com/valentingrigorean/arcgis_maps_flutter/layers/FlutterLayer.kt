@@ -6,6 +6,7 @@ import com.arcgismaps.mapping.PortalItem
 import com.arcgismaps.mapping.layers.GroupLayer
 import com.arcgismaps.mapping.layers.Layer
 import com.arcgismaps.mapping.layers.TileCache
+import com.arcgismaps.mapping.layers.WmsLayer
 import com.valentingrigorean.arcgis_maps_flutter.Convert
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeObjectStorage
 import java.util.Objects

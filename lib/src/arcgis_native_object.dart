@@ -67,7 +67,7 @@ abstract class ArcgisNativeObject {
       return null;
     }
 
-    final response = await ArcgisNativeFlutterPlatform.instance.sendMessage(
+    final response = await ArcgisNativeFlutterPlatform.instance.sendMessage<T>(
       objectId: _id,
       method: method,
       arguments: arguments,

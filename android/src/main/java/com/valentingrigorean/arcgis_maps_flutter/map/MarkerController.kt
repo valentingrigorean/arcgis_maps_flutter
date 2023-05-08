@@ -1,6 +1,8 @@
 package com.valentingrigorean.arcgis_maps_flutter.map
 
 import android.content.Context
+import com.arcgismaps.mapping.symbology.CompositeSymbol
+import com.arcgismaps.mapping.view.Graphic
 import com.esri.arcgisruntime.mapping.view.Graphic
 import com.esri.arcgisruntime.symbology.CompositeSymbol
 import com.esri.arcgisruntime.symbology.MarkerSymbol
