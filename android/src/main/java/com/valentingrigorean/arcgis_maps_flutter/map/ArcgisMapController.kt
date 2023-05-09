@@ -14,6 +14,9 @@ import com.valentingrigorean.arcgis_maps_flutter.layers.LayersController
 import com.valentingrigorean.arcgis_maps_flutter.layers.LegendInfoController
 import com.valentingrigorean.arcgis_maps_flutter.layers.MapChangeAware
 import com.valentingrigorean.arcgis_maps_flutter.map.LocationDisplayController.LocationDisplayControllerDelegate
+import com.valentingrigorean.arcgis_maps_flutter.mapping.symbology.MarkersController
+import com.valentingrigorean.arcgis_maps_flutter.mapping.symbology.PolygonsController
+import com.valentingrigorean.arcgis_maps_flutter.mapping.symbology.PolylinesController
 import com.valentingrigorean.arcgis_maps_flutter.utils.AGSLoadObjects
 import com.valentingrigorean.arcgis_maps_flutter.utils.AGSLoadObjects.LoadObjectsResult
 import com.valentingrigorean.arcgis_maps_flutter.utils.toMap

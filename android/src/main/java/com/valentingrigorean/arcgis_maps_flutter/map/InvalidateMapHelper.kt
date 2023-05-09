@@ -2,24 +2,46 @@ package com.valentingrigorean.arcgis_maps_flutter.map
 
 import android.util.Log
 import android.view.Choreographer
+import com.arcgismaps.mapping.view.DrawStatus
+import com.arcgismaps.mapping.view.GeoView
+import com.arcgismaps.mapping.view.LayerViewStatus
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
-class InvalidateMapHelper(private val flutterMapViewDelegate: FlutterMapViewDelegate) :
-    DrawStatusChangedListener, LayerViewStateChangedListener {
+class InvalidateMapHelper(geoView: GeoView, scope:CoroutineScope) {
     private var loadedCallbackPending = false
-    private var isDisposed = false
 
     init {
-        flutterMapViewDelegate.addDrawStatusChangedListener(this)
-        flutterMapViewDelegate.addLayerViewStateChangedListener(this)
-    }
+        geoView.drawStatus.onEach {
+            Log.d(TAG, "drawStatusChanged: $it")
+            if (!loadedCallbackPending) {
+                Log.d(TAG, "drawStatusChanged: invalidate map not needed")
+                return@onEach
+            }
+            if(it == DrawStatus.Completed){
+                Log.d(TAG, "drawStatusChanged: invalidating map")
+                loadedCallbackPending = false
+                postFrameCallback {
+                    postFrameCallback {
+                        geoView.invalidate()
+                    }
+                }
+            }
+        }.launchIn(scope)
 
-    fun dispose() {
-        if (isDisposed) {
-            return
-        }
-        isDisposed = true
-        flutterMapViewDelegate.removeLayerViewStateChangedListener(this)
-        flutterMapViewDelegate.removeDrawStatusChangedListener(this)
+        geoView.layerViewStateChanged.onEach {
+            var needsInvalidate = false
+            for (layerViewStatus in it.layerViewState.status) {
+                if (layerViewStatus == LayerViewStatus.Active) {
+                    needsInvalidate = true
+                    break
+                }
+            }
+            if (needsInvalidate) {
+                invalidateMapIfNeeded()
+            }
+        }.launchIn(scope)
     }
 
     /**
@@ -45,45 +67,13 @@ class InvalidateMapHelper(private val flutterMapViewDelegate: FlutterMapViewDele
         loadedCallbackPending = true
     }
 
-    override fun drawStatusChanged(drawStatusChangedEvent: DrawStatusChangedEvent) {
-        Log.d(TAG, "drawStatusChanged: " + drawStatusChangedEvent.drawStatus.name)
-        if (!loadedCallbackPending) {
-            Log.d(TAG, "drawStatusChanged: invalidate map not needed")
-            return
-        }
-        when (drawStatusChangedEvent.drawStatus) {
-            DrawStatus.COMPLETED -> {
-                Log.d(TAG, "drawStatusChanged: invalidating map")
-                loadedCallbackPending = false
-                postFrameCallback {
-                    postFrameCallback {
-                        if (flutterMapViewDelegate.mapView != null && !isDisposed) {
-                            flutterMapViewDelegate.mapView.invalidate()
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    override fun layerViewStateChanged(layerViewStateChangedEvent: LayerViewStateChangedEvent) {
-        var needsInvalidate = false
-        for (layerViewStatus in layerViewStateChangedEvent.layerViewStatus) {
-            if (layerViewStatus == LayerViewStatus.ACTIVE) {
-                needsInvalidate = true
-                break
-            }
-        }
-        if (needsInvalidate) {
-            invalidateMapIfNeeded()
-        }
+    private fun postFrameCallback(f: Runnable) {
+        Choreographer.getInstance()
+            .postFrameCallback { _: Long -> f.run() }
     }
 
     companion object {
         private val TAG = InvalidateMapHelper::class.java.simpleName
-        private fun postFrameCallback(f: Runnable) {
-            Choreographer.getInstance()
-                .postFrameCallback { frameTimeNanos: Long -> f.run() }
-        }
+
     }
 }

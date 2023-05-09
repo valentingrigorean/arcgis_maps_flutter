@@ -6,8 +6,8 @@ import 'package:flutter/services.dart';
 class LocationDisplayImpl extends LocationDisplay {
   final StreamController<AutoPanMode> _autoPanModeStream =
       StreamController<AutoPanMode>.broadcast();
-  final StreamController<Location> _locationStream =
-      StreamController<Location>.broadcast();
+  final StreamController<Location?> _locationStream =
+      StreamController<Location?>.broadcast();
   late final MethodChannel _channel;
 
   AutoPanMode _autoPanMode = AutoPanMode.off;
@@ -31,7 +31,7 @@ class LocationDisplayImpl extends LocationDisplay {
       _autoPanModeStream.stream.distinct();
 
   @override
-  Stream<Location> get onLocationChanged => _locationStream.stream.distinct();
+  Stream<Location?> get onLocationChanged => _locationStream.stream.distinct();
 
   @override
   Future<bool> get started =>

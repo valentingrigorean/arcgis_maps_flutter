@@ -1,9 +1,11 @@
-package com.valentingrigorean.arcgis_maps_flutter.map
+package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 
 import android.graphics.Color
 import com.arcgismaps.geometry.Geometry
 import com.arcgismaps.mapping.view.Graphic
 import com.arcgismaps.mapping.view.GraphicsOverlay
+import com.valentingrigorean.arcgis_maps_flutter.map.GraphicControllerSink
+import com.valentingrigorean.arcgis_maps_flutter.map.SelectionPropertiesHandler
 
 abstract class BaseGraphicController : GraphicControllerSink {
     private var selectionPropertiesHandler: SelectionPropertiesHandler? = null

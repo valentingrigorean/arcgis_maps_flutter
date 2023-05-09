@@ -7,7 +7,7 @@ class Location {
     this.horizontalAccuracy = -1,
     this.lastKnown = false,
     this.position,
-    this.velocity = -1,
+    this.speed = -1,
     DateTime? timestamp,
     this.verticalAccuracy = 0,
   }) : timestamp = timestamp ?? DateTime.now();
@@ -20,7 +20,7 @@ class Location {
       position: json['position'] == null
           ? null
           : Point.fromJson(json['position'] as Map<dynamic, dynamic>),
-      velocity: json['velocity'] as double,
+      speed: json['speed'] as double,
       timestamp: json['timestamp'] == null
           ? null
           : DateTime.parse(json['timestamp'] as String),
@@ -49,7 +49,7 @@ class Location {
   final Point? position;
 
   /// The speed of the device in meters per second.
-  final double velocity;
+  final double speed;
 
   /// The time the location was determined.
   final DateTime timestamp;
@@ -66,7 +66,7 @@ class Location {
           horizontalAccuracy == other.horizontalAccuracy &&
           lastKnown == other.lastKnown &&
           position == other.position &&
-          velocity == other.velocity &&
+          speed == other.speed &&
           timestamp == other.timestamp &&
           verticalAccuracy == other.verticalAccuracy;
 
@@ -76,12 +76,12 @@ class Location {
       horizontalAccuracy.hashCode ^
       lastKnown.hashCode ^
       position.hashCode ^
-      velocity.hashCode ^
+      speed.hashCode ^
       timestamp.hashCode ^
       verticalAccuracy.hashCode;
 
   @override
   String toString() {
-    return 'Location{course: $course, horizontalAccuracy: $horizontalAccuracy, lastKnown: $lastKnown, position: $position, velocity: $velocity, timestamp: $timestamp, verticalAccuracy: $verticalAccuracy}';
+    return 'Location{course: $course, horizontalAccuracy: $horizontalAccuracy, lastKnown: $lastKnown, position: $position, speed: $speed, timestamp: $timestamp, verticalAccuracy: $verticalAccuracy}';
   }
 }

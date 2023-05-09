@@ -1,47 +1,59 @@
 package com.valentingrigorean.arcgis_maps_flutter.map
 
+import com.arcgismaps.location.LocationDataSourceStatus
+import com.arcgismaps.mapping.view.GeoView
 import com.arcgismaps.mapping.view.Graphic
 import com.arcgismaps.mapping.view.GraphicsOverlay
 import com.arcgismaps.mapping.view.LocationDisplay
 import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.location.toFlutterJson
+import com.valentingrigorean.arcgis_maps_flutter.convert.location.toFlutterValue
+import com.valentingrigorean.arcgis_maps_flutter.convert.location.toLocationDisplayAutoPanMode
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class LocationDisplayController(
     private val channel: MethodChannel,
-    private val flutterMapViewDelegate: FlutterMapViewDelegate
+    private val locationDisplay: LocationDisplay,
+    private val geoView: GeoView,
+    private val scope: CoroutineScope
 ) : MapTouchGraphicDelegate, MethodCallHandler {
-    private val locationDisplay: LocationDisplay?
-    private val locationGraphicsOverlay: GraphicsOverlay
+    private val locationGraphicsOverlay = GraphicsOverlay()
     private val locationGraphic: Graphic
     private var delegate: LocationDisplayControllerDelegate? = null
-    private var startResult: MethodChannel.Result? = null
     private var trackUserLocationTap = false
 
     init {
-        locationDisplay = flutterMapViewDelegate.locationDisplay
-        locationGraphicsOverlay = GraphicsOverlay()
         locationGraphicsOverlay.opacity = 0f
         locationGraphic = Graphic()
-        locationGraphic.geometry = flutterMapViewDelegate.locationDisplay.mapLocation
+        locationGraphic.geometry = locationDisplay.mapLocation
         locationGraphic.attributes[LOCATION_ATTRIBUTE] = true
-        locationGraphic.symbol = locationDisplay!!.defaultSymbol
+        locationGraphic.symbol = locationDisplay.defaultSymbol
         locationGraphicsOverlay.graphics.add(locationGraphic)
         channel.setMethodCallHandler(this)
-        locationDisplay.addDataSourceStatusChangedListener(this)
-        locationDisplay.addAutoPanModeChangedListener(this)
-        locationDisplay.addLocationChangedListener(this)
+        locationDisplay.autoPanMode.onEach {
+            channel.invokeMethod("onAutoPanModeChanged", it.toFlutterValue())
+        }.launchIn(scope)
+        locationDisplay.location.onEach {
+            locationGraphic.geometry = locationDisplay.mapLocation
+            channel.invokeMethod(
+                "onLocationChanged",
+                it?.toFlutterJson()
+            )
+        }.launchIn(scope)
+
+        locationDisplay.dataSource.status.onEach {
+            locationGraphic.geometry = locationDisplay.mapLocation
+        }.launchIn(scope)
     }
 
     fun dispose() {
-        locationDisplay!!.removeDataSourceStatusChangedListener(this)
-        locationDisplay.removeAutoPanModeChangedListener(this)
-        locationDisplay.removeLocationChangedListener(this)
-        if (startResult != null) {
-            startResult!!.success(null)
-            startResult = null
-        }
         channel.setMethodCallHandler(null)
     }
 
@@ -49,9 +61,9 @@ class LocationDisplayController(
         if (this.trackUserLocationTap != trackUserLocationTap) {
             this.trackUserLocationTap = trackUserLocationTap
             if (trackUserLocationTap) {
-                flutterMapViewDelegate.graphicsOverlays.add(locationGraphicsOverlay)
+                geoView.graphicsOverlays.add(locationGraphicsOverlay)
             } else {
-                flutterMapViewDelegate.graphicsOverlays.remove(locationGraphicsOverlay)
+                geoView.graphicsOverlays.remove(locationGraphicsOverlay)
             }
         }
     }
@@ -72,102 +84,73 @@ class LocationDisplayController(
         return result
     }
 
-    override fun onStatusChanged(dataSourceStatusChangedEvent: DataSourceStatusChangedEvent) {
-        try {
-            locationGraphic.geometry = locationDisplay!!.mapLocation
-        } catch (e: ArcGISRuntimeException) {
-            //ignore
-        }
-        handleStatusChanged(
-            dataSourceStatusChangedEvent.isStarted,
-            dataSourceStatusChangedEvent.error
-        )
-    }
-
-    override fun onAutoPanModeChanged(autoPanModeChangedEvent: AutoPanModeChangedEvent) {
-        channel.invokeMethod("onAutoPanModeChanged", autoPanModeChangedEvent.autoPanMode.ordinal)
-    }
-
-    override fun onLocationChanged(locationChangedEvent: LocationDisplay.LocationChangedEvent) {
-        try {
-            locationGraphic.geometry = locationDisplay!!.mapLocation
-        } catch (e: ArcGISRuntimeException) {
-            //ignore
-        }
-        channel.invokeMethod(
-            "onLocationChanged",
-            Convert.Companion.locationToJson(locationChangedEvent.location)
-        )
-    }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
-            "getStarted" -> result.success(locationDisplay!!.isStarted)
+            "getStarted" -> result.success(locationDisplay.dataSource.status.value == LocationDataSourceStatus.Started)
             "setAutoPanMode" -> {
-                locationDisplay!!.autoPanMode =
-                    Convert.Companion.toAutoPanMode(call.arguments)
+                locationDisplay.setAutoPanMode((call.arguments as Int).toLocationDisplayAutoPanMode())
                 result.success(null)
             }
 
             "setInitialZoomScale" -> {
-                locationDisplay!!.initialZoomScale = call.arguments()!!
+                locationDisplay.initialZoomScale = call.arguments()!!
                 result.success(null)
             }
 
             "setNavigationPointHeightFactor" -> {
-                locationDisplay!!.navigationPointHeightFactor = call.arguments()!!
+                locationDisplay.navigationPointHeightFactor = call.arguments()!!
                 result.success(null)
             }
 
             "setWanderExtentFactor" -> {
-                locationDisplay!!.wanderExtentFactor = call.arguments()!!
+                locationDisplay.wanderExtentFactor = call.arguments()!!
                 result.success(null)
             }
 
-            "getLocation" -> if (locationDisplay!!.location != null) {
+            "getLocation" -> {
                 result.success(
-                    Convert.Companion.locationToJson(
-                        locationDisplay.location
-                    )
+                    locationDisplay.location.value?.toFlutterJson()
                 )
-            } else {
-                result.success(null)
             }
 
-            "getMapLocation" -> if (locationDisplay!!.mapLocation != null) {
+            "getMapLocation" -> {
                 result.success(
-                    Convert.Companion.geometryToJson(
-                        locationDisplay.mapLocation
-                    )
+                    locationDisplay.location.value?.toGeometryOrNull()
                 )
-            } else {
-                result.success(null)
             }
 
-            "getHeading" -> result.success(locationDisplay!!.heading)
+            "getHeading" -> result.success(locationDisplay.heading)
             "setUseCourseSymbolOnMovement" -> {
-                locationDisplay!!.isUseCourseSymbolOnMovement = call.arguments()!!
+                locationDisplay.useCourseSymbolOnMovement = call.arguments()!!
                 result.success(null)
             }
 
             "setOpacity" -> {
-                locationDisplay!!.opacity = call.arguments()!!
+                locationDisplay.opacity = call.arguments()!!
                 result.success(null)
             }
 
             "setShowAccuracy" -> {
-                locationDisplay!!.isShowAccuracy = call.arguments()!!
+                locationDisplay.showAccuracy = call.arguments()!!
                 result.success(null)
             }
 
-            "setShowLocation" -> locationDisplay!!.isShowLocation = call.arguments()!!
+            "setShowLocation" -> {
+                locationDisplay.showLocation = call.arguments()!!
+                result.success(null)
+            }
             "setShowPingAnimationSymbol" -> {
-                locationDisplay!!.isShowPingAnimation = call.arguments()!!
+                locationDisplay.showPingAnimationSymbol = call.arguments()!!
                 result.success(null)
             }
 
             "start" -> {
-                startResult = result
+                 scope.launch {
+                     locationDisplay.dataSource.start().onSuccess {
+                         result.success(true)
+                     }
+                 }
                 locationDisplay!!.startAsync()
             }
 

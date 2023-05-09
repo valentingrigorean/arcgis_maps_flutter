@@ -1,8 +1,9 @@
-package com.valentingrigorean.arcgis_maps_flutter.map
+package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 
 import com.esri.arcgisruntime.mapping.view.Graphic
 import com.esri.arcgisruntime.mapping.view.GraphicsOverlay
 import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.map.MapTouchGraphicDelegate
 import io.flutter.plugin.common.MethodChannel
 
 class PolylinesController(

@@ -1,9 +1,10 @@
-package com.valentingrigorean.arcgis_maps_flutter.map
+package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 
 import android.content.Context
 import com.arcgismaps.mapping.view.Graphic
 import com.arcgismaps.mapping.view.GraphicsOverlay
 import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.map.MapTouchGraphicDelegate
 import io.flutter.plugin.common.MethodChannel
 
 class MarkersController(

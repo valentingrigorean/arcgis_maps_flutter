@@ -1,14 +1,13 @@
-package com.valentingrigorean.arcgis_maps_flutter.map
+package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 
 import android.content.Context
 import com.arcgismaps.mapping.symbology.CompositeSymbol
 import com.arcgismaps.mapping.view.Graphic
-import com.esri.arcgisruntime.mapping.view.Graphic
-import com.esri.arcgisruntime.symbology.CompositeSymbol
 import com.esri.arcgisruntime.symbology.MarkerSymbol
 import com.esri.arcgisruntime.symbology.PictureMarkerSymbol
 import com.esri.arcgisruntime.symbology.Symbol
-import com.valentingrigorean.arcgis_maps_flutter.map.BitmapDescriptor.BitmapDescriptorListener
+import com.valentingrigorean.arcgis_maps_flutter.map.ScaleSymbol
+import com.valentingrigorean.arcgis_maps_flutter.mapping.symbology.BitmapDescriptor.BitmapDescriptorListener
 
 class MarkerController(val context: Context, markerId: String?) : BaseGraphicController(),
     MarkerControllerSink {

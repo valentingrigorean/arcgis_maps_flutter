@@ -1,7 +1,7 @@
 part of arcgis_maps_flutter;
 
 abstract class LocationDisplay {
-  Stream<Location> get onLocationChanged;
+  Stream<Location?> get onLocationChanged;
 
   Stream<AutoPanMode> get onAutoPanModeChanged;
 

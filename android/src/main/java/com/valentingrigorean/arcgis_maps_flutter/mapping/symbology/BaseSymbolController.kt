@@ -1,7 +1,11 @@
-package com.valentingrigorean.arcgis_maps_flutter.map
+package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 
 import android.graphics.Color
 import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.map.GraphicControllerSink
+import com.valentingrigorean.arcgis_maps_flutter.map.SelectionPropertiesHandler
+import com.valentingrigorean.arcgis_maps_flutter.map.SymbolVisibilityFilterController
+import com.valentingrigorean.arcgis_maps_flutter.map.SymbolsController
 
 abstract class BaseSymbolController : SymbolsController {
     override var symbolVisibilityFilterController: SymbolVisibilityFilterController? = null
