@@ -2,23 +2,31 @@ package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 
 import android.content.Context
 import com.arcgismaps.mapping.symbology.CompositeSymbol
-import com.arcgismaps.mapping.view.Graphic
-import com.valentingrigorean.arcgis_maps_flutter.map.ScaleSymbol
+import com.arcgismaps.mapping.symbology.MarkerSymbol
+import com.arcgismaps.mapping.symbology.PictureMarkerSymbol
+import com.arcgismaps.mapping.symbology.Symbol
+import com.arcgismaps.mapping.symbology.SymbolAngleAlignment
 
-class MarkerController(val context: Context, markerId: String?) : BaseGraphicController(),
+class MarkerController(val context: Context, markerId: String) : BaseGraphicController(),
     MarkerControllerSink {
     private val marker = CompositeSymbol()
-    protected override val graphic: Graphic = Graphic()
     private var icon: BitmapDescriptor? = null
-    private var iconSymbol: ScaleSymbol? = null
+    private var iconScaleSymbolController: ScaleSymbolController? = null
     private var background: BitmapDescriptor? = null
-    private var backgroundSymbol: ScaleSymbol? = null
+    private var backgroundScaleSymbolController: ScaleSymbolController? = null
     private var opacity = 1f
     private var angle = 0.0f
     private var iconOffsetX = 0f
     private var iconOffsetY = 0f
-    private override var isSelected = false
+
     private var selectedScale = 1.4f
+
+    override var isSelected: Boolean
+        get() = this.isSelected
+        set(value) {
+            this.isSelected = value
+            handleScaleChange()
+        }
 
     init {
         graphic.symbol = marker
@@ -34,43 +42,29 @@ class MarkerController(val context: Context, markerId: String?) : BaseGraphicCon
         if (bitmapDescriptor === icon) {
             return
         }
-        if (iconSymbol != null) {
-            marker.symbols.remove(iconSymbol)
+        if (iconScaleSymbolController != null) {
+            marker.symbols.remove(iconScaleSymbolController!!.symbol)
         }
         icon = bitmapDescriptor
-        bitmapDescriptor!!.createSymbolAsync(object : BitmapDescriptorListener {
-            override fun onLoaded(symbol: Symbol) {
-                iconSymbol = ScaleSymbol(symbol)
-                setOpacity(iconSymbol, opacity)
-                setAngle(iconSymbol, angle)
-                offsetSymbol(iconSymbol, iconOffsetX, iconOffsetY)
-                marker.symbols.add(iconSymbol)
-                handleScaleChange()
-            }
-
-            override fun onFailed() {}
-        })
+        iconScaleSymbolController = bitmapDescriptor?.let {
+            ScaleSymbolController(createSymbol(it))
+        }
+        handleScaleChange()
     }
 
     override fun setBackground(bitmapDescriptor: BitmapDescriptor?) {
         if (bitmapDescriptor === background) {
             return
         }
-        if (backgroundSymbol != null) {
-            marker.symbols.remove(backgroundSymbol)
+        if (backgroundScaleSymbolController != null) {
+            marker.symbols.remove(backgroundScaleSymbolController!!.symbol)
         }
         background = bitmapDescriptor
-        bitmapDescriptor!!.createSymbolAsync(object : BitmapDescriptorListener {
-            override fun onLoaded(symbol: Symbol) {
-                backgroundSymbol = ScaleSymbol(symbol)
-                setOpacity(backgroundSymbol, opacity)
-                setAngle(backgroundSymbol, angle)
-                marker.symbols.add(0, backgroundSymbol)
-                handleScaleChange()
-            }
+        backgroundScaleSymbolController = bitmapDescriptor?.let {
+            ScaleSymbolController(createSymbol(it))
+        }
 
-            override fun onFailed() {}
-        })
+        handleScaleChange()
     }
 
     override fun setIconOffset(offsetX: Float, offsetY: Float) {
@@ -79,8 +73,8 @@ class MarkerController(val context: Context, markerId: String?) : BaseGraphicCon
         }
         iconOffsetX = offsetX
         iconOffsetY = offsetY
-        if (iconSymbol != null) {
-            offsetSymbol(iconSymbol.getSymbol(), offsetX, offsetY)
+        if (iconScaleSymbolController != null) {
+            offsetSymbol(iconScaleSymbolController!!.symbol, offsetX, offsetY)
         }
     }
 
@@ -104,55 +98,43 @@ class MarkerController(val context: Context, markerId: String?) : BaseGraphicCon
         }
     }
 
-    override fun setSelected(selected: Boolean) {
-        if (selected == isSelected) return
-        isSelected = selected
-        handleScaleChange()
+
+    private fun createSymbol(bitmapDescriptor: BitmapDescriptor): Symbol {
+        val symbol = bitmapDescriptor.createSymbol()
+        setOpacity(symbol, opacity)
+        setAngle(symbol, angle)
+        marker.symbols.add(symbol)
+        return symbol
     }
 
     private fun handleScaleChange() {
         val scale = if (isSelected) selectedScale else 1f
-        if (backgroundSymbol != null) {
-            backgroundSymbol!!.setScale(scale)
+        if (backgroundScaleSymbolController != null) {
+            backgroundScaleSymbolController!!.scale = scale
         }
-        if (iconSymbol != null) {
-            iconSymbol!!.setScale(scale)
+        if (iconScaleSymbolController != null) {
+            iconScaleSymbolController!!.scale = scale
         }
     }
 
-    companion object {
-        private fun offsetSymbol(symbol: Symbol?, offsetX: Float, offsetY: Float) {
-            if (symbol is PictureMarkerSymbol) {
-                val pictureMarkerSymbol = symbol
-                pictureMarkerSymbol.offsetX = offsetX
-                pictureMarkerSymbol.offsetY = offsetY
-            }
-            if (symbol is ScaleSymbol) {
-                offsetSymbol(symbol.symbol, offsetX, offsetY)
-            }
+    private fun offsetSymbol(symbol: Symbol?, offsetX: Float, offsetY: Float) {
+        if (symbol is PictureMarkerSymbol) {
+            symbol.offsetX = offsetX
+            symbol.offsetY = offsetY
         }
+    }
 
-        private fun setOpacity(symbol: Symbol?, opacity: Float) {
-            if (symbol is PictureMarkerSymbol) {
-                symbol.opacity = opacity
-            }
-            if (symbol is ScaleSymbol) {
-                setOpacity(symbol.symbol, opacity)
-            }
+    private fun setOpacity(symbol: Symbol, opacity: Float) {
+        if (symbol is PictureMarkerSymbol) {
+            symbol.opacity = opacity
         }
+    }
 
-        private fun setAngle(symbol: Symbol?, angle: Float) {
-            if (symbol is MarkerSymbol) {
-                symbol.angle = angle
-                symbol.angleAlignment = if (java.lang.Float.compare(
-                        angle,
-                        0f
-                    ) == 0
-                ) MarkerSymbol.AngleAlignment.SCREEN else MarkerSymbol.AngleAlignment.MAP
-            }
-            if (symbol is ScaleSymbol) {
-                setAngle(symbol.symbol, angle)
-            }
+    private fun setAngle(symbol: Symbol, angle: Float) {
+        if (symbol is MarkerSymbol) {
+            symbol.angle = angle
+            symbol.angleAlignment = if (angle.compareTo(0f) == 0
+            ) SymbolAngleAlignment.Screen else SymbolAngleAlignment.Map
         }
     }
 }

@@ -21,4 +21,8 @@ interface GraphicControllerSink {
 
     var selectedColor: Color?
 
+    fun interpretGraphicController(
+        data: Map<*, *>,
+        symbolVisibilityFilterController: SymbolVisibilityFilterController?,
+    )
 }

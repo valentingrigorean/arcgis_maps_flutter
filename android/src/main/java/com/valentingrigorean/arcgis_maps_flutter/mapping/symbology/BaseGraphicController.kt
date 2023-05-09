@@ -1,5 +1,6 @@
 package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 
+import com.arcgismaps.Color
 import com.arcgismaps.geometry.Geometry
 import com.arcgismaps.mapping.view.Graphic
 import com.arcgismaps.mapping.view.GraphicsOverlay
@@ -9,9 +10,12 @@ import com.valentingrigorean.arcgis_maps_flutter.map.GraphicControllerSink
 import com.valentingrigorean.arcgis_maps_flutter.map.SelectionPropertiesHandler
 import com.valentingrigorean.arcgis_maps_flutter.map.SymbolVisibilityFilterController
 
-abstract class BaseGraphicController : GraphicControllerSink {
+abstract class BaseGraphicController(
+    override var consumeTapEvents: Boolean = false,
+    override var selectedColor: Color? = null,
+) : GraphicControllerSink {
     private var selectionPropertiesHandler: SelectionPropertiesHandler? = null
-    protected abstract val graphic: Graphic
+    protected val graphic = Graphic()
 
     override var geometry: Geometry?
         get() = graphic.geometry
@@ -37,9 +41,9 @@ abstract class BaseGraphicController : GraphicControllerSink {
         set(selected) {
             val graphic = graphic
             if (selected && !graphic.isSelected) {
-                selectionPropertiesHandler!!.setSelected(graphic, selectedColor)
+                selectionPropertiesHandler?.setSelected(graphic, selectedColor)
             } else if (graphic.isSelected) {
-                selectionPropertiesHandler!!.clearSelection(graphic)
+                selectionPropertiesHandler?.clearSelection(graphic)
             }
         }
 
@@ -56,7 +60,7 @@ abstract class BaseGraphicController : GraphicControllerSink {
         graphicsOverlay.graphics.remove(graphic)
     }
 
-    open fun interpretGraphicController(
+    override fun interpretGraphicController(
         data: Map<*, *>,
         symbolVisibilityFilterController: SymbolVisibilityFilterController?,
     ) {

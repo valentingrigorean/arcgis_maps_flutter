@@ -1,34 +1,33 @@
-package com.valentingrigorean.arcgis_maps_flutter.map
+package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 
+import com.arcgismaps.mapping.symbology.CompositeSymbol
+import com.arcgismaps.mapping.symbology.PictureFillSymbol
+import com.arcgismaps.mapping.symbology.PictureMarkerSymbol
 import com.arcgismaps.mapping.symbology.Symbol
 
 
-class ScaleSymbol(val symbol: Symbol) : Symbol(
-    symbol.internal
-) {
+class ScaleSymbolController(val symbol: Symbol) {
     private val scaleHandles = ArrayList<SymbolScaleHandle>()
 
     init {
         populateDefaultSize(symbol)
     }
 
-    fun setScale(scale: Float) {
-        for (scaleHandle in scaleHandles) {
-            scaleHandle.setScale(scale)
+    var scale = 1f
+        set(value) {
+            if (value == field) {
+                return
+            }
+            field = value
+            for (scaleHandle in scaleHandles) {
+                scaleHandle.setScale(scale)
+            }
         }
-    }
-
-    @Throws(Throwable::class)
-    protected fun finalize() {
-        super.finalize()
-        scaleHandles.clear()
-    }
 
     private fun populateDefaultSize(symbol: Symbol) {
         if (symbol is CompositeSymbol) {
-            val compositeSymbol = symbol
-            if (compositeSymbol != null) {
-                for (child in compositeSymbol.symbols) {
+            if (symbol != null) {
+                for (child in symbol.symbols) {
                     populateDefaultSize(child)
                 }
             }
@@ -44,20 +43,26 @@ class ScaleSymbol(val symbol: Symbol) : Symbol(
         private var scale = 1f
 
         init {
-            if (symbol is PictureMarkerSymbol) {
-                val pictureMarkerSymbol = symbol
-                haveSize = true
-                width = pictureMarkerSymbol.width
-                height = pictureMarkerSymbol.height
-            } else if (symbol is PictureFillSymbol) {
-                val pictureFillSymbol = symbol
-                haveSize = true
-                width = pictureFillSymbol.width
-                height = pictureFillSymbol.height
-            } else {
-                haveSize = false
-                width = 0f
-                height = 0f
+            when (symbol) {
+                is PictureMarkerSymbol -> {
+                    val pictureMarkerSymbol = symbol
+                    haveSize = true
+                    width = pictureMarkerSymbol.width
+                    height = pictureMarkerSymbol.height
+                }
+
+                is PictureFillSymbol -> {
+                    val pictureFillSymbol = symbol
+                    haveSize = true
+                    width = pictureFillSymbol.width
+                    height = pictureFillSymbol.height
+                }
+
+                else -> {
+                    haveSize = false
+                    width = 0f
+                    height = 0f
+                }
             }
         }
 

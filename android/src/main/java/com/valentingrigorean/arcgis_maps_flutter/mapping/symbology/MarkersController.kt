@@ -16,7 +16,7 @@ class MarkersController(
     private var selectedMarker: MarkerController? = null
     override fun canConsumeTaps(): Boolean {
         for (controller in markerIdToController.values) {
-            if (controller.canConsumeTapEvents()) {
+            if (controller.consumeTapEvents) {
                 return true
             }
         }
@@ -27,7 +27,7 @@ class MarkersController(
         val rawMarkerId = graphic.attributes["markerId"] ?: return false
         val markerId = rawMarkerId as String
         val markerController = markerIdToController[markerId]
-        if (markerController == null || !markerController.canConsumeTapEvents()) {
+        if (markerController == null || !markerController.consumeTapEvents) {
             return false
         }
         if (selectedMarker != null) selectedMarker!!.isSelected = false
@@ -44,7 +44,7 @@ class MarkersController(
         }
         for (marker in markersToAdd) {
             val data = marker as Map<*, *>? ?: continue
-            val markerId = data["markerId"] as String?
+            val markerId = data["markerId"] as String
             val markerController = MarkerController(context, markerId)
             markerController.setSelectionPropertiesHandler(selectionPropertiesHandler)
             markerIdToController[markerId] = markerController
@@ -63,7 +63,7 @@ class MarkersController(
         }
         for (marker in markersToChange) {
             val data = marker as Map<*, *>? ?: continue
-            val markerId = data["markerId"] as String?
+            val markerId = data["markerId"] as String
             val markerController = markerIdToController[markerId]
             if (markerController != null) {
                 Convert.Companion.interpretMarkerController(
