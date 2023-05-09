@@ -1,9 +1,10 @@
 package com.valentingrigorean.arcgis_maps_flutter.map
 
 import android.graphics.Color
-import com.esri.arcgisruntime.mapping.view.Graphic
-import com.esri.arcgisruntime.symbology.SimpleFillSymbol
-import com.esri.arcgisruntime.symbology.SimpleLineSymbol
+import com.arcgismaps.mapping.symbology.SimpleFillSymbol
+import com.arcgismaps.mapping.symbology.SimpleLineSymbol
+import com.arcgismaps.mapping.view.Graphic
+
 
 class PolygonController(polygonId: String?) : BaseGraphicController(), PolygonControllerSink {
     protected override val graphic: Graphic

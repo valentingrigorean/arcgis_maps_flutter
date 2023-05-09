@@ -1,8 +1,9 @@
 package com.valentingrigorean.arcgis_maps_flutter.map
 
-import com.esri.arcgisruntime.mapping.view.Graphic
-import com.esri.arcgisruntime.mapping.view.GraphicsOverlay
+import com.arcgismaps.mapping.view.Graphic
+import com.arcgismaps.mapping.view.GraphicsOverlay
 import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.convert.map.toPolygonIdValue
 import io.flutter.plugin.common.MethodChannel
 
 class PolygonsController(
@@ -26,9 +27,11 @@ class PolygonsController(
         if (controller == null || !controller.canConsumeTapEvents()) {
             return false
         }
-        methodChannel.invokeMethod("polygon#onTap", Convert.Companion.polygonIdToJson(polygonId))
+        methodChannel.invokeMethod("polygon#onTap", polygonId.toPolygonIdValue())
         return true
     }
+
+
 
     fun addPolygons(polygonsToAdd: List<Any?>?) {
         if (polygonsToAdd == null) {
@@ -40,6 +43,7 @@ class PolygonsController(
             val controller = PolygonController(polygonId)
             controller.setSelectionPropertiesHandler(selectionPropertiesHandler)
             polygonIdToController[polygonId] = controller
+            interpretBaseGraphicController(data, controller)
             Convert.Companion.interpretPolygonController(
                 data,
                 controller,

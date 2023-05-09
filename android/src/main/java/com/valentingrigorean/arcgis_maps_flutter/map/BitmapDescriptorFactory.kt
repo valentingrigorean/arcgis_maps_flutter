@@ -6,58 +6,49 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.util.Log
 import android.util.LruCache
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import com.arcgismaps.Color
+import com.arcgismaps.mapping.symbology.CompositeSymbol
 import com.arcgismaps.mapping.symbology.PictureMarkerSymbol
 import com.arcgismaps.mapping.symbology.SimpleMarkerSymbol
+import com.arcgismaps.mapping.symbology.SimpleMarkerSymbolStyle
 import com.arcgismaps.mapping.symbology.Symbol
-import com.esri.arcgisruntime.concurrent.ListenableFuture
-import com.esri.arcgisruntime.internal.jni.CoreImage
-import com.esri.arcgisruntime.internal.jni.CorePictureMarkerSymbol
-import com.esri.arcgisruntime.symbology.CompositeSymbol
-import com.esri.arcgisruntime.symbology.PictureMarkerSymbol
-import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol
-import com.esri.arcgisruntime.symbology.Symbol
-import com.valentingrigorean.arcgis_maps_flutter.Convert
-import com.valentingrigorean.arcgis_maps_flutter.map.BitmapDescriptor.BitmapDescriptorListener
+import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.symbology.toSimpleMarkerSymbolStyle
+import com.valentingrigorean.arcgis_maps_flutter.convert.toBitmapDrawable
 import java.util.Objects
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ExecutionException
-import java.util.stream.Collectors
 
 object BitmapDescriptorFactory {
-    private val bitmapDescriptorFutures =
-        ConcurrentHashMap<BitmapDescriptorOptions, ListenableFuture<PictureMarkerSymbol>>()
+    private val resourceIdCache = HashMap<String, Int>()
     private var cache: LruCacheEx? = null
     fun fromRawData(context: Context, o: Any?): BitmapDescriptor? {
         val data = o as Map<*, *>? ?: return null
         if (cache == null) {
             createCache(context)
         }
-        val fromBytes = data["fromBytes"]
+        val fromBytes = data["fromBytes"] as ByteArray?
         if (fromBytes != null) {
             return RawBitmapDescriptor(context, fromBytes)
         }
         val fromAsset = data["fromNativeAsset"]
         if (fromAsset != null) {
-            return AssetBitmapDescriptor(context, BitmapDescriptorOptions(context, data))
+            return AssetBitmapDescriptor(context, BitmapDescriptorOptions(data))
         }
         val styleMarker = (data["styleMarker"] as Int?)?.toSimpleMarkerSymbolStyle()
         if (styleMarker != null) {
             val color = data["color"] as Int
             val size = data["size"] as Float
-            val style: SimpleMarkerSymbol.Style = Convert.Companion.toSimpleMarkerSymbolStyle(
-                Convert.Companion.toInt(styleMarker)
-            )
-            return StyleMarkerBitmapDescriptor(style, color, size)
+            return StyleMarkerBitmapDescriptor(styleMarker, color, size)
         }
         val descriptors = data["descriptors"] as List<Objects>?
         if (descriptors != null) {
-            val bitmapDescriptors = ArrayList<BitmapDescriptor?>()
+            val bitmapDescriptors = ArrayList<BitmapDescriptor>()
             for (descriptor in descriptors) {
-                bitmapDescriptors.add(fromRawData(context, descriptor))
+                val bitmapDescriptor = fromRawData(context, descriptor)
+                if (bitmapDescriptor != null) {
+                    bitmapDescriptors.add(bitmapDescriptor)
+                }
             }
             return CompositeBitmapDescriptor(bitmapDescriptors)
         }
@@ -70,70 +61,39 @@ object BitmapDescriptorFactory {
         ) as ActivityManager
         val maxKb = am.memoryClass * 1024
         val limitKb = maxKb / 8 // 1/8th of total ram
-        _cache = LruCacheEx(limitKb)
+        cache = LruCacheEx(limitKb)
     }
 
-    private class RawBitmapDescriptor(context: Context, data: Any) : BitmapDescriptor {
+    private class RawBitmapDescriptor(context: Context, data: ByteArray) : BitmapDescriptor {
         private val bitmap: BitmapDrawable
 
         init {
-            bitmap = BitmapDrawable(context.resources, Convert.Companion.toBitmap(data))
+            bitmap = data.toBitmapDrawable(context)!!
         }
 
-        override fun createSymbolAsync(loader: BitmapDescriptorListener) {
-            val symbol = PictureMarkerSymbol.createWithImage(bitmap)
-            loader.onLoaded(symbol)
+        override fun createSymbol(): Symbol {
+            return PictureMarkerSymbol.createWithImage(bitmap)
         }
     }
 
     private class AssetBitmapDescriptor(
-        val context: Context?,
-        val bitmapDescriptorOptions: BitmapDescriptorOptions
+        private val context: Context,
+        private val bitmapDescriptorOptions: BitmapDescriptorOptions
     ) : BitmapDescriptor {
-        override fun createSymbolAsync(loader: BitmapDescriptorListener) {
-            val markerSymbolInfo = _cache!![bitmapDescriptorOptions]
-            if (markerSymbolInfo != null) {
-                loader.onLoaded(markerSymbolInfo.createSymbol())
-                return
+        override fun createSymbol(): Symbol {
+            val cache = cache!!
+            if (cache.get(bitmapDescriptorOptions) != null) {
+                return cache.get(bitmapDescriptorOptions)!!
             }
-            if (!_bitmapDescriptorFutures.containsKey(bitmapDescriptorOptions)) {
-                val bitmap = bitmapDescriptorOptions.createBitmap(context)
-                _bitmapDescriptorFutures[bitmapDescriptorOptions] = PictureMarkerSymbol.createAsync(
-                    BitmapDrawable(
-                        context!!.resources, bitmap
-                    )
+            val bitmap = bitmapDescriptorOptions.createBitmap(context)
+            val symbol = PictureMarkerSymbol.createWithImage(
+                BitmapDrawable(
+                    context.resources,
+                    bitmap
                 )
-            }
-            val future = _bitmapDescriptorFutures[bitmapDescriptorOptions]!!
-            future.addDoneListener {
-                try {
-                    val symbol = future.get()
-                    val bitmap = symbol.image.bitmap
-                    if (bitmapDescriptorOptions.getWidth() != null) {
-                        symbol.width = bitmapDescriptorOptions.getWidth()
-                    }
-                    if (bitmapDescriptorOptions.getHeight() != null) {
-                        symbol.height = bitmapDescriptorOptions.getHeight()
-                    }
-                    val corePictureMarkerSymbol = symbol.internal as CorePictureMarkerSymbol
-                    val info = CorePictureMarkerSymbolInfo(
-                        bitmap.byteCount,
-                        corePictureMarkerSymbol.w(),
-                        bitmapDescriptorOptions
-                    )
-                    _cache!!.put(bitmapDescriptorOptions, info)
-                    Log.d(
-                        TAG,
-                        "createSymbolAsync: Insert bitmap to cache for $bitmapDescriptorOptions."
-                    )
-                    loader.onLoaded(symbol)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    loader.onFailed()
-                } finally {
-                    _bitmapDescriptorFutures.remove(bitmapDescriptorOptions)
-                }
-            }
+            )
+            cache.put(bitmapDescriptorOptions, symbol)
+            return symbol
         }
 
         override fun equals(o: Any?): Boolean {
@@ -146,85 +106,37 @@ object BitmapDescriptorFactory {
         override fun hashCode(): Int {
             return Objects.hash(bitmapDescriptorOptions)
         }
-
-        companion object {
-            private const val TAG = "AssetBitmapDescriptor"
-        }
     }
 
-    private class CompositeBitmapDescriptor(private val bitmapDescriptors: Collection<BitmapDescriptor?>) :
+    private class CompositeBitmapDescriptor(private val bitmapDescriptors: Collection<BitmapDescriptor>) :
         BitmapDescriptor {
-        override fun createSymbolAsync(loader: BitmapDescriptorListener) {
-            val compositeBitmapDescriptorListener =
-                CompositeBitmapDescriptorListener(bitmapDescriptors, loader)
-            compositeBitmapDescriptorListener.startAsync()
-        }
-    }
-
-    private class CompositeBitmapDescriptorListener(
-        private val bitmapDescriptors: Collection<BitmapDescriptor?>,
-        private val listener: BitmapDescriptorListener
-    ) {
-        private val symbols = ArrayList<Symbol>()
-        private var currentSymbols = 0
-
-        init {
-            for (i in bitmapDescriptors.indices) {
-                symbols.add(null)
-            }
-        }
-
-        fun startAsync() {
-            var i = 0
+        override fun createSymbol(): Symbol {
+            val compositeSymbol = CompositeSymbol()
             for (bitmapDescriptor in bitmapDescriptors) {
-                val index = i
-                bitmapDescriptor!!.createSymbolAsync(object : BitmapDescriptorListener {
-                    override fun onLoaded(symbol: Symbol) {
-                        symbols.add(index, symbol)
-                        currentSymbols++
-                        checkIfFinish()
-                    }
-
-                    override fun onFailed() {
-                        currentSymbols++
-                        checkIfFinish()
-                    }
-                })
-                i++
+                val symbol = bitmapDescriptor.createSymbol()
+                if (symbol != null) {
+                    compositeSymbol.symbols.add(symbol)
+                }
             }
-        }
-
-        private fun checkIfFinish() {
-            if (currentSymbols != bitmapDescriptors.size) {
-                return
-            }
-            if (symbols.size == 0 && bitmapDescriptors.size > 0) {
-                listener.onFailed()
-                return
-            }
-            val symbol = CompositeSymbol(symbols.stream().filter { e: Symbol? -> e != null }
-                .collect(Collectors.toList()))
-            listener.onLoaded(symbol)
+            return compositeSymbol
         }
     }
+
 
     private class StyleMarkerBitmapDescriptor(
-        private val style: SimpleMarkerSymbol.Style,
+        private val style: SimpleMarkerSymbolStyle,
         private val color: Int,
         private val size: Float
     ) : BitmapDescriptor {
-        override fun createSymbolAsync(loader: BitmapDescriptorListener) {
-            loader.onLoaded(SimpleMarkerSymbol(style, color, size))
+        override fun createSymbol(): Symbol {
+            return SimpleMarkerSymbol(style, Color(color), size)
         }
 
         override fun equals(o: Any?): Boolean {
             if (this === o) return true
             if (o == null || javaClass != o.javaClass) return false
             val that = o as StyleMarkerBitmapDescriptor
-            return color == that.color && java.lang.Float.compare(
-                that.size,
-                size
-            ) == 0 && style == that.style
+            return color == that.color && that.size.compareTo(size) == 0 && style == that.style
         }
 
         override fun hashCode(): Int {
@@ -232,7 +144,7 @@ object BitmapDescriptorFactory {
         }
     }
 
-    private class BitmapDescriptorOptions(context: Context?, data: Map<*, *>) {
+    private class BitmapDescriptorOptions(data: Map<*, *>) {
         private val resourceName: String?
         private var tintColor: Int? = null
         var width: Float? = null
@@ -240,27 +152,12 @@ object BitmapDescriptorFactory {
 
         init {
             resourceName = data["fromNativeAsset"] as String?
-            val rawTintColor = data["tintColor"]
-            tintColor = if (rawTintColor != null) {
-                Convert.Companion.toInt(rawTintColor)
-            } else {
-                null
-            }
-            val rawWidth = data["width"]
-            width = if (rawWidth != null) {
-                Convert.Companion.toFloat(rawWidth)
-            } else {
-                null
-            }
-            val rawHeight = data["height"]
-            height = if (rawHeight != null) {
-                Convert.Companion.toFloat(rawHeight)
-            } else {
-                null
-            }
+            tintColor = data["tintColor"] as Int?
+            width = data["width"] as Float?
+            height = data["height"] as Float?
         }
 
-        fun createBitmap(context: Context?): Bitmap {
+        fun createBitmap(context: Context): Bitmap {
             val drawable = createDrawable(context)
             if (drawable is BitmapDrawable) {
                 return drawable.bitmap
@@ -276,28 +173,28 @@ object BitmapDescriptorFactory {
             return bitmap
         }
 
-        private fun createDrawable(context: Context?): Drawable? {
-            var drawableResourceId = 0
-            if (_resourceIdCache.containsKey(resourceName)) {
-                drawableResourceId = _resourceIdCache[resourceName]!!
+        private fun createDrawable(context: Context): Drawable {
+            var drawableResourceId: Int
+            if (resourceIdCache.containsKey(resourceName)) {
+                drawableResourceId = resourceIdCache[resourceName]!!
             } else {
                 drawableResourceId =
-                    context!!.resources.getIdentifier(resourceName, "drawable", context.packageName)
-                _resourceIdCache[resourceName] = drawableResourceId
+                    context.resources.getIdentifier(resourceName, "drawable", context.packageName)
+                resourceIdCache[resourceName!!] = drawableResourceId
             }
             val drawable = ResourcesCompat.getDrawableForDensity(
-                context!!.resources,
+                context.resources,
                 drawableResourceId,
                 context.resources.displayMetrics.densityDpi,
                 context.theme
             )
             if (tintColor == null) {
-                return drawable
+                return drawable!!
             }
             val wrappedDrawable = DrawableCompat.wrap(
                 drawable!!
             )
-            DrawableCompat.setTint(wrappedDrawable, tintColor)
+            DrawableCompat.setTint(wrappedDrawable, tintColor!!)
             return wrappedDrawable
         }
 
@@ -320,10 +217,6 @@ object BitmapDescriptorFactory {
                     ", height=" + height +
                     '}'
         }
-
-        companion object {
-            private val _resourceIdCache: MutableMap<String?, Int> = HashMap()
-        }
     }
 
     private class LruCacheEx
@@ -332,29 +225,20 @@ object BitmapDescriptorFactory {
      * the maximum number of entries in the cache. For all other caches,
      * this is the maximum sum of the sizes of the entries in this cache.
      */
-        (maxSize: Int) : LruCache<BitmapDescriptorOptions?, CorePictureMarkerSymbolInfo>(maxSize) {
+        (maxSize: Int) : LruCache<BitmapDescriptorOptions, Symbol>(maxSize) {
         override fun sizeOf(
             key: BitmapDescriptorOptions?,
-            value: CorePictureMarkerSymbolInfo
+            value: Symbol
         ): Int {
-            return value.getSize() / 1024
+            return getSymbolSize(value) / 1024
         }
-    }
 
-    private class CorePictureMarkerSymbolInfo(
-        val size: Int,
-        val coreImage: CoreImage,
-        val bitmapDescriptorOptions: BitmapDescriptorOptions
-    ) {
-        fun createSymbol(): Symbol {
-            val symbol = PictureMarkerSymbol.createFromInternal(CorePictureMarkerSymbol(coreImage))
-            if (bitmapDescriptorOptions.getWidth() != null) {
-                symbol.width = bitmapDescriptorOptions.getWidth()
+        private fun getSymbolSize(symbol: Symbol): Int {
+            return when (symbol) {
+                is PictureMarkerSymbol -> symbol.image?.bitmap?.byteCount ?: 4
+                is CompositeSymbol -> symbol.symbols.sumOf { getSymbolSize(it) }
+                else -> 4
             }
-            if (bitmapDescriptorOptions.getHeight() != null) {
-                symbol.height = bitmapDescriptorOptions.getHeight()
-            }
-            return symbol
         }
     }
 }

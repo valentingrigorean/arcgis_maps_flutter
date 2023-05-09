@@ -13,7 +13,7 @@ import com.valentingrigorean.arcgis_maps_flutter.map.BitmapDescriptor.BitmapDesc
 class MarkerController(val context: Context, markerId: String?) : BaseGraphicController(),
     MarkerControllerSink {
     private val marker = CompositeSymbol()
-    protected override val graphic: Graphic
+    protected override val graphic: Graphic = Graphic()
     private var icon: BitmapDescriptor? = null
     private var iconSymbol: ScaleSymbol? = null
     private var background: BitmapDescriptor? = null
@@ -26,7 +26,6 @@ class MarkerController(val context: Context, markerId: String?) : BaseGraphicCon
     private var selectedScale = 1.4f
 
     init {
-        graphic = Graphic()
         graphic.symbol = marker
         graphic.attributes["markerId"] = markerId
     }

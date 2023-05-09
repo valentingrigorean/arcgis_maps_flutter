@@ -1,8 +1,8 @@
 package com.valentingrigorean.arcgis_maps_flutter.map
 
 import android.content.Context
-import com.esri.arcgisruntime.mapping.view.Graphic
-import com.esri.arcgisruntime.mapping.view.GraphicsOverlay
+import com.arcgismaps.mapping.view.Graphic
+import com.arcgismaps.mapping.view.GraphicsOverlay
 import com.valentingrigorean.arcgis_maps_flutter.Convert
 import io.flutter.plugin.common.MethodChannel
 

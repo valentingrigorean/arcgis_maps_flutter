@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Point
 import android.util.Log
 import android.view.MotionEvent
+import com.arcgismaps.mapping.view.IdentifyGraphicsOverlayResult
 import com.esri.arcgisruntime.concurrent.ListenableFuture
 import com.esri.arcgisruntime.mapping.view.DefaultMapViewOnTouchListener
 import com.esri.arcgisruntime.mapping.view.IdentifyGraphicsOverlayResult

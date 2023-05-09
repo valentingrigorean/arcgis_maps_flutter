@@ -5,8 +5,14 @@ enum SimpleLineSymbolStyle {
   dashDot(1),
   dashDotDot(2),
   dot(3),
-  none(4),
-  solid(5),
+  longDash(4),
+  longDashDot(5),
+  none(6),
+  shortDash(7),
+  shortDashDotDot(8),
+  shortDashDot(9),
+  shortDot(10),
+  solid(11),
   ;
 
   const SimpleLineSymbolStyle(this.value);

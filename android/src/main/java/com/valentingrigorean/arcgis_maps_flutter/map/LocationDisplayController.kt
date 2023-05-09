@@ -1,13 +1,8 @@
 package com.valentingrigorean.arcgis_maps_flutter.map
 
-import com.esri.arcgisruntime.ArcGISRuntimeException
-import com.esri.arcgisruntime.mapping.view.Graphic
-import com.esri.arcgisruntime.mapping.view.GraphicsOverlay
-import com.esri.arcgisruntime.mapping.view.LocationDisplay
-import com.esri.arcgisruntime.mapping.view.LocationDisplay.AutoPanModeChangedEvent
-import com.esri.arcgisruntime.mapping.view.LocationDisplay.AutoPanModeChangedListener
-import com.esri.arcgisruntime.mapping.view.LocationDisplay.DataSourceStatusChangedEvent
-import com.esri.arcgisruntime.mapping.view.LocationDisplay.DataSourceStatusChangedListener
+import com.arcgismaps.mapping.view.Graphic
+import com.arcgismaps.mapping.view.GraphicsOverlay
+import com.arcgismaps.mapping.view.LocationDisplay
 import com.valentingrigorean.arcgis_maps_flutter.Convert
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -16,8 +11,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 class LocationDisplayController(
     private val channel: MethodChannel,
     private val flutterMapViewDelegate: FlutterMapViewDelegate
-) : MapTouchGraphicDelegate, LocationDisplay.LocationChangedListener, MethodCallHandler,
-    AutoPanModeChangedListener, DataSourceStatusChangedListener {
+) : MapTouchGraphicDelegate, MethodCallHandler {
     private val locationDisplay: LocationDisplay?
     private val locationGraphicsOverlay: GraphicsOverlay
     private val locationGraphic: Graphic

@@ -10,6 +10,7 @@ interface GraphicControllerSink {
     var visible: Boolean
     fun setZIndex(zIndex: Int)
     fun setGeometry(geometry: Geometry?)
+
     var isSelected: Boolean
     fun canConsumeTapEvents(): Boolean
     fun setConsumeTapEvents(consumeTapEvent: Boolean)
