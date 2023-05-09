@@ -1,17 +1,25 @@
 package com.valentingrigorean.arcgis_maps_flutter.map
 
-class SymbolVisibilityFilterController(private val flutterMapViewDelegate: FlutterMapViewDelegate) :
-    MapScaleChangedListener {
-    private val graphicControllers: MutableMap<GraphicControllerSink, SymbolVisibilityFilter?> =
+import com.arcgismaps.mapping.view.MapView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+
+class SymbolVisibilityFilterController(
+    private val mapView: MapView,
+    private val scope: CoroutineScope
+) {
+    private val graphicControllers: MutableMap<GraphicControllerSink, SymbolVisibilityFilter> =
         HashMap()
     private val initialValues: MutableMap<GraphicControllerSink, Boolean> = HashMap()
-    private var isRegister = false
+
+    init {
+        mapView.mapScale.onEach {
+            invalidate()
+        }.launchIn(scope)
+    }
+
     fun clear() {
-        flutterMapViewDelegate.removeMapScaleChangedListener(this)
-        isRegister = false
-        for ((key) in graphicControllers) {
-            key.setVisible(initialValues.remove(key))
-        }
         graphicControllers.clear()
     }
 
@@ -29,15 +37,15 @@ class SymbolVisibilityFilterController(private val flutterMapViewDelegate: Flutt
         if (containsGraphicsController(graphicController)) {
             handleGraphicsFilterZoom(
                 graphicController,
-                graphicControllers[graphicController],
-                flutterMapViewDelegate.mapScale
+                graphicControllers[graphicController]!!,
+                mapView.mapScale.value
             )
         }
     }
 
     fun addGraphicsController(
         graphicController: GraphicControllerSink,
-        symbolVisibilityFilter: SymbolVisibilityFilter?,
+        symbolVisibilityFilter: SymbolVisibilityFilter,
         initValue: Boolean
     ) {
         if (initialValues.containsKey(graphicController)) {
@@ -47,7 +55,7 @@ class SymbolVisibilityFilterController(private val flutterMapViewDelegate: Flutt
         handleGraphicsFilterZoom(
             graphicController,
             symbolVisibilityFilter,
-            flutterMapViewDelegate.mapScale
+            mapView.mapScale.value
         )
         if (graphicControllers.containsKey(graphicController)) {
             if (graphicControllers[graphicController] === symbolVisibilityFilter) {
@@ -56,52 +64,37 @@ class SymbolVisibilityFilterController(private val flutterMapViewDelegate: Flutt
             graphicControllers.remove(graphicController)
         }
         graphicControllers[graphicController] = symbolVisibilityFilter
-        handleRegistrationToScaleChanged()
     }
 
     fun removeGraphicsController(graphicController: GraphicControllerSink) {
         if (!containsGraphicsController(graphicController)) {
             return
         }
-        graphicController.setVisible(initialValues.remove(graphicController))
+        graphicController.visible = initialValues.remove(graphicController) ?: true
         graphicControllers.remove(graphicController)
-        handleRegistrationToScaleChanged()
     }
 
-    override fun mapScaleChanged(mapScaleChangedEvent: MapScaleChangedEvent) {
-        invalidate()
-    }
 
     fun invalidate() {
         for ((key, value) in graphicControllers) {
-            handleGraphicsFilterZoom(key, value, flutterMapViewDelegate.mapScale)
+            handleGraphicsFilterZoom(key, value, mapView.mapScale.value)
         }
     }
 
     private fun handleGraphicsFilterZoom(
         graphicController: GraphicControllerSink,
-        visibilityFilter: SymbolVisibilityFilter?,
+        visibilityFilter: SymbolVisibilityFilter,
         currentZoom: Double
     ) {
         if (java.lang.Double.isNaN(currentZoom)) {
             return
         }
-        if (currentZoom < visibilityFilter.getMinZoom() && currentZoom > visibilityFilter.getMaxZoom()) {
-            graphicController.setVisible(initialValues[graphicController])
+        if (currentZoom < visibilityFilter.minZoom && currentZoom > visibilityFilter.maxZoom) {
+            graphicController.visible = initialValues[graphicController] ?: true
         } else {
             if (!graphicController.isSelected) {
                 graphicController.visible = false
             }
-        }
-    }
-
-    private fun handleRegistrationToScaleChanged() {
-        if (graphicControllers.size > 0 && !isRegister) {
-            isRegister = true
-            flutterMapViewDelegate.addMapScaleChangedListener(this)
-        } else if (graphicControllers.size == 0 && isRegister) {
-            isRegister = false
-            flutterMapViewDelegate.removeMapScaleChangedListener(this)
         }
     }
 }

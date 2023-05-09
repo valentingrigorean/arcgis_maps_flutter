@@ -1,15 +1,15 @@
 package com.valentingrigorean.arcgis_maps_flutter.map
 
-import android.graphics.Color
+import com.arcgismaps.Color
 import com.arcgismaps.mapping.view.Graphic
 import com.arcgismaps.mapping.view.SelectionProperties
 
 class SelectionPropertiesHandler(private val selectionProperties: SelectionProperties) {
-    private val defaultSelectedColor: com.arcgismaps.Color = selectionProperties.color
+    private val defaultSelectedColor: Color = selectionProperties.color
 
     fun setSelected(graphic: Graphic, selectedColor: Color?) {
         if (selectedColor != null) {
-            selectionProperties.color = com.arcgismaps.Color(selectedColor.toArgb())
+            selectionProperties.color = selectedColor
         } else {
             reset()
         }

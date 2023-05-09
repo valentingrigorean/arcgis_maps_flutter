@@ -118,14 +118,7 @@ open class Convert {
             return map
         }
 
-        fun toScaleBarAlignment(rawValue: Int): Scalebar.Alignment {
-            return when (rawValue) {
-                0 -> Scalebar.Alignment.LEFT
-                1 -> Scalebar.Alignment.RIGHT
-                2 -> Scalebar.Alignment.CENTER
-                else -> throw IllegalStateException("Unexpected value: $rawValue")
-            }
-        }
+
 
 
 
@@ -165,17 +158,6 @@ open class Convert {
             }
         }
 
-        fun toScaleBarStyle(rawValue: Int): Style {
-            return when (rawValue) {
-                0 -> Style.LINE
-                1 -> Style.BAR
-                2 -> Style.GRADUATED_LINE
-                3 -> Style.ALTERNATING_BAR
-                4 -> Style.DUAL_UNIT_LINE
-                5 -> Style.DUAL_UNIT_LINE_NAUTICAL_MILE
-                else -> throw IllegalStateException("Unexpected value: $rawValue")
-            }
-        }
 
         fun toUnitSystem(rawValue: Int): UnitSystem {
             return when (rawValue) {
@@ -505,19 +487,6 @@ open class Convert {
             }
         }
 
-        fun toSymbolVisibilityFilter(o: Any?): SymbolVisibilityFilter? {
-            if (o == null) {
-                return null
-            }
-            val data = toMap(o)
-            val minZoom = toDouble(
-                data["minZoom"]
-            )
-            val maxZoom = toDouble(
-                data["maxZoom"]
-            )
-            return SymbolVisibilityFilter(minZoom, maxZoom)
-        }
 
         fun interpretMarkerController(
             o: Any,
@@ -569,31 +538,7 @@ open class Convert {
         ) {
             val data = toMap(o)
             interpretBaseGraphicController(data, controller, symbolVisibilityFilterController)
-            val fillColor = data["fillColor"]
-            if (fillColor != null) {
-                controller.setFillColor(toInt(fillColor))
-            }
-            val strokeColor = data["strokeColor"]
-            if (strokeColor != null) {
-                controller.setStrokeColor(toInt(strokeColor))
-            }
-            val strokeWidth = data["strokeWidth"]
-            if (strokeWidth != null) {
-                controller.setStrokeWidth(toInt(strokeWidth).toFloat())
-            }
-            val strokeStyle = data["strokeStyle"]
-            if (strokeStyle != null) {
-                controller.setStrokeStyle(toSimpleLineStyle(toInt(strokeStyle)))
-            }
-            val pointsRaw = data["points"]
-            if (pointsRaw != null) {
-                val points = toList(pointsRaw)
-                val nativePoints = ArrayList<com.esri.arcgisruntime.geometry.Point>(points.size)
-                for (point in points) {
-                    nativePoints.add(toPoint(point))
-                }
-                controller.setGeometry(Polygon(PointCollection(nativePoints)))
-            }
+
         }
 
         fun interpretPolylineController(

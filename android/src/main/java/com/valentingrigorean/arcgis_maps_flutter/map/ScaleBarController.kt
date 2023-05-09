@@ -4,18 +4,22 @@ import android.content.Context
 import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
 import android.widget.FrameLayout
-import com.esri.arcgisruntime.mapping.view.MapScaleChangedEvent
-import com.esri.arcgisruntime.mapping.view.MapScaleChangedListener
+import com.arcgismaps.mapping.view.MapView
 import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.convert.toUnitSystem
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.Scalebar
-import com.valentingrigorean.arcgis_maps_flutter.utils.toMap
+import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.Style
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class ScaleBarController(
     private val context: Context,
-    private val flutterMapViewDelegate: FlutterMapViewDelegate,
-    private val container: FrameLayout
-) : MapScaleChangedListener {
-    private val scalebar: Scalebar
+    private val mapView: MapView,
+    private val container: FrameLayout,
+    scope: CoroutineScope
+) {
+    private val scalebar: Scalebar = Scalebar(context)
     private var scaleBarState = ScaleBarState.NONE
     private var layoutParams: FrameLayout.LayoutParams? = null
     private var isAutoHide = false
@@ -25,14 +29,33 @@ class ScaleBarController(
     private var didGotScale = false
 
     init {
-        scalebar = Scalebar(context)
         scalebar.alpha = 0f
-        flutterMapViewDelegate.addMapScaleChangedListener(this)
+        mapView.mapScale.onEach {
+            viewPropertyAnimator?.cancel()
+            viewPropertyAnimator = null
+            val currentScale = it
+            if (mapScale == currentScale) {
+                return@onEach
+            }
+            mapScale = currentScale
+            if (!didGotScale) {
+                didGotScale = true
+                return@onEach
+            }
+            if (scaleBarState == ScaleBarState.NONE) {
+                return@onEach
+            }
+            if (!isAutoHide) return@onEach
+            scalebar.alpha = 1f
+            viewPropertyAnimator = scalebar.animate()
+                .setDuration(hideAfterMS.toLong())
+                .alpha(0f)
+                .withEndAction { viewPropertyAnimator = null }
+        }.launchIn(scope)
     }
 
     fun dispose() {
         removeScaleBar()
-        flutterMapViewDelegate.removeMapScaleChangedListener(this)
     }
 
     fun removeScaleBar() {
@@ -47,115 +70,65 @@ class ScaleBarController(
         scaleBarState = ScaleBarState.NONE
     }
 
-    override fun mapScaleChanged(mapScaleChangedEvent: MapScaleChangedEvent) {
-        if (viewPropertyAnimator != null) {
-            viewPropertyAnimator!!.cancel()
-            viewPropertyAnimator = null
-        }
-        val currentScale = flutterMapViewDelegate.mapScale
-        if (mapScale == currentScale) {
-            return
-        }
-        mapScale = currentScale
-        if (!didGotScale) {
-            didGotScale = true
-            return
-        }
-        if (scaleBarState == ScaleBarState.NONE) {
-            return
-        }
-        if (!isAutoHide) return
-        scalebar.alpha = 1f
-        viewPropertyAnimator = scalebar.animate()
-            .setDuration(hideAfterMS.toLong())
-            .alpha(0f)
-            .withEndAction { viewPropertyAnimator = null }
-    }
-
     fun interpretConfiguration(o: Any) {
-        val data: Map<*, *> = Convert.Companion.toMap(o)
+        val data = o as Map<*, *>?
         if (data == null) {
             removeScaleBar()
             return
         }
-        val showInMap: Boolean = Convert.Companion.toBoolean(
-            data["showInMap"]!!
-        )
+        val showInMap = data["showInMap"] as Boolean
         validateScaleBarState(showInMap)
         if (showInMap) {
-            val inMapAlignment = data["inMapAlignment"]
+            val inMapAlignment = data["inMapAlignment"] as Int?
             if (inMapAlignment != null) {
-                scalebar.alignment =
-                    Convert.Companion.toScaleBarAlignment(Convert.Companion.toInt(inMapAlignment))
+                scalebar.alignment = toScaleBarAlignment(inMapAlignment)
             }
         } else {
-            val width: Int = Convert.Companion.toInt(
-                data["width"]
-            )
-            val offsetPoints: List<*> = Convert.Companion.toList(
-                data["offset"]!!
-            )
+            val width = data["width"] as Int
+            val offsetPoints = data["offset"] as List<Int>
             if (width < 0) {
                 layoutParams!!.width = ViewGroup.LayoutParams.WRAP_CONTENT
             } else {
-                layoutParams!!.width = Convert.Companion.dpToPixelsI(
+                layoutParams!!.width = Convert.dpToPixelsI(
                     context, width
                 )
             }
-            layoutParams!!.leftMargin = Convert.Companion.dpToPixelsI(
-                context, Convert.Companion.toInt(
-                    offsetPoints[0]
-                )
+            layoutParams!!.leftMargin = Convert.dpToPixelsI(
+                context, offsetPoints[0]
             )
-            layoutParams!!.topMargin = Convert.Companion.dpToPixelsI(
-                context, Convert.Companion.toInt(
-                    offsetPoints[1]
-                )
+            layoutParams!!.topMargin = Convert.dpToPixelsI(
+                context, offsetPoints[1]
             )
         }
-        isAutoHide = Convert.Companion.toBoolean(data["autoHide"]!!)
-        hideAfterMS = Convert.Companion.toInt(data["hideAfter"])
+        isAutoHide = data["autoHide"] as Boolean
+        hideAfterMS = data["hideAfter"] as Int
         if (isAutoHide) {
             scalebar.alpha = 0f
-            mapScale = flutterMapViewDelegate.mapScale
+            mapScale = mapView.mapScale.value
         } else {
             scalebar.alpha = 1f
         }
-        scalebar.unitSystem = Convert.Companion.toUnitSystem(
-            Convert.Companion.toInt(
-                data["units"]
-            )
-        )
-        scalebar.style = Convert.Companion.toScaleBarStyle(
-            Convert.Companion.toInt(
-                data["style"]
-            )
-        )
-        scalebar.fillColor = Convert.Companion.toInt(data["fillColor"])
-        scalebar.alternateFillColor = Convert.Companion.toInt(
-            data["alternateFillColor"]
-        )
-        scalebar.lineColor = Convert.Companion.toInt(data["lineColor"])
-        scalebar.shadowColor = Convert.Companion.toInt(
-            data["shadowColor"]
-        )
-        scalebar.textColor = Convert.Companion.toInt(data["textColor"])
-        scalebar.textShadowColor = Convert.Companion.toInt(
-            data["textShadowColor"]
-        )
-        scalebar.textSize = Convert.Companion.spToPixels(
-            context, Convert.Companion.toInt(data["textSize"])
+        scalebar.unitSystem = (data["units"] as Int).toUnitSystem()
+        scalebar.style = toScaleBarStyle(data["style"] as Int)
+        scalebar.fillColor = data["fillColor"] as Int
+        scalebar.alternateFillColor = data["alternateFillColor"] as Int
+        scalebar.lineColor = data["lineColor"] as Int
+        scalebar.shadowColor = data["shadowColor"] as Int
+        scalebar.textColor = data["textColor"] as Int
+        scalebar.textShadowColor = data["textShadowColor"] as Int
+        scalebar.textSize = Convert.spToPixels(
+            context, data["textSize"] as Int
         )
     }
 
     private fun validateScaleBarState(isInMap: Boolean) {
         if (isInMap && scaleBarState != ScaleBarState.IN_MAP) {
             removeScaleBar()
-            scalebar.addToMapView(flutterMapViewDelegate.mapView)
+            scalebar.addToMapView(mapView)
             scaleBarState = ScaleBarState.IN_MAP
         } else if (scaleBarState != ScaleBarState.IN_CONTAINER) {
             removeScaleBar()
-            scalebar.bindTo(flutterMapViewDelegate.mapView)
+            scalebar.bindTo(mapView)
             layoutParams = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 Convert.Companion.dpToPixelsI(context, 50)
@@ -164,6 +137,28 @@ class ScaleBarController(
             scaleBarState = ScaleBarState.IN_CONTAINER
         }
     }
+
+    private fun toScaleBarAlignment(rawValue: Int): Scalebar.Alignment {
+        return when (rawValue) {
+            0 -> Scalebar.Alignment.LEFT
+            1 -> Scalebar.Alignment.RIGHT
+            2 -> Scalebar.Alignment.CENTER
+            else -> throw IllegalStateException("Unexpected value: $rawValue")
+        }
+    }
+
+    private fun toScaleBarStyle(rawValue: Int): Style {
+        return when (rawValue) {
+            0 -> Style.LINE
+            1 -> Style.BAR
+            2 -> Style.GRADUATED_LINE
+            3 -> Style.ALTERNATING_BAR
+            4 -> Style.DUAL_UNIT_LINE
+            5 -> Style.DUAL_UNIT_LINE_NAUTICAL_MILE
+            else -> throw IllegalStateException("Unexpected value: $rawValue")
+        }
+    }
+
 
     private enum class ScaleBarState {
         NONE, IN_MAP, IN_CONTAINER

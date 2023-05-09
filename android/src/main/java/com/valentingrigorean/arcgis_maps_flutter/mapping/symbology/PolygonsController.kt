@@ -4,7 +4,9 @@ import com.arcgismaps.mapping.view.Graphic
 import com.arcgismaps.mapping.view.GraphicsOverlay
 import com.valentingrigorean.arcgis_maps_flutter.Convert
 import com.valentingrigorean.arcgis_maps_flutter.convert.map.toPolygonIdValue
+import com.valentingrigorean.arcgis_maps_flutter.map.GraphicControllerSink
 import com.valentingrigorean.arcgis_maps_flutter.map.MapTouchGraphicDelegate
+import com.valentingrigorean.arcgis_maps_flutter.map.SelectionPropertiesHandler
 import io.flutter.plugin.common.MethodChannel
 
 class PolygonsController(
@@ -32,7 +34,34 @@ class PolygonsController(
         return true
     }
 
-
+    override fun interpretGraphicController(data: Map<*, *>, controller: GraphicControllerSink) {
+        super.interpretGraphicController(data, controller)
+        val fillColor = data["fillColor"]
+        if (fillColor != null) {
+            controller.setFillColor(Convert.toInt(fillColor))
+        }
+        val strokeColor = data["strokeColor"]
+        if (strokeColor != null) {
+            controller.setStrokeColor(Convert.toInt(strokeColor))
+        }
+        val strokeWidth = data["strokeWidth"]
+        if (strokeWidth != null) {
+            controller.setStrokeWidth(Convert.toInt(strokeWidth).toFloat())
+        }
+        val strokeStyle = data["strokeStyle"]
+        if (strokeStyle != null) {
+            controller.setStrokeStyle(Convert.toSimpleLineStyle(Convert.toInt(strokeStyle)))
+        }
+        val pointsRaw = data["points"]
+        if (pointsRaw != null) {
+            val points = Convert.toList(pointsRaw)
+            val nativePoints = ArrayList<com.esri.arcgisruntime.geometry.Point>(points.size)
+            for (point in points) {
+                nativePoints.add(toPoint(point))
+            }
+            controller.setGeometry(Polygon(PointCollection(nativePoints)))
+        }
+    }
 
     fun addPolygons(polygonsToAdd: List<Any?>?) {
         if (polygonsToAdd == null) {

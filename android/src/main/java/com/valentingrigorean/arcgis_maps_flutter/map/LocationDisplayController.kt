@@ -5,7 +5,6 @@ import com.arcgismaps.mapping.view.GeoView
 import com.arcgismaps.mapping.view.Graphic
 import com.arcgismaps.mapping.view.GraphicsOverlay
 import com.arcgismaps.mapping.view.LocationDisplay
-import com.valentingrigorean.arcgis_maps_flutter.Convert
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.location.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.convert.location.toFlutterValue
@@ -148,36 +147,21 @@ class LocationDisplayController(
             "start" -> {
                  scope.launch {
                      locationDisplay.dataSource.start().onSuccess {
-                         result.success(true)
+                         result.success(null)
+                     }.onFailure {
+                         result.error("Failed to start locationDisplay", it.message, null)
                      }
                  }
-                locationDisplay!!.startAsync()
             }
 
             "stop" -> {
-                locationDisplay!!.stop()
-                result.success(null)
+                scope.launch {
+                    locationDisplay.dataSource.stop()
+                    result.success(null)
+                }
             }
 
             else -> result.notImplemented()
-        }
-    }
-
-    private fun handleStatusChanged(
-        isStarted: Boolean,
-        error: Throwable?
-    ) {
-        if (startResult != null) {
-            if (isStarted) {
-                startResult!!.success(null)
-            } else {
-                var errorMessage: String? = "Unknown error"
-                if (error != null) {
-                    errorMessage = error.message
-                }
-                startResult!!.error("Failed to start locationDisplay", errorMessage, null)
-            }
-            startResult = null
         }
     }
 

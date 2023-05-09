@@ -8,7 +8,7 @@ class MapPageGeodeticDistance extends StatefulWidget {
   const MapPageGeodeticDistance({Key? key}) : super(key: key);
 
   @override
-  State<MapPageGeodeticDistance>  createState() =>
+  State<MapPageGeodeticDistance> createState() =>
       _MapPageGeodeticDistanceState();
 }
 
@@ -41,8 +41,8 @@ class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance> {
         onMapCreated: (controller) {
           controller.locationDisplay.wanderExtentFactor = 0.0;
           _locationSubscription = controller.locationDisplay.onLocationChanged
-              .listen((Location location) {
-            _userLocation = location.position;
+              .listen((Location? location) {
+            if (location != null) _userLocation = location.position;
           });
           Future.delayed(const Duration(seconds: 1)).then((value) async {
             if (mounted) {
@@ -77,7 +77,7 @@ class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance> {
           } else {
             msg = 'Distance: ${result.distance.toStringAsFixed(2)} meters';
           }
-          if(!mounted){
+          if (!mounted) {
             return;
           }
           ScaffoldMessenger.of(context).clearSnackBars();
@@ -104,7 +104,6 @@ class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance> {
       body: body,
     );
   }
-
 
   Future<void> requestPermission() async {
     var currentStatus = await Permission.locationWhenInUse.status;
