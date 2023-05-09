@@ -1,6 +1,7 @@
 package com.valentingrigorean.arcgis_maps_flutter.flutterobject
 
 import com.arcgismaps.data.Geodatabase
+import com.arcgismaps.data.ServiceFeatureTable
 import com.arcgismaps.mapping.ArcGISMap
 import com.arcgismaps.mapping.PortalItem
 import com.arcgismaps.mapping.layers.TileCache
@@ -11,6 +12,7 @@ import com.arcgismaps.tasks.offlinemaptask.OfflineMapTask
 import com.arcgismaps.tasks.tilecache.ExportTileCacheTask
 import com.valentingrigorean.arcgis_maps_flutter.Convert
 import com.valentingrigorean.arcgis_maps_flutter.data.GeodatabaseNativeObject
+import com.valentingrigorean.arcgis_maps_flutter.data.ServiceFeatureTableNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.data.TileCacheNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.tasks.geocode.LocatorTaskNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.tasks.geodatabase.GeodatabaseSyncTaskNativeObject
@@ -101,6 +103,15 @@ class ArcgisNativeObjectFactoryImpl : ArcgisNativeObjectFactory {
                 val locatorTask = LocatorTask(url)
                 val nativeObject: NativeObject =
                     LocatorTaskNativeObject(objectId, locatorTask)
+                nativeObject.setMessageSink(messageSink)
+                nativeObject
+            }
+
+            "ServiceFeatureTable"  -> {
+                val url = arguments as String
+                val serviceFeatureTable = ServiceFeatureTable(url)
+                val nativeObject: NativeObject =
+                    ServiceFeatureTableNativeObject(objectId, serviceFeatureTable)
                 nativeObject.setMessageSink(messageSink)
                 nativeObject
             }

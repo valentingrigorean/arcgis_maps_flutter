@@ -12,7 +12,7 @@ import com.valentingrigorean.arcgis_maps_flutter.loadable.LoadableNativeHandler
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.launch
 
-class ServiceFeatureTableNativeHandler(objectId: String, serviceFeatureTable: ServiceFeatureTable) :
+class ServiceFeatureTableNativeObject(objectId: String, serviceFeatureTable: ServiceFeatureTable) :
     BaseNativeObject<ServiceFeatureTable>(
         objectId, serviceFeatureTable, arrayOf(
             LoadableNativeHandler(serviceFeatureTable),
@@ -27,6 +27,15 @@ class ServiceFeatureTableNativeHandler(objectId: String, serviceFeatureTable: Se
 
             "serviceFeatureTable#queryStatistics" -> {
                 queryStatistics(args as Map<*, *>, result)
+            }
+
+            "serviceFeatureTable#queryFeatureCount" ->{
+                scope.launch {
+                    val queryParameters = args as Map<*, *>
+                    nativeObject.queryFeatureCount(queryParameters.toQueryParametersOrNull()!!)
+                        .onSuccess { res -> result.success(res) }
+                        .onFailure { result.success(it.toFlutterJson()) }
+                }
             }
 
             else -> super.onMethodCall(method, args, result)
