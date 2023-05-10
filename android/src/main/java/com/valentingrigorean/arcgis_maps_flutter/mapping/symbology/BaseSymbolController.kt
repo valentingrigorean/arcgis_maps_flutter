@@ -1,6 +1,5 @@
 package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 
-import com.valentingrigorean.arcgis_maps_flutter.map.GraphicControllerSink
 import com.valentingrigorean.arcgis_maps_flutter.map.SelectionPropertiesHandler
 import com.valentingrigorean.arcgis_maps_flutter.map.SymbolVisibilityFilterController
 import com.valentingrigorean.arcgis_maps_flutter.map.SymbolsController

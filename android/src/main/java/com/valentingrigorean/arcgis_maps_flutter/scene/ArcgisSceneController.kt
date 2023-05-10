@@ -5,8 +5,6 @@ import android.view.View
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.arcgismaps.mapping.view.SceneView
-import com.esri.arcgisruntime.mapping.view.Camera
-import com.esri.arcgisruntime.mapping.view.SceneView
 import com.valentingrigorean.arcgis_maps_flutter.Convert
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
@@ -16,16 +14,16 @@ import io.flutter.plugin.platform.PlatformView
 
 class ArcgisSceneController(
     id: Int,
-    context: Context?,
-    params: Map<String?, Any?>?,
-    binaryMessenger: BinaryMessenger?,
-    private val lifecycleProvider: LifecycleProvider
+    context: Context,
+    params: Map<String, Any>?,
+    binaryMessenger: BinaryMessenger,
+    //private val lifecycleProvider: LifecycleProvider
 ) : DefaultLifecycleObserver, PlatformView, MethodCallHandler {
     private val methodChannel: MethodChannel
     private val sceneController: SceneController
     private var sceneView: SceneView?
     private var disposed = false
-    private var camera: Camera
+   // private var camera: Camera
 
     init {
         methodChannel = MethodChannel(binaryMessenger!!, "plugins.flutter.io/arcgis_scene_$id")
@@ -33,13 +31,13 @@ class ArcgisSceneController(
         sceneView = SceneView(context)
         sceneController = SceneController()
         sceneController.setSceneView(sceneView)
-        if (params == null) {
-            return
-        }
-        sceneController.setScene(params!!["scene"])
-        sceneController.setSurface(params["surface"])
-        camera = Convert.Companion.toCamera(params["initialCamera"])
-        sceneView!!.setViewpointCamera(camera)
+//        if (params == null) {
+//            return
+//        }
+//        sceneController.setScene(params!!["scene"])
+//        sceneController.setSurface(params["surface"])
+//        camera = Convert.Companion.toCamera(params["initialCamera"])
+//        sceneView!!.setViewpointCamera(camera)
     }
 
     override fun getView(): View? {
@@ -53,29 +51,30 @@ class ArcgisSceneController(
         disposed = true
         methodChannel.setMethodCallHandler(null)
         destroyMapViewIfNecessary()
-        val lifecycle = lifecycleProvider.lifecycle
-        lifecycle?.removeObserver(this)
+        //val lifecycle = lifecycleProvider.lifecycle
+        //lifecycle?.removeObserver(this)
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        when (call.method) {
-            "sceneView#waitForView" -> result.success(null)
-            "sceneView#setScene" -> {
-                sceneController.setScene(call.arguments)
-                result.success(null)
-            }
-
-            "sceneView#setSurface" -> {
-                sceneController.setSurface(call.arguments)
-                result.success(null)
-            }
-
-            "sceneView#setViewpointCamera" -> {
-                camera = Convert.Companion.toCamera(call.arguments)
-                sceneView!!.setViewpointCamera(camera)
-                result.success(null)
-            }
-        }
+        result.notImplemented()
+//        when (call.method) {
+//            "sceneView#waitForView" -> result.success(null)
+//            "sceneView#setScene" -> {
+//                sceneController.setScene(call.arguments)
+//                result.success(null)
+//            }
+//
+//            "sceneView#setSurface" -> {
+//                sceneController.setSurface(call.arguments)
+//                result.success(null)
+//            }
+//
+//            "sceneView#setViewpointCamera" -> {
+//                camera = Convert.Companion.toCamera(call.arguments)
+//                sceneView!!.setViewpointCamera(camera)
+//                result.success(null)
+//            }
+//        }
     }
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -94,14 +93,14 @@ class ArcgisSceneController(
         if (disposed) {
             return
         }
-        sceneView!!.resume()
+        //sceneView!!.resume()
     }
 
     override fun onPause(owner: LifecycleOwner) {
         if (disposed) {
             return
         }
-        sceneView!!.pause()
+      //  sceneView!!.pause()
     }
 
     override fun onStop(owner: LifecycleOwner) {
@@ -123,7 +122,7 @@ class ArcgisSceneController(
             return
         }
         sceneController.setSceneView(null)
-        sceneView!!.dispose()
+       // sceneView!!.dispose()
         sceneView = null
     }
 }

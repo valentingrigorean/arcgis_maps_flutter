@@ -1,7 +1,5 @@
 package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 
-import com.valentingrigorean.arcgis_maps_flutter.map.GraphicControllerSink
-
 interface MarkerControllerSink : GraphicControllerSink {
 
     var selectedScale: Float

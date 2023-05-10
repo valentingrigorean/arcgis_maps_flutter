@@ -1,8 +1,9 @@
 package com.valentingrigorean.arcgis_maps_flutter.scene
 
-import com.esri.arcgisruntime.mapping.ArcGISScene
-import com.esri.arcgisruntime.mapping.Surface
-import com.esri.arcgisruntime.mapping.view.SceneView
+import com.arcgismaps.mapping.ArcGISScene
+import com.arcgismaps.mapping.Surface
+import com.arcgismaps.mapping.view.SceneView
+
 import com.valentingrigorean.arcgis_maps_flutter.Convert
 
 class SceneController {
@@ -13,24 +14,24 @@ class SceneController {
         this.sceneView = sceneView
     }
 
-    fun setScene(json: Any?) {
-        if (json == null) {
-            return
-        }
-        scene = Convert.Companion.toScene(json)
-        if (surface != null) {
-            scene!!.baseSurface = surface
-        }
-        sceneView!!.scene = scene
-    }
-
-    fun setSurface(json: Any?) {
-        if (json == null) {
-            return
-        }
-        surface = Convert.Companion.toSurface(json)
-        if (scene != null) {
-            scene!!.baseSurface = surface
-        }
-    }
+//    fun setScene(json: Any?) {
+//        if (json == null) {
+//            return
+//        }
+//        scene = Convert.Companion.toScene(json)
+//        if (surface != null) {
+//            scene!!.baseSurface = surface
+//        }
+//        sceneView!!.scene = scene
+//    }
+//
+//    fun setSurface(json: Any?) {
+//        if (json == null) {
+//            return
+//        }
+//        surface = Convert.Companion.toSurface(json)
+//        if (scene != null) {
+//            scene!!.baseSurface = surface
+//        }
+//    }
 }

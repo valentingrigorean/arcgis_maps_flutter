@@ -8,6 +8,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import com.arcgismaps.mapping.Viewpoint
 import com.arcgismaps.mapping.view.GraphicsOverlay
+import com.arcgismaps.mapping.view.MapView
 import com.valentingrigorean.arcgis_maps_flutter.Convert
 import com.valentingrigorean.arcgis_maps_flutter.layers.LayersChangedController
 import com.valentingrigorean.arcgis_maps_flutter.layers.LayersController
@@ -49,7 +50,7 @@ class ArcgisMapController(
     private val layersChangedController: LayersChangedController
     private val locationDisplayController: LocationDisplayController
     private val mapLoadedListener = MapLoadedListener()
-    private var mapView: FlutterMapView?
+    private var mapView: MapView?
     private var mapViewOnTouchListener: MapViewOnTouchListener?
     private var scaleBarController: ScaleBarController?
     private val invalidateMapHelper: InvalidateMapHelper
@@ -64,9 +65,9 @@ class ArcgisMapController(
     init {
         methodChannel = MethodChannel(binaryMessenger!!, "plugins.flutter.io/arcgis_maps_$id")
         methodChannel.setMethodCallHandler(this)
-        mapView = FlutterMapView(context)
-        scaleBarController = ScaleBarController(context, mapView!!, mapView!!)
-        selectionPropertiesHandler = SelectionPropertiesHandler(mapView.getSelectionProperties())
+        mapView = MapView(context)
+        scaleBarController = ScaleBarController(context, mapView!!, mapView!!,lifecycleProvider())
+        selectionPropertiesHandler = SelectionPropertiesHandler(mapView.selectionProperties)
         symbolVisibilityFilterController = SymbolVisibilityFilterController(mapView!!)
         layersController = LayersController(methodChannel)
         mapChangeAwares.add(layersController)

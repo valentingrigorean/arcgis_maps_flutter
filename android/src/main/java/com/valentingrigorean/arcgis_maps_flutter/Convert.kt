@@ -85,44 +85,8 @@ open class Convert {
             return Camera(latitude, longitude, altitude, heading, pitch, roll)
         }
 
-        fun toScene(o: Any): ArcGISScene {
-            val data = toMap(o)
-            if (data.containsKey("json")) {
-                return ArcGISScene.fromJson(data["json"] as String?)
-            }
-            val basemap = createBasemapFromType(
-                data["basemap"] as String?
-            )
-            return ArcGISScene(basemap)
-        }
 
-        fun toSurface(o: Any): Surface {
-            val data = toMap(o)
-            val alpha = toFloat(Objects.requireNonNull(data)["alpha"])
-            val isEnabled = toBoolean(
-                data["isEnabled"]!!
-            )
-            var elevationSources: List<ElevationSource?>? = null
-            if (data.containsKey("elevationSources")) {
-                elevationSources = toElevationSourceList(
-                    data["elevationSources"] as List<*>?
-                )
-            }
-            val surface: Surface
-            surface = if (elevationSources != null) {
-                Surface(elevationSources)
-            } else {
-                Surface()
-            }
-            surface.isEnabled = isEnabled
-            surface.opacity = alpha
-            if (data.containsKey("elevationExaggeration")) {
-                surface.elevationExaggeration = toFloat(
-                    data["elevationExaggeration"]
-                )
-            }
-            return surface
-        }
+
 
         fun toServiceImageTiledLayerOptions(o: Any): ServiceImageTiledLayerOptions {
             val data = toMap(o)
@@ -375,23 +339,6 @@ open class Convert {
                 interactionOptions.setCanMagnifierPanMap(toBoolean(allowMagnifierToPan))
             }
         }
-
-        private fun toElevationSourceList(list: List<*>?): List<ElevationSource?> {
-            val elevationSources = ArrayList<ElevationSource?>()
-            for (o in list!!) {
-                elevationSources.add(o?.let { toElevationSource(it) })
-            }
-            return elevationSources
-        }
-
-        private fun toElevationSource(o: Any): ElevationSource {
-            val map = toMap(o)
-            if ("ArcGISTiledElevationSource" == map["elevationType"].toString()) {
-                return ArcGISTiledElevationSource(map["url"] as String?)
-            }
-            throw IllegalStateException("Unexpected value: " + map["elevationType"].toString())
-        }
-
 
         fun dpToPixelsI(context: Context, dp: Int): Int {
             return (dp * (context.resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)).toInt()
