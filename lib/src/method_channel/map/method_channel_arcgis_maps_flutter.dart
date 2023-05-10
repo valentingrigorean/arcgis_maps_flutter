@@ -583,7 +583,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
       case 'map#onTap':
         final args = call.arguments;
         final screenPoint = _fromJson(args['screenPoint']);
-        Point position = Point.fromJson(args['position'])!;
+        final position = Point.fromJson(args['position']);
         _mapEventStreamController.add(
           MapTapEvent(
             mapId,
@@ -595,7 +595,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
       case 'map#onLongPress':
         final args = call.arguments;
         final screenPoint = _fromJson(args['screenPoint']);
-        Point position = Point.fromJson(args['position'])!;
+        final position = Point.fromJson(args['position']);
         _mapEventStreamController.add(
           MapLongPressEvent(
             mapId,
@@ -607,7 +607,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
       case 'map#onLongPressEnd':
         final args = call.arguments;
         final screenPoint = _fromJson(args['screenPoint']);
-        Point position = Point.fromJson(args['position'])!;
+        final position = Point.fromJson(args['position']);
         _mapEventStreamController.add(
           MapLongPressEndEvent(
             mapId,
@@ -619,7 +619,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
       case 'map#onIdentifyLayers':
         final Map<dynamic, dynamic> args = call.arguments;
         final screenPoint = _fromJson(args['screenPoint']);
-        final position = Point.fromJson(args['position'])!;
+        final position = Point.fromJson(args['position']);
         final List<IdentifyLayerResult> results = [];
         for (var item in args['results']) {
           final String layerName = item['layerName']!;

@@ -12,13 +12,13 @@ typedef MapLoadedCallback = void Function(ArcgisError? error);
 
 typedef LayerLoadedCallback = void Function(Layer layer, ArcgisError? error);
 
-typedef GestureCallback = void Function(Offset screenPoint, Point poisition);
+typedef GestureCallback = void Function(Offset screenPoint, Point? position);
 
 typedef IdentifyLayerCallback = void Function(
-    Offset screenPoint, Point position, IdentifyLayerResult result);
+    Offset screenPoint, Point? position, IdentifyLayerResult result);
 
 typedef IdentifyLayersCallback = void Function(
-    Offset screenPoint, Point position, List<IdentifyLayerResult> results);
+    Offset screenPoint, Point? position, List<IdentifyLayerResult> results);
 
 /// Callback function taking a single argument.
 typedef ArgumentCallback<T> = void Function(T argument);
@@ -426,28 +426,28 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     }
   }
 
-  void onTap(Offset screenPoint, Point position) {
+  void onTap(Offset screenPoint, Point? position) {
     final onTap = widget.onTap;
     if (onTap != null) {
       onTap(screenPoint, position);
     }
   }
 
-  void onLongPress(Offset screenPoint, Point position) {
+  void onLongPress(Offset screenPoint, Point? position) {
     final onLongPress = widget.onLongPress;
     if (onLongPress != null) {
       onLongPress(screenPoint, position);
     }
   }
 
-  void onLongPressEnd(Offset screenPoint, Point position) {
+  void onLongPressEnd(Offset screenPoint, Point? position) {
     final onLongPressEnd = widget.onLongPressEnd;
     if (onLongPressEnd != null) {
       onLongPressEnd(screenPoint, position);
     }
   }
 
-  void onIdentifyLayer(LayerId layerId, Offset screenMap, Point position,
+  void onIdentifyLayer(LayerId layerId, Offset screenMap, Point? position,
       IdentifyLayerResult result) {
     final callback = widget.onIdentifyLayer[layerId];
     if (callback != null) {
@@ -456,7 +456,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   }
 
   void onIdentifyLayers(
-      Offset screenMap, Point position, List<IdentifyLayerResult> results) {
+      Offset screenMap, Point? position, List<IdentifyLayerResult> results) {
     final callback = widget.onIdentifyLayers;
     if (callback != null) {
       callback(screenMap, position, results);

@@ -76,7 +76,7 @@ class IdentifyLayersEvent extends MapEvent<void> {
   }) : super(mapId, null);
 
   final Offset screenPoint;
-  final Point position;
+  final Point? position;
 
   final List<IdentifyLayerResult> results;
 }
@@ -162,7 +162,7 @@ class _PositionedMapEvent<T> extends MapEvent<T> {
   }) : super(mapId, value);
 
   /// The position where this event happened.
-  final Point position;
+  final Point? position;
 
   final Offset screenPoint;
 }

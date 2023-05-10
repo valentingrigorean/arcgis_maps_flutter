@@ -1,25 +1,58 @@
 package com.valentingrigorean.arcgis_maps_flutter.map
 
-import android.content.Context
-import android.graphics.Point
 import android.util.Log
-import android.view.MotionEvent
+import com.arcgismaps.geometry.Point
 import com.arcgismaps.mapping.view.IdentifyGraphicsOverlayResult
+import com.arcgismaps.mapping.view.MapView
+import com.arcgismaps.mapping.view.ScreenCoordinate
 import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toFlutterJson
 import io.flutter.plugin.common.MethodChannel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+
+private enum class MessageType{
+    OnTap,
+    OnLongPress,
+    OnLongPressEnd,
+}
 
 class MapViewOnTouchListener(
-    context: Context?,
-    private val flutterMapViewDelegate: FlutterMapViewDelegate,
-    private val methodChannel: MethodChannel
-) : DefaultMapViewOnTouchListener(context, flutterMapViewDelegate.mapView) {
+    private val mapView: MapView,
+    private val methodChannel: MethodChannel,
+    private val scope: CoroutineScope,
+) {
     private val mapTouchGraphicDelegates = ArrayList<MapTouchGraphicDelegate>()
-    private var graphicHandler: ListenableFuture<List<IdentifyGraphicsOverlayResult>>? = null
-    private var layerHandler: ListenableFuture<List<IdentifyLayerResult>>? = null
-    private var trackIdentityLayers = false
-    private var isLongPress = false
-    fun setTrackIdentityLayers(trackIdentityLayers: Boolean) {
-        this.trackIdentityLayers = trackIdentityLayers
+    private var graphicJob: Job? = null
+    private var layerJob: Job? = null
+    private val isLongPress = false
+    var trackIdentityLayers = false
+
+
+    init {
+        mapView.onSingleTapConfirmed.onEach {
+            clearHandlers()
+            if (mapView.map == null) {
+                return@onEach
+            }
+
+            if (canConsumeGraphics()) {
+                Log.d(TAG, "onSingleTapConfirmed: identifyGraphicsOverlays")
+                identifyGraphicsOverlays(it.screenCoordinate)
+            } else if (trackIdentityLayers) {
+                Log.d(TAG, "onSingleTapConfirmed: identifyLayers")
+                identifyLayers(it.mapPoint)
+            } else {
+                sendOnMapTap(it.screenCoordinate)
+            }
+        }.launchIn(scope)
+
+        mapView.onLongPress.onEach {
+
+        }.launchIn(scope)
     }
 
     fun addGraphicDelegate(mapTouchGraphicDelegate: MapTouchGraphicDelegate) {
@@ -32,112 +65,32 @@ class MapViewOnTouchListener(
         mapTouchGraphicDelegates.clear()
     }
 
-    override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-        clearHandlers()
-        if (flutterMapViewDelegate.mapView == null) {
-            return false
-        }
-        try {
-            val screenPoint = Point(e.x.toInt(), e.y.toInt())
-            if (canConsumeGraphics()) {
-                Log.d(TAG, "onSingleTapConfirmed: identifyGraphicsOverlays")
-                identifyGraphicsOverlays(screenPoint)
-            } else if (trackIdentityLayers) {
-                Log.d(TAG, "onSingleTapConfirmed: identifyLayers")
-                identifyLayers(screenPoint)
-            } else {
+
+    private fun identifyGraphicsOverlays(screenPoint: ScreenCoordinate,point: Point?) {
+        graphicJob?.cancel()
+        graphicJob = scope.launch {
+            mapView.identifyGraphicsOverlays(screenPoint, 10.0, false, 10).onSuccess {
+                if (onTapCompleted(it)) {
+                    return@launch
+                }
                 sendOnMapTap(screenPoint)
             }
-            return true
-        } catch (ex: Exception) {
-            Log.e(TAG, "onSingleTapConfirmed: ", ex)
-        }
-        return false
-    }
-
-    override fun onLongPress(e: MotionEvent) {
-        try {
-            super.onLongPress(e)
-            val screenPoint = Point(e.x.toInt(), e.y.toInt())
-            sendOnMapLongPress(screenPoint, false)
-            isLongPress = true
-        } catch (exception: Exception) {
-            Log.e(TAG, "onLongPress: ", exception)
         }
     }
 
-    override fun onUp(e: MotionEvent): Boolean {
-        if (isLongPress) {
-            try {
-                super.onUp(e)
-                val screenPoint = Point(e.x.toInt(), e.y.toInt())
-                sendOnMapLongPress(screenPoint, true)
-                isLongPress = false
-            } catch (exception: Exception) {
-                Log.e(TAG, "onLongPressEnd: ", exception)
-            }
-        }
-        return true
-    }
+    private fun identifyLayers(screenPoint: ScreenCoordinate) {
 
-    private fun identifyGraphicsOverlays(screenPoint: Point) {
-        val mapView = flutterMapViewDelegate.mapView ?: return
-        graphicHandler = mapView.identifyGraphicsOverlaysAsync(screenPoint, 12.0, false)
-        graphicHandler.addDoneListener(Runnable {
-            try {
-                val results = graphicHandler.get()
-                graphicHandler = null
-                Log.d(TAG, "identifyGraphicsOverlays: " + results.size + " found.")
-                if (onTapCompleted(results, screenPoint)) {
-                    return@addDoneListener
-                }
-                if (trackIdentityLayers) {
-                    identifyLayers(screenPoint)
-                } else {
-                    sendOnMapTap(screenPoint)
-                }
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            }
-        })
-    }
-
-    private fun identifyLayers(screenPoint: Point) {
-        val mapView = flutterMapViewDelegate.mapView ?: return
-        layerHandler = mapView.identifyLayersAsync(screenPoint, 10.0, false)
-        layerHandler.addDoneListener(Runnable {
-            try {
-                val results = layerHandler.get()
-                layerHandler = null
-                Log.d(TAG, "identifyLayers: " + results.size + " found.")
-                if (results.size == 0) {
-                    sendOnMapTap(screenPoint)
-                    return@addDoneListener
-                }
-                val jsonResults: Any = Convert.Companion.identifyLayerResultsToJson(results)
-                val position = mMapView.screenToLocation(screenPoint)
-                val data = HashMap<String, Any?>(3)
-                data["results"] = jsonResults
-                data["screenPoint"] = Convert.Companion.pointToJson(screenPoint)
-                data["position"] = Convert.Companion.geometryToJson(position)
-                methodChannel.invokeMethod("map#onIdentifyLayers", data)
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            }
-        })
     }
 
     private fun onTapCompleted(
-        results: List<IdentifyGraphicsOverlayResult>?,
-        screenPoint: Point
+        results: List<IdentifyGraphicsOverlayResult>,
     ): Boolean {
-        if (results != null) {
-            for (result in results) {
-                for (touchDelegate in mapTouchGraphicDelegates) {
-                    for (graphic in result.graphics) {
-                        if (touchDelegate.didHandleGraphic(graphic)) {
-                            return true
-                        }
+
+        for (result in results) {
+            for (touchDelegate in mapTouchGraphicDelegates) {
+                for (graphic in result.graphics) {
+                    if (touchDelegate.didHandleGraphic(graphic)) {
+                        return true
                     }
                 }
             }
@@ -145,27 +98,14 @@ class MapViewOnTouchListener(
         return false
     }
 
-    private fun sendOnMapTap(screenPoint: Point) {
-        val mapView = flutterMapViewDelegate.mapView ?: return
-        val mapPoint = mapView.screenToLocation(screenPoint) ?: return
-        val data = HashMap<String, Any?>(1)
-        data["position"] = Convert.Companion.geometryToJson(mapPoint)
-        data["screenPoint"] =
-            Convert.Companion.pointToJson(screenPoint)
-        methodChannel.invokeMethod("map#onTap", data)
-    }
-
-    private fun sendOnMapLongPress(screenPoint: Point, isEnd: Boolean) {
-        val mapView = flutterMapViewDelegate.mapView ?: return
-        val mapPoint = mapView.screenToLocation(screenPoint) ?: return
-        val data = HashMap<String, Any?>(1)
-        data["position"] =
-            Convert.Companion.geometryToJson(mapPoint)
-        data["screenPoint"] = Convert.Companion.pointToJson(screenPoint)
-        if (isEnd) {
-            methodChannel.invokeMethod("map#onLongPressEnd", data)
-        } else {
-            methodChannel.invokeMethod("map#onLongPress", data)
+    private fun sendMessage(screenPoint: ScreenCoordinate,point: Point?,messageType: MessageType){
+        val data = HashMap<String, Any?>(2)
+        data["position"] = point?.toFlutterJson()
+        data["screenPoint"] = arrayListOf(screenPoint.x, screenPoint.y)
+        when(messageType){
+            MessageType.OnTap -> methodChannel.invokeMethod("map#onTap", data)
+            MessageType.OnLongPress -> methodChannel.invokeMethod("map#onLongPress", data)
+            MessageType.OnLongPressEnd -> methodChannel.invokeMethod("map#onLongPressEnd", data)
         }
     }
 

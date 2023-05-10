@@ -6,6 +6,7 @@ import android.view.View
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
+import com.arcgismaps.mapping.ArcGISMap
 import com.arcgismaps.mapping.Viewpoint
 import com.arcgismaps.mapping.view.GraphicsOverlay
 import com.arcgismaps.mapping.view.MapView
@@ -50,7 +51,7 @@ class ArcgisMapController(
     private val layersChangedController: LayersChangedController
     private val locationDisplayController: LocationDisplayController
     private val mapLoadedListener = MapLoadedListener()
-    private var mapView: MapView?
+    private lateinit var mapView: MapView
     private var mapViewOnTouchListener: MapViewOnTouchListener?
     private var scaleBarController: ScaleBarController?
     private val invalidateMapHelper: InvalidateMapHelper
@@ -66,7 +67,7 @@ class ArcgisMapController(
         methodChannel = MethodChannel(binaryMessenger!!, "plugins.flutter.io/arcgis_maps_$id")
         methodChannel.setMethodCallHandler(this)
         mapView = MapView(context)
-        scaleBarController = ScaleBarController(context, mapView!!, mapView!!,lifecycleProvider())
+        scaleBarController = ScaleBarController(context, mapView!!, mapView!!, lifecycleProvider())
         selectionPropertiesHandler = SelectionPropertiesHandler(mapView.selectionProperties)
         symbolVisibilityFilterController = SymbolVisibilityFilterController(mapView!!)
         layersController = LayersController(methodChannel)
@@ -84,7 +85,7 @@ class ArcgisMapController(
             binaryMessenger,
             "plugins.flutter.io/arcgis_maps_" + id + "_location_display"
         )
-        locationDisplayController = LocationDisplayController(locationDisplayChannel, mapView!!)
+        locationDisplayController = LocationDisplayController(locationDisplayChannel, mapView.locationDisplay,mapView,null)
         locationDisplayController.setLocationDisplayControllerDelegate(this)
         initSymbolsControllers()
         mapViewOnTouchListener = MapViewOnTouchListener(context, mapView!!, methodChannel)
@@ -92,16 +93,15 @@ class ArcgisMapController(
         mapViewOnTouchListener!!.addGraphicDelegate(polygonsController)
         mapViewOnTouchListener!!.addGraphicDelegate(polylinesController)
         mapViewOnTouchListener!!.addGraphicDelegate(locationDisplayController)
-        mapView.getGraphicsOverlays().add(graphicsOverlay)
-        mapView!!.mapView!!.onTouchListener = mapViewOnTouchListener
-        mapView!!.addViewpointChangedListener(this)
-        invalidateMapHelper = InvalidateMapHelper(mapView!!)
+        mapView.graphicsOverlays.add(graphicsOverlay)
+        mapView.mapView.onTouchListener = mapViewOnTouchListener
+        mapView.addViewpointChangedListener(this)
+        invalidateMapHelper = InvalidateMapHelper(mapView)
         lifecycleProvider.lifecycle.addObserver(this)
-        if (params == null) {
-            return
+        if (params != null) {
+            initWithParams(params)
         }
-        initWithParams(params)
-        Log.d(TAG, "setApiKey: " + ArcGISRuntimeEnvironment.getApiKey())
+       
     }
 
     override fun getView(): View? {
@@ -167,7 +167,7 @@ class ArcgisMapController(
             }
 
             "map#exportImage" -> {
-                val future = mapView!!.exportImageAsync()
+                val future = mapView.exportImageAsync()
                 future!!.addDoneListener {
                     try {
                         val bitmap = future.get()
@@ -225,9 +225,9 @@ class ArcgisMapController(
                 if (trackTimeExtentEvents != track) {
                     trackTimeExtentEvents = track
                     if (trackTimeExtentEvents) {
-                        mapView!!.addTimeExtentChangedListener(this)
+                        mapView.addTimeExtentChangedListener(this)
                     } else {
-                        mapView!!.removeTimeExtentChangedListener(this)
+                        mapView.removeTimeExtentChangedListener(this)
                     }
                 }
                 result.success(null)
@@ -370,7 +370,7 @@ class ArcgisMapController(
             "map#getTimeAwareLayerInfos" -> handleTimeAwareLayerInfos(result)
             "map#getCurrentViewpoint" -> {
                 val currentViewPoint =
-                    mapView!!.getCurrentViewpoint(Convert.Companion.toViewpointType(call.arguments))
+                    mapView.getCurrentViewpoint(Convert.Companion.toViewpointType(call.arguments))
                 if (currentViewPoint == null) {
                     result.success(null)
                 } else {
@@ -390,10 +390,10 @@ class ArcgisMapController(
                 val padding = data["padding"]
                 val future: ListenableFuture<Boolean?>?
                 future = if (padding == null) {
-                    mapView!!.setViewpointGeometryAsync(geometry)
+                    mapView.setViewpointGeometryAsync(geometry)
                 } else {
                     val paddingDouble: Double = Convert.Companion.toDouble(padding)
-                    mapView!!.setViewpointGeometryAsync(geometry, paddingDouble)
+                    mapView.setViewpointGeometryAsync(geometry, paddingDouble)
                 }
                 future.addDoneListener(Runnable {
                     try {
@@ -413,7 +413,7 @@ class ArcgisMapController(
                 val scale: Double = Convert.Companion.toDouble(
                     data["scale"]
                 )
-                val future = mapView!!.setViewpointCenterAsync(center, scale)
+                val future = mapView.setViewpointCenterAsync(center, scale)
                 future!!.addDoneListener {
                     try {
                         result.success(future.get())
@@ -426,13 +426,13 @@ class ArcgisMapController(
 
             "map#setViewpointRotation" -> {
                 val angleDegrees: Double = Convert.Companion.toDouble(call.arguments)
-                mapView!!.setViewpointRotationAsync(angleDegrees)
+                mapView.setViewpointRotationAsync(angleDegrees)
                     .addDoneListener { result.success(null) }
             }
 
             "map#locationToScreen" -> {
                 val mapPoint: Point = Convert.Companion.toPoint(call.arguments)
-                val screenPoint = mapView!!.locationToScreen(mapPoint)
+                val screenPoint = mapView.locationToScreen(mapPoint)
                 if (screenPoint == null) {
                     result.success(null)
                 } else {
@@ -451,7 +451,7 @@ class ArcgisMapController(
                 val screenLocationData: ScreenLocationData = Convert.Companion.toScreenLocationData(
                     context, call.arguments
                 )
-                var mapPoint = mapView!!.screenToLocation(screenLocationData.point)
+                var mapPoint = mapView.screenToLocation(screenLocationData.point)
                 if (mapPoint == null) {
                     result.success(null)
                 } else {
@@ -529,7 +529,7 @@ class ArcgisMapController(
                 val data = call.arguments<Map<*, *>>()
                 if (mapView != null && data != null) {
                     val scale = data["scale"] as Double
-                    val future = mapView!!.setViewpointScaleAsync(scale)
+                    val future = mapView.setViewpointScaleAsync(scale)
                     future!!.addDoneListener {
                         val scaled: Boolean
                         try {
@@ -584,14 +584,14 @@ class ArcgisMapController(
         if (disposed) {
             return
         }
-        mapView!!.resume()
+        mapView.resume()
     }
 
     override fun onPause(owner: LifecycleOwner) {
         if (disposed) {
             return
         }
-        mapView!!.pause()
+        mapView.pause()
     }
 
     override fun onStop(owner: LifecycleOwner) {
@@ -611,8 +611,8 @@ class ArcgisMapController(
     private fun destroyMapViewIfNecessary() {
         mapLoadedListener.setMap(null)
         if (mapView != null) {
-            mapView!!.dispose()
-            mapView!!.removeAllViews()
+            mapView.dispose()
+            mapView.removeAllViews()
             mapView = null
         }
     }
@@ -675,9 +675,9 @@ class ArcgisMapController(
             return
         }
         if (animated) {
-            mapView!!.setViewpointAsync(viewpoint).addDoneListener { result?.success(null) }
+            mapView.setViewpointAsync(viewpoint).addDoneListener { result?.success(null) }
         } else {
-            mapView!!.setViewpointAsync(viewpoint, 0f).addDoneListener { result?.success(null) }
+            mapView.setViewpointAsync(viewpoint, 0f).addDoneListener { result?.success(null) }
         }
         viewpoint = null
     }
@@ -746,7 +746,7 @@ class ArcgisMapController(
     private fun changeMap(map: ArcGISMap) {
         var viewpoint = viewpoint
         if (viewpoint == null) {
-            viewpoint = mapView!!.getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE)
+            viewpoint = mapView.getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE)
         }
         mapLoadedListener.setMap(map)
         map.loadAsync()
@@ -757,7 +757,7 @@ class ArcgisMapController(
         }
         if (viewpoint != null) {
             this.viewpoint = null
-            val future = mapView!!.setViewpointAsync(viewpoint)
+            val future = mapView.setViewpointAsync(viewpoint)
             future!!.addDoneListener { invalidateMapHelper.invalidateMapIfNeeded() }
         }
     }
@@ -767,43 +767,36 @@ class ArcgisMapController(
             return
         }
         val data = args as Map<*, *>
+        val mapOptions = data["interactionOptions"] as Map<*, *>?
         if (mapView != null) {
-            Convert.Companion.interpretMapViewOptions(data, mapView!!)
+            interpretInteractionOptions(mapOptions)
         }
-        val trackUserLocationTap = data["trackUserLocationTap"]
+        val trackUserLocationTap = data["trackUserLocationTap"] as Boolean?
         if (trackUserLocationTap != null) {
             locationDisplayController.setTrackUserLocationTap(
-                Convert.Companion.toBoolean(
-                    trackUserLocationTap
-                )
+                trackUserLocationTap
             )
         }
-        val trackIdentifyLayers = data["trackIdentifyLayers"]
+        val trackIdentifyLayers = data["trackIdentifyLayers"] as Boolean?
         if (trackIdentifyLayers != null) {
             mapViewOnTouchListener!!.setTrackIdentityLayers(
-                Convert.Companion.toBoolean(
-                    trackIdentifyLayers
-                )
+                trackIdentifyLayers
             )
         }
-        val haveScaleBar = data["haveScalebar"]
+        val haveScaleBar = data["haveScalebar"] as Boolean?
         if (haveScaleBar != null) {
-            this.haveScaleBar = Convert.Companion.toBoolean(haveScaleBar)
+            this.haveScaleBar = haveScaleBar
         }
-        val isAttributionTextVisible = data["isAttributionTextVisible"]
+        val isAttributionTextVisible = data["isAttributionTextVisible"] as Boolean?
         if (isAttributionTextVisible != null && mapView != null) {
-            mapView!!.setAttributionTextVisible(Convert.Companion.toBoolean(isAttributionTextVisible))
+            mapView.isAttributionBarVisible = isAttributionTextVisible
         }
-        val contentInsets = data["contentInsets"]
+        val contentInsets = data["contentInsets"] as List<Double>?
         if (contentInsets != null && mapView != null) {
             // order is left,top,right,bottom
-            val rect: List<*> = Convert.Companion.toList(contentInsets)
-            mapView!!.setViewInsets(
-                Convert.Companion.toDouble(
-                    rect[0]
-                ), Convert.Companion.toDouble(rect[1]), Convert.Companion.toDouble(
-                    rect[2]
-                ), Convert.Companion.toDouble(rect[3])
+            mapView.setViewInsets(
+                contentInsets[0], contentInsets[1],
+                contentInsets[2], contentInsets[3]
             )
         }
         val scaleBarConfiguration = data["scalebarConfiguration"]
@@ -812,13 +805,13 @@ class ArcgisMapController(
         } else if (!this.haveScaleBar) {
             scaleBarController!!.removeScaleBar()
         }
-        val minScale = data["minScale"]
+        val minScale = data["minScale"] as Double?
         if (minScale != null) {
-            this.minScale = Convert.Companion.toDouble(minScale)
+            this.minScale = minScale
         }
-        val maxScale = data["maxScale"]
+        val maxScale = data["maxScale"] as Double?
         if (maxScale != null) {
-            this.maxScale = Convert.Companion.toDouble(maxScale)
+            this.maxScale = maxScale
         }
         updateMapScale()
     }
@@ -848,9 +841,39 @@ class ArcgisMapController(
     }
 
     private fun updateMapScale() {
-        if (mapView != null && mapView.getMap() != null) {
-            mapView.getMap().minScale = minScale
-            mapView.getMap().maxScale = maxScale
+        if (mapView != null && mapView.map != null) {
+            mapView.map!!.minScale = minScale
+            mapView.map!!.maxScale = maxScale
+        }
+    }
+
+    private fun interpretInteractionOptions(
+        data: Map<*, *>,
+    ) {
+        val interactionOptions = mapView.interactionOptions
+        val isEnabled = data["isEnabled"] as Boolean?
+        if (isEnabled != null) {
+            interactionOptions.isEnabled = isEnabled
+        }
+        val isRotateEnabled = data["isRotateEnabled"] as Boolean?
+        if (isRotateEnabled != null) {
+            interactionOptions.isRotateEnabled = isRotateEnabled
+        }
+        val isPanEnabled = data["isPanEnabled"] as Boolean?
+        if (isPanEnabled != null) {
+            interactionOptions.isPanEnabled = isPanEnabled
+        }
+        val isZoomEnabled = data["isZoomEnabled"] as Boolean?
+        if (isZoomEnabled != null) {
+            interactionOptions.isZoomEnabled = isZoomEnabled
+        }
+        val isMagnifierEnabled = data["isMagnifierEnabled"] as Boolean?
+        if (isMagnifierEnabled != null) {
+            interactionOptions.isMagnifierEnabled = isMagnifierEnabled
+        }
+        val allowMagnifierToPan = data["allowMagnifierToPan"] as Boolean?
+        if (allowMagnifierToPan != null) {
+            interactionOptions.allowMagnifierToPan = allowMagnifierToPan
         }
     }
 
