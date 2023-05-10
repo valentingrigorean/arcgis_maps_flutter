@@ -1,12 +1,14 @@
 package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 
+import com.arcgismaps.Color
 import com.arcgismaps.mapping.symbology.SimpleLineSymbolStyle
 import com.valentingrigorean.arcgis_maps_flutter.map.GraphicControllerSink
 
 
 interface PolylineControllerSink : GraphicControllerSink {
-    fun setColor(color: Int)
-    fun setWidth(width: Float)
-    fun setStyle(style: SimpleLineSymbolStyle)
-    fun setAntialias(antialias: Boolean)
+
+    var color: Color
+    var width: Float
+    var style: SimpleLineSymbolStyle
+    var antialias: Boolean
 }

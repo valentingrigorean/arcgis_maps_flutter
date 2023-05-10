@@ -6,20 +6,24 @@ import com.arcgismaps.mapping.symbology.MarkerSymbol
 import com.arcgismaps.mapping.symbology.PictureMarkerSymbol
 import com.arcgismaps.mapping.symbology.Symbol
 import com.arcgismaps.mapping.symbology.SymbolAngleAlignment
+import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull
+import com.valentingrigorean.arcgis_maps_flutter.map.SymbolVisibilityFilterController
 
 class MarkerController(val context: Context, markerId: String) : BaseGraphicController(),
     MarkerControllerSink {
     private val marker = CompositeSymbol()
-    private var icon: BitmapDescriptor? = null
     private var iconScaleSymbolController: ScaleSymbolController? = null
-    private var background: BitmapDescriptor? = null
     private var backgroundScaleSymbolController: ScaleSymbolController? = null
-    private var opacity = 1f
-    private var angle = 0.0f
+
     private var iconOffsetX = 0f
     private var iconOffsetY = 0f
 
-    private var selectedScale = 1.4f
+
+    init {
+        graphic.symbol = marker
+        graphic.attributes["markerId"] = markerId
+    }
 
     override var isSelected: Boolean
         get() = this.isSelected
@@ -28,44 +32,98 @@ class MarkerController(val context: Context, markerId: String) : BaseGraphicCont
             handleScaleChange()
         }
 
-    init {
-        graphic.symbol = marker
-        graphic.attributes["markerId"] = markerId
+    override var selectedScale: Float = 1f
+        set(value) {
+            field = value
+            handleScaleChange()
+        }
+    override var icon: BitmapDescriptor? = null
+        get() = field
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            if (iconScaleSymbolController != null) {
+                marker.symbols.remove(iconScaleSymbolController!!.symbol)
+            }
+            iconScaleSymbolController = value?.let {
+                ScaleSymbolController(createSymbol(it))
+            }
+            handleScaleChange()
+        }
+    override var background: BitmapDescriptor? = null
+        get() = field
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            if (backgroundScaleSymbolController != null) {
+                marker.symbols.remove(backgroundScaleSymbolController!!.symbol)
+            }
+            backgroundScaleSymbolController = value?.let {
+                ScaleSymbolController(createSymbol(it))
+            }
+            handleScaleChange()
+        }
+    override var opacity: Float = 1f
+        get() = field
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            for (symbol in marker.symbols) {
+                setOpacity(symbol, value)
+            }
+        }
+    override var angle: Float = 0f
+        get() = field
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            for (symbol in marker.symbols) {
+                setAngle(symbol, value)
+            }
+        }
+
+
+    override fun interpretGraphicController(
+        data: Map<*, *>,
+        symbolVisibilityFilterController: SymbolVisibilityFilterController?
+    ) {
+        super.interpretGraphicController(data, symbolVisibilityFilterController)
+        val position = data["position"]?.toGeometryOrNull()
+        if (position != null) {
+            this.geometry = position
+        }
+        val icon = data["icon"]
+        if (icon != null) {
+            this.icon = BitmapDescriptorFactory.fromRawData(context, icon)
+        }
+        val backgroundImage = data["backgroundImage"]
+        if (backgroundImage != null) {
+            this.background = BitmapDescriptorFactory.fromRawData(context, backgroundImage)
+
+        }
+        setIconOffset(data["iconOffsetX"] as Float, data["iconOffsetY"] as Float)
+        val opacity = data["opacity"] as Float?
+        if (opacity != null) {
+            this.opacity = opacity
+        }
+        val angle = data["angle"] as Float?
+        if (angle != null) {
+            this.angle = angle
+        }
+        val selectedScale = data["selectedScale"] as Float?
+        if (selectedScale != null) {
+            this.selectedScale = selectedScale
+        }
     }
 
-    override fun setSelectedScale(selectedScale: Float) {
-        this.selectedScale = selectedScale
-        handleScaleChange()
-    }
-
-    override fun setIcon(bitmapDescriptor: BitmapDescriptor?) {
-        if (bitmapDescriptor === icon) {
-            return
-        }
-        if (iconScaleSymbolController != null) {
-            marker.symbols.remove(iconScaleSymbolController!!.symbol)
-        }
-        icon = bitmapDescriptor
-        iconScaleSymbolController = bitmapDescriptor?.let {
-            ScaleSymbolController(createSymbol(it))
-        }
-        handleScaleChange()
-    }
-
-    override fun setBackground(bitmapDescriptor: BitmapDescriptor?) {
-        if (bitmapDescriptor === background) {
-            return
-        }
-        if (backgroundScaleSymbolController != null) {
-            marker.symbols.remove(backgroundScaleSymbolController!!.symbol)
-        }
-        background = bitmapDescriptor
-        backgroundScaleSymbolController = bitmapDescriptor?.let {
-            ScaleSymbolController(createSymbol(it))
-        }
-
-        handleScaleChange()
-    }
 
     override fun setIconOffset(offsetX: Float, offsetY: Float) {
         if (offsetX == iconOffsetX && offsetY == iconOffsetY) {
@@ -77,27 +135,6 @@ class MarkerController(val context: Context, markerId: String) : BaseGraphicCont
             offsetSymbol(iconScaleSymbolController!!.symbol, offsetX, offsetY)
         }
     }
-
-    override fun setOpacity(opacity: Float) {
-        if (this.opacity == opacity) {
-            return
-        }
-        this.opacity = opacity
-        for (symbol in marker.symbols) {
-            setOpacity(symbol, opacity)
-        }
-    }
-
-    override fun setAngle(angle: Float) {
-        if (this.angle == angle) {
-            return
-        }
-        this.angle = angle
-        for (symbol in marker.symbols) {
-            setAngle(symbol, angle)
-        }
-    }
-
 
     private fun createSymbol(bitmapDescriptor: BitmapDescriptor): Symbol {
         val symbol = bitmapDescriptor.createSymbol()

@@ -1,8 +1,8 @@
 package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 
-import com.esri.arcgisruntime.mapping.view.Graphic
-import com.esri.arcgisruntime.mapping.view.GraphicsOverlay
-import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.arcgismaps.mapping.view.Graphic
+import com.arcgismaps.mapping.view.GraphicsOverlay
+import com.valentingrigorean.arcgis_maps_flutter.convert.map.toPolylineIdValue
 import com.valentingrigorean.arcgis_maps_flutter.map.MapTouchGraphicDelegate
 import io.flutter.plugin.common.MethodChannel
 
@@ -10,10 +10,10 @@ class PolylinesController(
     private val methodChannel: MethodChannel,
     private val graphicsOverlay: GraphicsOverlay
 ) : BaseSymbolController(), MapTouchGraphicDelegate {
-    val polylineIdToController: MutableMap<String?, PolylineController> = HashMap()
+    private val polylineIdToController: MutableMap<String?, PolylineController> = HashMap()
     override fun canConsumeTaps(): Boolean {
         for (controller in polylineIdToController.values) {
-            if (controller.canConsumeTapEvents()) {
+            if (controller.consumeTapEvents) {
                 return true
             }
         }
@@ -24,10 +24,10 @@ class PolylinesController(
         val rawPolylineId = graphic.attributes["polylineId"] ?: return false
         val polylineId = rawPolylineId as String
         val controller = polylineIdToController[polylineId]
-        if (controller == null || !controller.canConsumeTapEvents()) {
+        if (controller == null || !controller.consumeTapEvents) {
             return false
         }
-        methodChannel.invokeMethod("polyline#onTap", Convert.Companion.polylineIdToJson(polylineId))
+        methodChannel.invokeMethod("polyline#onTap", polylineId.toPolylineIdValue())
         return true
     }
 
@@ -36,16 +36,12 @@ class PolylinesController(
             return
         }
         for (polyline in polylinesToAdd) {
-            val data = polyline as Map<*, *> ?: continue
-            val polylineId = data["polylineId"] as String?
+            val data = polyline as Map<*, *>? ?: continue
+            val polylineId = data["polylineId"] as String
             val controller = PolylineController(polylineId)
             controller.setSelectionPropertiesHandler(selectionPropertiesHandler)
             polylineIdToController[polylineId] = controller
-            Convert.Companion.interpretPolylineController(
-                data,
-                controller,
-                symbolVisibilityFilterController
-            )
+            controller.interpretGraphicController(data, symbolVisibilityFilterController)
             controller.add(graphicsOverlay)
         }
     }
@@ -55,16 +51,12 @@ class PolylinesController(
             return
         }
         for (polyline in polylinesToChange) {
-            val data = polyline as Map<*, *> ?: continue
+            val data = polyline as Map<*, *>? ?: continue
             val polylineId = data["polylineId"] as String?
-            val controller = polylineIdToController[polylineId]
-            if (controller != null) {
-                Convert.Companion.interpretPolylineController(
-                    data,
-                    controller,
-                    symbolVisibilityFilterController
-                )
-            }
+            polylineIdToController[polylineId]?.interpretGraphicController(
+                data,
+                symbolVisibilityFilterController
+            )
         }
     }
 

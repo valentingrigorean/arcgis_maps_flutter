@@ -1,16 +1,18 @@
 package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 
 import android.graphics.Color
+import com.arcgismaps.geometry.Polyline
 import com.arcgismaps.mapping.symbology.SimpleFillSymbol
 import com.arcgismaps.mapping.symbology.SimpleFillSymbolStyle
 import com.arcgismaps.mapping.symbology.SimpleLineSymbol
 import com.arcgismaps.mapping.symbology.SimpleLineSymbolStyle
-import com.arcgismaps.mapping.view.Graphic
+import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toPointOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.symbology.toSimpleLineSymbolStyle
 import com.valentingrigorean.arcgis_maps_flutter.convert.toArcgisColor
+import com.valentingrigorean.arcgis_maps_flutter.map.SymbolVisibilityFilterController
 
 
-class PolygonController(polygonId: String?) : BaseGraphicController(), PolygonControllerSink {
-    protected override val graphic: Graphic
+class PolygonController(polygonId: String) : BaseGraphicController(), PolygonControllerSink {
     private val polygonSymbol: SimpleFillSymbol
     private val polygonStrokeSymbol: SimpleLineSymbol =
         SimpleLineSymbol(SimpleLineSymbolStyle.Solid, Color.BLACK.toArcgisColor(), 10f)
@@ -18,24 +20,55 @@ class PolygonController(polygonId: String?) : BaseGraphicController(), PolygonCo
     init {
         polygonSymbol =
             SimpleFillSymbol(SimpleFillSymbolStyle.Solid, Color.BLACK.toArcgisColor(), polygonStrokeSymbol)
-        graphic = Graphic()
         graphic.symbol = polygonSymbol
         graphic.attributes["polygonId"] = polygonId
     }
 
-    override fun setFillColor(color: Int) {
-        polygonSymbol.color = com.arcgismaps.Color(color)
-    }
+    override var fillColor: com.arcgismaps.Color
+        get() = polygonSymbol.color
+        set(value) {
+            polygonSymbol.color = value
+        }
+    override var strokeColor: com.arcgismaps.Color
+        get() = polygonStrokeSymbol.color
+        set(value) {
+            polygonStrokeSymbol.color = value
+        }
+    override var strokeWidth: Float
+        get() = polygonStrokeSymbol.width
+        set(value) {
+            polygonStrokeSymbol.width = value
+        }
+    override var strokeStyle: SimpleLineSymbolStyle
+        get() = polygonStrokeSymbol.style
+        set(value) {
+            polygonStrokeSymbol.style = value
+        }
 
-    override fun setStrokeColor(color: Int) {
-        polygonStrokeSymbol.color = com.arcgismaps.Color(color)
-    }
-
-    override fun setStrokeWidth(width: Float) {
-        polygonStrokeSymbol.width = width
-    }
-
-    override fun setStrokeStyle(style: SimpleLineSymbolStyle) {
-        polygonStrokeSymbol.style = style
+    override fun interpretGraphicController(
+        data: Map<*, *>,
+        symbolVisibilityFilterController: SymbolVisibilityFilterController?
+    ) {
+        super.interpretGraphicController(data, symbolVisibilityFilterController)
+        val fillColor = (data["fillColor"] as? Int)?.toArcgisColor()
+        if (fillColor != null) {
+            this.fillColor = fillColor
+        }
+        val strokeColor = (data["strokeColor"] as? Int)?.toArcgisColor()
+        if (strokeColor != null) {
+            this.strokeColor = strokeColor
+        }
+        val strokeWidth = data["strokeWidth"] as Float
+        if (strokeWidth != null) {
+            this.strokeWidth = strokeWidth
+        }
+        val strokeStyle = (data["strokeStyle"] as Int?)?.toSimpleLineSymbolStyle()
+        if (strokeStyle != null) {
+            this.strokeStyle = strokeStyle
+        }
+        val pointsRaw = (data["points"] as? List<*>)?.map { it!!.toPointOrNull()!! }
+        if (pointsRaw != null) {
+            geometry = Polyline(pointsRaw)
+        }
     }
 }

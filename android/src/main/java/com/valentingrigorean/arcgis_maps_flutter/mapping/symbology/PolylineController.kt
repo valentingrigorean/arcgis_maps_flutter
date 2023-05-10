@@ -3,11 +3,12 @@ package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 import android.graphics.Color
 import com.arcgismaps.mapping.symbology.SimpleLineSymbol
 import com.arcgismaps.mapping.symbology.SimpleLineSymbolStyle
-import com.arcgismaps.mapping.view.Graphic
+import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.symbology.toSimpleLineSymbolStyle
+import com.valentingrigorean.arcgis_maps_flutter.convert.toArcgisColor
+import com.valentingrigorean.arcgis_maps_flutter.map.SymbolVisibilityFilterController
 
 
-class PolylineController(polylineId: String?) : BaseGraphicController(), PolylineControllerSink {
-    protected override val graphic: Graphic = Graphic()
+class PolylineController(polylineId: String) : BaseGraphicController(), PolylineControllerSink {
     private val polylineSymbol: SimpleLineSymbol =
         SimpleLineSymbol(SimpleLineSymbolStyle.Solid, com.arcgismaps.Color(Color.BLACK), 10f)
 
@@ -16,19 +17,48 @@ class PolylineController(polylineId: String?) : BaseGraphicController(), Polylin
         graphic.attributes["polylineId"] = polylineId
     }
 
-    override fun setColor(color: Int) {
-        polylineSymbol.color = com.arcgismaps.Color(color)
-    }
+    override var color: com.arcgismaps.Color
+        get() = polylineSymbol.color
+        set(value) {
+            polylineSymbol.color = value
+        }
+    override var width: Float
+        get() = polylineSymbol.width
+        set(value) {
+            polylineSymbol.width = value
+        }
+    override var style: SimpleLineSymbolStyle
+        get() = polylineSymbol.style
+        set(value) {
+            polylineSymbol.style = value
+        }
+    override var antialias: Boolean
+        get() = polylineSymbol.antiAlias
+        set(value) {
+            polylineSymbol.antiAlias = value
+        }
 
-    override fun setWidth(width: Float) {
-        polylineSymbol.width = width
-    }
+    override fun interpretGraphicController(
+        data: Map<*, *>,
+        symbolVisibilityFilterController: SymbolVisibilityFilterController?
+    ) {
+        super.interpretGraphicController(data, symbolVisibilityFilterController)
+        val color = (data["color"] as Int?)?.toArcgisColor()
+        if (color != null) {
+            this.color = color
+        }
+        val width = data["width"] as Float?
+        if (width != null) {
+            this.width = width
+        }
 
-    override fun setStyle(style: SimpleLineSymbolStyle) {
-        polylineSymbol.style = style
-    }
-
-    override fun setAntialias(antialias: Boolean) {
-        polylineSymbol.antiAlias = antialias
+        val style = (data["style"] as Int?)?.toSimpleLineSymbolStyle()
+        if (style != null) {
+            this.style = style
+        }
+        val antialias = data["antialias"] as Boolean?
+        if (antialias != null) {
+            this.antialias = antialias
+        }
     }
 }

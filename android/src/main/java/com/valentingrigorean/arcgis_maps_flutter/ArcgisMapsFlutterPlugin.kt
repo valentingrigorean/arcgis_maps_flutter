@@ -30,7 +30,6 @@ class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
     private var coordinateFormatterController: CoordinateFormatterController? = null
     private var nativeObjectsController: ArcgisNativeObjectsController? = null
     private lateinit var channel: MethodChannel
-    private var serviceTableController: ServiceTableController? = null
     private var lifecycle: Lifecycle? = null
     override fun onAttachedToEngine(binding: FlutterPluginBinding) {
         binding.platformViewRegistry
@@ -49,7 +48,6 @@ class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
             binding.binaryMessenger,
             ArcgisNativeObjectFactoryImpl(),
         )
-        serviceTableController = ServiceTableController(binding.binaryMessenger)
     }
 
     override fun onDetachedFromEngine(binding: FlutterPluginBinding) {
@@ -60,8 +58,6 @@ class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
         coordinateFormatterController = null
         nativeObjectsController?.dispose()
         nativeObjectsController = null
-        serviceTableController?.dispose()
-        serviceTableController = null
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {

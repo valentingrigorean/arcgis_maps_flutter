@@ -3,7 +3,7 @@ package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 import android.content.Context
 import com.arcgismaps.mapping.view.Graphic
 import com.arcgismaps.mapping.view.GraphicsOverlay
-import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.convert.map.toMarkerIdValue
 import com.valentingrigorean.arcgis_maps_flutter.map.MapTouchGraphicDelegate
 import io.flutter.plugin.common.MethodChannel
 
@@ -34,7 +34,7 @@ class MarkersController(
         markerController.isSelected = true
         selectedMarker = markerController
         invalidateVisibilityFilterController(selectedMarker!!)
-        methodChannel.invokeMethod("marker#onTap", Convert.Companion.markerIdToJson(markerId))
+        methodChannel.invokeMethod("marker#onTap", markerId.toMarkerIdValue())
         return true
     }
 
@@ -47,12 +47,8 @@ class MarkersController(
             val markerId = data["markerId"] as String
             val markerController = MarkerController(context, markerId)
             markerController.setSelectionPropertiesHandler(selectionPropertiesHandler)
+            markerController.interpretGraphicController(data, symbolVisibilityFilterController)
             markerIdToController[markerId] = markerController
-            Convert.Companion.interpretMarkerController(
-                data,
-                markerController,
-                symbolVisibilityFilterController
-            )
             markerController.add(graphicsOverlay)
         }
     }
@@ -64,14 +60,10 @@ class MarkersController(
         for (marker in markersToChange) {
             val data = marker as Map<*, *>? ?: continue
             val markerId = data["markerId"] as String
-            val markerController = markerIdToController[markerId]
-            if (markerController != null) {
-                Convert.Companion.interpretMarkerController(
-                    data,
-                    markerController,
-                    symbolVisibilityFilterController
-                )
-            }
+            markerIdToController[markerId]?.interpretGraphicController(
+                data,
+                symbolVisibilityFilterController
+            )
         }
     }
 

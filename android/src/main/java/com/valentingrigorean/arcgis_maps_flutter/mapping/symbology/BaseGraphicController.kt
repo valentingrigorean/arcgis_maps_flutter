@@ -4,6 +4,7 @@ import com.arcgismaps.Color
 import com.arcgismaps.geometry.Geometry
 import com.arcgismaps.mapping.view.Graphic
 import com.arcgismaps.mapping.view.GraphicsOverlay
+import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.map.toSymbolVisibilityFilterOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.toArcgisColor
 import com.valentingrigorean.arcgis_maps_flutter.map.GraphicControllerSink
