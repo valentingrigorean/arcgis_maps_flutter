@@ -29,26 +29,16 @@ fun Any.toEnvelopeOrNull(): Envelope? {
     val spatialReference = data["spatialReference"]?.toSpatialReferenceOrNull()
 
     if (data.containsKey("xmin")) {
-        val xmin = Convert.toDouble(
-            data["xmin"]
-        )
-        val ymin = Convert.toDouble(
-            data["ymin"]
-        )
-        val xmax = Convert.toDouble(
-            data["xmax"]
-        )
-        val ymax = Convert.toDouble(
-            data["ymax"]
-        )
+        val xmin =  data["xmin"] as Double
+        val ymin =  data["ymin"] as Double
+        val xmax = data["xmax"] as Double
+        val ymax = data["ymax"] as Double
         return Envelope(xmin, ymin, xmax, ymax, null, null, null, null, spatialReference)
     }
     if (data.containsKey("bbox")) {
-        val bbox = Convert.toDoubleArray(
-            data["bbox"]
-        )
+        val bbox =  data["bbox"] as List<Double>
         return Envelope(
-            bbox!![0],
+            bbox[0],
             bbox[1],
             bbox[2],
             bbox[3],

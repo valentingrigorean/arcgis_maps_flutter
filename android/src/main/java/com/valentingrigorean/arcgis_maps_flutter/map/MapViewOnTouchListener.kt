@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
-private enum class MessageType{
+private enum class MessageType {
     OnTap,
     OnLongPress,
     OnLongPressEnd,
@@ -66,20 +66,30 @@ class MapViewOnTouchListener(
     }
 
 
-    private fun identifyGraphicsOverlays(screenPoint: ScreenCoordinate,point: Point?) {
-        graphicJob?.cancel()
+    private fun identifyGraphicsOverlays(screenPoint: ScreenCoordinate, point: Point?) {
         graphicJob = scope.launch {
             mapView.identifyGraphicsOverlays(screenPoint, 10.0, false, 10).onSuccess {
                 if (onTapCompleted(it)) {
                     return@launch
                 }
-                sendOnMapTap(screenPoint)
+                if (trackIdentityLayers) {
+                    identifyLayers(screenPoint, point)
+                } else {
+                    sendMessage(screenPoint, point, MessageType.OnTap)
+                }
             }
         }
     }
 
-    private fun identifyLayers(screenPoint: ScreenCoordinate) {
-
+    private fun identifyLayers(screenPoint: ScreenCoordinate, point: Point?) {
+        layerJob = scope.launch {
+            mapView.identifyLayers(screenPoint, 10.0, false, 10).onSuccess {
+                if (it.isEmpty()) {
+                    sendMessage(screenPoint, point, MessageType.OnTap)
+                    return@launch
+                }
+            }
+        }
     }
 
     private fun onTapCompleted(
@@ -98,11 +108,15 @@ class MapViewOnTouchListener(
         return false
     }
 
-    private fun sendMessage(screenPoint: ScreenCoordinate,point: Point?,messageType: MessageType){
+    private fun sendMessage(
+        screenPoint: ScreenCoordinate,
+        point: Point?,
+        messageType: MessageType
+    ) {
         val data = HashMap<String, Any?>(2)
         data["position"] = point?.toFlutterJson()
         data["screenPoint"] = arrayListOf(screenPoint.x, screenPoint.y)
-        when(messageType){
+        when (messageType) {
             MessageType.OnTap -> methodChannel.invokeMethod("map#onTap", data)
             MessageType.OnLongPress -> methodChannel.invokeMethod("map#onLongPress", data)
             MessageType.OnLongPressEnd -> methodChannel.invokeMethod("map#onLongPressEnd", data)
@@ -110,14 +124,10 @@ class MapViewOnTouchListener(
     }
 
     private fun clearHandlers() {
-        if (graphicHandler != null) {
-            graphicHandler!!.cancel(true)
-            graphicHandler = null
-        }
-        if (layerHandler != null) {
-            layerHandler!!.cancel(true)
-            layerHandler = null
-        }
+        graphicJob?.cancel()
+        graphicJob = null
+        layerJob?.cancel()
+        layerJob = null
     }
 
     private fun canConsumeGraphics(): Boolean {
