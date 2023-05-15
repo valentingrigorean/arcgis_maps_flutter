@@ -2,16 +2,53 @@ package com.valentingrigorean.arcgis_maps_flutter.layers
 
 import android.util.Log
 import com.arcgismaps.data.Geodatabase
-import com.arcgismaps.io.RemoteResource
+import com.arcgismaps.data.ServiceFeatureTable
 import com.arcgismaps.mapping.PortalItem
+import com.arcgismaps.mapping.layers.ArcGISMapImageLayer
+import com.arcgismaps.mapping.layers.ArcGISTiledLayer
+import com.arcgismaps.mapping.layers.ArcGISVectorTiledLayer
+import com.arcgismaps.mapping.layers.FeatureLayer
 import com.arcgismaps.mapping.layers.GroupLayer
+import com.arcgismaps.mapping.layers.GroupVisibilityMode
 import com.arcgismaps.mapping.layers.Layer
 import com.arcgismaps.mapping.layers.TileCache
 import com.arcgismaps.mapping.layers.WmsLayer
+import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.layers.toGroupVisibilityMode
 import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toPortalItemOrNull
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeObjectStorage
 import java.util.Objects
-import java.util.stream.Collectors
+
+private class GroupLayerOptions(data: Map<*, *>) {
+    val layers: List<FlutterLayer>
+    val visibilityMode: GroupVisibilityMode
+    val showChildrenInLegend: Boolean
+
+    init {
+        showChildrenInLegend = data["showChildrenInLegend"] as Boolean
+        visibilityMode = (data["visibilityMode"] as Int).toGroupVisibilityMode()
+        layers = (data["layers"] as List<*>).map { FlutterLayer(it as Map<*, *>) }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as GroupLayerOptions
+
+        if (layers != other.layers) return false
+        if (visibilityMode != other.visibilityMode) return false
+        if (showChildrenInLegend != other.showChildrenInLegend) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = layers.hashCode()
+        result = 31 * result + visibilityMode.hashCode()
+        result = 31 * result + showChildrenInLegend.hashCode()
+        return result
+    }
+}
 
 class FlutterLayer(private val data: Map<*, *>) {
     val layerId: String = data["layerId"] as String
@@ -19,7 +56,6 @@ class FlutterLayer(private val data: Map<*, *>) {
     private var url: String? = null
     private val isVisible: Boolean
     private val opacity: Float
-    private var serviceImageTiledLayerOptions: ServiceImageTiledLayerOptions? = null
     private var groupLayerOptions: GroupLayerOptions? = null
     private var portalItem: PortalItem? = null
     private var tileCache: TileCache? = null
@@ -52,18 +88,8 @@ class FlutterLayer(private val data: Map<*, *>) {
         isVisible = data["isVisible"] as Boolean
         opacity = data["opacity"] as Float
         when (layerType) {
-            "ServiceImageTiledLayer" -> {
-                serviceImageTiledLayerOptions =
-                    ConvertUti.Companion.toServiceImageTiledLayerOptions(
-                        data
-                    )
-                groupLayerOptions = null
-                portalItemLayerId = -1
-            }
-
             "GroupLayer" -> {
                 groupLayerOptions = GroupLayerOptions(data)
-                serviceImageTiledLayerOptions = null
                 portalItemLayerId = -1
             }
 
@@ -73,12 +99,10 @@ class FlutterLayer(private val data: Map<*, *>) {
                 } else {
                     -1
                 }
-                serviceImageTiledLayerOptions = null
                 groupLayerOptions = null
             }
 
             else -> {
-                serviceImageTiledLayerOptions = null
                 groupLayerOptions = null
                 portalItemLayerId = -1
             }
@@ -87,174 +111,87 @@ class FlutterLayer(private val data: Map<*, *>) {
 
     suspend fun createLayer(): Layer {
         val layer: Layer
-        var remoteResource: RemoteResource? = null
         when (layerType) {
             "GeodatabaseLayer" -> {
                 val groupLayer = GroupLayer()
                 val geodatabase = Geodatabase(url!!)
                 geodatabase.load().onSuccess {
-                    for(table in geodatabase.geodatabaseFeatureTables) {
-                        groupLayer.layers.add(FeatureLayer(table))
-                    }
-                }.onFailure {
-                    Log.w("GeodatabaseLayer", "createLayer: ", it)
-                }
-                geodatabase.loadAsync()
-                geodatabase.addDoneLoadingListener {
-                    if (geodatabase.loadStatus == LoadStatus.LOADED) {
-                        val featureLayersIdsRaw = data["featureLayersIds"]
-                        val featureLayersIds: IntArray = ConvertUti.Companion.toIntArray(
-                            featureLayersIdsRaw ?: ArrayList<Int>()
-                        )
-                        for (table in geodatabase.geodatabaseFeatureTables) {
-                            if (featureLayersIds.size == 0) {
-                                groupLayer.layers.add(FeatureLayer(table))
-                            } else {
-                                for (featureLayerId in featureLayersIds) {
-                                    if (table.serviceLayerId == featureLayerId.toLong()) {
-                                        groupLayer.layers.add(FeatureLayer(table))
-                                    }
+                    val featureLayersIds = data["featureLayersIds"] as List<Int>
+                    for (table in geodatabase.featureTables) {
+                        if (featureLayersIds.isEmpty()) {
+                            groupLayer.layers.add(FeatureLayer.createWithFeatureTable(table))
+                        } else {
+                            for (featureLayerId in featureLayersIds) {
+                                if (table.serviceLayerId == featureLayerId.toLong()) {
+                                    groupLayer.layers.add(
+                                        FeatureLayer.createWithFeatureTable(
+                                            table
+                                        )
+                                    )
                                 }
                             }
                         }
-                    } else if (geodatabase.loadStatus == LoadStatus.FAILED_TO_LOAD) {
-                        Log.w("GeodatabaseLayer", "createLayer: " + geodatabase.loadError.message)
-                        if (geodatabase.loadError.cause != null) {
-                            Log.w(
-                                "GeodatabaseLayer",
-                                "createLayer: " + geodatabase.loadError.cause!!.message
-                            )
-                        }
                     }
+                }.onFailure {
+                    Log.w("GeodatabaseLayer", "createLayer: ", it)
                 }
                 layer = groupLayer
             }
 
             "VectorTileLayer" -> {
-                val vectorTiledLayer = ArcGISVectorTiledLayer(url)
+                val vectorTiledLayer = ArcGISVectorTiledLayer(url!!)
                 layer = vectorTiledLayer
-                remoteResource = vectorTiledLayer
             }
 
             "FeatureLayer" -> {
-                if (url != null) {
-                    val serviceFeatureTable = ServiceFeatureTable(url)
-                    remoteResource = serviceFeatureTable
-                    layer = FeatureLayer(serviceFeatureTable)
+                layer = if (url != null) {
+                    val serviceFeatureTable = ServiceFeatureTable(url!!)
+                    FeatureLayer.createWithFeatureTable(serviceFeatureTable)
                 } else {
-                    layer = FeatureLayer(portalItem, portalItemLayerId)
+                    FeatureLayer.createWithItemAndLayerId(portalItem!!, portalItemLayerId!!)
                 }
             }
 
             "TiledLayer" -> {
                 val tiledLayer =
-                    if (tileCache != null) ArcGISTiledLayer(tileCache) else ArcGISTiledLayer(url)
-                remoteResource = tiledLayer
+                    if (tileCache != null) ArcGISTiledLayer(tileCache!!) else ArcGISTiledLayer(url!!)
                 layer = tiledLayer
             }
 
             "WmsLayer" -> {
-                val layersNames = data["layersName"] as Collection<String>?
-                val wmsLayer = WmsLayer(url, layersNames)
-                remoteResource = wmsLayer
+                val layersNames = data["layersName"] as Collection<String>
+                val wmsLayer = WmsLayer(url!!, layersNames)
                 layer = wmsLayer
             }
 
             "MapImageLayer" -> {
-                val mapImageLayer = ArcGISMapImageLayer(url)
-                remoteResource = mapImageLayer
+                val mapImageLayer = ArcGISMapImageLayer(url!!)
                 layer = mapImageLayer
             }
 
-            "ServiceImageTiledLayer" -> {
-                layer = FlutterServiceImageTiledLayer(
-                    serviceImageTiledLayerOptions!!.tileInfo,
-                    serviceImageTiledLayerOptions!!.fullExtent,
-                    serviceImageTiledLayerOptions!!.urlTemplate,
-                    serviceImageTiledLayerOptions!!.subdomains,
-                    serviceImageTiledLayerOptions!!.additionalOptions
-                )
-            }
-
             "GroupLayer" -> {
-                val groupLayer = GroupLayer(
-                    groupLayerOptions!!.layers.stream().map { e: FlutterLayer -> e.createLayer() }
-                        .collect(Collectors.toList()))
+                val groupLayer = GroupLayer(groupLayerOptions!!.layers.map { it.createLayer() })
                 groupLayer.visibilityMode = groupLayerOptions!!.visibilityMode
-                groupLayer.isShowChildrenInLegend = groupLayerOptions!!.showChildrenInLegend
+                groupLayer.showChildrenInLegend = groupLayerOptions!!.showChildrenInLegend
                 layer = groupLayer
             }
 
             else -> throw UnsupportedOperationException("not implemented.")
-        }
-        if (credential != null && remoteResource != null) {
-            remoteResource.credential = credential
         }
         layer.opacity = opacity
         layer.isVisible = isVisible
         return layer
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o == null || javaClass != o.javaClass) return false
-        val that = o as FlutterLayer
-        return isVisible == that.isVisible && java.lang.Float.compare(
-            that.opacity,
-            opacity
-        ) == 0 && portalItemLayerId == that.portalItemLayerId && layerId == that.layerId && layerType == that.layerType && url == that.url && credential == that.credential && serviceImageTiledLayerOptions == that.serviceImageTiledLayerOptions && groupLayerOptions == that.groupLayerOptions && portalItem == that.portalItem
-    }
 
     override fun hashCode(): Int {
         return Objects.hash(layerId)
     }
 
-    class ServiceImageTiledLayerOptions(
-        val tileInfo: TileInfo, val fullExtent: Envelope, val urlTemplate: String,
-        val subdomains: List<String?>?, val additionalOptions: Map<String?, String?>?
-    ) {
-        override fun equals(o: Any?): Boolean {
-            if (this === o) return true
-            if (o == null || javaClass != o.javaClass) return false
-            val that = o as ServiceImageTiledLayerOptions
-            return tileInfo == that.tileInfo && fullExtent == that.fullExtent && urlTemplate == that.urlTemplate && subdomains == that.subdomains && additionalOptions == that.additionalOptions
+    override fun equals(other: Any?): Boolean {
+        if (other is FlutterLayer) {
+            return layerId == other.layerId
         }
-
-        override fun hashCode(): Int {
-            return Objects.hash(tileInfo, fullExtent, urlTemplate, subdomains, additionalOptions)
-        }
-    }
-
-    class GroupLayerOptions(data: Map<*, *>) {
-        val layers: List<FlutterLayer>
-        val visibilityMode: GroupVisibilityMode
-        val showChildrenInLegend: Boolean
-
-        init {
-            showChildrenInLegend = ConvertUti.Companion.toBoolean(
-                data["showChildrenInLegend"]!!
-            )
-            visibilityMode = GroupVisibilityMode.values()[ConvertUti.Companion.toInt(
-                data["visibilityMode"]
-            )]
-            layers =
-                ConvertUti.Companion.toList(data["layers"]!!).stream().map<FlutterLayer> { e: Any ->
-                    FlutterLayer(
-                        ConvertUti.Companion.toMap(e)
-                    )
-                }
-                    .collect<List<FlutterLayer>, Any>(Collectors.toList<FlutterLayer>())
-        }
-
-        override fun equals(o: Any?): Boolean {
-            if (this === o) return true
-            if (o == null || javaClass != o.javaClass) return false
-            val that = o as GroupLayerOptions
-            return showChildrenInLegend == that.showChildrenInLegend && layers == that.layers && visibilityMode == that.visibilityMode
-        }
-
-        override fun hashCode(): Int {
-            return Objects.hash(layers, visibilityMode, showChildrenInLegend)
-        }
+        return false
     }
 }

@@ -6,7 +6,6 @@ import 'package:arcgis_maps_flutter_example/map_page_assets_marker.dart';
 import 'package:arcgis_maps_flutter_example/map_page_auto_pan_mode.dart';
 import 'package:arcgis_maps_flutter_example/map_page_buffer.dart';
 import 'package:arcgis_maps_flutter_example/map_page_current_location_tap.dart';
-import 'package:arcgis_maps_flutter_example/map_page_dynamic_layer.dart';
 import 'package:arcgis_maps_flutter_example/map_page_export_image.dart';
 import 'package:arcgis_maps_flutter_example/map_page_feature_service_offline.dart';
 import 'package:arcgis_maps_flutter_example/map_page_geodesic_distance.dart';
@@ -334,17 +333,6 @@ class MainPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const MapPageLegend(),
-                    ),
-                  );
-                },
-              ),
-              ElevatedButton(
-                child: const Text('Map Dynamic Layer'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const MapPageDynamicLayer(),
                     ),
                   );
                 },
