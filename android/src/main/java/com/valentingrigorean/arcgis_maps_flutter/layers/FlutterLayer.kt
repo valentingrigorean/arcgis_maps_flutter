@@ -16,6 +16,9 @@ import com.arcgismaps.mapping.layers.WmsLayer
 import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.layers.toGroupVisibilityMode
 import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toPortalItemOrNull
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeObjectStorage
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.Objects
 
 private class GroupLayerOptions(data: Map<*, *>) {
@@ -59,7 +62,7 @@ class FlutterLayer(private val data: Map<*, *>) {
     private var groupLayerOptions: GroupLayerOptions? = null
     private var portalItem: PortalItem? = null
     private var tileCache: TileCache? = null
-    private var portalItemLayerId: Long = 0
+    private var portalItemLayerId: Long = -1
 
     init {
         if (data.containsKey("url")) {
@@ -90,50 +93,45 @@ class FlutterLayer(private val data: Map<*, *>) {
         when (layerType) {
             "GroupLayer" -> {
                 groupLayerOptions = GroupLayerOptions(data)
-                portalItemLayerId = -1
             }
-
             "FeatureLayer" -> {
                 portalItemLayerId = if (data.containsKey("portalItemLayerId")) {
                     data["portalItemLayerId"] as Long
                 } else {
                     -1
                 }
-                groupLayerOptions = null
-            }
-
-            else -> {
-                groupLayerOptions = null
-                portalItemLayerId = -1
             }
         }
     }
 
-    suspend fun createLayer(): Layer {
+    @OptIn(DelicateCoroutinesApi::class)
+    fun createLayer(): Layer {
         val layer: Layer
         when (layerType) {
             "GeodatabaseLayer" -> {
                 val groupLayer = GroupLayer()
                 val geodatabase = Geodatabase(url!!)
-                geodatabase.load().onSuccess {
-                    val featureLayersIds = data["featureLayersIds"] as List<Int>
-                    for (table in geodatabase.featureTables) {
-                        if (featureLayersIds.isEmpty()) {
-                            groupLayer.layers.add(FeatureLayer.createWithFeatureTable(table))
-                        } else {
-                            for (featureLayerId in featureLayersIds) {
-                                if (table.serviceLayerId == featureLayerId.toLong()) {
-                                    groupLayer.layers.add(
-                                        FeatureLayer.createWithFeatureTable(
-                                            table
+                GlobalScope.launch {
+                    geodatabase.load().onSuccess {
+                        val featureLayersIds = data["featureLayersIds"] as List<Long>
+                        for (table in geodatabase.featureTables) {
+                            if (featureLayersIds.isEmpty()) {
+                                groupLayer.layers.add(FeatureLayer.createWithFeatureTable(table))
+                            } else {
+                                for (featureLayerId in featureLayersIds) {
+                                    if (table.serviceLayerId == featureLayerId) {
+                                        groupLayer.layers.add(
+                                            FeatureLayer.createWithFeatureTable(
+                                                table
+                                            )
                                         )
-                                    )
+                                    }
                                 }
                             }
                         }
+                    }.onFailure {
+                        Log.w("GeodatabaseLayer", "createLayer: ", it)
                     }
-                }.onFailure {
-                    Log.w("GeodatabaseLayer", "createLayer: ", it)
                 }
                 layer = groupLayer
             }
@@ -148,7 +146,7 @@ class FlutterLayer(private val data: Map<*, *>) {
                     val serviceFeatureTable = ServiceFeatureTable(url!!)
                     FeatureLayer.createWithFeatureTable(serviceFeatureTable)
                 } else {
-                    FeatureLayer.createWithItemAndLayerId(portalItem!!, portalItemLayerId!!)
+                    FeatureLayer.createWithItemAndLayerId(portalItem!!, portalItemLayerId)
                 }
             }
 

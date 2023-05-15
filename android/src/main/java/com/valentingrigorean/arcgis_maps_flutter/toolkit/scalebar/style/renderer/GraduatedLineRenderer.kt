@@ -18,8 +18,8 @@ package com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.rendere
 
 import android.graphics.Canvas
 import android.graphics.Paint
-import com.esri.arcgisruntime.UnitSystem
-import com.esri.arcgisruntime.geometry.LinearUnit
+import com.arcgismaps.UnitSystem
+import com.arcgismaps.geometry.LinearUnit
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.extension.asDistanceString
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.SHADOW_OFFSET_PIXELS
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.Style

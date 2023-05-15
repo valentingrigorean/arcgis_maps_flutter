@@ -2,7 +2,6 @@ package com.valentingrigorean.arcgis_maps_flutter.data
 
 import android.icu.text.SimpleDateFormat
 import com.arcgismaps.geometry.Geometry
-import com.valentingrigorean.arcgis_maps_flutter.ConvertUti
 import com.valentingrigorean.arcgis_maps_flutter.convert.fromFlutterInstant
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull

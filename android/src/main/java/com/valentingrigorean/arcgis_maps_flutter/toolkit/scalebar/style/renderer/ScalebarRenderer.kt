@@ -21,8 +21,8 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Rect
 import android.graphics.RectF
-import com.esri.arcgisruntime.UnitSystem
-import com.esri.arcgisruntime.geometry.LinearUnit
+import com.arcgismaps.UnitSystem
+import com.arcgismaps.geometry.LinearUnit
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.extension.asDistanceString
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.extension.calculateOptimalNumberOfSegments
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.extension.dpToPixels

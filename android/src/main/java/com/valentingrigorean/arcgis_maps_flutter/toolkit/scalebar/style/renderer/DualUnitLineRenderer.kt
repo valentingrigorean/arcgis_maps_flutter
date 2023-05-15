@@ -19,8 +19,8 @@ package com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.rendere
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
-import com.esri.arcgisruntime.UnitSystem
-import com.esri.arcgisruntime.geometry.LinearUnit
+import com.arcgismaps.UnitSystem
+import com.arcgismaps.geometry.LinearUnit
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.extension.asDistanceString
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.extension.calculateBestLength
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.extension.selectLinearUnit
@@ -62,7 +62,7 @@ class DualUnitLineRenderer : ScalebarRenderer() {
     ) {
 
         // Calculate scalebar length in the secondary units
-        val secondaryBaseUnits = if (unitSystem == UnitSystem.METRIC) LINEAR_UNIT_FEET else LINEAR_UNIT_METERS
+        val secondaryBaseUnits = if (unitSystem == UnitSystem.Metric) LINEAR_UNIT_FEET else LINEAR_UNIT_METERS
         val fullLengthInSecondaryUnits = displayUnits.convertTo(secondaryBaseUnits, distance)
 
         // Reduce the secondary units length to make it a nice number
@@ -72,7 +72,7 @@ class DualUnitLineRenderer : ScalebarRenderer() {
             left + (lineDisplayLength * secondaryUnitsLength / fullLengthInSecondaryUnits).toFloat()
 
         // Change units if secondaryUnitsLength is too big a number in the base units
-        val secondaryUnitSystem = if (unitSystem == UnitSystem.METRIC) UnitSystem.IMPERIAL else UnitSystem.METRIC
+        val secondaryUnitSystem = if (unitSystem == UnitSystem.Metric) UnitSystem.Imperial else UnitSystem.Metric
         val secondaryDisplayUnits = selectLinearUnit(secondaryUnitsLength, secondaryUnitSystem)
         if (secondaryDisplayUnits != secondaryBaseUnits) {
             secondaryUnitsLength = secondaryBaseUnits.convertTo(secondaryDisplayUnits, secondaryUnitsLength)
@@ -125,7 +125,7 @@ class DualUnitLineRenderer : ScalebarRenderer() {
                 textPaint.textAlign = Paint.Align.RIGHT
                 canvas.drawText(secondaryUnitsLength.asDistanceString(), xPosSecondaryTick, yPosText, textPaint)
                 textPaint.textAlign = Paint.Align.LEFT
-                canvas.drawText(' ' + secondaryDisplayUnits.abbreviation, xPosSecondaryTick, yPosText, textPaint)
+                canvas.drawText((' ' + secondaryDisplayUnits.abbreviation).toString(), xPosSecondaryTick, yPosText, textPaint)
             }
         }
     }
