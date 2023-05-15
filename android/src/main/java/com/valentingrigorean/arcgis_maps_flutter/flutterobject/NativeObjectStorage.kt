@@ -23,7 +23,7 @@ class NativeObjectStorage private constructor() {
 
     companion object {
         val instance = NativeObjectStorage()
-        fun <T> getNativeObjectOrConvert(obj: Any, mappingFunction: Function<Any?, T>): T? {
+        fun <T> getNativeObjectOrConvert(obj: Any, mappingFunction:(Any) -> T): T? {
             val data = obj as Map<*, *>
             val objectId = data["nativeObjectId"] as String?
             if (objectId != null) {
@@ -33,7 +33,7 @@ class NativeObjectStorage private constructor() {
                     return baseNativeObject.nativeObject
                 }
             }
-            return mappingFunction.apply(obj)
+            return mappingFunction(obj)
         }
     }
 }

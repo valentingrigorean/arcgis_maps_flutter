@@ -1,15 +1,16 @@
 package com.valentingrigorean.arcgis_maps_flutter.layers
 
 import android.util.Log
+import com.arcgismaps.data.Geodatabase
 import com.arcgismaps.io.RemoteResource
 import com.arcgismaps.mapping.PortalItem
 import com.arcgismaps.mapping.layers.GroupLayer
 import com.arcgismaps.mapping.layers.Layer
 import com.arcgismaps.mapping.layers.TileCache
 import com.arcgismaps.mapping.layers.WmsLayer
+import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toPortalItemOrNull
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeObjectStorage
 import java.util.Objects
-import java.util.function.Function
 import java.util.stream.Collectors
 
 class FlutterLayer(private val data: Map<*, *>) {
@@ -31,28 +32,31 @@ class FlutterLayer(private val data: Map<*, *>) {
             tileCache = null
         } else if (data.containsKey("portalItem")) {
             url = null
-            portalItem = ConvertUti.Companion.toPortalItem(
-                data["portalItem"]
-            )
+            portalItem = data["portalItem"]?.toPortalItemOrNull()
             tileCache = null
         } else if (data.containsKey("tileCache")) {
             url = null
             portalItem = null
-            tileCache = NativeObjectStorage.Companion.getNativeObjectOrConvert<TileCache>(
-                data["tileCache"],
-                Function<Any?, TileCache> { o: Any -> ConvertUti.Companion.toTileCache(o) })
+            tileCache = NativeObjectStorage.getNativeObjectOrConvert(
+                data["tileCache"]!!
+            ) { obj ->
+                val tileCacheData = obj as Map<*, *>
+                val url = tileCacheData["url"] as String
+                TileCache(url)
+            }
         } else {
             url = null
             portalItem = null
             tileCache = null
         }
-        isVisible = ConvertUti.Companion.toBoolean(data["isVisible"]!!)
-        opacity = ConvertUti.Companion.toFloat(data["opacity"])
+        isVisible = data["isVisible"] as Boolean
+        opacity = data["opacity"] as Float
         when (layerType) {
             "ServiceImageTiledLayer" -> {
-                serviceImageTiledLayerOptions = ConvertUti.Companion.toServiceImageTiledLayerOptions(
-                    data
-                )
+                serviceImageTiledLayerOptions =
+                    ConvertUti.Companion.toServiceImageTiledLayerOptions(
+                        data
+                    )
                 groupLayerOptions = null
                 portalItemLayerId = -1
             }
@@ -65,9 +69,7 @@ class FlutterLayer(private val data: Map<*, *>) {
 
             "FeatureLayer" -> {
                 portalItemLayerId = if (data.containsKey("portalItemLayerId")) {
-                    ConvertUti.Companion.toLong(
-                        data["portalItemLayerId"]
-                    )
+                    data["portalItemLayerId"] as Long
                 } else {
                     -1
                 }
@@ -83,13 +85,20 @@ class FlutterLayer(private val data: Map<*, *>) {
         }
     }
 
-    fun createLayer(): Layer {
+    suspend fun createLayer(): Layer {
         val layer: Layer
         var remoteResource: RemoteResource? = null
         when (layerType) {
             "GeodatabaseLayer" -> {
                 val groupLayer = GroupLayer()
-                val geodatabase = Geodatabase(url)
+                val geodatabase = Geodatabase(url!!)
+                geodatabase.load().onSuccess {
+                    for(table in geodatabase.geodatabaseFeatureTables) {
+                        groupLayer.layers.add(FeatureLayer(table))
+                    }
+                }.onFailure {
+                    Log.w("GeodatabaseLayer", "createLayer: ", it)
+                }
                 geodatabase.loadAsync()
                 geodatabase.addDoneLoadingListener {
                     if (geodatabase.loadStatus == LoadStatus.LOADED) {
