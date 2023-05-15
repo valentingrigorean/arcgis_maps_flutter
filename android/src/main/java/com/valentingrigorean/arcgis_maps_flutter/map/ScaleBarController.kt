@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
 import android.widget.FrameLayout
 import com.arcgismaps.mapping.view.MapView
-import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.ConvertUtils
 import com.valentingrigorean.arcgis_maps_flutter.convert.toUnitSystem
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.Scalebar
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.Style
@@ -89,14 +89,14 @@ class ScaleBarController(
             if (width < 0) {
                 layoutParams!!.width = ViewGroup.LayoutParams.WRAP_CONTENT
             } else {
-                layoutParams!!.width = Convert.dpToPixelsI(
+                layoutParams!!.width = ConvertUtils.dpToPixelsI(
                     context, width
                 )
             }
-            layoutParams!!.leftMargin = Convert.dpToPixelsI(
+            layoutParams!!.leftMargin = ConvertUtils.dpToPixelsI(
                 context, offsetPoints[0]
             )
-            layoutParams!!.topMargin = Convert.dpToPixelsI(
+            layoutParams!!.topMargin = ConvertUtils.dpToPixelsI(
                 context, offsetPoints[1]
             )
         }
@@ -116,7 +116,7 @@ class ScaleBarController(
         scalebar.shadowColor = data["shadowColor"] as Int
         scalebar.textColor = data["textColor"] as Int
         scalebar.textShadowColor = data["textShadowColor"] as Int
-        scalebar.textSize = Convert.spToPixels(
+        scalebar.textSize = ConvertUtils.spToPixels(
             context, data["textSize"] as Int
         )
     }
@@ -131,7 +131,7 @@ class ScaleBarController(
             scalebar.bindTo(mapView)
             layoutParams = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
-                Convert.Companion.dpToPixelsI(context, 50)
+                ConvertUtils.dpToPixelsI(context, 50)
             )
             container.addView(scalebar, layoutParams)
             scaleBarState = ScaleBarState.IN_CONTAINER

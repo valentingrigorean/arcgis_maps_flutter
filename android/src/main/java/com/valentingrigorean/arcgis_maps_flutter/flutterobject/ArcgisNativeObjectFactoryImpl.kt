@@ -10,7 +10,7 @@ import com.arcgismaps.tasks.geodatabase.GeodatabaseSyncTask
 import com.arcgismaps.tasks.networkanalysis.RouteTask
 import com.arcgismaps.tasks.offlinemaptask.OfflineMapTask
 import com.arcgismaps.tasks.tilecache.ExportTileCacheTask
-import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.ConvertUti
 import com.valentingrigorean.arcgis_maps_flutter.data.GeodatabaseNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.data.ServiceFeatureTableNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.data.TileCacheNativeObject
@@ -63,7 +63,7 @@ class ArcgisNativeObjectFactoryImpl : ArcgisNativeObjectFactory {
 
             "OfflineMapTask" -> {
                 val task = createOfflineMapTask(
-                    Convert.toMap(
+                    ConvertUti.toMap(
                         arguments!!
                     )
                 )
@@ -127,11 +127,11 @@ class ArcgisNativeObjectFactoryImpl : ArcgisNativeObjectFactory {
             val portalItem = data["portalItem"]
             offlineMapTask = if (arcgisMap != null) {
                 val arcGISMap: ArcGISMap =
-                    Convert.Companion.toArcGISMap(arcgisMap)
+                    ConvertUti.Companion.toArcGISMap(arcgisMap)
                 OfflineMapTask(arcGISMap)
             } else if (portalItem != null) {
                 val nativePortalItem: PortalItem =
-                    Convert.Companion.toPortalItem(portalItem)
+                    ConvertUti.Companion.toPortalItem(portalItem)
                 OfflineMapTask(nativePortalItem)
             } else {
                 throw IllegalArgumentException("Map or PortalItem is required")

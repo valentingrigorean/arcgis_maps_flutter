@@ -2,7 +2,7 @@ package com.valentingrigorean.arcgis_maps_flutter.tasks.offlinemap
 
 import com.arcgismaps.mapping.MobileMapPackage
 import com.arcgismaps.tasks.offlinemaptask.OfflineMapSyncTask
-import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.ConvertUti
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeHandler
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeMessageSink
@@ -85,7 +85,7 @@ class OfflineMapSyncTaskNativeObject(
                 }
                 messageSink!!.send(
                     "offlineMapSyncTask#loadError",
-                    Convert.Companion.arcGISRuntimeExceptionToJson(exception)
+                    ConvertUti.Companion.arcGISRuntimeExceptionToJson(exception)
                 )
             }
         }
@@ -157,7 +157,7 @@ class OfflineMapSyncTaskNativeObject(
                 }
 
                 "offlineMapSyncTask#offlineMapSyncJob" -> {
-                    createJob(Convert.Companion.toMap(args!!), result)
+                    createJob(ConvertUti.Companion.toMap(args!!), result)
                 }
 
                 else -> super.onMethodCall(method, args, result)

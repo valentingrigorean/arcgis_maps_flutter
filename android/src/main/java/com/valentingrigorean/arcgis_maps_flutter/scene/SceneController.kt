@@ -4,8 +4,6 @@ import com.arcgismaps.mapping.ArcGISScene
 import com.arcgismaps.mapping.Surface
 import com.arcgismaps.mapping.view.SceneView
 
-import com.valentingrigorean.arcgis_maps_flutter.Convert
-
 class SceneController {
     private var sceneView: SceneView? = null
     private var scene: ArcGISScene? = null

@@ -5,7 +5,6 @@ import android.view.View
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.arcgismaps.mapping.view.SceneView
-import com.valentingrigorean.arcgis_maps_flutter.Convert
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel

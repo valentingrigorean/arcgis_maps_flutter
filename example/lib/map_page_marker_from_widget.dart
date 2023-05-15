@@ -47,7 +47,7 @@ class _MapPageMarkerFromWidgetState extends State<MapPageMarkerFromWidget> {
           );
           final marker = Marker(
             markerId: MarkerId(_markers.length.toString()),
-            position: point,
+            position: point!,
             icon: bitmapDescriptor,
           );
           setState(() {

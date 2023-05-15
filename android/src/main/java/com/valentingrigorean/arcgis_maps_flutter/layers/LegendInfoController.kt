@@ -9,7 +9,7 @@ import com.esri.arcgisruntime.layers.Layer
 import com.esri.arcgisruntime.layers.LayerContent
 import com.esri.arcgisruntime.layers.LegendInfo
 import com.esri.arcgisruntime.loadable.LoadStatus
-import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.ConvertUti
 import com.valentingrigorean.arcgis_maps_flutter.utils.toMap
 import java.io.ByteArrayOutputStream
 
@@ -34,7 +34,7 @@ class LegendInfoController(
             return
         }
         this.legendInfoControllerResult = legendInfoControllerResult
-        val data: Map<*, *> = Convert.Companion.toMap(args)
+        val data: Map<*, *> = ConvertUti.Companion.toMap(args)
         if (data == null || data.isEmpty()) {
             setResult()
             return

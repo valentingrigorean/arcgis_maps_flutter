@@ -5,8 +5,8 @@ import com.arcgismaps.geometry.Point
 import com.arcgismaps.mapping.view.IdentifyGraphicsOverlayResult
 import com.arcgismaps.mapping.view.MapView
 import com.arcgismaps.mapping.view.ScreenCoordinate
-import com.valentingrigorean.arcgis_maps_flutter.Convert
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toFlutterJson
+import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.view.toFlutterJson
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -28,7 +28,7 @@ class MapViewOnTouchListener(
     private val mapTouchGraphicDelegates = ArrayList<MapTouchGraphicDelegate>()
     private var graphicJob: Job? = null
     private var layerJob: Job? = null
-    private val isLongPress = false
+    private var isLongPress = false
     var trackIdentityLayers = false
 
 
@@ -41,17 +41,25 @@ class MapViewOnTouchListener(
 
             if (canConsumeGraphics()) {
                 Log.d(TAG, "onSingleTapConfirmed: identifyGraphicsOverlays")
-                identifyGraphicsOverlays(it.screenCoordinate)
+                identifyGraphicsOverlays(it.screenCoordinate, it.mapPoint)
             } else if (trackIdentityLayers) {
                 Log.d(TAG, "onSingleTapConfirmed: identifyLayers")
-                identifyLayers(it.mapPoint)
+                identifyLayers(it.screenCoordinate, it.mapPoint)
             } else {
-                sendOnMapTap(it.screenCoordinate)
+                sendMessage(it.screenCoordinate, it.mapPoint, MessageType.OnTap)
             }
         }.launchIn(scope)
 
         mapView.onLongPress.onEach {
+            isLongPress = true
+            sendMessage(it.screenCoordinate, it.mapPoint, MessageType.OnLongPress)
+        }.launchIn(scope)
 
+        mapView.onUp.onEach {
+            if (isLongPress) {
+                isLongPress = false
+                sendMessage(it.screenCoordinate, it.mapPoint, MessageType.OnLongPressEnd)
+            }
         }.launchIn(scope)
     }
 
@@ -83,11 +91,18 @@ class MapViewOnTouchListener(
 
     private fun identifyLayers(screenPoint: ScreenCoordinate, point: Point?) {
         layerJob = scope.launch {
-            mapView.identifyLayers(screenPoint, 10.0, false, 10).onSuccess {
-                if (it.isEmpty()) {
+            mapView.identifyLayers(screenPoint, 10.0, false, 10).onSuccess { results ->
+                if (results.isEmpty()) {
                     sendMessage(screenPoint, point, MessageType.OnTap)
                     return@launch
                 }
+
+                val data = mapOf(
+                    "screenPoint" to arrayListOf(screenPoint.x, screenPoint.y),
+                    "position" to point?.toFlutterJson(),
+                    "results" to results.map { it.toFlutterJson() }
+                )
+                methodChannel.invokeMethod("map#onIdentifyLayers", data);
             }
         }
     }
@@ -95,7 +110,6 @@ class MapViewOnTouchListener(
     private fun onTapCompleted(
         results: List<IdentifyGraphicsOverlayResult>,
     ): Boolean {
-
         for (result in results) {
             for (touchDelegate in mapTouchGraphicDelegates) {
                 for (graphic in result.graphics) {

@@ -10,7 +10,7 @@ import com.arcgismaps.mapping.ArcGISMap
 import com.arcgismaps.mapping.Viewpoint
 import com.arcgismaps.mapping.view.GraphicsOverlay
 import com.arcgismaps.mapping.view.MapView
-import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.ConvertUti
 import com.valentingrigorean.arcgis_maps_flutter.layers.LayersChangedController
 import com.valentingrigorean.arcgis_maps_flutter.layers.LayersController
 import com.valentingrigorean.arcgis_maps_flutter.layers.LegendInfoController
@@ -19,7 +19,6 @@ import com.valentingrigorean.arcgis_maps_flutter.map.LocationDisplayController.L
 import com.valentingrigorean.arcgis_maps_flutter.mapping.symbology.MarkersController
 import com.valentingrigorean.arcgis_maps_flutter.mapping.symbology.PolygonsController
 import com.valentingrigorean.arcgis_maps_flutter.mapping.symbology.PolylinesController
-import com.valentingrigorean.arcgis_maps_flutter.utils.AGSLoadObjects
 import com.valentingrigorean.arcgis_maps_flutter.utils.AGSLoadObjects.LoadObjectsResult
 import com.valentingrigorean.arcgis_maps_flutter.utils.toMap
 import io.flutter.plugin.common.BinaryMessenger
@@ -142,7 +141,7 @@ class ArcgisMapController(
     override fun timeExtentChanged(timeExtentChangedEvent: TimeExtentChangedEvent) {
         methodChannel.invokeMethod(
             "map#timeExtentChanged",
-            Convert.Companion.timeExtentToJson(timeExtentChangedEvent.timeExtent)
+            ConvertUti.Companion.timeExtentToJson(timeExtentChangedEvent.timeExtent)
         )
     }
 
@@ -171,7 +170,7 @@ class ArcgisMapController(
                 future!!.addDoneListener {
                     try {
                         val bitmap = future.get()
-                        result.success(Convert.Companion.bitmapToByteArray(bitmap))
+                        result.success(ConvertUti.Companion.bitmapToByteArray(bitmap))
                     } catch (e: Exception) {
                         result.error("exportImage", e.message, null)
                     }
@@ -194,7 +193,7 @@ class ArcgisMapController(
                         if (maxExtend == null) {
                             result.success(null)
                         } else {
-                            result.success(Convert.Companion.geometryToJson(maxExtend))
+                            result.success(ConvertUti.Companion.geometryToJson(maxExtend))
                         }
                     }
                 } else {
@@ -203,7 +202,7 @@ class ArcgisMapController(
             }
 
             "map#setMapMaxExtent" -> {
-                val maxExtend = Convert.Companion.toGeometry(call.arguments) as Envelope
+                val maxExtend = ConvertUti.Companion.toGeometry(call.arguments) as Envelope
                 if (mapView.getMap() != null) {
                     mapView.getMap().maxExtent = maxExtend
                 }
@@ -239,11 +238,11 @@ class ArcgisMapController(
             }
 
             "map#getTimeExtent" -> {
-                result.success(Convert.Companion.timeExtentToJson(mapView.getTimeExtent()))
+                result.success(ConvertUti.Companion.timeExtentToJson(mapView.getTimeExtent()))
             }
 
             "map#setTimeExtent" -> {
-                mapView.setTimeExtent(Convert.Companion.toTimeExtent(call.arguments))
+                mapView.setTimeExtent(ConvertUti.Companion.toTimeExtent(call.arguments))
                 result.success(null)
             }
 
@@ -271,12 +270,12 @@ class ArcgisMapController(
                             "layerName" -> layerName = value as String?
                             "objectId" -> params.objectIds.add(value as kotlin.String?. toLong ())
                             "maxResults" -> params.maxFeatures = value as kotlin.String?. toInt ()
-                            "geometry" -> params.geometry = Convert.Companion.toGeometry(
+                            "geometry" -> params.geometry = ConvertUti.Companion.toGeometry(
                                 value
                             )
 
                             "spatialRelationship" -> params.spatialRelationship =
-                                Convert.Companion.toSpatialRelationship(
+                                ConvertUti.Companion.toSpatialRelationship(
                                     value!!
                                 )
 
@@ -370,11 +369,11 @@ class ArcgisMapController(
             "map#getTimeAwareLayerInfos" -> handleTimeAwareLayerInfos(result)
             "map#getCurrentViewpoint" -> {
                 val currentViewPoint =
-                    mapView.getCurrentViewpoint(Convert.Companion.toViewpointType(call.arguments))
+                    mapView.getCurrentViewpoint(ConvertUti.Companion.toViewpointType(call.arguments))
                 if (currentViewPoint == null) {
                     result.success(null)
                 } else {
-                    result.success(Convert.Companion.viewpointToJson(currentViewPoint))
+                    result.success(ConvertUti.Companion.viewpointToJson(currentViewPoint))
                 }
             }
 
@@ -384,7 +383,7 @@ class ArcgisMapController(
 
             "map#setViewpointGeometry" -> {
                 val data = call.arguments<Map<*, *>>()!!
-                val geometry: Geometry = Convert.Companion.toGeometry(
+                val geometry: Geometry = ConvertUti.Companion.toGeometry(
                     data["geometry"]
                 )
                 val padding = data["padding"]
@@ -392,7 +391,7 @@ class ArcgisMapController(
                 future = if (padding == null) {
                     mapView.setViewpointGeometryAsync(geometry)
                 } else {
-                    val paddingDouble: Double = Convert.Companion.toDouble(padding)
+                    val paddingDouble: Double = ConvertUti.Companion.toDouble(padding)
                     mapView.setViewpointGeometryAsync(geometry, paddingDouble)
                 }
                 future.addDoneListener(Runnable {
@@ -407,10 +406,10 @@ class ArcgisMapController(
 
             "map#setViewpointCenter" -> {
                 val data = call.arguments<Map<*, *>>()!!
-                val center: Point = Convert.Companion.toPoint(
+                val center: Point = ConvertUti.Companion.toPoint(
                     data["center"]
                 )
-                val scale: Double = Convert.Companion.toDouble(
+                val scale: Double = ConvertUti.Companion.toDouble(
                     data["scale"]
                 )
                 val future = mapView.setViewpointCenterAsync(center, scale)
@@ -425,22 +424,22 @@ class ArcgisMapController(
             }
 
             "map#setViewpointRotation" -> {
-                val angleDegrees: Double = Convert.Companion.toDouble(call.arguments)
+                val angleDegrees: Double = ConvertUti.Companion.toDouble(call.arguments)
                 mapView.setViewpointRotationAsync(angleDegrees)
                     .addDoneListener { result.success(null) }
             }
 
             "map#locationToScreen" -> {
-                val mapPoint: Point = Convert.Companion.toPoint(call.arguments)
+                val mapPoint: Point = ConvertUti.Companion.toPoint(call.arguments)
                 val screenPoint = mapView.locationToScreen(mapPoint)
                 if (screenPoint == null) {
                     result.success(null)
                 } else {
                     val screenPoints = DoubleArray(2)
-                    screenPoints[0] = Convert.Companion.pixelsToDpF(
+                    screenPoints[0] = ConvertUti.Companion.pixelsToDpF(
                         context, screenPoint.x.toFloat()
                     ).toDouble()
-                    screenPoints[1] = Convert.Companion.pixelsToDpF(
+                    screenPoints[1] = ConvertUti.Companion.pixelsToDpF(
                         context, screenPoint.y.toFloat()
                     ).toDouble()
                     result.success(screenPoints)
@@ -448,7 +447,7 @@ class ArcgisMapController(
             }
 
             "map#screenToLocation" -> {
-                val screenLocationData: ScreenLocationData = Convert.Companion.toScreenLocationData(
+                val screenLocationData: ScreenLocationData = ConvertUti.Companion.toScreenLocationData(
                     context, call.arguments
                 )
                 var mapPoint = mapView.screenToLocation(screenLocationData.point)
@@ -461,7 +460,7 @@ class ArcgisMapController(
                             screenLocationData.spatialReference
                         ) as Point
                     }
-                    result.success(Convert.Companion.geometryToJson(mapPoint))
+                    result.success(ConvertUti.Companion.geometryToJson(mapPoint))
                 }
             }
 
@@ -560,7 +559,7 @@ class ArcgisMapController(
                 if (initialViewPoint == null) {
                     result.success(null)
                 } else {
-                    result.success(Convert.Companion.viewpointToJson(initialViewPoint))
+                    result.success(ConvertUti.Companion.viewpointToJson(initialViewPoint))
                 }
             }
 
@@ -633,7 +632,7 @@ class ArcgisMapController(
             for (layer in layers) {
                 if (layer is TimeAware) {
                     results.add(
-                        Convert.Companion.timeAwareToJson(
+                        ConvertUti.Companion.timeAwareToJson(
                             layer as TimeAware,
                             layersController.getLayerIdByLayer(layer)
                         )
@@ -669,7 +668,7 @@ class ArcgisMapController(
             result?.success(null)
             return
         }
-        viewpoint = Convert.Companion.toViewPoint(args)
+        viewpoint = ConvertUti.Companion.toViewPoint(args)
         if (mapView.getMap() == null) {
             result?.success(null)
             return
@@ -686,12 +685,12 @@ class ArcgisMapController(
         if (args == null) {
             return
         }
-        val data: Map<*, *> = Convert.Companion.toMap(args)
+        val data: Map<*, *> = ConvertUti.Companion.toMap(args)
         if (data.containsKey("offlinePath")) {
             loadOfflineMap(data)
             return
         }
-        val map: ArcGISMap = Convert.Companion.toArcGISMap(args)
+        val map: ArcGISMap = ConvertUti.Companion.toArcGISMap(args)
         changeMap(map)
     }
 
@@ -904,7 +903,7 @@ class ArcgisMapController(
                     Log.w(TAG, "changeMap: Failed to load map." + map!!.loadError.cause!!.message)
                 }
                 methodChannel.invokeMethod(
-                    "map#loaded", Convert.Companion.arcGISRuntimeExceptionToJson(
+                    "map#loaded", ConvertUti.Companion.arcGISRuntimeExceptionToJson(
                         map!!.loadError
                     )
                 )

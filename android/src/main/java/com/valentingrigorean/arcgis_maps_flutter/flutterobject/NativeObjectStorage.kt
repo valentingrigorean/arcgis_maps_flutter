@@ -1,13 +1,10 @@
 package com.valentingrigorean.arcgis_maps_flutter.flutterobject
-
-import com.valentingrigorean.arcgis_maps_flutter.Convert
-import com.valentingrigorean.arcgis_maps_flutter.utils.toMap
 import java.util.function.Function
 
 class NativeObjectStorage private constructor() {
-    private val nativeObjects = HashMap<String?, NativeObject>()
-    fun addNativeObject(`object`: NativeObject) {
-        nativeObjects.putIfAbsent(`object`.objectId, `object`)
+    private val nativeObjects = HashMap<String, NativeObject>()
+    fun addNativeObject(nativeObject: NativeObject) {
+        nativeObjects.putIfAbsent(nativeObject.objectId, nativeObject)
     }
 
     fun removeNativeObject(objectId: String) {
@@ -20,16 +17,14 @@ class NativeObjectStorage private constructor() {
     }
 
     fun clearAll() {
-        nativeObjects.forEach { (key: String?, value: NativeObject) -> value.dispose() }
+        nativeObjects.forEach { (_: String, value: NativeObject) -> value.dispose() }
         nativeObjects.clear()
     }
 
     companion object {
         val instance = NativeObjectStorage()
-        fun <T> getNativeObjectOrConvert(`object`: Any?, mappingFunction: Function<Any?, T>): T? {
-            val data: Map<*, *> = Convert.Companion.toMap(
-                `object`!!
-            )
+        fun <T> getNativeObjectOrConvert(obj: Any, mappingFunction: Function<Any?, T>): T? {
+            val data = obj as Map<*, *>
             val objectId = data["nativeObjectId"] as String?
             if (objectId != null) {
                 val nativeObject = instance.getNativeObject<NativeObject>(objectId)
@@ -38,7 +33,7 @@ class NativeObjectStorage private constructor() {
                     return baseNativeObject.nativeObject
                 }
             }
-            return mappingFunction.apply(`object`)
+            return mappingFunction.apply(obj)
         }
     }
 }

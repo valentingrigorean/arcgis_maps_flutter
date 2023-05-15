@@ -1,11 +1,7 @@
 package com.valentingrigorean.arcgis_maps_flutter.convert.mapping
 
 import com.arcgismaps.mapping.ArcGISMap
-import com.arcgismaps.mapping.Basemap
-import com.valentingrigorean.arcgis_maps_flutter.Convert
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toSpatialReferenceOrNull
-import com.valentingrigorean.arcgis_maps_flutter.convert.portal.toPortalOrNull
-import com.valentingrigorean.arcgis_maps_flutter.layers.FlutterLayer
 
 fun Any.toArcGISMapOrNull(): ArcGISMap? {
     val data = this as Map<*, *>? ?: return null

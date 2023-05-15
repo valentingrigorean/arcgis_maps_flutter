@@ -71,7 +71,7 @@ class _MapPageLocatorState extends State<MapPageLocator> {
                 _results.clear();
                 try {
                   final results =
-                      await _locatorTask.reverseGeocode(location: point);
+                      await _locatorTask.reverseGeocode(location: point!);
                   setState(() {
                     _results = results;
                     _isLoading = false;

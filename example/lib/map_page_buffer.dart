@@ -26,6 +26,7 @@ class _MapPageBufferState extends State<MapPageBuffer> {
             polygons: _polygon == null ? const {} : {_polygon!},
             onTap: (screenPoint, position) async {
               Polygon? polygon;
+              if(position == null)return;
               if (_currentBufferType == 0) {
                 polygon = await GeometryEngine.bufferGeometry(
                     geometry: position, distance: 1000);

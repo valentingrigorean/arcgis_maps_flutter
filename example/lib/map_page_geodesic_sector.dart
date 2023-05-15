@@ -23,7 +23,7 @@ class _MapPageGeodesicSectorState extends State<MapPageGeodesicSector> {
         onTap: (_,point) async {
           final geometry = await GeometryEngine.geodesicSector(
             GeodesicSectorParameters(
-              center: point,
+              center: point!,
               semiAxis1Length: 2300,
               semiAxis2Length: 300,
               startDirection: 25,

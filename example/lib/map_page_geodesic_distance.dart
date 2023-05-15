@@ -50,10 +50,11 @@ class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance> {
             }
           });
         },
-        onTap: (_, Point point) async {
+        onTap: (_, Point? point) async {
           if (_userLocation == null) {
             return;
           }
+          if(point == null)return;
           if (point.spatialReference?.wkId !=
               _userLocation?.spatialReference?.wkId) {
             if (_userLocation!.spatialReference == null) {

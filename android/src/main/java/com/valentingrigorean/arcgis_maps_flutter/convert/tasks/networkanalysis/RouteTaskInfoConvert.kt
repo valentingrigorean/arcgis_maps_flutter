@@ -1,7 +1,6 @@
 package com.valentingrigorean.arcgis_maps_flutter.convert.tasks.networkanalysis
 
 import com.arcgismaps.tasks.networkanalysis.RouteTaskInfo
-import com.valentingrigorean.arcgis_maps_flutter.Convert
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterValue
 

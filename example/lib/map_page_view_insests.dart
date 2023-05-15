@@ -17,12 +17,15 @@ class _MapPageViewInsetsState extends State<MapPageViewInsets> {
       body: Stack(
         children: [
           ArcgisMapView(
-            map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
+            map: const ArcGISMap.fromBasemapStyle(
+                BasemapStyle.arcGISImageryLabels),
             isAttributionTextVisible: false,
             insetsContentInsetFromSafeArea: false,
             contentInsets: const EdgeInsets.only(bottom: 200),
-            onTap: (_,point) {
-              _mapController.setViewpointCenter(point);
+            onTap: (_, point) {
+              if (point != null) {
+                _mapController.setViewpointCenter(point);
+              }
             },
             onMapCreated: (controller) {
               _mapController = controller;

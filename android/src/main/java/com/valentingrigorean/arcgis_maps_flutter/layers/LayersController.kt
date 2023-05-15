@@ -1,16 +1,19 @@
 package com.valentingrigorean.arcgis_maps_flutter.layers
 
 import com.arcgismaps.arcgisservices.TimeAware
+import com.arcgismaps.mapping.ArcGISMap
 import com.arcgismaps.mapping.layers.Layer
-import com.esri.arcgisruntime.arcgisservices.TimeAware
-import com.esri.arcgisruntime.layers.Layer
-import com.esri.arcgisruntime.mapping.ArcGISMap
-import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toTimeValueOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.utils.StringUtils
-import com.valentingrigorean.arcgis_maps_flutter.utils.toMap
 import io.flutter.plugin.common.MethodChannel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
-class LayersController(private val methodChannel: MethodChannel) : MapChangeAware {
+class LayersController(
+    private val methodChannel: MethodChannel,
+    private val scope: CoroutineScope,
+) : MapChangeAware {
     enum class LayerType {
         OPERATIONAL, BASE, REFERENCE
     }
@@ -18,9 +21,9 @@ class LayersController(private val methodChannel: MethodChannel) : MapChangeAwar
     private val operationalLayers: MutableSet<FlutterLayer> = HashSet()
     private val baseLayers: MutableSet<FlutterLayer> = HashSet()
     private val referenceLayers: MutableSet<FlutterLayer> = HashSet()
-    private val flutterOperationalLayersMap: MutableMap<String?, Layer> = HashMap()
-    private val flutterBaseLayersMap: MutableMap<String?, Layer> = HashMap()
-    private val flutterReferenceLayersMap: MutableMap<String?, Layer> = HashMap()
+    private val flutterOperationalLayersMap: MutableMap<String, Layer> = HashMap()
+    private val flutterBaseLayersMap: MutableMap<String, Layer> = HashMap()
+    private val flutterReferenceLayersMap: MutableMap<String, Layer> = HashMap()
     private var map: ArcGISMap? = null
     override fun onMapChange(map: ArcGISMap?) {
         clearMap()
@@ -57,7 +60,7 @@ class LayersController(private val methodChannel: MethodChannel) : MapChangeAwar
 
     fun updateFromArgs(args: Any?) {
         val mapData = args as Map<*, *>?
-        if (mapData == null || mapData.size == 0) {
+        if (mapData == null || mapData.isEmpty()) {
             return
         }
         for (layerType in LayerType.values()) {
@@ -77,23 +80,21 @@ class LayersController(private val methodChannel: MethodChannel) : MapChangeAwar
     }
 
     fun setTimeOffset(arguments: Any) {
-        val data: Map<*, *> = Convert.Companion.toMap(arguments)
-            ?: return
+        val data = arguments as Map<*, *>? ?: return
         val layerId = data["layerId"] as String? ?: return
         val layer = getLayerByLayerId(layerId)
         if (layer is TimeAware) {
             val timeAware = layer as TimeAware
-            timeAware.timeOffset =
-                Convert.Companion.toTimeValue(data["timeValue"])
+            timeAware.timeOffset = data["timeValue"]?.toTimeValueOrNull()
         }
     }
 
     private fun addLayers(args: Any, layerType: LayerType) {
         val layersArgs = args as Collection<Map<*, *>>
-        if (layersArgs == null || layersArgs.size == 0) {
+        if (layersArgs == null || layersArgs.isEmpty()) {
             return
         }
-        val flutterMap: Map<String?, Layer?> = getFlutterMap(layerType)
+        val flutterMap = getFlutterMap(layerType)
         val flutterLayers = getFlutterLayerSet(layerType)
         val layersToAdd = ArrayList<FlutterLayer>()
         for (layer in layersArgs) {
@@ -110,10 +111,10 @@ class LayersController(private val methodChannel: MethodChannel) : MapChangeAwar
 
     private fun removeLayers(args: Any, layerType: LayerType) {
         val layersArgs = args as Collection<Map<*, *>>
-        if (layersArgs == null || layersArgs.size == 0) {
+        if (layersArgs == null || layersArgs.isEmpty()) {
             return
         }
-        val flutterMap: Map<String?, Layer?> = getFlutterMap(layerType)
+        val flutterMap = getFlutterMap(layerType)
         val layersToRemove = ArrayList<FlutterLayer>()
         for (layer in layersArgs) {
             val layerId = layer["layerId"] as String?
@@ -127,7 +128,7 @@ class LayersController(private val methodChannel: MethodChannel) : MapChangeAwar
     }
 
     private fun removeLayersById(ids: Collection<String>, layerType: LayerType) {
-        if (ids.size == 0) return
+        if (ids.isEmpty()) return
         val layersToRemove = ArrayList<FlutterLayer>()
         val layers: Set<FlutterLayer> = getFlutterLayerSet(layerType)
         for (id in ids) {
@@ -142,49 +143,71 @@ class LayersController(private val methodChannel: MethodChannel) : MapChangeAwar
     }
 
     private fun addLayersToMap(layers: Collection<FlutterLayer>, layerType: LayerType) {
-        if (layers.size == 0) return
-        if (map == null) {
-            return
-        }
+        if (layers.isEmpty()) return
+        var map = this.map ?: return
         val flutterMap = getFlutterMap(layerType)
         for (layer in layers) {
             val nativeLayer = layer.createLayer()
             flutterMap[layer.layerId] = nativeLayer
-            nativeLayer!!.addDoneLoadingListener {
-                if (flutterMap.containsKey(layer.layerId)) {
-                    val args: MutableMap<String, Any?> = HashMap(1)
-                    args["layerId"] = layer.layerId
-                    methodChannel.invokeMethod("layer#loaded", args)
+            scope.launch {
+                nativeLayer.load()
+                    .onSuccess {
+                        if (flutterMap.containsKey(layer.layerId)) {
+                            val args: MutableMap<String, Any?> = HashMap(1)
+                            args["layerId"] = layer.layerId
+                            methodChannel.invokeMethod("layer#loaded", args)
+                        }
+                    }
+                    .onFailure {
+                        if (flutterMap.containsKey(layer.layerId)) {
+                            val args: MutableMap<String, Any?> = HashMap(2)
+                            args["layerId"] = layer.layerId
+                            args["error"] = it.toFlutterJson(withStackTrace = false)
+                            methodChannel.invokeMethod("layer#loaded", args)
+                        }
                 }
             }
             when (layerType) {
-                LayerType.OPERATIONAL -> map!!.operationalLayers.add(nativeLayer)
-                LayerType.BASE -> map!!.basemap.baseLayers.add(nativeLayer)
-                LayerType.REFERENCE -> map!!.basemap.referenceLayers.add(nativeLayer)
+                LayerType.OPERATIONAL -> map.operationalLayers.add(nativeLayer)
+                LayerType.BASE -> map.basemap?.value?.baseLayers?.add(nativeLayer)
+                LayerType.REFERENCE -> map.basemap?.value?.referenceLayers?.add(nativeLayer)
             }
         }
     }
 
     private fun removeLayersFromMap(layers: Collection<FlutterLayer>, layerType: LayerType) {
-        if (layers.size == 0) return
-        val nativeLayersToRemove = ArrayList<Layer?>()
+        if (layers.isEmpty()) return
+
+        val nativeLayersToRemove = HashSet<Layer>()
         val flutterMap = getFlutterMap(layerType)
         val flutterLayer = getFlutterLayerSet(layerType)
         for (layer in layers) {
-            val nativeLayer = flutterMap[layer.layerId]
+            val nativeLayer = flutterMap[layer.layerId]!!
             flutterMap.remove(layer.layerId)
             flutterLayer.remove(layer)
             nativeLayersToRemove.add(nativeLayer)
         }
-        if (map == null) {
-            return
-        }
+        var map = this.map ?: return
         when (layerType) {
-            LayerType.OPERATIONAL -> map!!.operationalLayers.removeAll(nativeLayersToRemove)
-            LayerType.BASE -> map!!.basemap.baseLayers.removeAll(nativeLayersToRemove)
-            LayerType.REFERENCE -> map!!.basemap.referenceLayers.removeAll(nativeLayersToRemove)
+            LayerType.OPERATIONAL -> map.operationalLayers.removeAll(nativeLayersToRemove)
+            LayerType.BASE -> map?.basemap?.value?.baseLayers?.removeAll(nativeLayersToRemove)
+            LayerType.REFERENCE -> map?.basemap?.value?.referenceLayers?.removeAll(nativeLayersToRemove)
         }
     }
+
+    private fun clearMap() {
+        val operationalLayersNative = flutterOperationalLayersMap.values
+        val baseLayersNative = flutterBaseLayersMap.values
+        val referenceLayersNative = flutterReferenceLayersMap.values
+        flutterOperationalLayersMap.clear()
+        flutterBaseLayersMap.clear()
+        flutterReferenceLayersMap.clear()
+        var map = this.map ?: return
+        map.operationalLayers.removeAll(operationalLayersNative)
+        map.basemap?.value?.baseLayers?.removeAll(baseLayersNative)
+        map.basemap?.value?.referenceLayers?.removeAll(referenceLayersNative)
+    }
+
 
     private fun getObjectName(layerType: LayerType): String {
         return when (layerType) {
@@ -200,11 +223,10 @@ class LayersController(private val methodChannel: MethodChannel) : MapChangeAwar
             LayerType.OPERATIONAL -> operationalLayers
             LayerType.BASE -> baseLayers
             LayerType.REFERENCE -> referenceLayers
-            else -> throw UnsupportedOperationException()
         }
     }
 
-    private fun getFlutterMap(layerType: LayerType): MutableMap<String?, Layer?> {
+    private fun getFlutterMap(layerType: LayerType): MutableMap<String, Layer> {
         return when (layerType) {
             LayerType.OPERATIONAL -> flutterOperationalLayersMap
             LayerType.BASE -> flutterBaseLayersMap
@@ -213,23 +235,9 @@ class LayersController(private val methodChannel: MethodChannel) : MapChangeAwar
         }
     }
 
-    private fun clearMap() {
-        val operationalLayersNative: Collection<Layer?> = flutterOperationalLayersMap.values
-        val baseLayersNative: Collection<Layer?> = flutterBaseLayersMap.values
-        val referenceLayersNative: Collection<Layer?> = flutterReferenceLayersMap.values
-        flutterOperationalLayersMap.clear()
-        flutterBaseLayersMap.clear()
-        flutterReferenceLayersMap.clear()
-        if (map == null) {
-            return
-        }
-        map!!.operationalLayers.removeAll(operationalLayersNative)
-        map!!.basemap.baseLayers.removeAll(baseLayersNative)
-        map!!.basemap.referenceLayers.removeAll(referenceLayersNative)
-    }
 
     companion object {
-        private fun findLayerIdByLayer(layer: Layer, data: Map<String?, Layer?>): String? {
+        private fun findLayerIdByLayer(layer: Layer, data: Map<String, Layer>): String? {
             for ((key, value) in data) {
                 if (value === layer) {
                     return key

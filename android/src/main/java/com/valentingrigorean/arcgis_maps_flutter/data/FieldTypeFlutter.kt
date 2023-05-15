@@ -2,7 +2,7 @@ package com.valentingrigorean.arcgis_maps_flutter.data
 
 import android.icu.text.SimpleDateFormat
 import com.arcgismaps.geometry.Geometry
-import com.valentingrigorean.arcgis_maps_flutter.Convert
+import com.valentingrigorean.arcgis_maps_flutter.ConvertUti
 import com.valentingrigorean.arcgis_maps_flutter.convert.fromFlutterInstant
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull
@@ -60,7 +60,7 @@ fun Any.toFlutterFieldType(): Any {
 
 fun Any.fromFlutterFieldOrNull(): Any? {
     val data: Map<*, *> = this as Map<*, *>? ?: return null
-    val fieldTypeFlutter = FieldTypeFlutter.values()[Convert.toInt(
+    val fieldTypeFlutter = FieldTypeFlutter.values()[ConvertUti.toInt(
         data["type"]
     )]
     var value = data["value"]

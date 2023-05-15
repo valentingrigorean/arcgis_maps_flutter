@@ -6,7 +6,6 @@ import com.arcgismaps.geometry.Multipoint
 import com.arcgismaps.geometry.Point
 import com.arcgismaps.geometry.Polygon
 import com.arcgismaps.geometry.Polyline
-import com.valentingrigorean.arcgis_maps_flutter.Convert
 import com.valentingrigorean.arcgis_maps_flutter.convert.toMap
 import org.json.JSONObject
 import java.lang.Exception

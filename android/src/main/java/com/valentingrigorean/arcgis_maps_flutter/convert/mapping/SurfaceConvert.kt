@@ -1,8 +1,6 @@
 package com.valentingrigorean.arcgis_maps_flutter.convert.mapping
 
 import com.arcgismaps.mapping.Surface
-import com.valentingrigorean.arcgis_maps_flutter.Convert
-import java.util.Objects
 
 
 fun Any.toSurfaceOrNull(o: Any): Surface? {

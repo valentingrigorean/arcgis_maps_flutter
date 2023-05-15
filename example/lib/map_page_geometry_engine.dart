@@ -20,7 +20,7 @@ class _MapPageGeometryEngineState extends State<MapPageGeometryEngine> {
             map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
             onTap: (_,point) async {
               final projection = await GeometryEngine.project(
-                point,
+                point!,
                 SpatialReference.wgs84(),
               );
               setState(() {

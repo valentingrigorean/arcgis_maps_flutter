@@ -4,10 +4,8 @@ import android.content.Context
 import android.util.DisplayMetrics
 import android.util.TypedValue
 
-open class Convert {
+open class ConvertUtils {
     companion object {
-
-
 
         fun dpToPixelsI(context: Context, dp: Int): Int {
             return (dp * (context.resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)).toInt()
