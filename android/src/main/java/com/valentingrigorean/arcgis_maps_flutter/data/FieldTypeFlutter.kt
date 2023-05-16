@@ -14,7 +14,15 @@ import java.util.UUID
 
 enum class FieldTypeFlutter(val value: Int) {
     UNKNOWN(0), INTEGER(1), DOUBLE(2), DATE(3), TEXT(4), NULLABLE(5), BLOB(6), GEOMETRY(7);
+
+    companion object{
+        fun fromInt(value: Int): FieldTypeFlutter {
+            return values()[value]
+        }
+    }
 }
+
+
 
 private val ISO8601Format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US)
 fun Any.toFlutterFieldType(): Any {
@@ -59,9 +67,7 @@ fun Any.toFlutterFieldType(): Any {
 
 fun Any.fromFlutterFieldOrNull(): Any? {
     val data: Map<*, *> = this as Map<*, *>? ?: return null
-    val fieldTypeFlutter = FieldTypeFlutter.values()[ConvertUti.toInt(
-        data["type"]
-    )]
+    val fieldTypeFlutter = FieldTypeFlutter.fromInt(data["type"] as Int)
     var value = data["value"]
     when (fieldTypeFlutter) {
         FieldTypeFlutter.DATE -> try {

@@ -24,13 +24,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.View.OnLayoutChangeListener
 import android.view.ViewGroup
-import com.esri.arcgisruntime.UnitSystem
-import com.esri.arcgisruntime.geometry.GeodeticCurveType
-import com.esri.arcgisruntime.geometry.GeometryEngine
-import com.esri.arcgisruntime.geometry.LinearUnit
-import com.esri.arcgisruntime.geometry.PolylineBuilder
-import com.esri.arcgisruntime.mapping.view.MapScaleChangedListener
-import com.esri.arcgisruntime.mapping.view.MapView
+import com.arcgismaps.mapping.view.MapView
 import com.valentingrigorean.arcgis_maps_flutter.R
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.extension.calculateBestLength
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.extension.dpToPixels

@@ -3,11 +3,10 @@ package com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.rendere
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
-import com.esri.arcgisruntime.UnitSystem
-import com.esri.arcgisruntime.geometry.LinearUnit
+import com.arcgismaps.UnitSystem
+import com.arcgismaps.geometry.LinearUnit
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.extension.asDistanceString
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.extension.calculateBestLength
-import com.valentingrigorean.arcgis_maps_flutter.toolkit.extension.selectLinearUnit
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.LINEAR_UNIT_NAUTICAL_MILES
 
 class DualUnitLineNauticalMileRenderer : ScalebarRenderer() {
