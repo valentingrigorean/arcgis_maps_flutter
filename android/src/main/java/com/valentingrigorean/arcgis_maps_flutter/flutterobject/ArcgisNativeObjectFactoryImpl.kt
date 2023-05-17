@@ -2,15 +2,14 @@ package com.valentingrigorean.arcgis_maps_flutter.flutterobject
 
 import com.arcgismaps.data.Geodatabase
 import com.arcgismaps.data.ServiceFeatureTable
-import com.arcgismaps.mapping.ArcGISMap
-import com.arcgismaps.mapping.PortalItem
 import com.arcgismaps.mapping.layers.TileCache
 import com.arcgismaps.tasks.geocode.LocatorTask
 import com.arcgismaps.tasks.geodatabase.GeodatabaseSyncTask
 import com.arcgismaps.tasks.networkanalysis.RouteTask
 import com.arcgismaps.tasks.offlinemaptask.OfflineMapTask
 import com.arcgismaps.tasks.tilecache.ExportTileCacheTask
-import com.valentingrigorean.arcgis_maps_flutter.ConvertUti
+import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toArcGISMapOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toPortalItemOrNull
 import com.valentingrigorean.arcgis_maps_flutter.data.GeodatabaseNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.data.ServiceFeatureTableNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.data.TileCacheNativeObject
@@ -63,9 +62,7 @@ class ArcgisNativeObjectFactoryImpl : ArcgisNativeObjectFactory {
 
             "OfflineMapTask" -> {
                 val task = createOfflineMapTask(
-                    ConvertUti.toMap(
-                        arguments!!
-                    )
+                    arguments as Map<*, *>
                 )
                 val nativeObject: NativeObject =
                     OfflineMapTaskNativeObject(objectId, task)
@@ -107,7 +104,7 @@ class ArcgisNativeObjectFactoryImpl : ArcgisNativeObjectFactory {
                 nativeObject
             }
 
-            "ServiceFeatureTable"  -> {
+            "ServiceFeatureTable" -> {
                 val url = arguments as String
                 val serviceFeatureTable = ServiceFeatureTable(url)
                 val nativeObject: NativeObject =
@@ -126,12 +123,10 @@ class ArcgisNativeObjectFactoryImpl : ArcgisNativeObjectFactory {
             val arcgisMap = data["map"]
             val portalItem = data["portalItem"]
             offlineMapTask = if (arcgisMap != null) {
-                val arcGISMap: ArcGISMap =
-                    ConvertUti.Companion.toArcGISMap(arcgisMap)
+                val arcGISMap = arcgisMap.toArcGISMapOrNull()!!
                 OfflineMapTask(arcGISMap)
             } else if (portalItem != null) {
-                val nativePortalItem: PortalItem =
-                    ConvertUti.Companion.toPortalItem(portalItem)
+                val nativePortalItem = portalItem.toPortalItemOrNull()!!
                 OfflineMapTask(nativePortalItem)
             } else {
                 throw IllegalArgumentException("Map or PortalItem is required")

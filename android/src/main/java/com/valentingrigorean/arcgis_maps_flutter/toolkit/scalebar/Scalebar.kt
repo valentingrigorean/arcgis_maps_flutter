@@ -22,15 +22,26 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
-import android.view.View.OnLayoutChangeListener
 import android.view.ViewGroup
+import com.arcgismaps.UnitSystem
+import com.arcgismaps.geometry.GeodeticCurveType
+import com.arcgismaps.geometry.GeometryEngine
+import com.arcgismaps.geometry.LinearUnit
+import com.arcgismaps.geometry.PolylineBuilder
 import com.arcgismaps.mapping.view.MapView
+import com.arcgismaps.mapping.view.ScreenCoordinate
 import com.valentingrigorean.arcgis_maps_flutter.R
+import com.valentingrigorean.arcgis_maps_flutter.convert.toUnitSystem
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.extension.calculateBestLength
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.extension.dpToPixels
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.extension.selectLinearUnit
-import com.valentingrigorean.arcgis_maps_flutter.toolkit.extension.unitSystemFromInt
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.Style
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlin.reflect.KProperty
 
 /**
@@ -105,19 +116,10 @@ class Scalebar : View {
     @Volatile
     private var attributionTextHeight = 0
 
-    private val mapScaleChangedListener = MapScaleChangedListener {
-        postInvalidate()
-    }
-
-    private val attributionViewLayoutChangeListener =
-        OnLayoutChangeListener { _, _, top, _, bottom, _, _, _, _ ->
-            // Recalculate the attribution text height and invalidate the Scalebar view when the bounds of the attribution
-            // view change
-            attributionTextHeight = bottom - top
-            postInvalidate()
-        }
-
     private val textPaint: Paint by TextPaintDelegate()
+
+    private var mapScaleJob: Job? = null
+    private var mapAttributeJob: Job? = null
 
     private class TextPaintDelegate {
         private var _paint: Paint = Paint()
@@ -287,8 +289,8 @@ class Scalebar : View {
 
     /**
      * The [UnitSystem] used that the Scalebar is representing. One of:
-     * - [UnitSystem.IMPERIAL]
-     * - [UnitSystem.METRIC]
+     * - [UnitSystem.Imperial]
+     * - [UnitSystem.Metric]
      *
      * The default unit system is UnitSystem.METRIC.
      *
@@ -326,9 +328,9 @@ class Scalebar : View {
                 Style.fromInt(getInt(R.styleable.Scalebar_style, DEFAULT_STYLE.value))?.let {
                     style = it
                 }
-                unitSystemFromInt(getInt(R.styleable.Scalebar_unitSystem, 1)).let {
-                    unitSystem = it
-                }
+
+                unitSystem = getInt(R.styleable.Scalebar_unitSystem, 1).toUnitSystem()
+
                 Alignment.fromInt(getInt(R.styleable.Scalebar_alignment, DEFAULT_ALIGNMENT.value))
                     ?.let {
                         alignment = it
@@ -351,11 +353,6 @@ class Scalebar : View {
         }
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-
-    }
-
 
     /**
      * Adds this [Scalebar] to the provided [mapView]. Used in Workflow 1 (see [Scalebar] above).
@@ -363,11 +360,11 @@ class Scalebar : View {
      * @throws IllegalStateException    if this Scalebar is already added to or bound to a MapView
      * @since 100.5.0
      */
-    fun addToMapView(mapView: MapView) {
+    fun addToMapView(mapView: MapView,lifecycleScope: CoroutineScope) {
         this.mapView?.let {
             throw IllegalStateException("Scalebar already has a MapView")
         }
-        setupMapView(mapView)
+        setupMapView(mapView,lifecycleScope)
         mapView.addView(
             this, ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -400,7 +397,7 @@ class Scalebar : View {
      * @throws IllegalStateException if this Scalebar is currently added to a MapView
      * @since 100.5.0
      */
-    fun bindTo(mapView: MapView?) {
+    fun bindTo(mapView: MapView?,lifecycleScope: CoroutineScope) {
         if (drawInMapView) {
             throw IllegalStateException("Scalebar is currently added to a MapView")
         }
@@ -410,7 +407,7 @@ class Scalebar : View {
                 this.mapView = null
             }
         } else {
-            setupMapView(mapView)
+            setupMapView(mapView,lifecycleScope)
         }
     }
 
@@ -433,7 +430,7 @@ class Scalebar : View {
 
             // Calculate maximum length of scalebar in pixels
             val baseUnits =
-                if (unitSystem == UnitSystem.METRIC) LINEAR_UNIT_METERS else LINEAR_UNIT_FEET
+                if (unitSystem == UnitSystem.Metric) LINEAR_UNIT_METERS else LINEAR_UNIT_FEET
             var maxScaleBarLengthPixels: Float
             if (drawInMapView) {
                 // When scalebar is a child of the MapView, its length is based on the size of the visible part of the MapView
@@ -454,9 +451,9 @@ class Scalebar : View {
             val centerX = mapView.viewInsetLeft.dpToPixels(displayDensity) + mapViewVisibleWidth / 2
             val centerY = mapView.viewInsetTop.dpToPixels(displayDensity) + mapViewVisibleHeight / 2
             graphicsPoint.set((centerX - maxScaleBarLengthPixels / 2).toInt(), centerY)
-            val p1 = mapView.screenToLocation(graphicsPoint)
+            val p1 = mapView.screenToLocation(graphicsPoint.toScreenCoordinate())
             graphicsPoint.set((centerX + maxScaleBarLengthPixels / 2).toInt(), centerY)
-            val p2 = mapView.screenToLocation(graphicsPoint)
+            val p2 = mapView.screenToLocation(graphicsPoint.toScreenCoordinate())
             val visibleArea = mapView.visibleArea
             if (p1 == null || p2 == null || visibleArea == null) {
                 return
@@ -464,15 +461,13 @@ class Scalebar : View {
             val centerPoint = visibleArea.extent.center
             // We shouldn't be allocating an object here but the Polyline class appears to be immutable and the
             // PolylineBuilder class doesn't allow us to clear points we've added
-            val builder = PolylineBuilder(mapView.spatialReference)
-            builder.addPoint(p1)
-            builder.addPoint(centerPoint) // include center point to ensure it goes the correct way round the globe
-            builder.addPoint(p2)
+            val polylineBuilder =
+                PolylineBuilder(listOf(p1, centerPoint, p2), mapView.spatialReference.value) {}
             val maxLengthGeodetic =
                 GeometryEngine.lengthGeodetic(
-                    builder.toGeometry(),
+                    polylineBuilder.toGeometry(),
                     baseUnits,
-                    GeodeticCurveType.GEODESIC
+                    GeodeticCurveType.Geodesic
                 )
 
             if (maxLengthGeodetic == 0.0) {
@@ -507,6 +502,7 @@ class Scalebar : View {
                 Style.DUAL_UNIT_LINE, Style.DUAL_UNIT_LINE_NAUTICAL_MILE -> if (drawInMapView) bottom - DEFAULT_BAR_HEIGHT_DP.dpToPixels(
                     displayDensity
                 ).toFloat() - textSize - maxPixelsBelowBaseline else 0.0f
+
                 else -> if (drawInMapView) bottom - DEFAULT_BAR_HEIGHT_DP.dpToPixels(displayDensity)
                     .toFloat() else 0.0f
             }
@@ -534,12 +530,13 @@ class Scalebar : View {
         }
     }
 
+
     /**
      * Sets up the [Scalebar] to work with the provided [mapView].
      *
      * @since 100.5.0
      */
-    private fun setupMapView(mapView: MapView) {
+    private fun setupMapView(mapView: MapView,lifecycleScope: CoroutineScope) {
         // Remove listeners from old MapView
         this.mapView?.let {
             removeListenersFromMapView()
@@ -547,8 +544,13 @@ class Scalebar : View {
 
         // Add listeners to new MapView
         this.mapView = mapView
-        mapView.addMapScaleChangedListener(mapScaleChangedListener)
-        mapView.addAttributionViewLayoutChangeListener(attributionViewLayoutChangeListener)
+        mapScaleJob = mapView.mapScale.onEach {
+            postInvalidate()
+        }.launchIn(lifecycleScope)
+
+//        mapAttributeJob = mapView.at.onEach {
+//            invalidate()
+//        }.launchIn(lifecycleScope)
     }
 
     /**
@@ -557,8 +559,8 @@ class Scalebar : View {
      * @since 100.5.0
      */
     private fun removeListenersFromMapView() {
-        mapView?.removeMapScaleChangedListener(mapScaleChangedListener)
-        mapView?.removeAttributionViewLayoutChangeListener(attributionViewLayoutChangeListener)
+        mapScaleJob?.cancel()
+        mapAttributeJob?.cancel()
     }
 
     /**
@@ -587,12 +589,14 @@ class Scalebar : View {
             Alignment.LEFT ->
                 // Position start of scalebar at left hand edge of the view, plus padding
                 (left + padding).toFloat()
+
             Alignment.RIGHT ->
                 // Position end of scalebar at right hand edge of the view, less padding and the width of the units string (if
                 // required)
                 right.toFloat() - padding.toFloat() - lineWidthDp.dpToPixels(displayDensity)
                     .toFloat() - scalebarLength -
                         style.renderer.calculateExtraSpaceForUnits(displayUnits, textPaint)
+
             Alignment.CENTER ->
                 // Position center of scalebar (plus units string if required) at center of the view
                 ((right + left).toFloat() - scalebarLength - style.renderer.calculateExtraSpaceForUnits(
@@ -601,7 +605,6 @@ class Scalebar : View {
                 )) / 2
         }
     }
-
 
 
     /**
@@ -651,4 +654,9 @@ class Scalebar : View {
             fun fromInt(type: Int) = map[type]
         }
     }
+}
+
+
+private fun android.graphics.Point.toScreenCoordinate(): ScreenCoordinate {
+    return ScreenCoordinate(x.toDouble(), y.toDouble())
 }

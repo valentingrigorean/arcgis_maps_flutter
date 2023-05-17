@@ -5,6 +5,7 @@ import com.valentingrigorean.arcgis_maps_flutter.convert.data.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.convert.data.toQueryFeatureFields
 import com.valentingrigorean.arcgis_maps_flutter.convert.data.toQueryParametersOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.data.toStatisticsQueryParametersOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.BaseNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.io.ApiKeyResourceNativeHandler

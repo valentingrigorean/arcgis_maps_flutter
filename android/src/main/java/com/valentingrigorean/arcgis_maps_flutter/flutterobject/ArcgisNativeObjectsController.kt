@@ -52,7 +52,7 @@ class ArcgisNativeObjectsController(
                 val objectId = args["objectId"] as String?
                 val method = args["method"] as String?
                 val arguments = args["arguments"]
-                val nativeObject = storage.getNativeObject(
+                val nativeObject = storage.getNativeObject<NativeObject>(
                     objectId!!
                 )
                 if (nativeObject != null) {

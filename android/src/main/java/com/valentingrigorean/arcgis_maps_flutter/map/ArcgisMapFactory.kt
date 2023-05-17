@@ -12,7 +12,7 @@ class ArcgisMapFactory(
     private val lifecycleProvider: () -> Lifecycle
 ) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
     override fun create(context: Context, viewId: Int, args: Any?): PlatformView {
-        val params = args as Map<String, Any>?
+        val params = args as Map<String, Any>
         return ArcgisMapController(viewId, context, params, binaryMessenger, lifecycleProvider)
     }
 }

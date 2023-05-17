@@ -6,11 +6,11 @@ import android.view.View
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.coroutineScope
 import com.arcgismaps.mapping.ArcGISMap
 import com.arcgismaps.mapping.Viewpoint
 import com.arcgismaps.mapping.view.GraphicsOverlay
 import com.arcgismaps.mapping.view.MapView
-import com.valentingrigorean.arcgis_maps_flutter.ConvertUti
 import com.valentingrigorean.arcgis_maps_flutter.layers.LayersChangedController
 import com.valentingrigorean.arcgis_maps_flutter.layers.LayersController
 import com.valentingrigorean.arcgis_maps_flutter.layers.LegendInfoController
@@ -19,13 +19,15 @@ import com.valentingrigorean.arcgis_maps_flutter.map.LocationDisplayController.L
 import com.valentingrigorean.arcgis_maps_flutter.mapping.symbology.MarkersController
 import com.valentingrigorean.arcgis_maps_flutter.mapping.symbology.PolygonsController
 import com.valentingrigorean.arcgis_maps_flutter.mapping.symbology.PolylinesController
-import com.valentingrigorean.arcgis_maps_flutter.utils.AGSLoadObjects.LoadObjectsResult
-import com.valentingrigorean.arcgis_maps_flutter.utils.toMap
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.platform.PlatformView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import java.util.Locale
 import java.util.concurrent.ExecutionException
 
@@ -33,10 +35,9 @@ class ArcgisMapController(
     id: Int,
     private val context: Context,
     params: Map<String, Any>?,
-    binaryMessenger: BinaryMessenger?,
+    binaryMessenger: BinaryMessenger,
     private val lifecycleProvider: () -> Lifecycle
-) : DefaultLifecycleObserver, PlatformView, MethodCallHandler, ViewpointChangedListener,
-    TimeExtentChangedListener, LocationDisplayControllerDelegate {
+) : DefaultLifecycleObserver, PlatformView, MethodCallHandler, LocationDisplayControllerDelegate {
     private val methodChannel: MethodChannel
     private val selectionPropertiesHandler: SelectionPropertiesHandler
     private val layersController: LayersController
@@ -50,8 +51,8 @@ class ArcgisMapController(
     private val layersChangedController: LayersChangedController
     private val locationDisplayController: LocationDisplayController
     private val mapLoadedListener = MapLoadedListener()
-    private lateinit var mapView: MapView
-    private var mapViewOnTouchListener: MapViewOnTouchListener?
+    private var mapView: MapView
+    private var mapViewOnTouchListener: MapViewOnTouchListener
     private var scaleBarController: ScaleBarController?
     private val invalidateMapHelper: InvalidateMapHelper
     private var viewpoint: Viewpoint? = null
@@ -61,15 +62,18 @@ class ArcgisMapController(
     private var disposed = false
     private var minScale = 0.0
     private var maxScale = 0.0
+    private val scope: CoroutineScope
 
     init {
-        methodChannel = MethodChannel(binaryMessenger!!, "plugins.flutter.io/arcgis_maps_$id")
+        scope = lifecycleProvider().coroutineScope
+        methodChannel = MethodChannel(binaryMessenger, "plugins.flutter.io/arcgis_maps_$id")
         methodChannel.setMethodCallHandler(this)
         mapView = MapView(context)
-        scaleBarController = ScaleBarController(context, mapView!!, mapView!!, lifecycleProvider())
+        lifecycleProvider().addObserver(this)
+        scaleBarController = ScaleBarController(context, mapView, mapView, scope)
         selectionPropertiesHandler = SelectionPropertiesHandler(mapView.selectionProperties)
-        symbolVisibilityFilterController = SymbolVisibilityFilterController(mapView!!)
-        layersController = LayersController(methodChannel)
+        symbolVisibilityFilterController = SymbolVisibilityFilterController(mapView, scope)
+        layersController = LayersController(methodChannel, scope)
         mapChangeAwares.add(layersController)
         layersChangedController = LayersChangedController(methodChannel)
         mapChangeAwares.add(layersChangedController)
@@ -84,23 +88,31 @@ class ArcgisMapController(
             binaryMessenger,
             "plugins.flutter.io/arcgis_maps_" + id + "_location_display"
         )
-        locationDisplayController = LocationDisplayController(locationDisplayChannel, mapView.locationDisplay,mapView,null)
+        locationDisplayController = LocationDisplayController(
+            locationDisplayChannel,
+            mapView.locationDisplay,
+            mapView,
+            scope
+        )
         locationDisplayController.setLocationDisplayControllerDelegate(this)
         initSymbolsControllers()
-        mapViewOnTouchListener = MapViewOnTouchListener(context, mapView!!, methodChannel)
-        mapViewOnTouchListener!!.addGraphicDelegate(markersController)
-        mapViewOnTouchListener!!.addGraphicDelegate(polygonsController)
-        mapViewOnTouchListener!!.addGraphicDelegate(polylinesController)
-        mapViewOnTouchListener!!.addGraphicDelegate(locationDisplayController)
+        mapViewOnTouchListener = MapViewOnTouchListener(mapView, methodChannel, scope)
+        mapViewOnTouchListener.addGraphicDelegate(markersController)
+        mapViewOnTouchListener.addGraphicDelegate(polygonsController)
+        mapViewOnTouchListener.addGraphicDelegate(polylinesController)
+        mapViewOnTouchListener.addGraphicDelegate(locationDisplayController)
         mapView.graphicsOverlays.add(graphicsOverlay)
-        mapView.mapView.onTouchListener = mapViewOnTouchListener
-        mapView.addViewpointChangedListener(this)
-        invalidateMapHelper = InvalidateMapHelper(mapView)
-        lifecycleProvider.lifecycle.addObserver(this)
+        mapView.viewpointChanged.onEach {
+            if (trackViewpointChangedListenerEvents) {
+                methodChannel.invokeMethod("map#viewpointChanged", null)
+            }
+        }.launchIn(scope)
+        invalidateMapHelper = InvalidateMapHelper(mapView, scope)
+
         if (params != null) {
             initWithParams(params)
         }
-       
+
     }
 
     override fun getView(): View? {
@@ -132,11 +144,6 @@ class ArcgisMapController(
         destroyMapViewIfNecessary()
     }
 
-    override fun viewpointChanged(viewpointChangedEvent: ViewpointChangedEvent) {
-        if (trackViewpointChangedListenerEvents) {
-            methodChannel.invokeMethod("map#viewpointChanged", null)
-        }
-    }
 
     override fun timeExtentChanged(timeExtentChangedEvent: TimeExtentChangedEvent) {
         methodChannel.invokeMethod(
@@ -166,17 +173,15 @@ class ArcgisMapController(
             }
 
             "map#exportImage" -> {
-                val future = mapView.exportImageAsync()
-                future!!.addDoneListener {
-                    try {
-                        val bitmap = future.get()
-                        result.success(ConvertUti.Companion.bitmapToByteArray(bitmap))
-                    } catch (e: Exception) {
-                        result.error("exportImage", e.message, null)
+                scope.launch {
+                    mapView.exportImage().onSuccess {
+                        result.success(ConvertUti.Companion.bitmapToByteArray(it))
+                    }.onFailure {
+                        result.error("exportImage", it.message, null)
                     }
                 }
             }
-
+            
             "map#getLegendInfos" -> {
                 val legendInfoController = LegendInfoController(context, layersController)
                 legendInfoControllers.add(legendInfoController)
@@ -447,9 +452,10 @@ class ArcgisMapController(
             }
 
             "map#screenToLocation" -> {
-                val screenLocationData: ScreenLocationData = ConvertUti.Companion.toScreenLocationData(
-                    context, call.arguments
-                )
+                val screenLocationData: ScreenLocationData =
+                    ConvertUti.Companion.toScreenLocationData(
+                        context, call.arguments
+                    )
                 var mapPoint = mapView.screenToLocation(screenLocationData.point)
                 if (mapPoint == null) {
                     result.success(null)

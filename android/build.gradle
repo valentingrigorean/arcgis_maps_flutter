@@ -55,4 +55,5 @@ android {
 
 dependencies {
     implementation 'androidx.core:core-ktx:+'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.0'
 }
