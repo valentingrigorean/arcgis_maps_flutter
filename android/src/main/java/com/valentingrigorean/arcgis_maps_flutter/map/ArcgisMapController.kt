@@ -7,10 +7,14 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.coroutineScope
+import com.arcgismaps.geometry.Envelope
 import com.arcgismaps.mapping.ArcGISMap
 import com.arcgismaps.mapping.Viewpoint
 import com.arcgismaps.mapping.view.GraphicsOverlay
 import com.arcgismaps.mapping.view.MapView
+import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toFlutterJson
+import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterValue
 import com.valentingrigorean.arcgis_maps_flutter.layers.LayersChangedController
 import com.valentingrigorean.arcgis_maps_flutter.layers.LayersController
 import com.valentingrigorean.arcgis_maps_flutter.layers.LegendInfoController
@@ -45,7 +49,6 @@ class ArcgisMapController(
     private val polygonsController: PolygonsController
     private val polylinesController: PolylinesController
     private val symbolControllers = ArrayList<SymbolsController>()
-    private val legendInfoControllers = ArrayList<LegendInfoController>()
     private val mapChangeAwares = ArrayList<MapChangeAware>()
     private val symbolVisibilityFilterController: SymbolVisibilityFilterController
     private val layersChangedController: LayersChangedController
@@ -53,7 +56,7 @@ class ArcgisMapController(
     private val mapLoadedListener = MapLoadedListener()
     private var mapView: MapView
     private var mapViewOnTouchListener: MapViewOnTouchListener
-    private var scaleBarController: ScaleBarController?
+    private var scaleBarController: ScaleBarController
     private val invalidateMapHelper: InvalidateMapHelper
     private var viewpoint: Viewpoint? = null
     private var haveScaleBar = false
@@ -107,6 +110,13 @@ class ArcgisMapController(
                 methodChannel.invokeMethod("map#viewpointChanged", null)
             }
         }.launchIn(scope)
+
+        mapView.timeExtent.onEach {
+            if(trackTimeExtentEvents){
+                methodChannel.invokeMethod("map#timeExtentChanged", it?.toFlutterJson())
+            }
+        }.launchIn(scope)
+
         invalidateMapHelper = InvalidateMapHelper(mapView, scope)
 
         if (params != null) {
@@ -124,32 +134,22 @@ class ArcgisMapController(
             return
         }
         disposed = true
-        invalidateMapHelper.dispose()
         trackTimeExtentEvents = false
         trackViewpointChangedListenerEvents = false
         methodChannel.setMethodCallHandler(null)
-        val lifecycle = lifecycleProvider.lifecycle
+        val lifecycle = lifecycleProvider()
         lifecycle?.removeObserver(this)
         if (scaleBarController != null) {
-            scaleBarController!!.dispose()
+            scaleBarController.dispose()
             scaleBarController = null
         }
-        mapViewOnTouchListener!!.clearAllDelegates()
-        mapViewOnTouchListener = null
+        mapViewOnTouchListener.clearAllDelegates()
         symbolVisibilityFilterController.clear()
         clearSymbolsControllers()
         clearMapAwareControllers()
         locationDisplayController.setLocationDisplayControllerDelegate(null)
         locationDisplayController.dispose()
         destroyMapViewIfNecessary()
-    }
-
-
-    override fun timeExtentChanged(timeExtentChangedEvent: TimeExtentChangedEvent) {
-        methodChannel.invokeMethod(
-            "map#timeExtentChanged",
-            ConvertUti.Companion.timeExtentToJson(timeExtentChangedEvent.timeExtent)
-        )
     }
 
     override fun onUserLocationTap() {
@@ -175,42 +175,39 @@ class ArcgisMapController(
             "map#exportImage" -> {
                 scope.launch {
                     mapView.exportImage().onSuccess {
-                        result.success(ConvertUti.Companion.bitmapToByteArray(it))
+                        result.success(it.toFlutterValue())
                     }.onFailure {
                         result.error("exportImage", it.message, null)
                     }
                 }
             }
-            
+
             "map#getLegendInfos" -> {
-                val legendInfoController = LegendInfoController(context, layersController)
-                legendInfoControllers.add(legendInfoController)
-                legendInfoController.loadAsync(call.arguments) { results: List<Any?>? ->
-                    result.success(results)
-                    legendInfoControllers.remove(legendInfoController)
+                scope.launch {
+                    val legendInfoController = LegendInfoController(context, layersController)
+                    legendInfoController.load(call.arguments as Map<*, *>).onSuccess{
+                        result.success(it)
+                    }.onFailure {
+                        result.error("getLegendInfos", it.message, null)
+                    }
                 }
             }
 
             "map#getMapMaxExtend" -> {
-                if (mapView.getMap() != null) {
-                    mapView.getMap().addDoneLoadingListener {
-                        val maxExtend = mapView.getMap().maxExtent
-                        if (maxExtend == null) {
-                            result.success(null)
-                        } else {
-                            result.success(ConvertUti.Companion.geometryToJson(maxExtend))
-                        }
+                scope.launch {
+                    val map = mapView.map
+                    if(map == null){
+                        result.success(null)
+                        return@launch
                     }
-                } else {
-                    result.success(null)
+                    map.load()
+                    result.success(map.maxExtent?.toFlutterJson())
                 }
             }
 
             "map#setMapMaxExtent" -> {
-                val maxExtend = ConvertUti.Companion.toGeometry(call.arguments) as Envelope
-                if (mapView.getMap() != null) {
-                    mapView.getMap().maxExtent = maxExtend
-                }
+                val maxExtend = call.arguments.toGeometryOrNull() as Envelope?
+                mapView.map?.maxExtent = maxExtend
                 result.success(null)
             }
 
@@ -228,11 +225,7 @@ class ArcgisMapController(
                 val track = call.arguments<Boolean>()!!
                 if (trackTimeExtentEvents != track) {
                     trackTimeExtentEvents = track
-                    if (trackTimeExtentEvents) {
-                        mapView.addTimeExtentChangedListener(this)
-                    } else {
-                        mapView.removeTimeExtentChangedListener(this)
-                    }
+
                 }
                 result.success(null)
             }
@@ -252,15 +245,11 @@ class ArcgisMapController(
             }
 
             "map#getMapRotation" -> {
-                if (mapView.getMap() != null) {
-                    result.success(mapView.getMapRotation())
-                } else {
-                    result.success(0.0)
-                }
+                result(mapView.mapRotation.value)
             }
 
             "map#getWanderExtentFactor" -> {
-                result.success(mapView.getLocationDisplay().wanderExtentFactor)
+                result.success(mapView.locationDisplay.wanderExtentFactor)
             }
 
             "map#queryFeatureTableFromLayer" -> {
@@ -585,45 +574,12 @@ class ArcgisMapController(
         }
     }
 
-    override fun onResume(owner: LifecycleOwner) {
-        if (disposed) {
-            return
-        }
-        mapView.resume()
-    }
-
-    override fun onPause(owner: LifecycleOwner) {
-        if (disposed) {
-            return
-        }
-        mapView.pause()
-    }
-
-    override fun onStop(owner: LifecycleOwner) {
-        if (disposed) {
-            return
-        }
-    }
-
-    override fun onDestroy(owner: LifecycleOwner) {
-        owner.lifecycle.removeObserver(this)
-        if (disposed) {
-            return
-        }
-        destroyMapViewIfNecessary()
-    }
-
     private fun destroyMapViewIfNecessary() {
         mapLoadedListener.setMap(null)
-        if (mapView != null) {
-            mapView.dispose()
-            mapView.removeAllViews()
-            mapView = null
-        }
     }
 
     private fun handleTimeAwareLayerInfos(result: MethodChannel.Result) {
-        val map = mapView.getMap()
+        val map = mapView.map
         if (map == null || map.operationalLayers.size == 0) {
             result.success(ArrayList<Any>())
             return
