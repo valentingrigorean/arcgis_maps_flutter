@@ -17,7 +17,7 @@ class ScaleBarController(
     private val context: Context,
     private val mapView: MapView,
     private val container: FrameLayout,
-    scope: CoroutineScope
+    private val scope: CoroutineScope
 ) {
     private val scalebar: Scalebar = Scalebar(context)
     private var scaleBarState = ScaleBarState.NONE
@@ -63,7 +63,7 @@ class ScaleBarController(
             ScaleBarState.NONE -> {}
             ScaleBarState.IN_MAP -> scalebar.removeFromMapView()
             ScaleBarState.IN_CONTAINER -> {
-                scalebar.bindTo(null)
+                scalebar.bindTo(null, scope)
                 container.removeView(scalebar)
             }
         }
@@ -124,11 +124,11 @@ class ScaleBarController(
     private fun validateScaleBarState(isInMap: Boolean) {
         if (isInMap && scaleBarState != ScaleBarState.IN_MAP) {
             removeScaleBar()
-            scalebar.addToMapView(mapView)
+            scalebar.addToMapView(mapView,scope)
             scaleBarState = ScaleBarState.IN_MAP
         } else if (scaleBarState != ScaleBarState.IN_CONTAINER) {
             removeScaleBar()
-            scalebar.bindTo(mapView)
+            scalebar.bindTo(mapView,scope)
             layoutParams = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ConvertUtils.dpToPixelsI(context, 50)

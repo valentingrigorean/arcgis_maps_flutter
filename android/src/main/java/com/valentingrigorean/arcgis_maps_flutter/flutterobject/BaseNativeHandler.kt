@@ -3,6 +3,7 @@ package com.valentingrigorean.arcgis_maps_flutter.flutterobject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 
 abstract class BaseNativeHandler<T> protected constructor(val nativeHandler: T) : NativeHandler {
     private var messageSink: NativeMessageSink? = null

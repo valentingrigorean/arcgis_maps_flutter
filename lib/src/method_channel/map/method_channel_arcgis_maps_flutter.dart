@@ -228,16 +228,14 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<List<Feature>> queryFeatureTableFromLayer(
-      {
-        required int mapId,
-        required String layerName,
-        Geometry? geometry,
-        SpatialRelationship? spatialRelationship,
-        int? maxResults,
-        Map<String, dynamic>? queryValues,
-      }) async {
-
+  Future<List<Feature>> queryFeatureTableFromLayer({
+    required int mapId,
+    required String layerName,
+    Geometry? geometry,
+    SpatialRelationship? spatialRelationship,
+    int? maxResults,
+    Map<String, dynamic>? queryValues,
+  }) async {
     queryValues ??= {};
 
     queryValues["layerName"] = layerName;
@@ -259,11 +257,8 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
       queryValues,
     );
 
-    return result
-        ?.map<Feature>((e) => Feature.fromJson(e))
-        .toList() ??
+    return result?.map<Feature>((e) => Feature.fromJson(e)).toList() ??
         const [];
-
   }
 
   @override
@@ -324,8 +319,8 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
 
   @override
   Future<Viewpoint?> getInitialViewpoint(int mapId) async {
-    final result = await channel(mapId).invokeMapMethod<String, dynamic>(
-        "map#getInitialViewpoint");
+    final result = await channel(mapId)
+        .invokeMapMethod<String, dynamic>("map#getInitialViewpoint");
     if (result == null) {
       return null;
     }
@@ -352,8 +347,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<bool> setViewpointCenter(
-      int mapId, Point center, double scale) async {
+  Future<bool> setViewpointCenter(int mapId, Point center, double scale) async {
     final result = await channel(mapId).invokeMethod<bool>(
       'map#setViewpointCenter',
       {
@@ -365,9 +359,10 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<void> setViewpointRotation(int mapId, double angleDegrees) {
-    return channel(mapId)
-        .invokeMethod<void>("map#setViewpointRotation", angleDegrees);
+  Future<bool> setViewpointRotation(int mapId, double angleDegrees) async {
+    final result = await channel(mapId)
+        .invokeMethod<bool>("map#setViewpointRotation", angleDegrees);
+    return result ?? false;
   }
 
   @override

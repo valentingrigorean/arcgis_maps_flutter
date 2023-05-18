@@ -1,6 +1,7 @@
 package com.valentingrigorean.arcgis_maps_flutter.convert.mapping
 
 import com.arcgismaps.mapping.BasemapStyle
+import com.arcgismaps.mapping.ViewpointType
 
 fun Int.toBasemapStyle(): BasemapStyle {
     return when (this) {
@@ -50,6 +51,21 @@ fun Int.toBasemapStyle(): BasemapStyle {
         43 -> BasemapStyle.OsmStreets
         44 -> BasemapStyle.OsmStreetsRelief
         45 -> BasemapStyle.OsmStreetsReliefBase
+        else -> throw IllegalArgumentException("Invalid value: $this")
+    }
+}
+
+fun ViewpointType.toFlutterValue() : Int{
+    return when(this){
+        ViewpointType.CenterAndScale -> 0
+        ViewpointType.BoundingGeometry -> 1
+    }
+}
+
+fun Int.toViewpointType() : ViewpointType{
+    return when(this){
+        0 -> ViewpointType.CenterAndScale
+        1 -> ViewpointType.BoundingGeometry
         else -> throw IllegalArgumentException("Invalid value: $this")
     }
 }

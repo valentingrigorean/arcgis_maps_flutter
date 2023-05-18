@@ -10,7 +10,7 @@ class LegendInfoController(
 
     suspend fun load(data: Map<*,*>) : Result<List<Any>?>{
         layersController.getLayerByLayerId("0")!!.load()
-        return null
+        return Result.success(null)
     }
 
     private fun validateLayerResults(src: List<*>, dst: List<*>): Boolean {
