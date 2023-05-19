@@ -135,3 +135,4 @@ class ArcgisNativeObjectFactoryImpl : ArcgisNativeObjectFactory {
         }
     }
 }
+

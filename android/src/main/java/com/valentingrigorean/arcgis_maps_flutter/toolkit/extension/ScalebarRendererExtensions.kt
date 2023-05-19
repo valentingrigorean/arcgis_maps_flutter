@@ -16,19 +16,22 @@
 
 package com.valentingrigorean.arcgis_maps_flutter.toolkit.extension
 
-import com.esri.arcgisruntime.UnitSystem
-import com.esri.arcgisruntime.geometry.LinearUnit
-import com.esri.arcgisruntime.geometry.LinearUnitId
+import com.arcgismaps.UnitSystem
+import com.arcgismaps.geometry.LinearUnit
+import com.arcgismaps.geometry.LinearUnitId
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.Multiplier
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.renderer.ScalebarRenderer
+import kotlin.math.floor
+import kotlin.math.log10
+import kotlin.math.pow
 
 internal const val HALF_MILE_FEET = 2640
 internal const val KILOMETER_METERS = 1000
 
-internal val LINEAR_UNIT_METERS = LinearUnit(LinearUnitId.METERS)
-internal val LINEAR_UNIT_FEET = LinearUnit(LinearUnitId.FEET)
-internal val LINEAR_UNIT_KILOMETERS = LinearUnit(LinearUnitId.KILOMETERS)
-internal val LINEAR_UNIT_MILES = LinearUnit(LinearUnitId.MILES)
+internal val LINEAR_UNIT_METERS = LinearUnit(LinearUnitId.Meters)
+internal val LINEAR_UNIT_FEET = LinearUnit(LinearUnitId.Feet)
+internal val LINEAR_UNIT_KILOMETERS = LinearUnit(LinearUnitId.Kilometers)
+internal val LINEAR_UNIT_MILES = LinearUnit(LinearUnitId.Miles)
 
 /**
  * Array containing the multipliers that may be used for a scalebar and arrays of segment options appropriate for each multiplier.
@@ -70,8 +73,8 @@ internal fun ScalebarRenderer.calculateBestLength(maxLength: Double, unit: Linea
 
     // If using imperial units, check if the number of feet is greater than the threshold for using feet; note this
     // isn't necessary for metric units because bestLength calculated using meters will also be a nice number of km
-    if (unit.linearUnitId == LinearUnitId.FEET) {
-        val displayUnits = selectLinearUnit(bestLength, UnitSystem.IMPERIAL)
+    if (unit.linearUnitId == LinearUnitId.Feet) {
+        val displayUnits = selectLinearUnit(bestLength, UnitSystem.Imperial)
         if (unit.linearUnitId != displayUnits.linearUnitId) {
             // 'unit' is feet but we're going to display in miles, so recalculate bestLength to give a nice number of miles
             bestLength = calculateBestLength(unit.convertTo(displayUnits, maxLength), displayUnits)
@@ -106,7 +109,7 @@ internal fun calculateOptimalNumberOfSegments(distance: Double, maxNumSegments: 
  */
 internal fun selectLinearUnit(distance: Double, unitSystem: UnitSystem): LinearUnit {
     return when (unitSystem) {
-        UnitSystem.IMPERIAL -> {
+        UnitSystem.Imperial -> {
             // use MILES if at least half a mile
             if (distance >= HALF_MILE_FEET) {
                 LINEAR_UNIT_MILES
@@ -114,7 +117,7 @@ internal fun selectLinearUnit(distance: Double, unitSystem: UnitSystem): LinearU
                 LINEAR_UNIT_FEET
             }
         }
-        UnitSystem.METRIC -> {
+        UnitSystem.Metric -> {
             // use KILOMETERS if at least one kilometer
             if (distance >= KILOMETER_METERS) {
                 LINEAR_UNIT_KILOMETERS
@@ -132,7 +135,7 @@ internal fun selectLinearUnit(distance: Double, unitSystem: UnitSystem): LinearU
  * @since 100.5.0
  */
 fun calculateMagnitude(distance: Double): Double {
-    return Math.pow(10.0, Math.floor(Math.log10(distance)))
+    return 10.0.pow(floor(log10(distance)))
 }
 
 /**

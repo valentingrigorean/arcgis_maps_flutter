@@ -4,6 +4,9 @@ import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 
 class ArcgisNativeObjectsController(
     messenger: BinaryMessenger,
@@ -13,6 +16,7 @@ class ArcgisNativeObjectsController(
     private val factory: ArcgisNativeObjectFactory
     private val messageSink: MessageSink
     private val storage: NativeObjectStorage
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main)
 
     init {
         channel = MethodChannel(messenger, "plugins.flutter.io/arcgis_channel/native_objects")
@@ -23,6 +27,7 @@ class ArcgisNativeObjectsController(
     }
 
     fun dispose() {
+        scope.cancel()
         channel.setMethodCallHandler(null)
         storage.clearAll()
     }

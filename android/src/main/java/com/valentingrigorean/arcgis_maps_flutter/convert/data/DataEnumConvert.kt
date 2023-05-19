@@ -16,6 +16,23 @@ fun Int.toStatisticType(): StatisticType = when (this) {
     else -> throw IllegalArgumentException("Unknown statistic type $this")
 }
 
+fun SpatialRelationship.toFlutterValue(): Int {
+    return when (this) {
+        SpatialRelationship.Unknown -> -1
+        SpatialRelationship.Relate -> 0
+        SpatialRelationship.Equals -> 1
+        SpatialRelationship.Disjoint -> 2
+        SpatialRelationship.Intersects -> 3
+        SpatialRelationship.Touches -> 4
+        SpatialRelationship.Crosses -> 5
+        SpatialRelationship.Within -> 6
+        SpatialRelationship.Contains -> 7
+        SpatialRelationship.Overlaps -> 8
+        SpatialRelationship.EnvelopeIntersects -> 9
+        SpatialRelationship.IndexIntersects -> 10
+    }
+}
+
 fun Int.toSpatialRelationship(): SpatialRelationship {
     return when (this) {
         -1 -> SpatialRelationship.Unknown
@@ -50,3 +67,6 @@ fun Int.toQueryFeatureFields(): QueryFeatureFields {
         else -> throw IllegalArgumentException("Unknown query feature fields $this")
     }
 }
+
+
+

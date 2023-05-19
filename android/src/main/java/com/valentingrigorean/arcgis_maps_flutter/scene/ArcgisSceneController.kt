@@ -3,6 +3,7 @@ package com.valentingrigorean.arcgis_maps_flutter.scene
 import android.content.Context
 import android.view.View
 import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import com.arcgismaps.mapping.view.SceneView
 import io.flutter.plugin.common.BinaryMessenger
@@ -16,7 +17,7 @@ class ArcgisSceneController(
     context: Context,
     params: Map<String, Any>?,
     binaryMessenger: BinaryMessenger,
-    //private val lifecycleProvider: LifecycleProvider
+    private val lifecycleProvider: () -> Lifecycle
 ) : DefaultLifecycleObserver, PlatformView, MethodCallHandler {
     private val methodChannel: MethodChannel
     private val sceneController: SceneController

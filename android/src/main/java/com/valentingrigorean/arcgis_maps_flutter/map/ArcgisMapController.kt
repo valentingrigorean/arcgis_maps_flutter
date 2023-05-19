@@ -1,25 +1,38 @@
 package com.valentingrigorean.arcgis_maps_flutter.map
 
 import android.content.Context
-import android.util.Log
 import android.view.View
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.coroutineScope
+import com.arcgismaps.LoadStatus
+import com.arcgismaps.arcgisservices.TimeAware
+import com.arcgismaps.data.QueryParameters
 import com.arcgismaps.geometry.Envelope
+import com.arcgismaps.geometry.GeometryEngine
 import com.arcgismaps.mapping.ArcGISMap
+import com.arcgismaps.mapping.Basemap
+import com.arcgismaps.mapping.MobileMapPackage
 import com.arcgismaps.mapping.Viewpoint
+import com.arcgismaps.mapping.ViewpointType
+import com.arcgismaps.mapping.layers.ArcGISVectorTiledLayer
+import com.arcgismaps.mapping.layers.FeatureLayer
+import com.arcgismaps.mapping.layers.GroupLayer
 import com.arcgismaps.mapping.view.GraphicsOverlay
 import com.arcgismaps.mapping.view.MapView
+import com.valentingrigorean.arcgis_maps_flutter.convert.arcgisservices.toFlutterJson
+import com.valentingrigorean.arcgis_maps_flutter.convert.data.toSpatialRelationship
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toPointOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toArcGISMapOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toFlutterJson
-import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toTimeExtent
 import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toTimeExtentOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toViewpointOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toViewpointType
+import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterValue
+import com.valentingrigorean.arcgis_maps_flutter.extensions.loadAll
 import com.valentingrigorean.arcgis_maps_flutter.layers.LayersChangedController
 import com.valentingrigorean.arcgis_maps_flutter.layers.LayersController
 import com.valentingrigorean.arcgis_maps_flutter.layers.LegendInfoController
@@ -35,11 +48,11 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.platform.PlatformView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.util.Locale
-import java.util.concurrent.ExecutionException
 
 class ArcgisMapController(
     id: Int,
@@ -59,7 +72,6 @@ class ArcgisMapController(
     private val symbolVisibilityFilterController: SymbolVisibilityFilterController
     private val layersChangedController: LayersChangedController
     private val locationDisplayController: LocationDisplayController
-    private val mapLoadedListener = MapLoadedListener()
     private var mapView: MapView
     private var mapViewOnTouchListener: MapViewOnTouchListener
     private var scaleBarController: ScaleBarController
@@ -94,14 +106,10 @@ class ArcgisMapController(
         polylinesController = PolylinesController(methodChannel, graphicsOverlay)
         symbolControllers.add(polylinesController)
         val locationDisplayChannel = MethodChannel(
-            binaryMessenger,
-            "plugins.flutter.io/arcgis_maps_" + id + "_location_display"
+            binaryMessenger, "plugins.flutter.io/arcgis_maps_" + id + "_location_display"
         )
         locationDisplayController = LocationDisplayController(
-            locationDisplayChannel,
-            mapView.locationDisplay,
-            mapView,
-            scope
+            locationDisplayChannel, mapView.locationDisplay, mapView, scope
         )
         locationDisplayController.setLocationDisplayControllerDelegate(this)
         initSymbolsControllers()
@@ -313,30 +321,19 @@ class ArcgisMapController(
             }
 
             "map#screenToLocation" -> {
-                val screenLocationData: ScreenLocationData =
-                    ConvertUti.Companion.toScreenLocationData(
-                        context, call.arguments
-                    )
-                var mapPoint = mapView.screenToLocation(screenLocationData.point)
-                if (mapPoint == null) {
-                    result.success(null)
-                } else {
-                    if (mapPoint.spatialReference.wkid != screenLocationData.spatialReference.wkid) {
-                        mapPoint = GeometryEngine.project(
-                            mapPoint,
-                            screenLocationData.spatialReference
-                        ) as Point
+                val screenLocationData = ScreenLocationData.fromJson(call.arguments as Map<*, *>)
+                var mapPoint = mapView.screenToLocation(screenLocationData.point)?.let {
+                    if (screenLocationData.spatialReference != null && it.spatialReference?.wkid != screenLocationData.spatialReference?.wkid) {
+                        GeometryEngine.projectOrNull(it, screenLocationData.spatialReference)
+                    } else {
+                        it
                     }
-                    result.success(ConvertUti.Companion.geometryToJson(mapPoint))
                 }
+                result.success(mapPoint?.toFlutterJson())
             }
 
             "map#getMapScale" -> {
-                if (mapView.getMap() != null) {
-                    result.success(mapView.getMapScale())
-                } else {
-                    result.success(0.0)
-                }
+                result.success(mapView.mapScale.value)
             }
 
             "layers#update" -> {
@@ -392,42 +389,19 @@ class ArcgisMapController(
             }
 
             "map#setViewpointScaleAsync" -> {
-                val data = call.arguments<Map<*, *>>()
-                if (mapView != null && data != null) {
+                scope.launch {
+                    val data = call.arguments<Map<*, *>>()!!
                     val scale = data["scale"] as Double
-                    val future = mapView.setViewpointScaleAsync(scale)
-                    future!!.addDoneListener {
-                        val scaled: Boolean
-                        try {
-                            scaled = future.get()!!
-                            result.success(scaled)
-                        } catch (e: ExecutionException) {
-                            result.success(false)
-                        } catch (e: InterruptedException) {
-                            result.success(false)
-                        }
+                    mapView.setViewpointScale(scale).onSuccess {
+                        result.success(true)
+                    }.onFailure {
+                        result.success(false)
                     }
-                } else {
-                    result.success(false)
                 }
             }
 
             "map#getInitialViewpoint" -> {
-                if (mapView == null) {
-                    result.success(null)
-                    return
-                }
-                val arcMap = mapView.getMap()
-                if (arcMap == null) {
-                    result.success(null)
-                    return
-                }
-                val initialViewPoint = arcMap.initialViewpoint
-                if (initialViewPoint == null) {
-                    result.success(null)
-                } else {
-                    result.success(ConvertUti.Companion.viewpointToJson(initialViewPoint))
-                }
+                result.success(mapView.map?.initialViewpoint?.toFlutterJson())
             }
 
             else -> result.notImplemented()
@@ -447,115 +421,109 @@ class ArcgisMapController(
     }
 
     private fun destroyMapViewIfNecessary() {
-        mapLoadedListener.setMap(null)
+
     }
 
     private fun handleQueryFeatureTableFromLayer(data: Map<*, *>, result: MethodChannel.Result) {
-        result.success(null)
-        if (mapView != null && data != null) {
-            val params = QueryParameters()
-            var layerName: String? = ""
+        result.notImplemented()
 
-            // init query params
-            for ((key, value) in data) {
-                when (key) {
-                    "layerName" -> layerName = value as String?
-                    "objectId" -> params.objectIds.add(value as kotlin.String?. toLong ())
-                    "maxResults" -> params.maxFeatures = value as kotlin.String?. toInt ()
-                    "geometry" -> params.geometry = ConvertUti.Companion.toGeometry(
-                        value
-                    )
+//        val params = QueryParameters()
+//        var layerName: String? = ""
+//
+//        // init query params
+//        for ((key, value) in data) {
+//            when (key) {
+//                "layerName" -> layerName = value as String?
+//                "objectId" -> params.objectIds.add(value as kotlin.String?). toLong ())
+//                "maxResults" -> params.maxFeatures = value as kotlin.String?. toInt ()
+//                "geometry" -> params.geometry =  value?.toGeometryOrNull()
+//
+//                "spatialRelationship" -> params.spatialRelationship =
+//                    (value as Int).toSpatialRelationship()
+//
+//                else -> if (params.whereClause.isEmpty()) {
+//                    params.whereClause = String.format(
+//                        "upper(%s) LIKE '%%%s%%'",
+//                        key,
+//                        value.toString().uppercase(Locale.getDefault())
+//                    )
+//                } else {
+//                    val whereClause = params.whereClause
+//                    params.whereClause = whereClause + String.format(
+//                        " AND upper(%s) LIKE '%%%s%%'",
+//                        key,
+//                        value.toString().uppercase(Locale.getDefault())
+//                    )
+//                }
+//            }
+//        }
+//
+//        // check map
+//        val map = mapView.map
+//        if (map == null || map.operationalLayers.size == 0) {
+//            result.success(null)
+//            return
+//        }
+//        val layers = map.operationalLayers
+//        val finalLayerName = layerName
+//        AGSLoadObjects.load(layers, LoadObjectsResult { loaded: Boolean ->
+//            if (!loaded) {
+//                result.success(null)
+//                return@LoadObjectsResult
+//            }
+//            for (layer in layers) {
+//                if (layer is FeatureLayer) {
+//                    val featureLayer = layer as FeatureLayer
+//                    if (featureLayer.name.equals(finalLayerName, ignoreCase = true)) {
+//                        val future =
+//                            featureLayer.featureTable.queryFeaturesAsync(params)
+//                        future.addDoneListener {
+//                            try {
+//                                val queryResult = future.get()
+//                                val results = ArrayList<Any>()
+//                                for (feature in queryResult) {
+//                                    results.add(feature.toMap())
+//                                }
+//                                result.success(results)
+//                            } catch (e: Exception) {
+//                                result.success(null)
+//                            }
+//                        }
+//                        return@LoadObjectsResult
+//                    }
+//                } else if (layer is GroupLayer) {
+//                    val gLayer = layer as GroupLayer
+//                    for (layerItem in gLayer.layers) {
+//                        if (layerItem is FeatureLayer) {
+//                            val featureLayer = layerItem
+//                            if (featureLayer.name.equals(
+//                                    finalLayerName,
+//                                    ignoreCase = true
+//                                )
+//                            ) {
+//                                val future =
+//                                    featureLayer.featureTable.queryFeaturesAsync(params)
+//                                future.addDoneListener {
+//                                    try {
+//                                        val queryResult = future.get()
+//                                        val results = ArrayList<Any>()
+//                                        for (feature in queryResult) {
+//                                            results.add(feature.toMap())
+//                                        }
+//                                        result.success(results)
+//                                    } catch (e: Exception) {
+//                                        result.success(null)
+//                                    }
+//                                }
+//                                return@LoadObjectsResult
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//            result.success(null)
+//        })
 
-                    "spatialRelationship" -> params.spatialRelationship =
-                        ConvertUti.Companion.toSpatialRelationship(
-                            value!!
-                        )
-
-                    else -> if (params.whereClause.isEmpty()) {
-                        params.whereClause = String.format(
-                            "upper(%s) LIKE '%%%s%%'",
-                            key,
-                            value.toString().uppercase(Locale.getDefault())
-                        )
-                    } else {
-                        val whereClause = params.whereClause
-                        params.whereClause = whereClause + String.format(
-                            " AND upper(%s) LIKE '%%%s%%'",
-                            key,
-                            value.toString().uppercase(Locale.getDefault())
-                        )
-                    }
-                }
-            }
-
-            // check map
-            val map = mapView.getMap()
-            if (map == null || map.operationalLayers.size == 0) {
-                result.success(null)
-                return
-            }
-            val layers = map.operationalLayers
-            val finalLayerName = layerName
-            AGSLoadObjects.load(layers, LoadObjectsResult { loaded: Boolean ->
-                if (!loaded) {
-                    result.success(null)
-                    return@LoadObjectsResult
-                }
-                for (layer in layers) {
-                    if (layer is FeatureLayer) {
-                        val featureLayer = layer as FeatureLayer
-                        if (featureLayer.name.equals(finalLayerName, ignoreCase = true)) {
-                            val future =
-                                featureLayer.featureTable.queryFeaturesAsync(params)
-                            future.addDoneListener {
-                                try {
-                                    val queryResult = future.get()
-                                    val results = ArrayList<Any>()
-                                    for (feature in queryResult) {
-                                        results.add(feature.toMap())
-                                    }
-                                    result.success(results)
-                                } catch (e: Exception) {
-                                    result.success(null)
-                                }
-                            }
-                            return@LoadObjectsResult
-                        }
-                    } else if (layer is GroupLayer) {
-                        val gLayer = layer as GroupLayer
-                        for (layerItem in gLayer.layers) {
-                            if (layerItem is FeatureLayer) {
-                                val featureLayer = layerItem
-                                if (featureLayer.name.equals(
-                                        finalLayerName,
-                                        ignoreCase = true
-                                    )
-                                ) {
-                                    val future =
-                                        featureLayer.featureTable.queryFeaturesAsync(params)
-                                    future.addDoneListener {
-                                        try {
-                                            val queryResult = future.get()
-                                            val results = ArrayList<Any>()
-                                            for (feature in queryResult) {
-                                                results.add(feature.toMap())
-                                            }
-                                            result.success(results)
-                                        } catch (e: Exception) {
-                                            result.success(null)
-                                        }
-                                    }
-                                    return@LoadObjectsResult
-                                }
-                            }
-                        }
-                    }
-                }
-                result.success(null)
-            })
-        } else {
-
-        }
     }
 
     private fun handleTimeAwareLayerInfos(result: MethodChannel.Result) {
@@ -564,25 +532,16 @@ class ArcgisMapController(
             result.success(ArrayList<Any>())
             return
         }
-        val layers = map.operationalLayers
-        AGSLoadObjects.load(layers, LoadObjectsResult { loaded: Boolean ->
-            if (!loaded) {
-                result.success(ArrayList<Any>())
-                return@LoadObjectsResult
-            }
-            val results = ArrayList<Any>()
-            for (layer in layers) {
-                if (layer is TimeAware) {
-                    results.add(
-                        ConvertUti.Companion.timeAwareToJson(
-                            layer as TimeAware,
-                            layersController.getLayerIdByLayer(layer)
-                        )
-                    )
-                }
-            }
+        scope.launch {
+            map.operationalLayers.loadAll()
+            val results =
+                map.operationalLayers.takeWhile { it is TimeAware && it.loadStatus.value == LoadStatus.Loaded }
+                    .map {
+                        val timeAware = it as TimeAware
+                        timeAware.toFlutterJson(layersController.getLayerIdByLayer(it))
+                    }
             result.success(results)
-        })
+        }
     }
 
     private fun initSymbolsControllers() {
@@ -606,33 +565,31 @@ class ArcgisMapController(
     }
 
     private fun setViewpoint(args: Any?, animated: Boolean, result: MethodChannel.Result?) {
-        if (args == null) {
+        scope.launch {
+            val currentViewpoint = args?.toViewpointOrNull()
+            val map = mapView.map
+            if (map == null || currentViewpoint == null) {
+                viewpoint = currentViewpoint
+                result?.success(null)
+                return@launch
+            }
+            if (animated) {
+                mapView.setViewpoint(currentViewpoint)
+            } else {
+                mapView.setViewpointAnimated(currentViewpoint)
+            }
+            viewpoint = null
             result?.success(null)
-            return
         }
-        viewpoint = ConvertUti.Companion.toViewPoint(args)
-        if (mapView.getMap() == null) {
-            result?.success(null)
-            return
-        }
-        if (animated) {
-            mapView.setViewpointAsync(viewpoint).addDoneListener { result?.success(null) }
-        } else {
-            mapView.setViewpointAsync(viewpoint, 0f).addDoneListener { result?.success(null) }
-        }
-        viewpoint = null
     }
 
     private fun changeMapType(args: Any?) {
-        if (args == null) {
-            return
-        }
-        val data: Map<*, *> = ConvertUti.Companion.toMap(args)
+        val data = args as Map<*, *>? ?: return
         if (data.containsKey("offlinePath")) {
             loadOfflineMap(data)
             return
         }
-        val map: ArcGISMap = ConvertUti.Companion.toArcGISMap(args)
+        val map = data.toArcGISMapOrNull()!!
         changeMap(map)
     }
 
@@ -646,60 +603,49 @@ class ArcgisMapController(
             "vtpk" -> {
                 val baseLayer = ArcGISVectorTiledLayer(offlinePath)
                 val baseMap = Basemap(baseLayer)
-                val vMap = ArcGISMap()
-                vMap.basemap = baseMap
-                changeMap(vMap)
+                changeMap(ArcGISMap(baseMap))
             }
 
             else -> {
-                val mobileMapPackage = MobileMapPackage(offlinePath)
-                mobileMapPackage.addDoneLoadingListener {
-                    if (mobileMapPackage.loadStatus == LoadStatus.LOADED) {
+                scope.launch {
+                    val mobileMapPackage = MobileMapPackage(offlinePath)
+                    mobileMapPackage.load().onSuccess {
                         val map = mobileMapPackage.maps[mapIndex]
                         changeMap(map)
-                    } else {
-                        Log.w(
-                            TAG,
-                            "loadOfflineMap: Failed to load map." + mobileMapPackage.loadError.message
+                    }.onFailure {
+                        methodChannel.invokeMethod(
+                            "map#loaded", it.toFlutterJson(withStackTrace = false)
                         )
-                        if (mobileMapPackage.loadError.cause != null) {
-                            Log.w(
-                                TAG,
-                                "loadOfflineMap: Failed to load map." + mobileMapPackage.loadError.cause!!.message
-                            )
-                            methodChannel.invokeMethod(
-                                "map#loaded",
-                                mobileMapPackage.loadError.cause!!.message
-                            )
-                        } else {
-                            methodChannel.invokeMethod(
-                                "map#loaded",
-                                mobileMapPackage.loadError.message
-                            )
-                        }
                     }
                 }
-                mobileMapPackage.loadAsync()
             }
         }
     }
 
     private fun changeMap(map: ArcGISMap) {
-        var viewpoint = viewpoint
-        if (viewpoint == null) {
-            viewpoint = mapView.getCurrentViewpoint(Viewpoint.Type.CENTER_AND_SCALE)
-        }
-        mapLoadedListener.setMap(map)
-        map.loadAsync()
-        mapView.setMap(map)
-        updateMapScale()
-        for (mapChangeAware in mapChangeAwares) {
-            mapChangeAware.onMapChange(map)
-        }
-        if (viewpoint != null) {
-            this.viewpoint = null
-            val future = mapView.setViewpointAsync(viewpoint)
-            future!!.addDoneListener { invalidateMapHelper.invalidateMapIfNeeded() }
+        scope.launch {
+            var currentViewpoint = viewpoint
+            if (currentViewpoint == null) {
+                currentViewpoint = mapView.getCurrentViewpoint(ViewpointType.CenterAndScale)
+            }
+            map.load().onSuccess {
+                methodChannel.invokeMethod("map#loaded", null)
+            }.onFailure {
+                methodChannel.invokeMethod(
+                    "map#loaded", it.toFlutterJson(withStackTrace = false)
+                )
+            }
+            ensureActive()
+            mapView.map = map
+            updateMapScale()
+            for (mapChangeAware in mapChangeAwares) {
+                mapChangeAware.onMapChange(map)
+            }
+            if (currentViewpoint != null) {
+                viewpoint = null
+                mapView.setViewpoint(currentViewpoint)
+                invalidateMapHelper.invalidateMapIfNeeded()
+            }
         }
     }
 
@@ -709,7 +655,7 @@ class ArcgisMapController(
         }
         val data = args as Map<*, *>
         val mapOptions = data["interactionOptions"] as Map<*, *>?
-        if (mapView != null) {
+        if (mapOptions != null) {
             interpretInteractionOptions(mapOptions)
         }
         val trackUserLocationTap = data["trackUserLocationTap"] as Boolean?
@@ -720,9 +666,7 @@ class ArcgisMapController(
         }
         val trackIdentifyLayers = data["trackIdentifyLayers"] as Boolean?
         if (trackIdentifyLayers != null) {
-            mapViewOnTouchListener!!.setTrackIdentityLayers(
-                trackIdentifyLayers
-            )
+            mapViewOnTouchListener.trackIdentityLayers = trackIdentifyLayers
         }
         val haveScaleBar = data["haveScalebar"] as Boolean?
         if (haveScaleBar != null) {
@@ -736,15 +680,14 @@ class ArcgisMapController(
         if (contentInsets != null && mapView != null) {
             // order is left,top,right,bottom
             mapView.setViewInsets(
-                contentInsets[0], contentInsets[1],
-                contentInsets[2], contentInsets[3]
+                contentInsets[0], contentInsets[1], contentInsets[2], contentInsets[3]
             )
         }
         val scaleBarConfiguration = data["scalebarConfiguration"]
         if (scaleBarConfiguration != null) {
-            scaleBarController!!.interpretConfiguration(scaleBarConfiguration)
+            scaleBarController.interpretConfiguration(scaleBarConfiguration)
         } else if (!this.haveScaleBar) {
-            scaleBarController!!.removeScaleBar()
+            scaleBarController.removeScaleBar()
         }
         val minScale = data["minScale"] as Double?
         if (minScale != null) {
@@ -782,9 +725,9 @@ class ArcgisMapController(
     }
 
     private fun updateMapScale() {
-        if (mapView != null && mapView.map != null) {
-            mapView.map!!.minScale = minScale
-            mapView.map!!.maxScale = maxScale
+        mapView.map?.let {
+            it.minScale = minScale
+            it.maxScale = maxScale
         }
     }
 
@@ -816,47 +759,5 @@ class ArcgisMapController(
         if (allowMagnifierToPan != null) {
             interactionOptions.allowMagnifierToPan = allowMagnifierToPan
         }
-    }
-
-    private inner class MapLoadedListener : Runnable {
-        private var map: ArcGISMap? = null
-        fun setMap(map: ArcGISMap?) {
-            try {
-                if (this.map != null) {
-                    this.map!!.removeDoneLoadingListener(this)
-                }
-                this.map = map
-                map?.addDoneLoadingListener(this)
-            } catch (e: Exception) {
-                Log.e(TAG, "setMap: ", e)
-            }
-        }
-
-        override fun run() {
-            if (disposed) {
-                return
-            }
-            map!!.removeDoneLoadingListener(this)
-            if (map!!.loadStatus == LoadStatus.LOADED) {
-                methodChannel.invokeMethod("map#loaded", null)
-            } else if (map!!.loadError != null) {
-                Log.w(TAG, "changeMap: Failed to load map." + map!!.loadError.message)
-                if (map!!.loadError.cause != null) {
-                    Log.w(TAG, "changeMap: Failed to load map." + map!!.loadError.cause!!.message)
-                }
-                methodChannel.invokeMethod(
-                    "map#loaded", ConvertUti.Companion.arcGISRuntimeExceptionToJson(
-                        map!!.loadError
-                    )
-                )
-            } else {
-                Log.w(TAG, "changeMap: Unknown error")
-                methodChannel.invokeMethod("map#loaded", null)
-            }
-        }
-    }
-
-    companion object {
-        private const val TAG = "ArcgisMapController"
     }
 }
