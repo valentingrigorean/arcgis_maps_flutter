@@ -7,6 +7,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 class ArcgisNativeObjectsController(
     messenger: BinaryMessenger,
@@ -35,15 +36,20 @@ class ArcgisNativeObjectsController(
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "createNativeObject" -> {
-                val args = call.arguments<Map<*, *>>()!!
-                val objectId = args["objectId"] as String?
-                val type = args["type"] as String?
-                val arguments = args["arguments"]
-                val nativeObject = factory.createNativeObject(
-                    objectId!!, type!!, arguments, messageSink
-                )
-                storage.addNativeObject(nativeObject)
-                result.success(null)
+                scope.launch {
+                    val args = call.arguments<Map<*, *>>()!!
+                    val objectId = args["objectId"] as String?
+                    val type = args["type"] as String?
+                    val arguments = args["arguments"]
+                    factory.createNativeObject(
+                        objectId!!, type!!, arguments, messageSink
+                    ).onSuccess {
+                        storage.addNativeObject(it)
+                        result.success(null)
+                    }.onFailure {
+                        result.error("createNativeObject", it.message, null)
+                    }
+                }
             }
 
             "destroyNativeObject" -> {

@@ -21,6 +21,8 @@ import io.flutter.embedding.engine.plugins.lifecycle.FlutterLifecycleAdapter
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
 /**
  * ArcgisMapsFlutterPlugin
@@ -29,6 +31,8 @@ class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
     private var geometryEngineController: GeometryEngineController? = null
     private var coordinateFormatterController: CoordinateFormatterController? = null
     private var nativeObjectsController: ArcgisNativeObjectsController? = null
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main)
+
     private lateinit var channel: MethodChannel
     private var lifecycle: Lifecycle? = null
     override fun onAttachedToEngine(binding: FlutterPluginBinding) {
@@ -46,7 +50,7 @@ class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
         coordinateFormatterController = CoordinateFormatterController(binding.binaryMessenger)
         nativeObjectsController = ArcgisNativeObjectsController(
             binding.binaryMessenger,
-            ArcgisNativeObjectFactoryImpl(),
+            ArcgisNativeObjectFactoryImpl(scope),
         )
     }
 

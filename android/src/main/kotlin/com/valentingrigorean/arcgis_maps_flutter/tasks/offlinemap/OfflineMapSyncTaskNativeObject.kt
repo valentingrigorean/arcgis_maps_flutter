@@ -15,7 +15,7 @@ class OfflineMapSyncTaskNativeObject(
     objectId: String,
     task: OfflineMapSyncTask
 ) : BaseNativeObject<OfflineMapSyncTask>(
-    objectId, task, arrayOf<NativeHandler>(
+    objectId, task, arrayOf(
         LoadableNativeHandler(task),
     )
 ) {

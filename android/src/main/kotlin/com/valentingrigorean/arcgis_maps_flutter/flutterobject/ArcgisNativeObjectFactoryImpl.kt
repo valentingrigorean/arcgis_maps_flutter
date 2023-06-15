@@ -2,10 +2,12 @@ package com.valentingrigorean.arcgis_maps_flutter.flutterobject
 
 import com.arcgismaps.data.Geodatabase
 import com.arcgismaps.data.ServiceFeatureTable
+import com.arcgismaps.mapping.MobileMapPackage
 import com.arcgismaps.mapping.layers.TileCache
 import com.arcgismaps.tasks.geocode.LocatorTask
 import com.arcgismaps.tasks.geodatabase.GeodatabaseSyncTask
 import com.arcgismaps.tasks.networkanalysis.RouteTask
+import com.arcgismaps.tasks.offlinemaptask.OfflineMapSyncTask
 import com.arcgismaps.tasks.offlinemaptask.OfflineMapTask
 import com.arcgismaps.tasks.tilecache.ExportTileCacheTask
 import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toArcGISMapOrNull
@@ -19,15 +21,21 @@ import com.valentingrigorean.arcgis_maps_flutter.tasks.networkanalysis.RouteTask
 import com.valentingrigorean.arcgis_maps_flutter.tasks.offlinemap.OfflineMapSyncTaskNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.tasks.offlinemap.OfflineMapTaskNativeObject
 import com.valentingrigorean.arcgis_maps_flutter.tasks.tilecache.ExportTileCacheTaskNativeObject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.withContext
 import java.util.Objects
 
-class ArcgisNativeObjectFactoryImpl : ArcgisNativeObjectFactory {
-    override fun createNativeObject(
+class ArcgisNativeObjectFactoryImpl(
+    private val scope: CoroutineScope,
+) : ArcgisNativeObjectFactory {
+
+
+    override suspend fun createNativeObject(
         objectId: String,
         type: String,
         arguments: Any?,
         messageSink: NativeMessageSink
-    ): NativeObject {
+    ): Result<NativeObject> {
         return when (type) {
             "ExportTileCacheTask" -> {
                 val url = arguments as String
@@ -37,7 +45,7 @@ class ArcgisNativeObjectFactoryImpl : ArcgisNativeObjectFactory {
                 val nativeObject: NativeObject =
                     ExportTileCacheTaskNativeObject(objectId, exportTileCacheTask)
                 nativeObject.setMessageSink(messageSink)
-                nativeObject
+                Result.success(nativeObject)
             }
 
             "TileCache" -> {
@@ -46,7 +54,7 @@ class ArcgisNativeObjectFactoryImpl : ArcgisNativeObjectFactory {
                 val nativeObject: NativeObject =
                     TileCacheNativeObject(objectId, tileCache)
                 nativeObject.setMessageSink(messageSink)
-                nativeObject
+                Result.success(nativeObject)
             }
 
             "GeodatabaseSyncTask" -> {
@@ -57,7 +65,7 @@ class ArcgisNativeObjectFactoryImpl : ArcgisNativeObjectFactory {
                 val nativeObject: NativeObject =
                     GeodatabaseSyncTaskNativeObject(objectId, geodatabaseSyncTask)
                 nativeObject.setMessageSink(messageSink)
-                nativeObject
+                Result.success(nativeObject)
             }
 
             "OfflineMapTask" -> {
@@ -67,21 +75,40 @@ class ArcgisNativeObjectFactoryImpl : ArcgisNativeObjectFactory {
                 val nativeObject: NativeObject =
                     OfflineMapTaskNativeObject(objectId, task)
                 nativeObject.setMessageSink(messageSink)
-                nativeObject
+                Result.success(nativeObject)
             }
 
             "OfflineMapSyncTask" -> {
-                val nativeObject = OfflineMapSyncTaskNativeObject(objectId, arguments.toString())
-                nativeObject.setMessageSink(messageSink)
-                nativeObject
+                try {
+                    val offlinePath = arguments as String
+                    val mobilePack = MobileMapPackage(offlinePath)
+                    val result = withContext(scope.coroutineContext) {
+                        mobilePack.load()
+                    }
+                    if (result.isSuccess) {
+                        val nativeObject = OfflineMapSyncTaskNativeObject(
+                            objectId,
+                            OfflineMapSyncTask(mobilePack.maps[0])
+                        )
+                        nativeObject.setMessageSink(messageSink)
+                        Result.success(nativeObject)
+                    } else {
+                        Result.failure(
+                            result.exceptionOrNull() ?: Exception("Failed to load the map.")
+                        )
+                    }
+                } catch (e: Exception) {
+                    Result.failure(e)
+                }
             }
+
 
             "Geodatabase" -> {
                 val url = arguments as String
                 val nativeObject: NativeObject =
                     GeodatabaseNativeObject(objectId, Geodatabase(url))
                 nativeObject.setMessageSink(messageSink)
-                nativeObject
+                Result.success(nativeObject)
             }
 
             "RouteTask" -> {
@@ -92,7 +119,7 @@ class ArcgisNativeObjectFactoryImpl : ArcgisNativeObjectFactory {
                 val nativeObject: NativeObject =
                     RouteTaskNativeObject(objectId, routeTask)
                 nativeObject.setMessageSink(messageSink)
-                nativeObject
+                Result.success(nativeObject)
             }
 
             "LocatorTask" -> {
@@ -101,7 +128,7 @@ class ArcgisNativeObjectFactoryImpl : ArcgisNativeObjectFactory {
                 val nativeObject: NativeObject =
                     LocatorTaskNativeObject(objectId, locatorTask)
                 nativeObject.setMessageSink(messageSink)
-                nativeObject
+                Result.success(nativeObject)
             }
 
             "ServiceFeatureTable" -> {
@@ -110,29 +137,27 @@ class ArcgisNativeObjectFactoryImpl : ArcgisNativeObjectFactory {
                 val nativeObject: NativeObject =
                     ServiceFeatureTableNativeObject(objectId, serviceFeatureTable)
                 nativeObject.setMessageSink(messageSink)
-                nativeObject
+                Result.success(nativeObject)
             }
 
-            else -> throw RuntimeException("Not implemented")
+            else -> Result.failure(throw RuntimeException("Not implemented"))
         }
     }
 
-    companion object {
-        private fun createOfflineMapTask(data: Map<*, *>): OfflineMapTask {
-            val offlineMapTask: OfflineMapTask
-            val arcgisMap = data["map"]
-            val portalItem = data["portalItem"]
-            offlineMapTask = if (arcgisMap != null) {
-                val arcGISMap = arcgisMap.toArcGISMapOrNull()!!
-                OfflineMapTask(arcGISMap)
-            } else if (portalItem != null) {
-                val nativePortalItem = portalItem.toPortalItemOrNull()!!
-                OfflineMapTask(nativePortalItem)
-            } else {
-                throw IllegalArgumentException("Map or PortalItem is required")
-            }
-            return offlineMapTask
+    private fun createOfflineMapTask(data: Map<*, *>): OfflineMapTask {
+        val offlineMapTask: OfflineMapTask
+        val arcgisMap = data["map"]
+        val portalItem = data["portalItem"]
+        offlineMapTask = if (arcgisMap != null) {
+            val arcGISMap = arcgisMap.toArcGISMapOrNull()!!
+            OfflineMapTask(arcGISMap)
+        } else if (portalItem != null) {
+            val nativePortalItem = portalItem.toPortalItemOrNull()!!
+            OfflineMapTask(nativePortalItem)
+        } else {
+            throw IllegalArgumentException("Map or PortalItem is required")
         }
+        return offlineMapTask
     }
 }
 
