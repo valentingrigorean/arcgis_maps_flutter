@@ -23,7 +23,11 @@ class _MapPageLayersChangeState extends State<MapPageLayersChange> {
         title: const Text('Layers Changed event.'),
       ),
       body: ArcgisMapView(
-        map:const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
+        map: const ArcGISMap.fromBasemap(
+          Basemap.fromStyle(
+            basemapStyle: BasemapStyle.arcGISCommunity,
+          ),
+        ),
         onMapCreated: (controller) {
           controller.addLayersChangedListener(_LayersChangedListener());
         },

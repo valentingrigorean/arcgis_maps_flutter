@@ -11,7 +11,11 @@ class MapPageGroupLayer extends StatelessWidget {
         title: const Text('Group Layer'),
       ),
       body: ArcgisMapView(
-        map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
+        map: const ArcGISMap.fromBasemap(
+          Basemap.fromStyle(
+            basemapStyle: BasemapStyle.arcGISCommunity,
+          ),
+        ),
         operationalLayers: {
           GroupLayer(
             layerId: const LayerId('Group'),

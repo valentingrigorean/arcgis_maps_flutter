@@ -27,7 +27,11 @@ class _MapPageCurrentLocationTapState extends State<MapPageCurrentLocationTap> {
 
     if (_permissionStatus == PermissionStatus.granted) {
       body = ArcgisMapView(
-        map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
+        map: const ArcGISMap.fromBasemap(
+          Basemap.fromStyle(
+            basemapStyle: BasemapStyle.arcGISCommunity,
+          ),
+        ),
         myLocationEnabled: true,
         onUserLocationTap: () async {
           final point = await _locationDisplay.mapLocation;
@@ -81,7 +85,7 @@ class _MapPageCurrentLocationTapState extends State<MapPageCurrentLocationTap> {
     } else {
       newStatus = await Permission.locationWhenInUse.request();
     }
-    if(mounted){
+    if (mounted) {
       setState(() {
         print(newStatus);
         _permissionStatus = newStatus;

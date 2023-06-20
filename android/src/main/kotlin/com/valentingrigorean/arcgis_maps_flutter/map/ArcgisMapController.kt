@@ -60,7 +60,7 @@ class ArcgisMapController(
     params: Map<String, Any>?,
     binaryMessenger: BinaryMessenger,
     private val lifecycleProvider: () -> Lifecycle
-) : DefaultLifecycleObserver, PlatformView, MethodCallHandler, LocationDisplayControllerDelegate {
+) : PlatformView, MethodCallHandler, LocationDisplayControllerDelegate {
     private val methodChannel: MethodChannel
     private val selectionPropertiesHandler: SelectionPropertiesHandler
     private val layersController: LayersController
@@ -86,11 +86,10 @@ class ArcgisMapController(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main)
 
     init {
-
         methodChannel = MethodChannel(binaryMessenger, "plugins.flutter.io/arcgis_maps_$id")
         methodChannel.setMethodCallHandler(this)
         mapView = MapView(context)
-        lifecycleProvider().addObserver(this)
+        lifecycleProvider().addObserver(mapView)
         scaleBarController = ScaleBarController(context, mapView, mapView, scope)
         selectionPropertiesHandler = SelectionPropertiesHandler(mapView.selectionProperties)
         symbolVisibilityFilterController = SymbolVisibilityFilterController(mapView, scope)
@@ -152,7 +151,7 @@ class ArcgisMapController(
         trackViewpointChangedListenerEvents = false
         methodChannel.setMethodCallHandler(null)
         val lifecycle = lifecycleProvider()
-        lifecycle?.removeObserver(this)
+        lifecycle?.removeObserver(mapView)
         scaleBarController.dispose()
         mapViewOnTouchListener.clearAllDelegates()
         symbolVisibilityFilterController.clear()
@@ -405,18 +404,6 @@ class ArcgisMapController(
             }
 
             else -> result.notImplemented()
-        }
-    }
-
-    override fun onCreate(owner: LifecycleOwner) {
-        if (disposed) {
-            return
-        }
-    }
-
-    override fun onStart(owner: LifecycleOwner) {
-        if (disposed) {
-            return
         }
     }
 

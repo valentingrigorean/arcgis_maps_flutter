@@ -50,7 +50,11 @@ class _MapPageRouteState extends State<MapPageRoute> {
       body: Stack(
         children: [
           ArcgisMapView(
-            map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
+            map: const ArcGISMap.fromBasemap(
+              Basemap.fromStyle(
+                basemapStyle: BasemapStyle.arcGISCommunity,
+              ),
+            ),
             viewpoint: Viewpoint.fromLatLng(
               latitude: 32.741123367963446,
               longitude: -117.15083257944445,

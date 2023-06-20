@@ -16,6 +16,7 @@ import com.arcgismaps.mapping.symbology.SimpleMarkerSymbol
 import com.arcgismaps.mapping.symbology.SimpleMarkerSymbolStyle
 import com.arcgismaps.mapping.symbology.Symbol
 import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.symbology.toSimpleMarkerSymbolStyle
+import com.valentingrigorean.arcgis_maps_flutter.convert.toArcgisColorOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.toBitmapDrawable
 import java.util.Objects
 
@@ -37,8 +38,8 @@ object BitmapDescriptorFactory {
         }
         val styleMarker = (data["styleMarker"] as Int?)?.toSimpleMarkerSymbolStyle()
         if (styleMarker != null) {
-            val color = data["color"] as Int
-            val size = data["size"] as Float
+            val color = data["color"]?.toArcgisColorOrNull()!!
+            val size = data["size"] as Double
             return StyleMarkerBitmapDescriptor(styleMarker, color, size)
         }
         val descriptors = data["descriptors"] as List<Objects>?
@@ -125,11 +126,11 @@ object BitmapDescriptorFactory {
 
     private class StyleMarkerBitmapDescriptor(
         private val style: SimpleMarkerSymbolStyle,
-        private val color: Int,
-        private val size: Float
+        private val color: Color,
+        private val size: Double
     ) : BitmapDescriptor {
         override fun createSymbol(): Symbol {
-            return SimpleMarkerSymbol(style, Color(color), size)
+            return SimpleMarkerSymbol(style, color, size.toFloat())
         }
 
         override fun equals(o: Any?): Boolean {

@@ -17,7 +17,11 @@ class _MapPageGeometryEngineState extends State<MapPageGeometryEngine> {
       body: Stack(
         children: [
           ArcgisMapView(
-            map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
+            map: const ArcGISMap.fromBasemap(
+              Basemap.fromStyle(
+                basemapStyle: BasemapStyle.arcGISCommunity,
+              ),
+            ),
             onTap: (_,point) async {
               final projection = await GeometryEngine.project(
                 point!,

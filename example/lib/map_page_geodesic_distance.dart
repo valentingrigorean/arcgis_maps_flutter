@@ -36,7 +36,11 @@ class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance> {
     late Widget body;
     if (_permissionStatus == PermissionStatus.granted) {
       body = ArcgisMapView(
-        map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
+        map: const ArcGISMap.fromBasemap(
+          Basemap.fromStyle(
+            basemapStyle: BasemapStyle.arcGISCommunity,
+          ),
+        ),
         myLocationEnabled: true,
         onMapCreated: (controller) {
           controller.locationDisplay.wanderExtentFactor = 0.0;

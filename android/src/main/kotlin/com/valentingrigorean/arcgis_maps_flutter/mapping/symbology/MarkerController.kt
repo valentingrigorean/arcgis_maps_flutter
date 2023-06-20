@@ -24,10 +24,12 @@ class MarkerController(val context: Context, markerId: String) : BaseGraphicCont
         graphic.attributes["markerId"] = markerId
     }
 
-    override var isSelected: Boolean
-        get() = this.isSelected
+    override var isSelected: Boolean = false
         set(value) {
-            this.isSelected = value
+            if (field == value) {
+                return
+            }
+            field = value
             handleScaleChange()
         }
 
@@ -52,7 +54,6 @@ class MarkerController(val context: Context, markerId: String) : BaseGraphicCont
             handleScaleChange()
         }
     override var background: BitmapDescriptor? = null
-        get() = field
         set(value) {
             if (field == value) {
                 return
@@ -67,7 +68,6 @@ class MarkerController(val context: Context, markerId: String) : BaseGraphicCont
             handleScaleChange()
         }
     override var opacity: Float = 1f
-        get() = field
         set(value) {
             if (field == value) {
                 return
@@ -108,18 +108,18 @@ class MarkerController(val context: Context, markerId: String) : BaseGraphicCont
             this.background = BitmapDescriptorFactory.fromRawData(context, backgroundImage)
 
         }
-        setIconOffset(data["iconOffsetX"] as Float, data["iconOffsetY"] as Float)
-        val opacity = data["opacity"] as Float?
+        setIconOffset((data["iconOffsetX"] as Double).toFloat(), (data["iconOffsetY"] as Double).toFloat())
+        val opacity = data["opacity"] as Double?
         if (opacity != null) {
-            this.opacity = opacity
+            this.opacity = opacity.toFloat()
         }
-        val angle = data["angle"] as Float?
+        val angle = data["angle"] as Double?
         if (angle != null) {
-            this.angle = angle
+            this.angle = angle.toFloat()
         }
-        val selectedScale = data["selectedScale"] as Float?
+        val selectedScale = data["selectedScale"] as Double?
         if (selectedScale != null) {
-            this.selectedScale = selectedScale
+            this.selectedScale = selectedScale.toFloat()
         }
     }
 

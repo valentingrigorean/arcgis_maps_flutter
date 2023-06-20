@@ -23,6 +23,7 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 
 /**
  * ArcgisMapsFlutterPlugin
@@ -31,11 +32,12 @@ class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
     private var geometryEngineController: GeometryEngineController? = null
     private var coordinateFormatterController: CoordinateFormatterController? = null
     private var nativeObjectsController: ArcgisNativeObjectsController? = null
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main)
+    private var scope: CoroutineScope? = null
 
     private lateinit var channel: MethodChannel
     private var lifecycle: Lifecycle? = null
     override fun onAttachedToEngine(binding: FlutterPluginBinding) {
+        scope = CoroutineScope(Dispatchers.Main)
         binding.platformViewRegistry
             .registerViewFactory(
                 VIEW_TYPE_MAP,
@@ -50,12 +52,14 @@ class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
         coordinateFormatterController = CoordinateFormatterController(binding.binaryMessenger)
         nativeObjectsController = ArcgisNativeObjectsController(
             binding.binaryMessenger,
-            ArcgisNativeObjectFactoryImpl(scope),
+            ArcgisNativeObjectFactoryImpl(scope!!),
         )
     }
 
     override fun onDetachedFromEngine(binding: FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
+        scope?.cancel()
+        scope = null
         geometryEngineController?.dispose()
         geometryEngineController = null
         coordinateFormatterController?.dispose()

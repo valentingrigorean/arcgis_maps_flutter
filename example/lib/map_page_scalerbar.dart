@@ -50,7 +50,11 @@ class _MapPageScaleBarState extends State<MapPageScaleBar> {
         return Stack(
           children: [
             ArcgisMapView(
-              map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
+              map: const ArcGISMap.fromBasemap(
+                Basemap.fromStyle(
+                  basemapStyle: BasemapStyle.arcGISCommunity,
+                ),
+              ),
               scalebarConfiguration: _useCustom
                   ? _customScaleConfiguration
                   : _defaultScaleConfiguration,

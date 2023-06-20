@@ -11,7 +11,11 @@ class MapPagePortal extends StatelessWidget {
         title: const Text('Portal'),
       ),
       body: ArcgisMapView(
-        map:const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
+        map: const ArcGISMap.fromBasemap(
+          Basemap.fromStyle(
+            basemapStyle: BasemapStyle.arcGISCommunity,
+          ),
+        ),
         operationalLayers: {
           FeatureLayer.fromPortalItem(
             layerId: const LayerId('LayerId'),

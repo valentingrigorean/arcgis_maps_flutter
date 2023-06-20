@@ -58,7 +58,7 @@ fun Any.toGeometryOrNull(): Geometry? {
     }
 
     if (this is Map<*, *>) {
-        return when (this["geometryType"] as Int) {
+        return when (this["type"] as Int) {
             1 -> this.toPointOrNull()
             2 -> this.toEnvelopeOrNull()
             3, 4, 5 -> {

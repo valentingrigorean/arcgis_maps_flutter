@@ -6,6 +6,7 @@ import android.view.ViewPropertyAnimator
 import android.widget.FrameLayout
 import com.arcgismaps.mapping.view.MapView
 import com.valentingrigorean.arcgis_maps_flutter.ConvertUtils
+import com.valentingrigorean.arcgis_maps_flutter.convert.fromFlutterColor
 import com.valentingrigorean.arcgis_maps_flutter.convert.toUnitSystem
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.Scalebar
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.Style
@@ -110,12 +111,12 @@ class ScaleBarController(
         }
         scalebar.unitSystem = (data["units"] as Int).toUnitSystem()
         scalebar.style = toScaleBarStyle(data["style"] as Int)
-        scalebar.fillColor = data["fillColor"] as Int
-        scalebar.alternateFillColor = data["alternateFillColor"] as Int
-        scalebar.lineColor = data["lineColor"] as Int
-        scalebar.shadowColor = data["shadowColor"] as Int
-        scalebar.textColor = data["textColor"] as Int
-        scalebar.textShadowColor = data["textShadowColor"] as Int
+        scalebar.fillColor = data["fillColor"]!!.fromFlutterColor()
+        scalebar.alternateFillColor = data["alternateFillColor"]!!.fromFlutterColor()
+        scalebar.lineColor = data["lineColor"]!!.fromFlutterColor()
+        scalebar.shadowColor = data["shadowColor"]!!.fromFlutterColor()
+        scalebar.textColor = data["textColor"]!!.fromFlutterColor()
+        scalebar.textShadowColor = data["textShadowColor"]!!.fromFlutterColor()
         scalebar.textSize = ConvertUtils.spToPixels(
             context, data["textSize"] as Int
         )
@@ -124,11 +125,11 @@ class ScaleBarController(
     private fun validateScaleBarState(isInMap: Boolean) {
         if (isInMap && scaleBarState != ScaleBarState.IN_MAP) {
             removeScaleBar()
-            scalebar.addToMapView(mapView,scope)
+            scalebar.addToMapView(mapView, scope)
             scaleBarState = ScaleBarState.IN_MAP
         } else if (scaleBarState != ScaleBarState.IN_CONTAINER) {
             removeScaleBar()
-            scalebar.bindTo(mapView,scope)
+            scalebar.bindTo(mapView, scope)
             layoutParams = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ConvertUtils.dpToPixelsI(context, 50)

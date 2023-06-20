@@ -191,7 +191,9 @@ class ArcgisMapsUtils {
   static ArcGISMap createMap(
       MapTypeOptions mapTypeOptions, Brightness brightness) {
     if (mapTypeOptions.mapType == MapType.satelitWorld) {
-      return const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels);
+      return const ArcGISMap.fromBasemap(
+          Basemap.fromStyle(basemapStyle: BasemapStyle.arcGISImageryLabels),
+        );
     }
     final layer = _createBasemapLayer(mapTypeOptions, brightness);
     return ArcGISMap.fromBasemap(Basemap.fromBaseLayer(layer));

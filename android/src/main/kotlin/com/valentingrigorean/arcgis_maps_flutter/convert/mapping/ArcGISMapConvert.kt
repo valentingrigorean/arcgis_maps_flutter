@@ -13,7 +13,7 @@ fun Any.toArcGISMapOrNull(): ArcGISMap? {
     if (basemapStyle != null) {
         return ArcGISMap(basemapStyle)
     }
-    val item = data["portal"]?.toPortalItemOrNull()
+    val item = data["item"]?.toPortalItemOrNull()
     if (item != null) {
         return ArcGISMap(item)
     }

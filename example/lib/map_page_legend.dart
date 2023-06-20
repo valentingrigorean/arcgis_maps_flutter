@@ -58,7 +58,11 @@ class _MapPageLegendState extends State<MapPageLegend> {
         title: const Text('Map Legend'),
       ),
       body: ArcgisMapView(
-        map:const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
+        map: const ArcGISMap.fromBasemap(
+          Basemap.fromStyle(
+            basemapStyle: BasemapStyle.arcGISCommunity,
+          ),
+        ),
         // operationalLayers: {_layer},
         onMapCreated: (controller) {
           _controller = controller;

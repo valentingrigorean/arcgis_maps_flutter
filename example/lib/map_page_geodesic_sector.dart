@@ -19,7 +19,11 @@ class _MapPageGeodesicSectorState extends State<MapPageGeodesicSector> {
         title: const Text('Geodesic Sector'),
       ),
       body: ArcgisMapView(
-        map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
+        map: const ArcGISMap.fromBasemap(
+          Basemap.fromStyle(
+            basemapStyle: BasemapStyle.arcGISCommunity,
+          ),
+        ),
         onTap: (_,point) async {
           final geometry = await GeometryEngine.geodesicSector(
             GeodesicSectorParameters(

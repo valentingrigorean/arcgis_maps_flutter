@@ -18,7 +18,11 @@ class _MapPagePolygonState extends State<MapPagePolygon> {
         title: const Text("Polygon"),
       ),
       body: ArcgisMapView(
-        map: const ArcGISMap.fromBasemapStyle(BasemapStyle.arcGISImageryLabels),
+        map: const ArcGISMap.fromBasemap(
+          Basemap.fromStyle(
+            basemapStyle: BasemapStyle.arcGISCommunity,
+          ),
+        ),
         viewpoint: Viewpoint.fromPoint(
           point: Point.fromLatLng(
             latitude: 60.443889,
