@@ -415,7 +415,7 @@ class ArcgisMapController(
     }
 
     private fun destroyMapViewIfNecessary() {
-
+        container.removeView(mapView)
     }
 
     private fun handleQueryFeatureTableFromLayer(data: Map<*, *>, result: MethodChannel.Result) {
@@ -579,8 +579,8 @@ class ArcgisMapController(
 
     private fun changeMapType(args: Any?) {
         val data = args as Map<*, *>? ?: return
-        if (data.containsKey("offlinePath")) {
-            loadOfflineMap(data)
+        if (data.containsKey("offlineInfo")) {
+            loadOfflineMap(data["offlineInfo"] as Map<*, *>)
             return
         }
         val map = data.toArcGISMapOrNull()!!
@@ -588,21 +588,19 @@ class ArcgisMapController(
     }
 
     private fun loadOfflineMap(data: Map<*, *>) {
-        val offlinePath = data["offlinePath"] as String?
-        val mapIndex = data["offlineMapIndex"] as Int
-        val parts =
-            offlinePath!!.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        val ext = parts[parts.size - 1]
-        when (ext) {
+        val offlinePath = data["path"] as String?
+        val mapIndex = data["index"] as Int
+        val parts = offlinePath?.split(".")?.filter { it.isNotEmpty() }
+
+        when (parts?.lastOrNull()) {
             "vtpk" -> {
                 val baseLayer = ArcGISVectorTiledLayer(offlinePath)
                 val baseMap = Basemap(baseLayer)
                 changeMap(ArcGISMap(baseMap))
             }
-
             else -> {
                 scope.launch {
-                    val mobileMapPackage = MobileMapPackage(offlinePath)
+                    val mobileMapPackage = MobileMapPackage(offlinePath!!)
                     mobileMapPackage.load().onSuccess {
                         val map = mobileMapPackage.maps[mapIndex]
                         changeMap(map)
