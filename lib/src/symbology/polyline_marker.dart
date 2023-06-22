@@ -46,6 +46,7 @@ class PolylineMarker extends Symbol {
     this.consumeTapEvents = false,
     this.color = Colors.black,
     this.style = SimpleLineSymbolStyle.solid,
+    this.spatialReference,
     this.points = const <Point>[],
     this.visible = true,
     this.width = 10,
@@ -69,6 +70,9 @@ class PolylineMarker extends Symbol {
 
   /// Style of the line
   final SimpleLineSymbolStyle style;
+
+
+  final SpatialReference? spatialReference;
 
   /// The vertices of the polygon to be drawn.
   final List<Point> points;
@@ -105,6 +109,7 @@ class PolylineMarker extends Symbol {
     bool? consumeTapEventsParam,
     Color? colorParam,
     SimpleLineSymbolStyle? styleParam,
+    SpatialReference? spatialReferenceParam,
     List<Point>? pointsParam,
     bool? visibleParam,
     int? widthParam,
@@ -119,6 +124,7 @@ class PolylineMarker extends Symbol {
       color: colorParam ?? color,
       consumeTapEvents: consumeTapEventsParam ?? consumeTapEvents,
       style: styleParam ?? style,
+      spatialReference: spatialReferenceParam ?? spatialReference,
       points: pointsParam ?? points,
       visible: visibleParam ?? visible,
       width: widthParam ?? width,
@@ -151,6 +157,7 @@ class PolylineMarker extends Symbol {
     addIfPresent('consumeTapEvents', consumeTapEvents);
     addIfPresent('color', color.value);
     addIfPresent('style', style.value);
+    addIfPresent('spatialReference', spatialReference?.toJson());
     json['points'] = _pointsToJson();
     addIfPresent('visible', visible);
     addIfPresent('width', width);

@@ -50,6 +50,7 @@ class _MapPageBufferState extends State<MapPageBuffer> {
                 _polygon = PolygonMarker(
                   polygonId: const PolygonId('buffer'),
                   points: polygon.points.first,
+                  spatialReference: polygon.spatialReference,
                   fillColor: Colors.red,
                   strokeWidth: 2,
                   strokeStyle: SimpleLineSymbolStyle.dash,

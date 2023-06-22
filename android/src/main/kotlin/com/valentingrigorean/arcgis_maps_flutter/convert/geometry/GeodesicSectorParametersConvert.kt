@@ -5,6 +5,7 @@ import com.arcgismaps.geometry.GeodesicSectorParameters
 import com.arcgismaps.geometry.GeometryType
 import com.arcgismaps.geometry.LinearUnit
 import com.arcgismaps.geometry.Point
+import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterLong
 
 fun Any.toGeodesicSectorParametersOrNull(): GeodesicSectorParameters? {
     val data = this as? Map<*, *> ?: return null
@@ -26,7 +27,7 @@ fun Any.toGeodesicSectorParametersOrNull(): GeodesicSectorParameters? {
     if (maxSegmentLength != null) {
         geodesicSectorParameters.maxSegmentLength = maxSegmentLength
     }
-    geodesicSectorParameters.maxPointCount = data["maxPointCount"] as Long
+    geodesicSectorParameters.maxPointCount = data["maxPointCount"]!!.toFlutterLong()
     return geodesicSectorParameters
 }
 

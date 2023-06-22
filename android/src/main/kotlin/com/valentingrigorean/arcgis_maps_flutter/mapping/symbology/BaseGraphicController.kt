@@ -6,6 +6,7 @@ import com.arcgismaps.mapping.view.Graphic
 import com.arcgismaps.mapping.view.GraphicsOverlay
 import com.valentingrigorean.arcgis_maps_flutter.convert.map.toSymbolVisibilityFilterOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.toArcgisColor
+import com.valentingrigorean.arcgis_maps_flutter.convert.toArcgisColorOrNull
 import com.valentingrigorean.arcgis_maps_flutter.map.SelectionPropertiesHandler
 import com.valentingrigorean.arcgis_maps_flutter.map.SymbolVisibilityFilterController
 
@@ -84,7 +85,7 @@ abstract class BaseGraphicController(
         if (zIndex != null) {
             this.zIndex = zIndex
         }
-        val selectedColor = (data["selectedColor"] as Int?)?.toArcgisColor()
+        val selectedColor = data["selectedColor"]?.toArcgisColorOrNull()
         if (selectedColor != null) {
             this.selectedColor = selectedColor
         }

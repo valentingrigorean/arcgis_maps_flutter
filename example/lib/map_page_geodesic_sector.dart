@@ -24,7 +24,7 @@ class _MapPageGeodesicSectorState extends State<MapPageGeodesicSector> {
             basemapStyle: BasemapStyle.arcGISCommunity,
           ),
         ),
-        onTap: (_,point) async {
+        onTap: (_, point) async {
           final geometry = await GeometryEngine.geodesicSector(
             GeodesicSectorParameters(
               center: point!,
@@ -41,11 +41,8 @@ class _MapPageGeodesicSectorState extends State<MapPageGeodesicSector> {
             polygons.add(
               PolygonMarker(
                 polygonId: PolygonId(polygons.length.toString()),
-                points: polygon.points
-                    .expand((e) => e)
-                    .map((e) =>
-                        e.copyWithSpatialReference(polygon.spatialReference))
-                    .toList(),
+                points: polygon.points.expand((e) => e).toList(),
+                spatialReference: polygon.spatialReference,
                 strokeWidth: 2,
                 strokeColor: Colors.red,
                 fillColor: Colors.blueAccent.withOpacity(0.5),
@@ -59,8 +56,6 @@ class _MapPageGeodesicSectorState extends State<MapPageGeodesicSector> {
                 polylineId: PolylineId(polylines.length.toString()),
                 points: polyline.points
                     .expand((e) => e)
-                    .map((e) =>
-                        e.copyWithSpatialReference(polyline.spatialReference))
                     .toList(),
                 color: Colors.red,
               ),

@@ -18,7 +18,8 @@ class _MapPageViewInsetsState extends State<MapPageViewInsets> {
         children: [
           ArcgisMapView(
             map: const ArcGISMap.fromBasemapStyle(
-                BasemapStyle.arcGISImageryLabels),
+              BasemapStyle.arcGISCommunity,
+            ),
             isAttributionTextVisible: false,
             insetsContentInsetFromSafeArea: false,
             contentInsets: const EdgeInsets.only(bottom: 200),

@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.onEach
 
 class SymbolVisibilityFilterController(
     private val mapView: MapView,
-    private val scope: CoroutineScope
+    scope: CoroutineScope
 ) {
     private val graphicControllers: MutableMap<GraphicControllerSink, SymbolVisibilityFilter> =
         HashMap()
@@ -88,14 +88,15 @@ class SymbolVisibilityFilterController(
         currentZoom: Double
     ) {
         if (java.lang.Double.isNaN(currentZoom)) {
+            graphicController.visible = initialValues[graphicController] ?: true
             return
         }
-        if (currentZoom < visibilityFilter.minZoom && currentZoom > visibilityFilter.maxZoom) {
-            graphicController.visible = initialValues[graphicController] ?: true
+        if (currentZoom < visibilityFilter.minZoom || currentZoom > visibilityFilter.maxZoom) {
+            graphicController.visible = false
         } else {
-            if (!graphicController.isSelected) {
-                graphicController.visible = false
-            }
+            // visible when it's in the zoom range or if it's selected
+            graphicController.visible = graphicController.isSelected || initialValues[graphicController] ?: true
         }
     }
+
 }

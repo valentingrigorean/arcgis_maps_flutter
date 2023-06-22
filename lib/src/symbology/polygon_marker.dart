@@ -18,6 +18,7 @@ class PolygonMarker extends Symbol {
     this.consumeTapEvents = false,
     this.fillColor = Colors.black,
     this.points = const <Point>[],
+    this.spatialReference,
     this.strokeColor = Colors.black,
     this.strokeWidth = 10,
     this.strokeStyle = SimpleLineSymbolStyle.solid,
@@ -41,6 +42,8 @@ class PolygonMarker extends Symbol {
 
   /// The vertices of the polygon to be drawn.
   final List<Point> points;
+
+  final SpatialReference? spatialReference;
 
   /// True if the marker is visible.
   final bool visible;
@@ -73,19 +76,20 @@ class PolygonMarker extends Symbol {
 
   /// Creates a new [PolygonMarker] object whose values are the same as this instance,
   /// unless overwritten by the specified parameters.
-  PolygonMarker copyWith(
-      {bool? consumeTapEventsParam,
-      Color? fillColorParam,
-      List<Point>? pointsParam,
-      Color? strokeColorParam,
-      double? strokeWidthParam,
-      SimpleLineSymbolStyle? strokeStyleParam,
-      bool? visibleParam,
-      int? zIndexParam,
-      VoidCallback? onTapParam,
-      Color? selectedColorParam,
-      SymbolVisibilityFilter? visibilityFilterParam,
-      }) {
+  PolygonMarker copyWith({
+    bool? consumeTapEventsParam,
+    Color? fillColorParam,
+    List<Point>? pointsParam,
+    Color? strokeColorParam,
+    double? strokeWidthParam,
+    SimpleLineSymbolStyle? strokeStyleParam,
+    bool? visibleParam,
+    int? zIndexParam,
+    VoidCallback? onTapParam,
+    Color? selectedColorParam,
+    SpatialReference? spatialReferenceParam,
+    SymbolVisibilityFilter? visibilityFilterParam,
+  }) {
     return PolygonMarker(
       polygonId: polygonId,
       consumeTapEvents: consumeTapEventsParam ?? consumeTapEvents,
@@ -98,6 +102,7 @@ class PolygonMarker extends Symbol {
       onTap: onTapParam ?? onTap,
       zIndex: zIndexParam ?? zIndex,
       selectedColor: selectedColorParam ?? selectedColor,
+      spatialReference: spatialReferenceParam ?? spatialReference,
       visibilityFilter: visibilityFilterParam ?? visibilityFilter,
     );
   }
@@ -127,6 +132,7 @@ class PolygonMarker extends Symbol {
     addIfPresent('zIndex', zIndex);
     addIfPresent('selectedColor', selectedColor?.value);
     addIfPresent('visibilityFilter', visibilityFilter?.toJson());
+    addIfPresent('spatialReference', spatialReference?.toJson());
 
     json['points'] = _pointsToJson();
 

@@ -26,18 +26,18 @@ class _MapPageMarkersVisibilityFilterState
     3: Colors.pinkAccent
   };
 
-  static const  Map<int, SymbolVisibilityFilter> _filterMap = {
+  static const Map<int, SymbolVisibilityFilter> _filterMap = {
     0: SymbolVisibilityFilter(
-      minZoom: ZoomLevel.level16,
-      maxZoom: ZoomLevel.level23,
+      maxZoom: ZoomLevel.level16,
+      minZoom: ZoomLevel.level23,
     ),
     1: SymbolVisibilityFilter(
-      minZoom: ZoomLevel.level9,
-      maxZoom: ZoomLevel.level15,
+      maxZoom: ZoomLevel.level9,
+      minZoom: ZoomLevel.level15,
     ),
     2: SymbolVisibilityFilter(
-      minZoom: ZoomLevel.largeCountry,
-      maxZoom: ZoomLevel.level23,
+      maxZoom: ZoomLevel.largeCountry,
+      minZoom: ZoomLevel.level23,
     ),
   };
 

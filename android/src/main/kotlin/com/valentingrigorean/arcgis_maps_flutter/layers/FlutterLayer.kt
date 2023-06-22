@@ -15,6 +15,7 @@ import com.arcgismaps.mapping.layers.TileCache
 import com.arcgismaps.mapping.layers.WmsLayer
 import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.layers.toGroupVisibilityMode
 import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toPortalItemOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterLong
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.NativeObjectStorage
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -94,6 +95,7 @@ class FlutterLayer(private val data: Map<*, *>) {
             "GroupLayer" -> {
                 groupLayerOptions = GroupLayerOptions(data)
             }
+
             "FeatureLayer" -> {
                 portalItemLayerId = when (val item = data["portalItemLayerId"]) {
                     is Long -> item
@@ -113,7 +115,8 @@ class FlutterLayer(private val data: Map<*, *>) {
                 val geodatabase = Geodatabase(url!!)
                 GlobalScope.launch {
                     geodatabase.load().onSuccess {
-                        val featureLayersIds = data["featureLayersIds"] as List<Long>
+                        val featureLayersIds = (data["featureLayersIds"] as List<Any>?)?.map { id -> id.toFlutterLong()
+                        }?.filter { id -> id != -1L } ?: emptyList()
                         for (table in geodatabase.featureTables) {
                             if (featureLayersIds.isEmpty()) {
                                 groupLayer.layers.add(FeatureLayer.createWithFeatureTable(table))

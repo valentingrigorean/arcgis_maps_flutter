@@ -7,8 +7,11 @@ import com.arcgismaps.mapping.symbology.SimpleFillSymbolStyle
 import com.arcgismaps.mapping.symbology.SimpleLineSymbol
 import com.arcgismaps.mapping.symbology.SimpleLineSymbolStyle
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toPointOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toSpatialReferenceOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.symbology.toSimpleLineSymbolStyle
+import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toArcGISMapOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.toArcgisColor
+import com.valentingrigorean.arcgis_maps_flutter.convert.toArcgisColorOrNull
 import com.valentingrigorean.arcgis_maps_flutter.map.SymbolVisibilityFilterController
 
 
@@ -19,7 +22,11 @@ class PolygonController(polygonId: String) : BaseGraphicController(), PolygonCon
 
     init {
         polygonSymbol =
-            SimpleFillSymbol(SimpleFillSymbolStyle.Solid, Color.BLACK.toArcgisColor(), polygonStrokeSymbol)
+            SimpleFillSymbol(
+                SimpleFillSymbolStyle.Solid,
+                Color.BLACK.toArcgisColor(),
+                polygonStrokeSymbol
+            )
         graphic.symbol = polygonSymbol
         graphic.attributes["polygonId"] = polygonId
     }
@@ -50,11 +57,11 @@ class PolygonController(polygonId: String) : BaseGraphicController(), PolygonCon
         symbolVisibilityFilterController: SymbolVisibilityFilterController?
     ) {
         super.interpretGraphicController(data, symbolVisibilityFilterController)
-        val fillColor = (data["fillColor"] as? Int)?.toArcgisColor()
+        val fillColor = data["fillColor"]?.toArcgisColorOrNull()
         if (fillColor != null) {
             this.fillColor = fillColor
         }
-        val strokeColor = (data["strokeColor"] as? Int)?.toArcgisColor()
+        val strokeColor = data["strokeColor"]?.toArcgisColorOrNull()
         if (strokeColor != null) {
             this.strokeColor = strokeColor
         }
@@ -66,9 +73,10 @@ class PolygonController(polygonId: String) : BaseGraphicController(), PolygonCon
         if (strokeStyle != null) {
             this.strokeStyle = strokeStyle
         }
+        val spatialReference = data["spatialReference"]?.toSpatialReferenceOrNull()
         val pointsRaw = (data["points"] as? List<*>)?.map { it!!.toPointOrNull()!! }
         if (pointsRaw != null) {
-            geometry = Polyline(pointsRaw)
+            geometry = Polyline(pointsRaw, spatialReference)
         }
     }
 }

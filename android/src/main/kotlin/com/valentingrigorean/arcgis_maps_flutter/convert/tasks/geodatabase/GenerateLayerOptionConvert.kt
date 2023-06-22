@@ -1,8 +1,9 @@
 package com.valentingrigorean.arcgis_maps_flutter.convert.tasks.geodatabase
 
 import com.arcgismaps.tasks.geodatabase.GenerateLayerOption
+import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterLong
 
-fun GenerateLayerOption.toFlutterJson() : Any{
+fun GenerateLayerOption.toFlutterJson(): Any {
     val data = HashMap<String, Any>(5)
     data["layerId"] = layerId
     data["includeRelated"] = includeRelated
@@ -15,7 +16,7 @@ fun GenerateLayerOption.toFlutterJson() : Any{
 fun Any.toGenerateLayerOptionOrNull(): GenerateLayerOption? {
     val data: Map<*, *> = this as Map<*, *>? ?: return null
     val layerOption = GenerateLayerOption()
-    layerOption.layerId = data["layerId"] as Long
+    layerOption.layerId = data["layerId"]!!.toFlutterLong()
     layerOption.includeRelated = data["includeRelated"] as Boolean
     layerOption.queryOption = (data["queryOption"] as Int).toGenerateLayerQueryOption()
     layerOption.useGeometry = data["useGeometry"] as Boolean
