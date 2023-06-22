@@ -2,6 +2,7 @@ package com.valentingrigorean.arcgis_maps_flutter.map
 
 import android.content.Context
 import android.view.View
+import android.widget.FrameLayout
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -72,6 +73,7 @@ class ArcgisMapController(
     private val symbolVisibilityFilterController: SymbolVisibilityFilterController
     private val layersChangedController: LayersChangedController
     private val locationDisplayController: LocationDisplayController
+    private val container: FrameLayout = FrameLayout(context)
     private var mapView: MapView
     private var mapViewOnTouchListener: MapViewOnTouchListener
     private var scaleBarController: ScaleBarController
@@ -89,8 +91,13 @@ class ArcgisMapController(
         methodChannel = MethodChannel(binaryMessenger, "plugins.flutter.io/arcgis_maps_$id")
         methodChannel.setMethodCallHandler(this)
         mapView = MapView(context)
+        container.addView(
+            mapView,
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+        )
         lifecycleProvider().addObserver(mapView)
-        scaleBarController = ScaleBarController(context, mapView, mapView, scope)
+        scaleBarController = ScaleBarController(context, mapView, container, scope)
         selectionPropertiesHandler = SelectionPropertiesHandler(mapView.selectionProperties)
         symbolVisibilityFilterController = SymbolVisibilityFilterController(mapView, scope)
         layersController = LayersController(methodChannel, scope)
@@ -139,7 +146,7 @@ class ArcgisMapController(
     }
 
     override fun getView(): View? {
-        return mapView
+        return container
     }
 
     override fun dispose() {

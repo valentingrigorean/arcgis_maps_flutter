@@ -31,27 +31,18 @@ class ScaleBarController(
 
     init {
         scalebar.alpha = 0f
-        mapView.mapScale.onEach {
-            viewPropertyAnimator?.cancel()
-            viewPropertyAnimator = null
-            val currentScale = it
-            if (mapScale == currentScale) {
-                return@onEach
+        mapView.mapScale.onEach { currentScale ->
+            cancelDisplayScaleBar()
+
+            if (mapScale != currentScale) {
+                mapScale = currentScale
+
+                if (!didGotScale) {
+                    didGotScale = true
+                } else if (scaleBarState != ScaleBarState.NONE && isAutoHide) {
+                    displayScaleBar()
+                }
             }
-            mapScale = currentScale
-            if (!didGotScale) {
-                didGotScale = true
-                return@onEach
-            }
-            if (scaleBarState == ScaleBarState.NONE) {
-                return@onEach
-            }
-            if (!isAutoHide) return@onEach
-            scalebar.alpha = 1f
-            viewPropertyAnimator = scalebar.animate()
-                .setDuration(hideAfterMS.toLong())
-                .alpha(0f)
-                .withEndAction { viewPropertyAnimator = null }
         }.launchIn(scope)
     }
 
@@ -60,6 +51,7 @@ class ScaleBarController(
     }
 
     fun removeScaleBar() {
+        cancelDisplayScaleBar()
         when (scaleBarState) {
             ScaleBarState.NONE -> {}
             ScaleBarState.IN_MAP -> scalebar.removeFromMapView()
@@ -77,6 +69,7 @@ class ScaleBarController(
             removeScaleBar()
             return
         }
+        cancelDisplayScaleBar()
         val showInMap = data["showInMap"] as Boolean
         validateScaleBarState(showInMap)
         if (showInMap) {
@@ -100,6 +93,7 @@ class ScaleBarController(
             layoutParams!!.topMargin = ConvertUtils.dpToPixelsI(
                 context, offsetPoints[1]
             )
+            scalebar.requestLayout()
         }
         isAutoHide = data["autoHide"] as Boolean
         hideAfterMS = data["hideAfter"] as Int
@@ -120,6 +114,10 @@ class ScaleBarController(
         scalebar.textSize = ConvertUtils.spToPixels(
             context, data["textSize"] as Int
         )
+
+        if (scaleBarState != ScaleBarState.NONE && isAutoHide) {
+            displayScaleBar()
+        }
     }
 
     private fun validateScaleBarState(isInMap: Boolean) {
@@ -137,6 +135,19 @@ class ScaleBarController(
             container.addView(scalebar, layoutParams)
             scaleBarState = ScaleBarState.IN_CONTAINER
         }
+    }
+
+    private fun displayScaleBar() {
+        scalebar.alpha = 1f
+        viewPropertyAnimator = scalebar.animate()
+            .setDuration(hideAfterMS.toLong())
+            .alpha(0f)
+            .withEndAction { viewPropertyAnimator = null }
+    }
+
+    private fun cancelDisplayScaleBar() {
+        viewPropertyAnimator?.cancel()
+        viewPropertyAnimator = null
     }
 
     private fun toScaleBarAlignment(rawValue: Int): Scalebar.Alignment {

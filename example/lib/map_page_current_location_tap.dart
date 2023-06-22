@@ -78,11 +78,9 @@ class _MapPageCurrentLocationTapState extends State<MapPageCurrentLocationTap> {
   }
 
   Future<void> requestPermission() async {
-    var currentStatus = await Permission.locationWhenInUse.status;
-    PermissionStatus newStatus;
+    final currentStatus = await Permission.locationWhenInUse.status;
+    PermissionStatus newStatus = currentStatus;
     if (currentStatus != PermissionStatus.granted) {
-      newStatus = PermissionStatus.granted;
-    } else {
       newStatus = await Permission.locationWhenInUse.request();
     }
     if (mounted) {

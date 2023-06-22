@@ -16,7 +16,8 @@ class _MapPageScaleBarState extends State<MapPageScaleBar> {
     inMapAlignment: ScalebarAlignment.center,
     style: ScalebarStyle.dualUnitLine,
   );
-  static   ScalebarConfiguration _customScaleConfiguration = const ScalebarConfiguration(
+  static ScalebarConfiguration _customScaleConfiguration =
+      const ScalebarConfiguration(
     showInMap: false,
     autoHide: true,
     hideAfter: Duration(milliseconds: 500),

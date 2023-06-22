@@ -119,7 +119,6 @@ class Scalebar : View {
     private val textPaint: Paint by TextPaintDelegate()
 
     private var mapScaleJob: Job? = null
-    private var mapAttributeJob: Job? = null
 
     private class TextPaintDelegate {
         private var _paint: Paint = Paint()
@@ -547,10 +546,6 @@ class Scalebar : View {
         mapScaleJob = mapView.mapScale.onEach {
             postInvalidate()
         }.launchIn(lifecycleScope)
-
-//        mapAttributeJob = mapView.at.onEach {
-//            invalidate()
-//        }.launchIn(lifecycleScope)
     }
 
     /**
@@ -560,7 +555,6 @@ class Scalebar : View {
      */
     private fun removeListenersFromMapView() {
         mapScaleJob?.cancel()
-        mapAttributeJob?.cancel()
     }
 
     /**
