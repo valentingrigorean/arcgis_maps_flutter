@@ -5,6 +5,7 @@ import com.arcgismaps.mapping.view.GeoView
 import com.arcgismaps.mapping.view.Graphic
 import com.arcgismaps.mapping.view.GraphicsOverlay
 import com.arcgismaps.mapping.view.LocationDisplay
+import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.location.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.convert.location.toFlutterValue
@@ -31,7 +32,7 @@ class LocationDisplayController(
     init {
         locationGraphicsOverlay.opacity = 0f
         locationGraphic = Graphic()
-        locationGraphic.geometry = locationDisplay.mapLocation
+        locationGraphic.geometry = locationDisplay.location.value?.position
         locationGraphic.attributes[LOCATION_ATTRIBUTE] = true
         locationGraphic.symbol = locationDisplay.defaultSymbol
         locationGraphicsOverlay.graphics.add(locationGraphic)
@@ -40,7 +41,7 @@ class LocationDisplayController(
             channel.invokeMethod("onAutoPanModeChanged", it.toFlutterValue())
         }.launchIn(scope)
         locationDisplay.location.onEach {
-            locationGraphic.geometry = locationDisplay.mapLocation
+            locationGraphic.geometry = it?.position
             channel.invokeMethod(
                 "onLocationChanged",
                 it?.toFlutterJson()
@@ -114,8 +115,9 @@ class LocationDisplayController(
             }
 
             "getMapLocation" -> {
+                // mapLocation is not updated and is always 0,0
                 result.success(
-                    locationDisplay.location.value?.toGeometryOrNull()
+                    locationDisplay.location.value?.position?.toFlutterJson()
                 )
             }
 
@@ -139,19 +141,20 @@ class LocationDisplayController(
                 locationDisplay.showLocation = call.arguments()!!
                 result.success(null)
             }
+
             "setShowPingAnimationSymbol" -> {
                 locationDisplay.showPingAnimationSymbol = call.arguments()!!
                 result.success(null)
             }
 
             "start" -> {
-                 scope.launch {
-                     locationDisplay.dataSource.start().onSuccess {
-                         result.success(null)
-                     }.onFailure {
-                         result.error("Failed to start locationDisplay", it.message, null)
-                     }
-                 }
+                scope.launch {
+                    locationDisplay.dataSource.start().onSuccess {
+                        result.success(null)
+                    }.onFailure {
+                        result.error("Failed to start locationDisplay", it.message, null)
+                    }
+                }
             }
 
             "stop" -> {

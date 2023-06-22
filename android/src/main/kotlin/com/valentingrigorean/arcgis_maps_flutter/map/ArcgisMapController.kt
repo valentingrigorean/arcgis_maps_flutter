@@ -49,6 +49,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.platform.PlatformView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -153,6 +154,7 @@ class ArcgisMapController(
         if (disposed) {
             return
         }
+        scope.cancel()
         disposed = true
         trackTimeExtentEvents = false
         trackViewpointChangedListenerEvents = false
@@ -598,6 +600,7 @@ class ArcgisMapController(
                 val baseMap = Basemap(baseLayer)
                 changeMap(ArcGISMap(baseMap))
             }
+
             else -> {
                 scope.launch {
                     val mobileMapPackage = MobileMapPackage(offlinePath!!)
