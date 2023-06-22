@@ -29,7 +29,7 @@ class JobNativeHandler<T>(job: Job<T>) :
             .onEach { progress ->
                 // Perform any action you want to do with the progress here
                 // You can send the progress to the Flutter side using the sendMessage method
-                sendMessage("job#onProgressChanged", progress)
+                sendMessage("job#onProgressChanged", progress / 100.0)
             }
             .launchIn(scope)
 

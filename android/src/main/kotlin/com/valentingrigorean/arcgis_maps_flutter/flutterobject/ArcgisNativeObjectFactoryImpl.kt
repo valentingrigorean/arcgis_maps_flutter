@@ -147,7 +147,7 @@ class ArcgisNativeObjectFactoryImpl(
     private fun createOfflineMapTask(data: Map<*, *>): OfflineMapTask {
         val offlineMapTask: OfflineMapTask
         val arcgisMap = data["map"]
-        val portalItem = data["portalItem"]
+        val portalItem = data["item"]
         offlineMapTask = if (arcgisMap != null) {
             val arcGISMap = arcgisMap.toArcGISMapOrNull()!!
             OfflineMapTask(arcGISMap)

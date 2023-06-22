@@ -14,7 +14,7 @@ enum OfflineMapAttachmentSyncDirection {
 
   factory OfflineMapAttachmentSyncDirection.fromValue(int value) {
     return OfflineMapAttachmentSyncDirection.values.firstWhere(
-          (e) => e.value == value,
+      (e) => e.value == value,
       orElse: () => OfflineMapAttachmentSyncDirection.none,
     );
   }
@@ -46,7 +46,6 @@ enum SyncDirection {
 
   final int value;
 }
-
 
 enum OnlineOnlyServicesOption {
   /// Online layers and tables that cannot be taken offline will
@@ -173,7 +172,8 @@ class GenerateOfflineMapParameters {
     this.maxScale = 0,
     this.onlineOnlyServicesOption = OnlineOnlyServicesOption.exclude,
     this.itemInfo,
-    this.attachmentSyncDirection = OfflineMapAttachmentSyncDirection.birectional,
+    this.attachmentSyncDirection =
+        OfflineMapAttachmentSyncDirection.birectional,
     this.continueOnErrors = true,
     this.includeBasemap = true,
     this.isDefinitionExpressionFilterEnabled = true,
@@ -190,8 +190,8 @@ class GenerateOfflineMapParameters {
   factory GenerateOfflineMapParameters.fromJson(Map<dynamic, dynamic> json) {
     return GenerateOfflineMapParameters(
       areaOfInterest: Geometry.fromJson(json['areaOfInterest'])!,
-      minScale: (json['minScale'] as num).toDouble(),
-      maxScale: (json['maxScale'] as num).toDouble(),
+      minScale: (json['minScale'] as num?)?.toDouble(),
+      maxScale: (json['maxScale'] as num?)?.toDouble(),
       onlineOnlyServicesOption: OnlineOnlyServicesOption.fromValue(
           (json['onlineOnlyServicesOption'] as num).toInt()),
       itemInfo: json.containsKey('itemInfo')
@@ -230,12 +230,13 @@ class GenerateOfflineMapParameters {
 
   /// The minimum scale for how far out data will be in tile caches.
   /// The [minScale] 0 default means extract all the available detailed levels to global scales.
-  final double minScale;
+  /// If [null] is no maximum.
+  final double? minScale;
 
   /// The maximum scale for how far in to extract tiles from tile caches.
   /// The [maxScale] 0 default means extract the levels down to the most detailed.
-  ///
-  final double maxScale;
+  /// If [null] is no maximum.
+  final double? maxScale;
 
   /// Describes how data that requires an online service will be handled
   /// when taking a map offline.
@@ -364,15 +365,17 @@ class GenerateOfflineMapParameters {
     json['minScale'] = minScale;
     json['maxScale'] = maxScale;
     json['onlineOnlyServicesOption'] = onlineOnlyServicesOption.value;
-    if(itemInfo != null){
+    if (itemInfo != null) {
       json['itemInfo'] = itemInfo!.toJson();
     }
     json['attachmentSyncDirection'] = attachmentSyncDirection.value;
     json['continueOnErrors'] = continueOnErrors;
     json['includeBasemap'] = includeBasemap;
-    json['isDefinitionExpressionFilterEnabled'] = isDefinitionExpressionFilterEnabled;
+    json['isDefinitionExpressionFilterEnabled'] =
+        isDefinitionExpressionFilterEnabled;
     json['returnLayerAttachmentOption'] = returnLayerAttachmentOption.value;
-    json['returnSchemaOnlyForEditableLayers'] = returnSchemaOnlyForEditableLayers;
+    json['returnSchemaOnlyForEditableLayers'] =
+        returnSchemaOnlyForEditableLayers;
     json['updateMode'] = updateMode.value;
     json['destinationTableRowFilter'] = destinationTableRowFilter.value;
     json['esriVectorTilesDownloadOption'] = esriVectorTilesDownloadOption.value;

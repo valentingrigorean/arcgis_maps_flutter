@@ -11,9 +11,13 @@ abstract class BaseNativeObject<T> protected constructor(
     private val nativeHandlers: Array<NativeHandler>
 ) : NativeObject, NativeMessageSink {
     private val messageSinkImpl = NativeObjectMessageSinkImpl(objectId)
-    private var isDisposed = false
     private val coroutineJob = Job()
+
+    private var messageSink: NativeMessageSink? = null
+    private var isDisposed = false
+
     protected val scope = CoroutineScope(Dispatchers.Main + coroutineJob)
+
 
     init {
         for (nativeHandler in nativeHandlers) {
@@ -29,6 +33,10 @@ abstract class BaseNativeObject<T> protected constructor(
     }
 
     override fun setMessageSink(messageSink: NativeMessageSink?) {
+        if (isDisposed) {
+            return
+        }
+        this.messageSink = messageSink
         messageSinkImpl.setMessageSink(messageSink)
     }
 
@@ -54,7 +62,7 @@ abstract class BaseNativeObject<T> protected constructor(
     }
 
     protected fun getMessageSink(): NativeMessageSink {
-        return messageSinkImpl
+        return messageSink!!
     }
 
     protected val nativeObjectStorage: NativeObjectStorage
@@ -69,9 +77,9 @@ private class NativeObjectMessageSinkImpl(
     private val data = HashMap<String, Any?>(3)
 
     override fun send(method: String, args: Any?) {
-       if(messageSink == null){
-           return
-       }
+        if (messageSink == null) {
+            return
+        }
         data.clear()
         data["objectId"] = objectId
         data["method"] = method

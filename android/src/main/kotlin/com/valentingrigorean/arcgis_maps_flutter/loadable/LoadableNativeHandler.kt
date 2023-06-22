@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 class LoadableNativeHandler(loadable: Loadable) : BaseNativeHandler<Loadable>(loadable) {
     init {
         loadable.loadStatus.onEach { status ->
-            sendMessage("loadable#loadStatusChanged", status)
+            sendMessage("loadable#loadStatusChanged", status.toFlutterValue())
         }.launchIn(scope)
     }
 
