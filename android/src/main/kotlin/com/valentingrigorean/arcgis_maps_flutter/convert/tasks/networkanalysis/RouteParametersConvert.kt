@@ -46,7 +46,7 @@ fun Any.toRouteParametersOrNull(): RouteParameters? {
     routeParameters.directionsLanguage = data["directionsLanguage"] as String
     routeParameters.directionsStyle = (data["directionsStyle"] as Int).toDirectionsStyle()
     routeParameters.findBestSequence = data["findBestSequence"] as Boolean
-    val startTime = data["startTime"] as String
+    val startTime = data["startTime"] as String?
     if (startTime != null) {
         routeParameters.startTime = startTime.fromFlutterInstant()
     }

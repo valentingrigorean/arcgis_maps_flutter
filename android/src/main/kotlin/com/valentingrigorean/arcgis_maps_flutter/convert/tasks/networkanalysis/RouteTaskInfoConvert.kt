@@ -23,7 +23,7 @@ fun RouteTaskInfo.toFlutterJson() : Any{
     }
     json["preserveFirstStop"] = preserveFirstStop
     json["preserveLastStop"] = preserveLastStop
-    json["restrictionAttributes"] = restrictionAttributes
+    json["restrictionAttributes"] = restrictionAttributes.map { pair -> Pair(pair.key,pair.value.toFlutterJson()) }.toMap()
     json["routeShapeType"] = routeShapeType.toFlutterValue()
     json["supportedLanguages"] = supportedLanguages
     json["supportedRestrictionUsageParameterValues"] =  supportedRestrictionUsageParameterValues

@@ -38,6 +38,7 @@ class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
     private var lifecycle: Lifecycle? = null
     override fun onAttachedToEngine(binding: FlutterPluginBinding) {
         scope = CoroutineScope(Dispatchers.Main)
+        ArcGISEnvironment.applicationContext = binding.applicationContext
         binding.platformViewRegistry
             .registerViewFactory(
                 VIEW_TYPE_MAP,
@@ -57,6 +58,7 @@ class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
     }
 
     override fun onDetachedFromEngine(binding: FlutterPluginBinding) {
+        ArcGISEnvironment.applicationContext = null
         channel.setMethodCallHandler(null)
         scope?.cancel()
         scope = null
