@@ -63,7 +63,7 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('getMapLocation() has not been implemented.');
   }
 
-  Future<List<LegendInfoResult>> getLegendInfos(int mapId, Layer layer) {
+  Future<LegendInfoResult?> getLegendInfos(int mapId, Layer layer) {
     throw UnimplementedError(
         'setMgetLegendInfosap() has not been implemented.');
   }

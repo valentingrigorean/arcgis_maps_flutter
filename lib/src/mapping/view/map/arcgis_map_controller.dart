@@ -42,7 +42,7 @@ class ArcgisMapController {
 
   bool get isDisposed => _isDisposed;
 
-  Future<List<LegendInfoResult>> getLegendInfosForLayer(Layer layer) async {
+  Future<LegendInfoResult?> getLegendInfosForLayer(Layer layer) async {
     return await ArcgisMapsFlutterPlatform.instance
         .getLegendInfos(mapId, layer);
   }
@@ -74,30 +74,32 @@ class ArcgisMapController {
   }
 
   Future<List<Feature>> queryFeatureTableFromLayer({
-        required String layerName,
-        Geometry? geometry,
-        SpatialRelationship? spatialRelationship,
-        int? maxResults,
-        Map<String, dynamic>? queryValues,
-      }) async {
+    required String layerName,
+    Geometry? geometry,
+    SpatialRelationship? spatialRelationship,
+    int? maxResults,
+    Map<String, dynamic>? queryValues,
+  }) async {
     return ArcgisMapsFlutterPlatform.instance.queryFeatureTableFromLayer(
-      mapId: mapId,
-      layerName: layerName,
-      queryValues: queryValues,
-      geometry: geometry,
-      spatialRelationship: spatialRelationship,
-      maxResults: maxResults
-    );
+        mapId: mapId,
+        layerName: layerName,
+        queryValues: queryValues,
+        geometry: geometry,
+        spatialRelationship: spatialRelationship,
+        maxResults: maxResults);
   }
 
   Future<List<LegendInfoResult>> getLegendInfosForLayers(
       Set<Layer> layers) async {
-    var futures = <Future<List<LegendInfoResult>>>[];
+    var futures = <Future<LegendInfoResult?>>[];
     for (final layer in layers) {
       futures.add(getLegendInfosForLayer(layer));
     }
     final result = await Future.wait(futures);
-    return result.expand((e) => e).toList();
+    return result
+        .where((element) => element != null)
+        .cast<LegendInfoResult>()
+        .toList();
   }
 
   Future<Envelope?> getMapMaxExtend() {
@@ -314,7 +316,7 @@ class ArcgisMapController {
             _arcgisMapState.onLongPress(e.screenPoint, e.position));
 
     ArcgisMapsFlutterPlatform.instance.onLongPressEnd(mapId: mapId).listen(
-            (MapLongPressEndEvent e) =>
+        (MapLongPressEndEvent e) =>
             _arcgisMapState.onLongPressEnd(e.screenPoint, e.position));
 
     ArcgisMapsFlutterPlatform.instance.onLayerLoad(mapId: mapId).listen(

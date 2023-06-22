@@ -203,7 +203,7 @@ class ArcgisMapController(
 
             "map#getLegendInfos" -> {
                 scope.launch {
-                    val legendInfoController = LegendInfoController(context, layersController)
+                    val legendInfoController = LegendInfoController(context,layersController)
                     legendInfoController.load(call.arguments as Map<*, *>).onSuccess {
                         result.success(it)
                     }.onFailure {
