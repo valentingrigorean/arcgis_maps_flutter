@@ -219,8 +219,11 @@ class ArcgisMapController(
                         result.success(null)
                         return@launch
                     }
-                    map.load()
-                    result.success(map.maxExtent?.toFlutterJson())
+                    map.load().onSuccess {
+                        result.success(map.maxExtent?.toFlutterJson())
+                    }.onFailure {
+                        result.error("getMapMaxExtend", it.message, null)
+                    }
                 }
             }
 
@@ -325,7 +328,7 @@ class ArcgisMapController(
             "map#locationToScreen" -> {
                 val mapPoint = call.arguments.toPointOrNull()!!
                 val screenPoint = mapView.locationToScreen(mapPoint)
-                result.success(arrayOf(screenPoint.x, screenPoint.y))
+                result.success(listOf(screenPoint.x, screenPoint.y))
             }
 
             "map#screenToLocation" -> {

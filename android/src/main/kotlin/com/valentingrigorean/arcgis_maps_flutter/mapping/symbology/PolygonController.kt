@@ -58,9 +58,9 @@ class PolygonController(polygonId: String) : BaseGraphicController(), PolygonCon
         if (strokeColor != null) {
             this.strokeColor = strokeColor
         }
-        val strokeWidth = data["strokeWidth"] as Float
+        val strokeWidth = data["strokeWidth"] as Double?
         if (strokeWidth != null) {
-            this.strokeWidth = strokeWidth
+            this.strokeWidth = strokeWidth.toFloat()
         }
         val strokeStyle = (data["strokeStyle"] as Int?)?.toSimpleLineSymbolStyle()
         if (strokeStyle != null) {

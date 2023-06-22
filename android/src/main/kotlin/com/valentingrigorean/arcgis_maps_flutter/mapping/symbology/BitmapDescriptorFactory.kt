@@ -15,6 +15,7 @@ import com.arcgismaps.mapping.symbology.PictureMarkerSymbol
 import com.arcgismaps.mapping.symbology.SimpleMarkerSymbol
 import com.arcgismaps.mapping.symbology.SimpleMarkerSymbolStyle
 import com.arcgismaps.mapping.symbology.Symbol
+import com.valentingrigorean.arcgis_maps_flutter.convert.fromFlutterColor
 import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.symbology.toSimpleMarkerSymbolStyle
 import com.valentingrigorean.arcgis_maps_flutter.convert.toArcgisColorOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.toBitmapDrawable
@@ -153,9 +154,9 @@ object BitmapDescriptorFactory {
 
         init {
             resourceName = data["fromNativeAsset"] as String?
-            tintColor = data["tintColor"] as Int?
-            width = data["width"] as Float?
-            height = data["height"] as Float?
+            tintColor = data["tintColor"]!!.fromFlutterColor()
+            width = (data["width"] as Double?)?.toFloat()
+            height = (data["height"] as Double?)?.toFloat()
         }
 
         fun createBitmap(context: Context): Bitmap {

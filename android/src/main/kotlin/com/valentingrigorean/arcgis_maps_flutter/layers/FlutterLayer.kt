@@ -89,16 +89,16 @@ class FlutterLayer(private val data: Map<*, *>) {
             tileCache = null
         }
         isVisible = data["isVisible"] as Boolean
-        opacity = data["opacity"] as Float
+        opacity = (data["opacity"] as Double).toFloat()
         when (layerType) {
             "GroupLayer" -> {
                 groupLayerOptions = GroupLayerOptions(data)
             }
             "FeatureLayer" -> {
-                portalItemLayerId = if (data.containsKey("portalItemLayerId")) {
-                    data["portalItemLayerId"] as Long
-                } else {
-                    -1
+                portalItemLayerId = when (val item = data["portalItemLayerId"]) {
+                    is Long -> item
+                    is Int -> item.toLong()
+                    else -> -1
                 }
             }
         }

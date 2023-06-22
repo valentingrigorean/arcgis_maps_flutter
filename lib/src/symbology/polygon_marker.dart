@@ -52,7 +52,7 @@ class PolygonMarker extends Symbol {
   ///
   /// The width is constant and independent of the camera's zoom level.
   /// The default value is 10.
-  final int strokeWidth;
+  final double strokeWidth;
 
   /// Style of the stroke.
   final SimpleLineSymbolStyle strokeStyle;
@@ -78,7 +78,7 @@ class PolygonMarker extends Symbol {
       Color? fillColorParam,
       List<Point>? pointsParam,
       Color? strokeColorParam,
-      int? strokeWidthParam,
+      double? strokeWidthParam,
       SimpleLineSymbolStyle? strokeStyleParam,
       bool? visibleParam,
       int? zIndexParam,
