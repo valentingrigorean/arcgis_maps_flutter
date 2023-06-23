@@ -40,8 +40,8 @@ class PolygonsController(
             val polygonId = data["polygonId"] as String
             val controller = PolygonController(polygonId)
             controller.setSelectionPropertiesHandler(selectionPropertiesHandler)
-            polygonIdToController[polygonId] = controller
             controller.interpretGraphicController(data, symbolVisibilityFilterController)
+            polygonIdToController[polygonId] = controller
             controller.add(graphicsOverlay)
         }
     }

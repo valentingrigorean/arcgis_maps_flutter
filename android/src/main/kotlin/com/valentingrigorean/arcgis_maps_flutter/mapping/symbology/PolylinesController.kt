@@ -40,8 +40,8 @@ class PolylinesController(
             val polylineId = data["polylineId"] as String
             val controller = PolylineController(polylineId)
             controller.setSelectionPropertiesHandler(selectionPropertiesHandler)
-            polylineIdToController[polylineId] = controller
             controller.interpretGraphicController(data, symbolVisibilityFilterController)
+            polylineIdToController[polylineId] = controller
             controller.add(graphicsOverlay)
         }
     }

@@ -698,13 +698,13 @@ class ArcgisMapController(
         updateMapScale()
     }
 
-    private fun initWithParams(params: Map<String, Any>?) {
-        val mapType = params!!["map"]
-        mapType?.let { changeMapType(it) }
+    private fun initWithParams(params: Map<String, Any>) {
         val viewPoint = params["viewpoint"]
         if (viewPoint != null) {
-            setViewpoint(viewPoint, false, null)
+            viewpoint = viewPoint.toViewpointOrNull()
         }
+        val mapType = params["map"]
+        mapType?.let { changeMapType(it) }
         val options = params["options"]
         options?.let { updateMapOptions(it) }
         layersController.updateFromArgs(params)

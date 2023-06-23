@@ -95,10 +95,7 @@ class MarkerController(val context: Context, markerId: String) : BaseGraphicCont
         symbolVisibilityFilterController: SymbolVisibilityFilterController?
     ) {
         super.interpretGraphicController(data, symbolVisibilityFilterController)
-        val position = data["position"]?.toGeometryOrNull()
-        if (position != null) {
-            this.geometry = position
-        }
+        this.geometry  = data["position"]?.toGeometryOrNull()
         val icon = data["icon"]
         if (icon != null) {
             this.icon = BitmapDescriptorFactory.fromRawData(context, icon)

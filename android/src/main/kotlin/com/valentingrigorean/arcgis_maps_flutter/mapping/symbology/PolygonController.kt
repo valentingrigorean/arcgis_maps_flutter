@@ -1,7 +1,7 @@
 package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 
 import android.graphics.Color
-import com.arcgismaps.geometry.Polyline
+import com.arcgismaps.geometry.PolygonBuilder
 import com.arcgismaps.mapping.symbology.SimpleFillSymbol
 import com.arcgismaps.mapping.symbology.SimpleFillSymbolStyle
 import com.arcgismaps.mapping.symbology.SimpleLineSymbol
@@ -9,7 +9,6 @@ import com.arcgismaps.mapping.symbology.SimpleLineSymbolStyle
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toPointOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toSpatialReferenceOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.symbology.toSimpleLineSymbolStyle
-import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toArcGISMapOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.toArcgisColor
 import com.valentingrigorean.arcgis_maps_flutter.convert.toArcgisColorOrNull
 import com.valentingrigorean.arcgis_maps_flutter.map.SymbolVisibilityFilterController
@@ -76,7 +75,7 @@ class PolygonController(polygonId: String) : BaseGraphicController(), PolygonCon
         val spatialReference = data["spatialReference"]?.toSpatialReferenceOrNull()
         val pointsRaw = (data["points"] as? List<*>)?.map { it!!.toPointOrNull()!! }
         if (pointsRaw != null) {
-            geometry = Polyline(pointsRaw, spatialReference)
+            geometry = PolygonBuilder(pointsRaw, spatialReference).toGeometry()
         }
     }
 }

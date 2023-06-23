@@ -2,6 +2,7 @@ package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 
 import android.graphics.Color
 import com.arcgismaps.geometry.Polyline
+import com.arcgismaps.geometry.PolylineBuilder
 import com.arcgismaps.mapping.symbology.SimpleLineSymbol
 import com.arcgismaps.mapping.symbology.SimpleLineSymbolStyle
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toPointOrNull
@@ -68,7 +69,7 @@ class PolylineController(polylineId: String) : BaseGraphicController(), Polyline
         val spatialReference = data["spatialReference"]?.toSpatialReferenceOrNull()
         val pointsRaw = (data["points"] as? List<*>)?.map { it!!.toPointOrNull()!! }
         if (pointsRaw != null) {
-            geometry = Polyline(pointsRaw, spatialReference)
+            geometry = PolylineBuilder(pointsRaw, spatialReference).toGeometry()
         }
     }
 }

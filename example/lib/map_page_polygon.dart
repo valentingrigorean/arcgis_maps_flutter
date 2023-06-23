@@ -20,7 +20,7 @@ class _MapPagePolygonState extends State<MapPagePolygon> {
       body: ArcgisMapView(
         map: const ArcGISMap.fromBasemap(
           Basemap.fromStyle(
-            basemapStyle: BasemapStyle.arcGISCommunity,
+            basemapStyle: BasemapStyle.arcGISImageryStandard,
           ),
         ),
         viewpoint: Viewpoint.fromPoint(
@@ -33,6 +33,7 @@ class _MapPagePolygonState extends State<MapPagePolygon> {
         polygons: {
           PolygonMarker(
             polygonId: const PolygonId("test"),
+            spatialReference: SpatialReference.wgs84(),
             points: [
               Point.fromLatLng(
                 latitude: 60.443889,
