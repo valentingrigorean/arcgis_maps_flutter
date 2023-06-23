@@ -72,11 +72,18 @@ abstract class BaseGraphicController(
         if (visible != null) {
             val visibilityFilter = data["visibilityFilter"]?.toSymbolVisibilityFilterOrNull()
             if (symbolVisibilityFilterController != null && visibilityFilter != null) {
-                symbolVisibilityFilterController!!.addGraphicsController(
-                    this,
-                    visibilityFilter,
-                    visible
-                )
+                if (symbolVisibilityFilterController.containsGraphicsController(this)) {
+                    symbolVisibilityFilterController.updateInitialVisibility(
+                        this,
+                        visible
+                    )
+                } else {
+                    symbolVisibilityFilterController!!.addGraphicsController(
+                        this,
+                        visibilityFilter,
+                        visible
+                    )
+                }
             } else {
                 this.visible = visible
             }

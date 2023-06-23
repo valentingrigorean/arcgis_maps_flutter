@@ -28,16 +28,16 @@ class _MapPageMarkersVisibilityFilterState
 
   static const Map<int, SymbolVisibilityFilter> _filterMap = {
     0: SymbolVisibilityFilter(
-      maxZoom: ZoomLevel.level16,
-      minZoom: ZoomLevel.level23,
+      minZoom: ZoomLevel.vilage,
+      maxZoom: ZoomLevel.city,
     ),
     1: SymbolVisibilityFilter(
-      maxZoom: ZoomLevel.level9,
-      minZoom: ZoomLevel.level15,
+      minZoom: ZoomLevel.largeMetropolitanArea,
+      maxZoom: ZoomLevel.smallCountry,
     ),
     2: SymbolVisibilityFilter(
-      maxZoom: ZoomLevel.largeCountry,
       minZoom: ZoomLevel.level23,
+      maxZoom: ZoomLevel.level15,
     ),
   };
 

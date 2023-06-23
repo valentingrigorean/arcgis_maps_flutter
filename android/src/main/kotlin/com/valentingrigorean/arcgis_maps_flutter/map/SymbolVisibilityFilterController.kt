@@ -3,8 +3,10 @@ package com.valentingrigorean.arcgis_maps_flutter.map
 import com.arcgismaps.mapping.view.MapView
 import com.valentingrigorean.arcgis_maps_flutter.mapping.symbology.GraphicControllerSink
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlin.time.Duration
 
 class SymbolVisibilityFilterController(
     private val mapView: MapView,
@@ -15,7 +17,7 @@ class SymbolVisibilityFilterController(
     private val initialValues: MutableMap<GraphicControllerSink, Boolean> = HashMap()
 
     init {
-        mapView.mapScale.onEach {
+        mapView.mapScale.debounce(300).onEach {
             invalidate()
         }.launchIn(scope)
     }
@@ -31,6 +33,7 @@ class SymbolVisibilityFilterController(
     fun updateInitialVisibility(graphicController: GraphicControllerSink, initValue: Boolean) {
         if (initialValues.containsKey(graphicController)) {
             initialValues.replace(graphicController, initValue)
+            invalidate(graphicController)
         }
     }
 
@@ -95,7 +98,8 @@ class SymbolVisibilityFilterController(
             graphicController.visible = false
         } else {
             // visible when it's in the zoom range or if it's selected
-            graphicController.visible = graphicController.isSelected || initialValues[graphicController] ?: true
+            graphicController.visible =
+                graphicController.isSelected || initialValues[graphicController] ?: true
         }
     }
 
