@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-extension AGSGeoElement {
+extension GeoElement {
     func toJSONFlutter() -> Any {
         var json = [String: Any]()
         if let geometry = geometry {

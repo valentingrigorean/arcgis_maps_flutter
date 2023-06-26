@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-extension AGSTimeAware {
+extension TimeAware {
     func toJSONFlutter(layerId: String? = nil) -> Any {
         var data = Dictionary<String, Any>()
 

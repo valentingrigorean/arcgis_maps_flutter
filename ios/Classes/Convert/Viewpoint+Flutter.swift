@@ -12,4 +12,11 @@ extension Viewpoint {
 
         self.init(center: Point(data: targetGeometry), scale: scale)
     }
+
+    func toJSONFlutter() -> Any {
+        [
+            "scale": scale,
+            "targetGeometry": targetGeometry.toJSONFlutter()
+        ]
+    }
 }

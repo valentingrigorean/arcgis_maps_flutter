@@ -9,9 +9,9 @@ fun Any.toBasemapOrNull(): Basemap? {
     if (basemapStyle != null) {
         return Basemap(basemapStyle)
     }
-    val item = data["portalItem"]?.toPortalItemOrNull()
-    if (item != null) {
-        return Basemap(item)
+    val portalItem = data["portalItem"]?.toPortalItemOrNull()
+    if (portalItem != null) {
+        return Basemap(portalItem)
     }
     val baseLayer = data["baseLayer"] as Map<*, *>?
     if (baseLayer != null) {

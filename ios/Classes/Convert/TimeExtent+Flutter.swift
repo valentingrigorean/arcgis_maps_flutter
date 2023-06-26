@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-extension AGSTimeExtent {
+extension TimeExtent {
     convenience init(data: Dictionary<String, Any>) {
         let startTime: Date?
         let endTime: Date?
@@ -25,12 +25,12 @@ extension AGSTimeExtent {
         self.init(startTime: startTime, endTime: endTime)
     }
 
-    func toJSONFlutter() -> Any? {
+    func toJSONFlutter() -> Any {
         var data = Dictionary<String, Any>()
-        if let startTime = startTime {
+        if let startTime = startDate {
             data["startTime"] = startTime.toIso8601String()
         }
-        if let endTime = endTime {
+        if let endTime = endDate {
             data["endTime"] = endTime.toIso8601String()
         }
 

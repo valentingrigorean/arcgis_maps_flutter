@@ -5,19 +5,19 @@
 import Foundation
 import ArcGIS
 
-extension AGSTimeValue {
+extension TimeValue {
 
     convenience init(data: Dictionary<String, Any>) {
         let duration = data["duration"] as! Double
         let unit = data["unit"] as! Int
 
-        self.init(duration: duration, unit: AGSTimeUnit.init(rawValue: unit - 1) ?? .unknown)
+        self.init(duration: duration,TimeValue.Unit.fromFlutterValue(unit))
     }
 
     func toJSONFlutter() -> Any {
         [
             "duration": duration,
-            "unit": unit.rawValue
+            "unit": unit?.toFlutterValue() ?? 0
         ]
     }
 }
