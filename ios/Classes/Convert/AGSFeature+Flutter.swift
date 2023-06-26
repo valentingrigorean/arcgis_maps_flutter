@@ -6,7 +6,7 @@ import Foundation
 import Foundation
 import ArcGIS
 
-extension AGSFeature {
+extension Feature {
     func toJSONFlutter() -> Any {
         var json = [String: Any]()
         json["geometry"] = geometry?.toJSONFlutter()

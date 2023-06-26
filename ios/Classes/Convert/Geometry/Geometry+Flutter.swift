@@ -11,40 +11,78 @@ enum GeometryType : Int,Hashable{
     case polyline = 3
     case polygon = 4
     case multipoint = 5
-    
+    case unknown = -1
 }
 
 extension Geometry {
     static func fromFlutter(data: Dictionary<String, Any>) -> Geometry? {
-        let geometryType = GeometryType(rawValue: data["type"] as! Int)!
+        guard let geometryType = data["type"] as? Int,
+                   let geometryType = GeometryType(rawValue: geometryType) else {
+                 return tryParseAsJson(data: data)
+        }
         switch (geometryType) {
         case .point:
             return Point(data: data)
         case .envelope:
             return Envelope(data: data)
         case .polyline, .polygon, .multipoint:
-            do {
-                let geometry = try Geometry.fromJSON(data)
-                return geometry as? Geometry
-            } catch let error {
-                fatalError("\(error)")
-            }
+            return tryParseAsJson(data: data)
+        case .unknown:
+            return nil
         @unknown default:
             return nil
         }
     }
 
     func toJSONFlutter() -> Any? {
+        do{
+               if var dictionary = try JSONSerialization.jsonObject(with: toJSON(), options: []) as? [String: Any] {
+                   dictionary["type"] = geometryType()
+                   return dictionary
+               }
+           }catch{
+               print("Error parsing JSON: \(error.localizedDescription)")
+               return nil
+           }
+           return nil
+    }
+    
+    
+   
+    private static func tryParseAsJson(data: Dictionary<String, Any>) -> Geometry? {
         do {
-            let json = try toJSON()
-            if var dict = json as? Dictionary<String, Any> {
-                dict["type"] = geometryType.rawValue
-                return dict
+            // Convert the dictionary to JSON data
+            let jsonData = try JSONSerialization.data(withJSONObject: data, options: .fragmentsAllowed)
+            // Convert the JSON data to a JSON string
+            guard let jsonString = String(data: jsonData, encoding: .utf8) else {
+                print("Could not convert data to UTF-8 encoded string")
+                return nil
             }
-            return json
+            // Convert the JSON data to a Geometry
+            let geometry = try Geometry.fromJSON(jsonString)
+            return geometry
         } catch let error {
+            print("Error parsing JSON: \(error.localizedDescription)")
             return nil
         }
     }
 }
 
+extension Geometry {
+    func geometryType() -> GeometryType {
+        switch self {
+        case is Point:
+            return .point
+        case is Envelope:
+            return .envelope
+        case is Polyline:
+            return .polyline
+        case is Polygon:
+            return .polygon
+        case is Multipoint:
+            return .multipoint
+        default:
+            return .unknown
+        }
+    }
+}

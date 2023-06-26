@@ -45,7 +45,7 @@ func getFieldType(value: Any?) -> FieldTypeFlutter {
         return .text
     } else if let _ = value as? Data {
         return .blob
-    } else if let _ = value as? AGSGeometry {
+    } else if let _ = value as? Geometry {
         return .geometry
     } else if let _ = value as? NSNull {
         return .nullable
@@ -68,7 +68,7 @@ func toFlutterFieldType(obj: Any?) -> Any {
         }
         break
     case .geometry:
-        if let geometry = obj as? AGSGeometry {
+        if let geometry = obj as? Geometry {
             value = geometry.toJSONFlutter()
         } else {
             value = nil
@@ -109,7 +109,7 @@ func fromFlutterField(data: Dictionary<String, Any>) -> Any? {
         break
     case .geometry:
         if let geometry = value as? Dictionary<String, Any> {
-            value = AGSGeometry.fromFlutter(data: geometry)
+            value = Geometry.fromFlutter(data: geometry)
         }
         break
     case .blob:

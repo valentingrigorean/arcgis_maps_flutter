@@ -9,10 +9,15 @@ import ArcGIS
 class JobNativeHandler<T: Job & JobProtocol > : BaseNativeHandler<T> {
     
     private var status: Job.Status
-    
+
     init(job: T) {
         status = job.status
         super.init(nativeHandler: job)
+        createTask {
+            for await message in self.nativeHandler.messages {
+                self.sendMessage(method:"job#onMessageAdded", arguments: message.toJSONFlutter())
+            }
+        }
         job.progress.addObserver(self, forKeyPath: "fractionCompleted", options: [.old, .new], context: nil)
     }
     
