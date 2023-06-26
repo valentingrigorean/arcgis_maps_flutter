@@ -7,26 +7,7 @@ import ArcGIS
 
 
 extension TileImageFormat {
-    func toFlutterValue() -> Int {
-        switch self {
-        case .png:
-            return 0
-        case .png8:
-            return 1
-        case .png24:
-            return 2
-        case .png32:
-            return 3
-        case .jpg:
-            return 4
-        case .mixed:
-            return 5
-        case .lerc:
-            return 6
-        }
-    }
-
-    static func fromFlutter(_ flutterValue: Int) -> TileImageFormat {
+    init(_ flutterValue: Int) {
         switch flutterValue {
         case 0:
             return .png
@@ -48,6 +29,27 @@ extension TileImageFormat {
             fatalError("Invalid TileImageFormat value \(self)")
         }
     }
+
+    func toFlutterValue() -> Int {
+        switch self {
+        case .png:
+            return 0
+        case .png8:
+            return 1
+        case .png24:
+            return 2
+        case .png32:
+            return 3
+        case .jpg:
+            return 4
+        case .mixed:
+            return 5
+        case .lerc:
+            return 6
+        }
+    }
+
+
 }
 
 extension TileInfo {
@@ -63,7 +65,7 @@ extension TileInfo {
         let tileHeight = data["tileHeight"] as! Int
         let tileWidth = data["tileWidth"] as! Int
 
-        self.init(dpi: dpi, format: TileImageFormat.fromFlutter(imageFormat), levelsOfDetail: levelOfDetails, origin: origin, spatialReference: spatialReference, tileHeight: tileHeight, tileWidth: tileWidth)
+        self.init(dpi: dpi, format: TileImageFormat(imageFormat), levelsOfDetail: levelOfDetails, origin: origin, spatialReference: spatialReference, tileHeight: tileHeight, tileWidth: tileWidth)
     }
 
     func toJSONFlutter() -> Dictionary<String, Any> {

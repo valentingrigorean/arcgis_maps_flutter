@@ -102,7 +102,7 @@ class GeodatabaseSyncTaskNativeObject: BaseNativeObject<GeodatabaseSyncTask> {
     
     private func syncJobWithSyncDirection(arguments: Any?, result: @escaping FlutterResult) {
         let data = arguments as! [String: Any]
-        let syncDirection = SyncDirection.fromFlutter(flutterValue: data["syncDirection"] as! Int)
+        let syncDirection = SyncDirection(data["syncDirection"] as! Int)
         let rollbackOnFailure = data["rollbackOnFailure"] as! Bool
         let geodatabaseId = data["geodatabase"] as! String
         let geodatabase = storage.getNativeObject(objectId: geodatabaseId) as! GeodatabaseNativeObject

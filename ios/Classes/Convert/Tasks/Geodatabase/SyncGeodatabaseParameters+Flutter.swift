@@ -9,7 +9,7 @@ extension SyncGeodatabaseParameters {
     convenience init(data: Dictionary<String, Any>) {
         self.init()
         keepsGeodatabaseDeltas = data["keepGeodatabaseDeltas"] as! Bool
-        geodatabaseSyncDirection = SyncDirection.fromFlutter(flutterValue: data["geodatabaseSyncDirection"] as! Int)
+        geodatabaseSyncDirection = SyncDirection(data["geodatabaseSyncDirection"] as! Int)
         let layersOptions = (data["layerOptions"] as! [Dictionary<String, Any>]).map {
             SyncLayerOption(data: $0)
         }

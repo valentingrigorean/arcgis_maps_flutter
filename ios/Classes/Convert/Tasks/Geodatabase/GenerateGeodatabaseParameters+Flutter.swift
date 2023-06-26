@@ -8,7 +8,7 @@ import ArcGIS
 extension GenerateGeodatabaseParameters {
     convenience init(data: Dictionary<String, Any>) {
         self.init()
-        attachmentSyncDirection = AttachmentSyncDirection.fromFlutter(flutterValue: data["attachmentSyncDirection"] as! Int)
+        attachmentSyncDirection = AttachmentSyncDirection(data["attachmentSyncDirection"] as! Int)
         if let geometry = data["extent"] as? Dictionary<String, Any> {
             extent = Geometry.fromFlutter(data: geometry)
         }
@@ -22,8 +22,8 @@ extension GenerateGeodatabaseParameters {
         }
         returnsAttachments = data["returnAttachments"] as! Bool
         syncsContingentValues = data["shouldSyncContingentValues"] as! Bool
-        syncModel = Geodatabase.SyncModel.fromFlutter(flutterValue: data["syncModel"] as! Int)
-        utilityNetworkSyncMode = UtilityNetworkSyncMode.fromFlutter(flutterValue: data["utilityNetworkSyncMode"] as! Int)
+        syncModel = Geodatabase.SyncModel(data["syncModel"] as! Int)
+        utilityNetworkSyncMode = UtilityNetworkSyncMode(data["utilityNetworkSyncMode"] as! Int)
     }
 
     func toJSONFlutter() -> Any {

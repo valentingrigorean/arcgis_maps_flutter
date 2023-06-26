@@ -6,7 +6,7 @@ import Foundation
 import ArcGIS
 
 extension Basemap.Style{
-    static func fromFlutter(_ flutterValue: Int) -> BasemapStyle {
+    init(_ flutterValue:Int){
         switch flutterValue {
         case 0:
             return .arcGISChartedTerritory

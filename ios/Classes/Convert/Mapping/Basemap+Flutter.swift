@@ -8,7 +8,7 @@ import ArcGIS
 extension Basemap {
     convenience init(data: Dictionary<String, Any>) {
         if let basemapStyle = data["basemapStyle"] as? Int {
-            self.init(style: Basemap.Style.fromFlutter(basemapStyle))
+            self.init(style: Basemap.Style(basemapStyle))
             return
         }
 

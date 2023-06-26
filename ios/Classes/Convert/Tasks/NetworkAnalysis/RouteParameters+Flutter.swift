@@ -13,7 +13,7 @@ extension RouteParameters {
         }
         directionsDistanceUnits = UnitSystem.fromFlutter(data["directionsDistanceUnits"] as! Int)
         directionsLanguage = data["directionsLanguage"] as! String
-        directionsStyle = DirectionsStyle.fromFlutter(data["directionsStyle"] as! Int)
+        directionsStyle = DirectionsStyle(data["directionsStyle"] as! Int)
         findsBestSequence = data["findBestSequence"] as! Bool
         if let startTime = data["startTime"] as? String {
             self.startDate = startTime.toDateFromIso8601()
@@ -29,7 +29,7 @@ extension RouteParameters {
         returnsPolylineBarriers = data["returnPolylineBarriers"] as! Bool
         returnsRoutes = data["returnRoutes"] as! Bool
         returnsStops = data["returnStops"] as! Bool
-        routeShapeType = RouteShapeType.fromFlutter(data["routeShapeType"] as! Int)
+        routeShapeType = RouteShapeType(data["routeShapeType"] as! Int)
         if let travelMode = data["travelMode"] as? Dictionary<String, Any> {
             self.travelMode = TravelMode(data: travelMode)
         }

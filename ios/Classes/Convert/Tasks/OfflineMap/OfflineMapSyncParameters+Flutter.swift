@@ -11,7 +11,7 @@ extension OfflineMapSyncParameters {
         keepsGeodatabaseDeltas = data["keepGeodatabaseDeltas"] as! Bool
         preplannedScheduledUpdatesOption = PreplannedScheduledUpdatesOption.fromFlutter( data["preplannedScheduledUpdatesOption"] as! Int)
         shouldRollbackOnFailure = data["rollbackOnFailure"] as! Bool
-        syncDirection = SyncDirection.fromFlutter(data["syncDirection"] as! Int)
+        syncDirection = SyncDirection(data["syncDirection"] as! Int)
     }
 
     func toJSONFlutter() -> Any {

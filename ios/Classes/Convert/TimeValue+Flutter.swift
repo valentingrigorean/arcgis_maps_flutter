@@ -7,11 +7,9 @@ import ArcGIS
 
 extension TimeValue {
 
-    convenience init(data: Dictionary<String, Any>) {
-        let duration = data["duration"] as! Double
-        let unit = data["unit"] as! Int
-
-        self.init(duration: duration,TimeValue.Unit.fromFlutterValue(unit))
+    init(data: Dictionary<String, Any>) {
+        duration = data["duration"] as! Double
+        unit = TimeValue.Unit(data["unit"] as! Int)
     }
 
     func toJSONFlutter() -> Any {

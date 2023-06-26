@@ -7,6 +7,35 @@ import ArcGIS
 
 
 extension TimeValue.Unit {
+    init(_ flutterValue: Int) {
+        switch flutterValue {
+        case 0:
+            return nil
+        case 1:
+            return .centuries
+        case 2:
+            return .days
+        case 3:
+            return .decades
+        case 4:
+            return .hours
+        case 5:
+            return .milliseconds
+        case 6:
+            return .minutes
+        case 7:
+            return .months
+        case 8:
+            return .seconds
+        case 9:
+            return .weeks
+        case 10:
+            return .years
+        default:
+            fatalError("Unknown TimeValue.Unit value \(flutterValue)")
+        }
+    }
+
     func toFlutterValue() -> Int {
         switch self {
         case .unknown:

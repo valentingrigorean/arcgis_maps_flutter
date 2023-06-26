@@ -13,7 +13,7 @@ extension Map {
         }
 
         if let basemapStyle = data["basemapStyle"] as? Int? {
-            self.init(basemap: Basemap(style: Basemap.Style.fromFlutter(basemapStyle)))
+            self.init(basemap: Basemap(style: Basemap.Style(flutterValue: basemapStyle)))
             return
         }
 

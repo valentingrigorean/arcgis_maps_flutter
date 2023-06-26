@@ -8,9 +8,9 @@
 import Foundation
 import ArcGIS
 
-extension AttachmentSyncDirection{
-    
-    static func fromFlutter(flutterValue:Int)  -> AttachmentSyncDirection{
+extension AttachmentSyncDirection {
+
+    init(_ flutterValue: Int) {
         switch flutterValue {
         case 1:
             return AttachmentSyncDirection.upload
@@ -20,8 +20,8 @@ extension AttachmentSyncDirection{
             return AttachmentSyncDirection.noSync
         }
     }
-    
-    func toFlutterValue() -> Int{
+
+    func toFlutterValue() -> Int {
         switch self {
         case .upload:
             return 1
@@ -36,10 +36,10 @@ extension AttachmentSyncDirection{
 }
 
 
-extension GenerateLayerOption.QueryOption{
-    
-    static func fromFlutter(flutterValue:Int) -> GenerateLayerOption.QueryOption{
-        switch flutterValue{
+extension GenerateLayerOption.QueryOption {
+
+    init(flutterValue: Int) {
+        switch flutterValue {
         case 0:
             return GenerateLayerOption.QueryOption.all
         case 1:
@@ -50,8 +50,8 @@ extension GenerateLayerOption.QueryOption{
             return GenerateLayerOption.QueryOption.all
         }
     }
-    
-    func toFlutterValue() -> Int{
+
+    func toFlutterValue() -> Int {
         switch self {
         case .all:
             return 0
@@ -66,9 +66,9 @@ extension GenerateLayerOption.QueryOption{
 }
 
 
-extension Geodatabase.SyncModel{
-    static func fromFlutter(_ flutterValue:Int) -> Geodatabase.SyncModel{
-        switch flutterValue{
+extension Geodatabase.SyncModel {
+    init(_ flutterValue: Int) {
+        switch flutterValue {
         case 1:
             return Geodatabase.SyncModel.geodatabase
         case 2:
@@ -77,9 +77,9 @@ extension Geodatabase.SyncModel{
             return Geodatabase.SyncModel.disabled
         }
     }
-    
-    func toFlutterValue() -> Int{
-        switch self{
+
+    func toFlutterValue() -> Int {
+        switch self {
         case .disabled:
             return 0
         case .geodatabase:
@@ -93,9 +93,9 @@ extension Geodatabase.SyncModel{
 }
 
 
-extension UtilityNetworkSyncMode{
-    
-    static func fromFlutter(flutterValue:Int)  -> UtilityNetworkSyncMode{
+extension UtilityNetworkSyncMode {
+
+    init(flutterValue: Int) {
         switch flutterValue {
         case 1:
             return UtilityNetworkSyncMode.syncSystemTables
@@ -105,10 +105,10 @@ extension UtilityNetworkSyncMode{
             return UtilityNetworkSyncMode.noSync
         }
     }
-    
-    
-    func toFlutterValue() -> Int{
-        switch self{
+
+
+    func toFlutterValue() -> Int {
+        switch self {
         case .noSync:
             return 0
         case .syncSystemTables:
@@ -123,9 +123,9 @@ extension UtilityNetworkSyncMode{
 }
 
 
-extension SyncDirection{
-    static func fromFlutter(_ flutterValue:Int) -> SyncDirection{
-        switch flutterValue{
+extension SyncDirection {
+    init(_ flutterValue: Int) {
+        switch flutterValue {
         case 1:
             return SyncDirection.download
         case 2:
@@ -136,9 +136,9 @@ extension SyncDirection{
             return SyncDirection.noSync
         }
     }
-    
-    func toFlutterValue() -> Int{
-        switch self{
+
+    func toFlutterValue() -> Int {
+        switch self {
         case .noSync:
             return 0
         case .download:

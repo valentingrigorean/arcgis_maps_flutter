@@ -13,21 +13,16 @@ extension LocatorInfo {
         data["intersectionResultAttributes"] = intersectionResultAttributes.map {
             $0.toJSONFlutter()
         }
-       
         data["properties"] = properties
-        
-
         data["resultAttributes"] = resultAttributes.map {
             $0.toJSONFlutter()
         }
         data["searchAttributes"] = searchAttributes.map {
             $0.toJSONFlutter()
         }
-
         if let spatialReference = spatialReference {
             data["spatialReference"] = spatialReference.toJSONFlutter()
         }
-
         data["supportsPOI"] = supportsPOI
         data["supportsAddresses"] = supportsAddresses
         data["supportsIntersections"] = supportsIntersections

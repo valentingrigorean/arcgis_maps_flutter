@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-extension AGSGeodesicSectorParameters {
+extension GeodesicSectorParameters {
     convenience init(data: Dictionary<String, Any>) {
         let center = Point(data: data["center"] as! Dictionary<String, Any>)
         let semiAxis1Length = data["semiAxis1Length"] as! Double
@@ -14,7 +14,7 @@ extension AGSGeodesicSectorParameters {
         let sectorAngle = data["sectorAngle"] as! Double
         self.init(center: center, semiAxis1Length: semiAxis1Length, semiAxis2Length: semiAxis2Length, sectorAngle: startDirection, startDirection: sectorAngle)
 
-        let linearUnitId = AGSLinearUnitID.fromFlutter(data["linearUnit"] as! Int)
+        let linearUnitId = LinearUnitID.fromFlutter(data["linearUnit"] as! Int)
         let angularUnitId = AGSAngularUnitID.fromFlutter(data["angularUnit"] as! Int)
         angularUnit = AGSAngularUnit(unitID: angularUnitId)!
         linearUnit = AGSLinearUnit(unitID: linearUnitId)!
@@ -22,7 +22,7 @@ extension AGSGeodesicSectorParameters {
         if let maxSegmentLength = data["maxSegmentLength"] as? Double {
             self.maxSegmentLength = maxSegmentLength
         }
-        geometryType = AGSGeometryType(rawValue: data["geometryType"] as! Int)!
+        geometryType = GeometryType(rawValue: data["geometryType"] as! Int)!
         maxPointCount = data["maxPointCount"] as! Int
     }
 }

@@ -1,5 +1,4 @@
-//package com.valentingrigorean.arcgis_maps_flutter.convert.data
-//
+package com.valentingrigorean.arcgis_maps_flutter.convert.data
 //import com.arcgismaps.data.Feature
 //import com.arcgismaps.data.FieldType
 //import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterValue
