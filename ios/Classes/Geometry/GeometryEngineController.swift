@@ -58,7 +58,7 @@ class GeometryEngineController {
                 result(nil)
                 return
             }
-            let geometry = AGSGeometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
+            let geometry = Geometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
             let distance = data["distance"] as! Double
             let polygon = AGSGeometryEngine.bufferGeometry(geometry, byDistance: distance)
             result(polygon?.toJSONFlutter())

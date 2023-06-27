@@ -31,7 +31,7 @@ class CoordinateFormatterController {
                 result(nil)
                 return
             }
-            let from = AGSGeometry.fromFlutter(data: data["from"] as! Dictionary<String, Any>) as! Point
+            let from = Geometry.fromFlutter(data: data["from"] as! Dictionary<String, Any>) as! Point
             let format = data["format"] as! Int
             let decimalPlaces = data["decimalPlaces"] as! Int
             result(AGSCoordinateFormatter.latitudeLongitudeString(from: from, format: AGSLatitudeLongitudeFormat(rawValue: format)!, decimalPlaces: decimalPlaces))

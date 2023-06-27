@@ -32,9 +32,9 @@ extension LinearUnit.ID {
         case 6:
             self = .nauticalMiles
         case 7:
-            return .yards
+            self = .yards
         default:
-            return .other
+            fatalError("Unexpected flutter value: \(flutterValue)")
         }
     }
 
