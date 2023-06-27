@@ -9,28 +9,26 @@ import ArcGIS
 extension TimeValue.Unit {
     init(_ flutterValue: Int) {
         switch flutterValue {
-        case 0:
-            return nil
         case 1:
-            return .centuries
+            self = .centuries
         case 2:
-            return .days
+            self = .days
         case 3:
-            return .decades
+            self = .decades
         case 4:
-            return .hours
+            self = .hours
         case 5:
-            return .milliseconds
+            self = .milliseconds
         case 6:
-            return .minutes
+            self = .minutes
         case 7:
-            return .months
+            self = .months
         case 8:
-            return .seconds
+            self = .seconds
         case 9:
-            return .weeks
+            self = .weeks
         case 10:
-            return .years
+            self = .years
         default:
             fatalError("Unknown TimeValue.Unit value \(flutterValue)")
         }
@@ -38,8 +36,6 @@ extension TimeValue.Unit {
 
     func toFlutterValue() -> Int {
         switch self {
-        case .unknown:
-            return 0
         case .centuries:
             return 1
         case .days:
@@ -93,32 +89,29 @@ extension TimeValue.Unit {
     }
 }
 
-extension CacheStorageFormat {
+extension TileCache.StorageFormat {
+
+    init(_ flutterValue: Int)  {
+        switch flutterValue {
+        case 0:
+            self = .compact
+        case 1:
+            self = .compactV2
+        case 2:
+            self = .exploded
+        default:
+            fatalError("Unknown TileCache.StorageFormat value \(flutterValue)")
+        }
+    }
+
     func toFlutterValue() -> Int {
         switch self {
-        case .unknown:
-            return -1
         case .compact:
             return 0
         case .compactV2:
             return 1
         case .exploded:
             return 2
-        }
-    }
-
-    static func fromFlutterValue(_ flutterValue: Int) -> CacheStorageFormat {
-        switch flutterValue {
-        case -1:
-            return .unknown
-        case 0:
-            return .compact
-        case 1:
-            return .compactV2
-        case 2:
-            return .exploded
-        default:
-            return .unknown
         }
     }
 }

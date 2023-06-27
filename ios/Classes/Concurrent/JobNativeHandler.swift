@@ -82,8 +82,8 @@ class JobNativeHandler<T: Job & JobProtocol > : BaseNativeHandler<T> {
         }
     }
     
-    func getCurrentMessages() async -> [ArcGIS.JobMessage] {
-        var messages: [ArcGIS.JobMessage] = []
+    func getCurrentMessages() async -> [JobMessage] {
+        var messages: [JobMessage] = []
         for await message in nativeHandler.messages {
             messages.append(message)
         }
