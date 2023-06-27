@@ -28,27 +28,16 @@ class OfflineMapTaskNativeObject: BaseNativeObject<OfflineMapTask> {
     }
 
     private func defaultGenerateOfflineMapParameters(data: [String: Any], result: @escaping FlutterResult) {
-        let areaOfInterest = AGSGeometry.fromFlutter(data: data["areaOfInterest"] as! [String: Any])!
+        let areaOfInterest = Geometry.fromFlutter(data: data["areaOfInterest"] as! [String: Any])!
         let minScale = data["minScale"] as? Double
         let maxScale = data["maxScale"] as? Double
-
-        if minScale == nil {
-            nativeObject.defaultGenerateOfflineMapParameters(withAreaOfInterest: areaOfInterest, completion: { (parameters, error) in
-                if let error = error {
-                    result(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))
-                } else {
-                    result(parameters?.toJSONFlutter())
-                }
-            })
-        } else {
-            nativeObject.defaultGenerateOfflineMapParameters(withAreaOfInterest: areaOfInterest, minScale: minScale!, maxScale: maxScale!, completion: { (parameters, error) in
-                if let error = error {
-                    result(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))
-                } else {
-                    result(parameters?.toJSONFlutter())
-                }
-            })
-        }
+        nativeObject.makeDefaultGenerateOfflineMapParameters(areaOfInterest: areaOfInterest, completion: { (parameters, error) in
+            if let error = error {
+                result(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))
+            } else {
+                result(parameters?.toJSONFlutter())
+            }
+        })
     }
 
     private func generateOfflineMap(data: [String: Any], result: @escaping FlutterResult) {

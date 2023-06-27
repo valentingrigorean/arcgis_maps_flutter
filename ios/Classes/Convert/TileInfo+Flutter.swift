@@ -10,21 +10,21 @@ extension TileImageFormat {
     init(_ flutterValue: Int) {
         switch flutterValue {
         case 0:
-            return .png
+            self = .png
         case 1:
-            return .png8
+            self = .png8
         case 2:
-            return .png24
+            self = .png24
         case 3:
-            return .png32
+            self = .png32
         case 4:
-            return .jpg
+            self = .jpg
         case 5:
-            return .mixed
+            self = .mixed
         case 6:
-            return .lerc
+            self = .lerc
         case 7:
-            return .png
+            self = .png
         default:
             fatalError("Invalid TileImageFormat value \(self)")
         }

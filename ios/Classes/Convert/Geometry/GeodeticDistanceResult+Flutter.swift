@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-extension AGSGeodeticDistanceResult {
+extension GeodeticDistanceResult {
     func toJSONFlutter() -> Any {
         [
             "distance": distance,

@@ -85,7 +85,10 @@ extension Geometry {
 
     func toJSONFlutter() -> Any? {
         do {
-            if var dictionary = try JSONSerialization.jsonObject(with: toJSON(), options: []) as? [String: Any] {
+            guard let data = toJSON().data(using: .utf8) else {
+                return nil
+            }
+            if var dictionary = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
                 dictionary["type"] = geometryType()
                 return dictionary
             }

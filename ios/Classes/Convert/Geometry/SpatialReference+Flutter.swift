@@ -6,9 +6,9 @@ import Foundation
 import ArcGIS
 
 extension SpatialReference {
-    convenience init?(data: Dictionary<String, Any>) {
+    init?(data: Dictionary<String, Any>) {
         if let wkId = data["wkid"] as? Int {
-            self.init(wkid: wkId)
+            self.init(wkid: WKID(rawValue: wkId)!)
             return
         }
         if let wkText = data["wkText"] as? String {

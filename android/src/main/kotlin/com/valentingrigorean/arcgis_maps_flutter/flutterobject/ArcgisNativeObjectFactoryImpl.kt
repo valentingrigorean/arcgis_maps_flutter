@@ -42,8 +42,7 @@ class ArcgisNativeObjectFactoryImpl(
                 val exportTileCacheTask = ExportTileCacheTask(
                     Objects.requireNonNull(url)
                 )
-                val nativeObject: NativeObject =
-                    ExportTileCacheTaskNativeObject(objectId, exportTileCacheTask)
+                val nativeObject = ExportTileCacheTaskNativeObject(objectId, exportTileCacheTask)
                 nativeObject.setMessageSink(messageSink)
                 Result.success(nativeObject)
             }
@@ -51,8 +50,7 @@ class ArcgisNativeObjectFactoryImpl(
             "TileCache" -> {
                 val url = arguments as String
                 val tileCache = TileCache(url)
-                val nativeObject: NativeObject =
-                    TileCacheNativeObject(objectId, tileCache)
+                val nativeObject = TileCacheNativeObject(objectId, tileCache)
                 nativeObject.setMessageSink(messageSink)
                 Result.success(nativeObject)
             }
@@ -62,8 +60,7 @@ class ArcgisNativeObjectFactoryImpl(
                 val geodatabaseSyncTask = GeodatabaseSyncTask(
                     url
                 )
-                val nativeObject: NativeObject =
-                    GeodatabaseSyncTaskNativeObject(objectId, geodatabaseSyncTask)
+                val nativeObject = GeodatabaseSyncTaskNativeObject(objectId, geodatabaseSyncTask)
                 nativeObject.setMessageSink(messageSink)
                 Result.success(nativeObject)
             }
@@ -72,8 +69,7 @@ class ArcgisNativeObjectFactoryImpl(
                 val task = createOfflineMapTask(
                     arguments as Map<*, *>
                 )
-                val nativeObject: NativeObject =
-                    OfflineMapTaskNativeObject(objectId, task)
+                val nativeObject = OfflineMapTaskNativeObject(objectId, task)
                 nativeObject.setMessageSink(messageSink)
                 Result.success(nativeObject)
             }
@@ -105,8 +101,7 @@ class ArcgisNativeObjectFactoryImpl(
 
             "Geodatabase" -> {
                 val url = arguments as String
-                val nativeObject: NativeObject =
-                    GeodatabaseNativeObject(objectId, Geodatabase(url))
+                val nativeObject = GeodatabaseNativeObject(objectId, Geodatabase(url))
                 nativeObject.setMessageSink(messageSink)
                 Result.success(nativeObject)
             }
@@ -116,8 +111,7 @@ class ArcgisNativeObjectFactoryImpl(
                 val routeTask = RouteTask(
                     url
                 )
-                val nativeObject: NativeObject =
-                    RouteTaskNativeObject(objectId, routeTask)
+                val nativeObject = RouteTaskNativeObject(objectId, routeTask)
                 nativeObject.setMessageSink(messageSink)
                 Result.success(nativeObject)
             }
@@ -125,8 +119,7 @@ class ArcgisNativeObjectFactoryImpl(
             "LocatorTask" -> {
                 val url = arguments as String
                 val locatorTask = LocatorTask(url)
-                val nativeObject: NativeObject =
-                    LocatorTaskNativeObject(objectId, locatorTask)
+                val nativeObject = LocatorTaskNativeObject(objectId, locatorTask)
                 nativeObject.setMessageSink(messageSink)
                 Result.success(nativeObject)
             }
@@ -134,8 +127,7 @@ class ArcgisNativeObjectFactoryImpl(
             "ServiceFeatureTable" -> {
                 val url = arguments as String
                 val serviceFeatureTable = ServiceFeatureTable(url)
-                val nativeObject: NativeObject =
-                    ServiceFeatureTableNativeObject(objectId, serviceFeatureTable)
+                val nativeObject = ServiceFeatureTableNativeObject(objectId, serviceFeatureTable)
                 nativeObject.setMessageSink(messageSink)
                 Result.success(nativeObject)
             }

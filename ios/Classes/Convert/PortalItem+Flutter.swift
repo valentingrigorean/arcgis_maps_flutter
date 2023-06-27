@@ -9,6 +9,6 @@ extension PortalItem {
     convenience init(data: Dictionary<String, Any>) {
         let portal = Portal(data: data["portal"] as! Dictionary<String, Any>)
         let itemId = data["itemId"] as! String
-        self.init(portal: portal, itemID: itemId)
+        self.init(portal: portal, id: ID(itemId))
     }
 }

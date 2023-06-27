@@ -126,7 +126,6 @@ struct FlutterLayer: Hashable, Equatable {
         case "GeodatabaseLayer":
             let layer = GroupLayer()
             let geodatabase = Geodatabase(fileURL: url!)
-            geodatabase.load()
             geodatabase.load { error in
                 if let error = error {
                     print(error.localizedDescription)
