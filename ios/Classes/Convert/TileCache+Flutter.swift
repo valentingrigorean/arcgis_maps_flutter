@@ -5,19 +5,19 @@
 import Foundation
 import ArcGIS
 
-extension AGSTileCache {
+extension TileCache {
     convenience init(data: Dictionary<String, Any>) {
         let url = data["url"] as! String
         self.init(name: url)
     }
 
-    static func createFlutter(data: Dictionary<String, Any>) -> AGSTileCache {
+    static func createFlutter(data: Dictionary<String, Any>) -> TileCache {
         if let nativeObjectId = data["nativeObjectId"] as? String {
             let nativeObject = NativeObjectStorage.shared.getNativeObject(objectId: nativeObjectId) as? BaseNativeObject<AGSTileCache>
             if let nativeObject = nativeObject {
                 return nativeObject.nativeObject
             }
         }
-        return AGSTileCache(data: data)
+        return TileCache(data: data)
     }
 }

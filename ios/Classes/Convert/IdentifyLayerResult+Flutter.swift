@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-extension AGSIdentifyLayerResult {
+extension IdentifyLayerResult {
     func toJSONFlutter() -> Any {
         let elements = geoElements.map {
             $0.toJSONFlutter()
@@ -13,16 +13,14 @@ extension AGSIdentifyLayerResult {
         return [
             "layerName": layerContent.name,
             "elements": elements
-        ]
+        ] as [String:Any]
     }
 }
 
-extension Array where Element == AGSIdentifyLayerResult {
+extension Array where Element == IdentifyLayerResult {
     func toJSONFlutter() -> [Any] {
         self.map {
             $0.toJSONFlutter()
         }
     }
-
-
 }

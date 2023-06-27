@@ -5,7 +5,7 @@
 import Foundation
 import ArcGIS
 
-enum GeometryType : Int,Hashable{
+enum GeometryType: Int, Hashable {
     case point = 1
     case envelope = 2
     case polyline = 3
@@ -14,11 +14,60 @@ enum GeometryType : Int,Hashable{
     case unknown = -1
 }
 
+extension LinearUnit.ID {
+    init(_ flutterValue: Int) {
+        switch flutterValue {
+        case 0:
+            self = .centimeters
+        case 1:
+            self = .feet
+        case 2:
+            self = .inches
+        case 3:
+            self = .kilometers
+        case 4:
+            self = .meters
+        case 5:
+            self = .miles
+        case 6:
+            self = .nauticalMiles
+        case 7:
+            return .yards
+        default:
+            return .other
+        }
+    }
+
+    func toFlutterValue() -> Int {
+        switch self {
+        case .centimeters:
+            return 0
+        case .feet:
+            return 1
+        case .inches:
+            return 2
+        case .kilometers:
+            return 3
+        case .meters:
+            return 4
+        case .miles:
+            return 5
+        case .nauticalMiles:
+            return 6
+        case .yards:
+            return 7
+        default:
+            return 8
+        }
+    }
+}
+
 extension Geometry {
     static func fromFlutter(data: Dictionary<String, Any>) -> Geometry? {
         guard let geometryType = data["type"] as? Int,
-                   let geometryType = GeometryType(rawValue: geometryType) else {
-                 return tryParseAsJson(data: data)
+              let geometryType = GeometryType(rawValue: geometryType)
+        else {
+            return tryParseAsJson(data: data)
         }
         switch (geometryType) {
         case .point:
@@ -35,20 +84,19 @@ extension Geometry {
     }
 
     func toJSONFlutter() -> Any? {
-        do{
-               if var dictionary = try JSONSerialization.jsonObject(with: toJSON(), options: []) as? [String: Any] {
-                   dictionary["type"] = geometryType()
-                   return dictionary
-               }
-           }catch{
-               print("Error parsing JSON: \(error.localizedDescription)")
-               return nil
-           }
-           return nil
+        do {
+            if var dictionary = try JSONSerialization.jsonObject(with: toJSON(), options: []) as? [String: Any] {
+                dictionary["type"] = geometryType()
+                return dictionary
+            }
+        } catch {
+            print("Error parsing JSON: \(error.localizedDescription)")
+            return nil
+        }
+        return nil
     }
-    
-    
-   
+
+
     private static func tryParseAsJson(data: Dictionary<String, Any>) -> Geometry? {
         do {
             // Convert the dictionary to JSON data

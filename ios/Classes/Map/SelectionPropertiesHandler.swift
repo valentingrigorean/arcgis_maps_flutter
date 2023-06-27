@@ -14,7 +14,7 @@ class SelectionPropertiesHandler {
         defaultSelectedColor = selectionProperties.color
     }
 
-    func setGraphicSelected(graphic: AGSGraphic,
+    func setGraphicSelected(graphic: Graphic,
                             selectedColor: UIColor?) {
         if let selectedColor = selectedColor {
             selectionProperties.color = selectedColor

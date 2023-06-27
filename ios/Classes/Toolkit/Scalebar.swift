@@ -19,7 +19,7 @@ public enum ScalebarUnits {
     case metric
     case nauticalMiles
 
-    internal func baseUnits() -> AGSLinearUnit {
+    internal func baseUnits() -> LinearUnit {
         switch self {
         case .imperial:
             return AGSLinearUnit.feet()
