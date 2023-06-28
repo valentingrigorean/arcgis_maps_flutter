@@ -101,7 +101,7 @@ class BitmapDescriptor: Hashable {
         bitmapDescriptor = BitmapDescriptor.createFlutterBitmapDescriptor(data: data)
     }
 
-    func createSymbol() -> AGSSymbol {
+    func createSymbol() -> Symbol {
         bitmapDescriptor.createSymbol()
     }
 
@@ -142,7 +142,7 @@ class BitmapDescriptor: Hashable {
         if let styleMarker = data["styleMarker"] as? Int {
             let color = UIColor(data: data["color"])!
             let size = CGFloat(data["size"] as! Double)
-            return StyleMarkerBitmapDescriptor(style: AGSSimpleMarkerSymbolStyle(rawValue: styleMarker)!, color: color, size: size)
+            return StyleMarkerBitmapDescriptor(style: SimpleMarkerSymbol.Style(styleMarker), color: color, size: size)
         }
 
         fatalError()
@@ -171,7 +171,7 @@ fileprivate class FlutterBitmapDescriptor: Hashable {
         return lhs.isEqual(to: rhs)
     }
 
-    func createSymbol() -> AGSSymbol {
+    func createSymbol() -> Symbol {
         fatalError()
     }
 }
@@ -185,8 +185,8 @@ fileprivate class RawBitmapDescriptor: FlutterBitmapDescriptor {
         self.rawData = rawData
     }
 
-    override func createSymbol() -> AGSSymbol {
-        AGSPictureMarkerSymbol(image: UIImage(data: rawData.data)!)
+    override func createSymbol() -> Symbol {
+        PictureMarkerSymbol(image: UIImage(data: rawData.data)!)
     }
 
     override func hash(into hasher: inout Hasher) {
@@ -229,9 +229,9 @@ fileprivate class AssetBitmapDescriptor: FlutterBitmapDescriptor {
         self.bitmapOptions = bitmapOptions
     }
 
-    override func createSymbol() -> AGSSymbol {
+    override func createSymbol() -> Symbol {
         let image = bitmapOptions.getImage()
-        let symbol = AGSPictureMarkerSymbol(image: image)
+        let symbol = PictureMarkerSymbol(image: image)
 
         if let width = bitmapOptions.width {
             symbol.width = width
@@ -284,14 +284,14 @@ fileprivate class CompositeBitmapDescriptor: FlutterBitmapDescriptor {
         super.init()
     }
 
-    override func createSymbol() -> AGSSymbol {
-        var symbols = [AGSSymbol]()
+    override func createSymbol() -> Symbol {
+        var symbols = [Symbol]()
 
         for bitmap in bitmapDescriptors {
             symbols.append(bitmap.createSymbol())
         }
 
-        return AGSCompositeSymbol(symbols: symbols)
+        return CompositeSymbol(symbols: symbols)
     }
 
     override func hash(into hasher: inout Hasher) {
@@ -328,11 +328,11 @@ fileprivate class CompositeBitmapDescriptor: FlutterBitmapDescriptor {
 
 fileprivate class StyleMarkerBitmapDescriptor: FlutterBitmapDescriptor {
 
-    private let style: AGSSimpleMarkerSymbolStyle
+    private let style: SimpleMarkerSymbol.Style
     private let color: UIColor
     private let size: CGFloat
 
-    init(style: AGSSimpleMarkerSymbolStyle,
+    init(style: SimpleMarkerSymbol.Style,
          color: UIColor,
          size: CGFloat) {
         self.style = style
@@ -340,8 +340,8 @@ fileprivate class StyleMarkerBitmapDescriptor: FlutterBitmapDescriptor {
         self.size = size
     }
 
-    override func createSymbol() -> AGSSymbol {
-        AGSSimpleMarkerSymbol(style: style, color: color, size: size)
+    override func createSymbol() -> Symbol {
+        SimpleMarkerSymbol(style: style, color: color, size: size)
     }
 
     override func hash(into hasher: inout Hasher) {

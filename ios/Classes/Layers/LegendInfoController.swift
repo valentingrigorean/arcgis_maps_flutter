@@ -11,7 +11,7 @@ class LegendInfoController {
 
     private let layersController: LayersController
     private var result: LegendInfoControllerResult?
-    private var layersLegend = Dictionary<LayerWrapper, [AGSLegendInfo]>()
+    private var layersLegend = Dictionary<LayerWrapper, [LegendInfo]>()
 
     private var legendResultsFlutter: [Any] = []
 
@@ -156,7 +156,7 @@ class LegendInfoController {
 
 fileprivate struct LayerWrapper: Hashable {
 
-    let layer: AGSLayerContent
+    let layer: LayerContent
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(LayerWrapper.objectIdentifierFor(layer))

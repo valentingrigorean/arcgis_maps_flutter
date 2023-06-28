@@ -71,10 +71,10 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)", binaryMessenger: registrar.messenger())
 
-        mapView = MapView(frame: frame)
-        mapView.selectionProperties = AGSSelectionProperties(color: UIColor.cyan)
+        mapView = MapView()
+        mapView.frame = frame
 
-        selectionPropertiesHandler = SelectionPropertiesHandler(selectionProperties: mapView.selectionProperties)
+        selectionPropertiesHandler = SelectionPropertiesHandler(geoView: mapView)
 
         symbolVisibilityFilterController = SymbolVisibilityFilterController(mapView: mapView)
 
@@ -243,7 +243,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             break
         case "map#setTimeExtent":
             if let timeExtentRaw = call.arguments as? Dictionary<String, Any> {
-                let timeExtent = AGSTimeExtent(data: timeExtentRaw)
+                let timeExtent = TimeExtent(data: timeExtentRaw)
                 if mapView.timeExtent != timeExtent {
                     mapView.timeExtent = timeExtent
                 }

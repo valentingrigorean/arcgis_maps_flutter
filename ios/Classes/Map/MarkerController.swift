@@ -25,7 +25,7 @@ class MarkerController: BaseGraphicController {
 
     init(markerId: String) {
         marker = AGSCompositeSymbol()
-        super.init(graphics: AGSGraphic(geometry: nil, symbol: marker, attributes: ["markerId": markerId]))
+        super.init(graphics: Graphic(geometry: nil, symbol: marker, attributes: ["markerId": markerId]))
     }
 
     override var isSelected: Bool {
@@ -125,7 +125,7 @@ class MarkerController: BaseGraphicController {
         }
     }
 
-    private func offsetSymbol(symbol: AGSSymbol,
+    private func offsetSymbol(symbol: Symbol,
                               offsetX: CGFloat,
                               offsetY: CGFloat) {
         guard let markerSymbol = symbol as? AGSMarkerSymbol else {
@@ -153,13 +153,13 @@ class MarkerController: BaseGraphicController {
         }
     }
 
-    private func createSymbol(bitmapDescription: BitmapDescriptor) -> AGSSymbol {
+    private func createSymbol(bitmapDescription: BitmapDescriptor) -> Symbol {
         let newSymbol = bitmapDescription.createSymbol()
         setOpacity(opacity: opacity)
         return newSymbol
     }
 
-    private func setOpacity(symbol: AGSSymbol,
+    private func setOpacity(symbol: Symbol,
                             opacity: Float) {
         guard let pictureSymbol = symbol as? AGSPictureMarkerSymbol else {
             return

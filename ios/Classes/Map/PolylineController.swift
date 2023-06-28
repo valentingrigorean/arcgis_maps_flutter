@@ -6,11 +6,11 @@ import Foundation
 import ArcGIS
 
 class PolylineController: BaseGraphicController {
-    private let polylineSymbol: AGSSimpleLineSymbol
+    private let polylineSymbol: SimpleLineSymbol
 
     init(polylineId: String) {
-        polylineSymbol = AGSSimpleLineSymbol(style: .solid, color: UIColor.black, width: 10)
-        super.init(graphics: AGSGraphic(geometry: nil, symbol: polylineSymbol, attributes: ["polylineId": polylineId]))
+        polylineSymbol = SimpleLineSymbol(style: .solid, color: UIColor.black, width: 10)
+        super.init(graphics: Graphic(geometry: nil, attributes: ["polylineId": polylineId], symbol: polylineSymbol))
     }
 
     func setVisible(visible: Bool) {
@@ -21,12 +21,12 @@ class PolylineController: BaseGraphicController {
         polylineSymbol.color = color
     }
 
-    func setStyle(style: AGSSimpleLineSymbolStyle) {
+    func setStyle(style: SimpleLineSymbol.Style) {
         polylineSymbol.style = style
     }
 
     func setPoints(points: [Point]) {
-        graphics.geometry = AGSPolyline(points: points)
+        graphics.geometry = Polyline(points: points)
     }
 
     func setWidth(width: CGFloat) {
@@ -38,6 +38,6 @@ class PolylineController: BaseGraphicController {
     }
 
     func setAntialias(antialias: Bool) {
-        polylineSymbol.antialias = antialias
+        polylineSymbol.isAntialiased = antialias
     }
 }

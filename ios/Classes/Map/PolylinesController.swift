@@ -7,10 +7,9 @@ import ArcGIS
 
 class PolylinesController: NSObject, SymbolsController {
 
-
     private var polylineIdToController = Dictionary<String, PolylineController>()
 
-    private let graphicsOverlays: AGSGraphicsOverlay
+    private let graphicsOverlays: GraphicsOverlay
 
     private let methodChannel: FlutterMethodChannel
 
@@ -19,7 +18,7 @@ class PolylinesController: NSObject, SymbolsController {
     var symbolVisibilityFilterController: SymbolVisibilityFilterController?
 
     init(methodChannel: FlutterMethodChannel,
-         graphicsOverlays: AGSGraphicsOverlay) {
+         graphicsOverlays: GraphicsOverlay) {
         self.methodChannel = methodChannel
         self.graphicsOverlays = graphicsOverlays
     }
@@ -63,9 +62,7 @@ class PolylinesController: NSObject, SymbolsController {
         }
 
         if let styleIndex = data["style"] as? Int {
-            if let style = AGSSimpleLineSymbolStyle(rawValue: styleIndex) {
-                controller.setStyle(style: style)
-            }
+            controller.setStyle(style:  SimpleLineSymbol.Style(styleIndex))
         }
 
         if let pointsData = data["points"] as? [Dictionary<String, Any>] {
@@ -97,7 +94,7 @@ extension PolylinesController: MapGraphicTouchDelegate {
         return false
     }
 
-    func didHandleGraphic(graphic: AGSGraphic) -> Bool {
+    func didHandleGraphic(graphic: Graphic) -> Bool {
         guard let polylineId = graphic.attributes["polylineId"] as? String else {
             return false
         }

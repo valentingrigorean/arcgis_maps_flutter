@@ -8,9 +8,9 @@ import ArcGIS
 class ScaleSymbolHelper {
     private let scaleSymbols: [SymbolScaleHandler]
 
-    let symbol: AGSSymbol
+    let symbol: Symbol
 
-    init(symbol: AGSSymbol) {
+    init(symbol: Symbol) {
         self.symbol = symbol
         scaleSymbols = ScaleSymbolHelper.populateDefaultSize(symbol: symbol)
     }
@@ -21,9 +21,9 @@ class ScaleSymbolHelper {
         }
     }
 
-    private static func populateDefaultSize(symbol: AGSSymbol) -> [SymbolScaleHandler] {
+    private static func populateDefaultSize(symbol: Symbol) -> [SymbolScaleHandler] {
         var arr = Array<SymbolScaleHandler>()
-        if let compositeSymbol = symbol as? AGSCompositeSymbol {
+        if let compositeSymbol = symbol as? CompositeSymbol {
             for child in compositeSymbol.symbols {
                 arr.append(contentsOf: populateDefaultSize(symbol: child))
             }
@@ -37,20 +37,20 @@ class ScaleSymbolHelper {
 }
 
 fileprivate class SymbolScaleHandler {
-    private let symbol: AGSSymbol
+    private let symbol: Symbol
     private let haveSize: Bool
     private let width: CGFloat
     private let height: CGFloat
 
     private var scale: CGFloat = 1
 
-    init(symbol: AGSSymbol) {
+    init(symbol: Symbol) {
         self.symbol = symbol
-        if let pictureMarkerSymbol = symbol as? AGSPictureMarkerSymbol {
+        if let pictureMarkerSymbol = symbol as? PictureMarkerSymbol {
             haveSize = true
             width = pictureMarkerSymbol.width
             height = pictureMarkerSymbol.height
-        } else if let pictureFillSymbol = symbol as? AGSPictureFillSymbol {
+        } else if let pictureFillSymbol = symbol as? PictureFillSymbol {
             haveSize = true
             width = pictureFillSymbol.width
             height = pictureFillSymbol.height
@@ -72,10 +72,10 @@ fileprivate class SymbolScaleHandler {
         scale = newScale
         let newWidth = width * newScale
         let newHeight = height * newScale
-        if let pictureMarkerSymbol = symbol as? AGSPictureMarkerSymbol {
+        if let pictureMarkerSymbol = symbol as? PictureMarkerSymbol {
             pictureMarkerSymbol.width = newWidth
             pictureMarkerSymbol.height = newHeight
-        } else if let pictureFillSymbol = symbol as? AGSPictureFillSymbol {
+        } else if let pictureFillSymbol = symbol as? PictureFillSymbol {
             pictureFillSymbol.width = newWidth
             pictureFillSymbol.height = newHeight
         }

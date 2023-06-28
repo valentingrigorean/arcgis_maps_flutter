@@ -19,7 +19,7 @@ class MarkersController: NSObject, SymbolsController {
     var symbolVisibilityFilterController: SymbolVisibilityFilterController?
 
     init(methodChannel: FlutterMethodChannel,
-         graphicsOverlays: AGSGraphicsOverlay
+         graphicsOverlays: GraphicsOverlay
     ) {
         self.methodChannel = methodChannel
         self.graphicsOverlays = graphicsOverlays
@@ -109,7 +109,7 @@ extension MarkersController: MapGraphicTouchDelegate {
         return false
     }
 
-    func didHandleGraphic(graphic: AGSGraphic) -> Bool {
+    func didHandleGraphic(graphic: Graphic) -> Bool {
         guard let markerId = graphic.attributes["markerId"] as? String else {
             return false
         }

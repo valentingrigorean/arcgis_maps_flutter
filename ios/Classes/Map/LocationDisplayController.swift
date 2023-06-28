@@ -11,8 +11,8 @@ class LocationDisplayController {
 
     private let mapView: MapView
     private let locationDisplay: AGSLocationDisplay
-    private let locationGraphicsOverlay: AGSGraphicsOverlay
-    private let locationGraphic: AGSGraphic
+    private let locationGraphicsOverlay: GraphicsOverlay
+    private let locationGraphic: Graphic
 
     private let methodChannel: FlutterMethodChannel
 
@@ -22,9 +22,9 @@ class LocationDisplayController {
         self.methodChannel = methodChannel
         self.mapView = mapView
         locationDisplay = mapView.locationDisplay
-        locationGraphicsOverlay = AGSGraphicsOverlay()
+        locationGraphicsOverlay = GraphicsOverlay()
         locationGraphicsOverlay.opacity = 0;
-        locationGraphic = AGSGraphic()
+        locationGraphic = Graphic()
         locationGraphic.attributes[LOCATION_ATTRIBUTE_NAME] = true
         locationGraphic.symbol = locationDisplay.defaultSymbol
         locationGraphic.zIndex = Int.max
@@ -179,7 +179,7 @@ extension LocationDisplayController: MapGraphicTouchDelegate {
         trackUserLocationTap
     }
 
-    func didHandleGraphic(graphic: AGSGraphic) -> Bool {
+    func didHandleGraphic(graphic: Graphic) -> Bool {
         let result = graphic.attributes[LOCATION_ATTRIBUTE_NAME] != nil
         if result {
             locationTapHandler?()

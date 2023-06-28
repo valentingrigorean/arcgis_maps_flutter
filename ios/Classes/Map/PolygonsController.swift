@@ -9,7 +9,7 @@ class PolygonsController: NSObject, SymbolsController {
 
     private var polygonIdToController = Dictionary<String, PolygonController>()
 
-    private let graphicsOverlays: AGSGraphicsOverlay
+    private let graphicsOverlays: GraphicsOverlay
 
     private let methodChannel: FlutterMethodChannel
 
@@ -18,7 +18,7 @@ class PolygonsController: NSObject, SymbolsController {
     var symbolVisibilityFilterController: SymbolVisibilityFilterController?
 
     init(methodChannel: FlutterMethodChannel,
-         graphicsOverlays: AGSGraphicsOverlay
+         graphicsOverlays: GraphicsOverlay
     ) {
         self.methodChannel = methodChannel
         self.graphicsOverlays = graphicsOverlays
@@ -73,7 +73,7 @@ class PolygonsController: NSObject, SymbolsController {
         }
 
         if let strokeStyle = data["strokeStyle"] as? Int {
-            controller.setStrokeStyle(style: AGSSimpleLineSymbolStyle(rawValue: strokeStyle)!)
+            controller.setStrokeStyle(style: SimpleLineSymbol.Style(strokeStyle))
         }
 
         if let pointsData = data["points"] as? [Dictionary<String, Any>] {
@@ -97,7 +97,7 @@ extension PolygonsController: MapGraphicTouchDelegate {
         return false
     }
 
-    func didHandleGraphic(graphic: AGSGraphic) -> Bool {
+    func didHandleGraphic(graphic: Graphic) -> Bool {
         guard let polygonId = graphic.attributes["polygonId"] as? String else {
             return false
         }

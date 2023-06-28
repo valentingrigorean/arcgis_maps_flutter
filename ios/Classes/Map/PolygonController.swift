@@ -6,14 +6,14 @@ import Foundation
 import ArcGIS
 
 class PolygonController : BaseGraphicController {
-    private let polygonSymbol: AGSSimpleFillSymbol
-    private let polygonStrokeSymbol: AGSSimpleLineSymbol
+    private let polygonSymbol: SimpleFillSymbol
+    private let polygonStrokeSymbol: SimpleLineSymbol
 
 
     init(polygonId: String) {
-        polygonStrokeSymbol = AGSSimpleLineSymbol(style: .solid, color: UIColor.black, width: 10)
-        polygonSymbol = AGSSimpleFillSymbol(style: .solid, color: UIColor.black, outline: polygonStrokeSymbol)
-        super.init(graphics: AGSGraphic(geometry: nil, symbol: polygonSymbol, attributes: ["polygonId": polygonId]))
+        polygonStrokeSymbol = SimpleLineSymbol(style: .solid, color: UIColor.black, width: 10)
+        polygonSymbol = SimpleFillSymbol(style: .solid, color: UIColor.black, outline: polygonStrokeSymbol)
+        super.init(graphics: Graphic(geometry: nil, attributes: ["polygonId": polygonId],symbol: polygonSymbol))
     }
 
     func setVisible(visible: Bool) {
@@ -29,14 +29,14 @@ class PolygonController : BaseGraphicController {
     }
 
     func setPoints(points: [Point]) {
-        graphics.geometry = AGSPolygon(points: points)
+        graphics.geometry = Polygon(points: points)
     }
 
     func setStrokeWidth(width: CGFloat) {
         polygonStrokeSymbol.width = width
     }
 
-    func setStrokeStyle(style: AGSSimpleLineSymbolStyle) {
+    func setStrokeStyle(style: SimpleLineSymbol.Style) {
         polygonStrokeSymbol.style = style
     }
 

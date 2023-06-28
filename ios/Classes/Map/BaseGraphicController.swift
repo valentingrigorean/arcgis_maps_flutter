@@ -6,13 +6,13 @@ import Foundation
 import ArcGIS
 
 protocol GraphicController {
-    var graphics: AGSGraphic { get }
+    var graphics: Graphic { get }
 
     var selectionPropertiesHandler: SelectionPropertiesHandler? { get set }
 
     var consumeTapEvents: Bool { get set }
 
-    var geometry: AGSGeometry? { get set }
+    var geometry: Geometry? { get set }
 
     var isVisible: Bool { get set }
 
@@ -25,29 +25,29 @@ protocol GraphicController {
 
 extension GraphicController {
 
-    func add(graphicsOverlay: AGSGraphicsOverlay) {
-        graphicsOverlay.graphics.add(graphics)
+    func add(graphicsOverlay: GraphicsOverlay) {
+        graphicsOverlay.addGraphic(graphics)
     }
 
-    func remove(graphicsOverlay: AGSGraphicsOverlay) {
-        graphicsOverlay.graphics.remove(graphics)
+    func remove(graphicsOverlay: GraphicsOverlay) {
+        graphicsOverlay.removeGraphic(graphics)
     }
 }
 
 class BaseGraphicController: GraphicController {
 
-    init(graphics: AGSGraphic) {
+    init(graphics: Graphic) {
         self.graphics = graphics
         consumeTapEvents = false
     }
 
-    let graphics: AGSGraphic
+    let graphics: Graphic
 
     var selectionPropertiesHandler: SelectionPropertiesHandler?
 
     var consumeTapEvents: Bool
 
-    var geometry: AGSGeometry? {
+    var geometry: Geometry? {
         get {
             graphics.geometry
         }

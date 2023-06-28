@@ -2,38 +2,41 @@
 // Created by Valentin Grigorean on 27.06.2021.
 //
 
-import Foundation
+import SwiftUI
 import ArcGIS
 
 class SelectionPropertiesHandler {
-    private let selectionProperties: AGSSelectionProperties
-    private let defaultSelectedColor: UIColor
+    private let geoView: any GeoView
+    private let defaultSelectedColor: Color
+    private var selectedColor: Color
 
-    init(selectionProperties: AGSSelectionProperties) {
-        self.selectionProperties = selectionProperties
-        defaultSelectedColor = selectionProperties.color
+    init(geoView: any GeoView) {
+        self.geoView = geoView
+        defaultSelectedColor = Color.cyan
+        selectedColor = defaultSelectedColor
     }
 
     func setGraphicSelected(graphic: Graphic,
-                            selectedColor: UIColor?) {
-        if let selectedColor = selectedColor {
-            selectionProperties.color = selectedColor
+                            selectedColor: Color?) {
+        if let newSelectedColor = selectedColor {
+            geoView.selectionColor(newSelectedColor)
+            self.selectedColor = newSelectedColor
         } else {
             reset()
         }
         graphic.isSelected = true
     }
 
-    func clearGraphicsSelection(graphic: AGSGraphic) {
+    func clearGraphicsSelection(graphic: Graphic) {
         graphic.isSelected = false
         reset()
     }
 
     func reset() {
-        if selectionProperties.color == defaultSelectedColor {
+        if selectedColor == defaultSelectedColor {
             return
         }
-        selectionProperties.color = defaultSelectedColor
+        selectedColor = defaultSelectedColor
+        geoView.selectionColor(selectedColor)
     }
-
 }
