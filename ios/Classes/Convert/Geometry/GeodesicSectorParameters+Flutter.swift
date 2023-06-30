@@ -6,23 +6,33 @@ import Foundation
 import ArcGIS
 
 extension GeodesicSectorParameters {
-    convenience init(data: Dictionary<String, Any>) {
-        let center = Point(data: data["center"] as! Dictionary<String, Any>)
-        let semiAxis1Length = data["semiAxis1Length"] as! Double
-        let semiAxis2Length = data["semiAxis2Length"] as! Double
-        let startDirection = data["startDirection"] as! Double
-        let sectorAngle = data["sectorAngle"] as! Double
-        self.init(center: center, semiAxis1Length: semiAxis1Length, semiAxis2Length: semiAxis2Length, sectorAngle: startDirection, startDirection: sectorAngle)
-
-        let linearUnitId = LinearUnitID.fromFlutter(data["linearUnit"] as! Int)
-        let angularUnitId = AGSAngularUnitID.fromFlutter(data["angularUnit"] as! Int)
-        angularUnit = AGSAngularUnit(unitID: angularUnitId)!
-        linearUnit = AGSLinearUnit(unitID: linearUnitId)!
+    init(data: Dictionary<String, Any>) where Geometry: ArcGIS.Multipart {
+        self.init()
+        center = Point(data: data["center"] as! Dictionary<String, Any>)
+        semiAxis1Length = data["semiAxis1Length"] as! Double
+        semiAxis2Length = data["semiAxis2Length"] as! Double
+        startDirection = data["startDirection"] as! Double
+        sectorAngle = data["sectorAngle"] as! Double
+        linearUnit = LinearUnit(flutterValue: data["linearUnit"] as! Int)!
+        angularUnit = AngularUnit(flutterValue: data["angularUnit"] as! Int)!
         axisDirection = data["axisDirection"] as! Double
         if let maxSegmentLength = data["maxSegmentLength"] as? Double {
             self.maxSegmentLength = maxSegmentLength
         }
-        geometryType = GeometryType(rawValue: data["geometryType"] as! Int)!
         maxPointCount = data["maxPointCount"] as! Int
+    }
+
+    static func createGeodesicSectorParameters(data: Dictionary<String, Any>) -> GeodesicSectorParameters<Geometry> {
+        let geometryType = GeometryType(rawValue: data["geometryType"] as! Int)!
+        switch geometryType {
+        case .polyline:
+            return GeodesicSectorParameters<Polyline>(data: data) as! GeodesicSectorParameters<Geometry>
+        case .polygon:
+            return GeodesicSectorParameters<Polygon>(data: data) as! GeodesicSectorParameters<Geometry>
+//        case .multipoint:
+//            GeodesicSectorParameters<Multipart>(data: data)
+        default:
+            fatalError("GeometryType not supported")
+        }
     }
 }

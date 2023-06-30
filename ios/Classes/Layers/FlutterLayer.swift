@@ -5,7 +5,35 @@
 import Foundation
 import ArcGIS
 
+extension TileInfo {
+    func isEqualTo(_ other: TileInfo) -> Bool {
+        // Implement your comparison logic here.
+        // For example:
+        dpi == other.dpi &&
+                format == other.format &&
+                levelsOfDetail == other.levelsOfDetail &&
+                origin == other.origin &&
+                spatialReference == other.spatialReference &&
+                tileHeight == other.tileHeight &&
+                tileWidth == other.tileWidth
+    }
+
+    var hashValue: Int {
+        var hasher = Hasher()
+        hasher.combine(dpi)
+        hasher.combine(format)
+        hasher.combine(levelsOfDetail)
+        hasher.combine(origin)
+        hasher.combine(spatialReference)
+        hasher.combine(tileHeight)
+        hasher.combine(tileWidth)
+        return hasher.finalize()
+    }
+}
+
 struct ServiceImageTiledLayerOptions: Hashable, Equatable {
+
+
     let tileInfo: TileInfo
     let fullExtent: Envelope
 
@@ -13,12 +41,43 @@ struct ServiceImageTiledLayerOptions: Hashable, Equatable {
     let subdomains: [String]
 
     let additionalOptions: Dictionary<String, String>
+
+    static func ==(lhs: ServiceImageTiledLayerOptions, rhs: ServiceImageTiledLayerOptions) -> Bool {
+        lhs.tileInfo.isEqualTo(rhs.tileInfo) &&
+                lhs.fullExtent == rhs.fullExtent &&
+                lhs.urlTemplate == rhs.urlTemplate &&
+                lhs.subdomains == rhs.subdomains &&
+                lhs.additionalOptions == rhs.additionalOptions
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(tileInfo.hashValue)
+        hasher.combine(fullExtent.hashValue)
+        hasher.combine(urlTemplate)
+        hasher.combine(subdomains)
+        hasher.combine(additionalOptions)
+    }
 }
 
 struct GroupLayerOptions: Hashable, Equatable {
     let showChildrenInLegend: Bool
-    let visibilityMode: AGSGroupVisibilityMode
+    let visibilityMode: GroupLayer.VisibilityMode
     let layers: [FlutterLayer]
+}
+
+extension GroupLayer.VisibilityMode{
+    init(_ flutterValue:Int){
+        switch flutterValue {
+        case 0:
+            self = .independent
+        case 1:
+            self = .inherited
+        case 2:
+            self = .exclusive
+        default:
+            fatalError("VisibilityMode not supported")
+        }
+    }
 }
 
 
@@ -35,11 +94,11 @@ struct FlutterLayer: Hashable, Equatable {
         } else if let portalItemData = data["portalItem"] as? Dictionary<String, Any> {
             url = nil
             tileCache = nil
-            portalItem = AGSPortalItem(data: portalItemData)
+            portalItem = PortalItem(data: portalItemData)
         } else if let tileCache = data["tileCache"] as? Dictionary<String, Any> {
             url = nil
             portalItem = nil
-            self.tileCache = AGSTileCache.createFlutter(data: tileCache)
+            self.tileCache = TileCache.createFlutter(data: tileCache)
         } else {
             url = nil
             portalItem = nil
@@ -49,19 +108,13 @@ struct FlutterLayer: Hashable, Equatable {
         isVisible = data["isVisible"] as! Bool
         opacity = Float(data["opacity"] as! Double)
 
-        if let credential = data["credential"] as? Dictionary<String, Any> {
-            self.credential = NetworkCredential(data: credential)
-        } else {
-            credential = nil
-        }
-
         layersName = data["layersName"] as? [String]
 
         switch (layerType) {
         case "ServiceImageTiledLayer":
             serviceImageTiledLayerOptions = ServiceImageTiledLayerOptions(
-                    tileInfo: AGSTileInfo(data: data["tileInfo"] as! Dictionary<String, Any>),
-                    fullExtent: AGSEnvelope(data: data["fullExtent"] as! Dictionary<String, Any>),
+                    tileInfo: TileInfo(data: data["tileInfo"] as! Dictionary<String, Any>),
+                    fullExtent: Envelope(data: data["fullExtent"] as! Dictionary<String, Any>),
                     urlTemplate: data["url"] as! String,
                     subdomains: data["subdomains"] as! [String],
                     additionalOptions: data["additionalOptions"] as! Dictionary<String, String>
@@ -72,7 +125,7 @@ struct FlutterLayer: Hashable, Equatable {
         case "GroupLayer":
             groupLayerOptions = GroupLayerOptions(
                     showChildrenInLegend: data["showChildrenInLegend"] as! Bool,
-                    visibilityMode: AGSGroupVisibilityMode(rawValue: data["visibilityMode"] as! Int) ?? .independent,
+                    visibilityMode: GroupLayer.VisibilityMode(data["visibilityMode"] as! Int),
                     layers: (data["layers"] as! [Any]).map {
                         FlutterLayer(data: $0 as! Dictionary<String, Any>)
                     })
@@ -102,8 +155,6 @@ struct FlutterLayer: Hashable, Equatable {
 
     let featureLayersIds: [Int]?
 
-    let credential: NetworkCredential?
-
     let serviceImageTiledLayerOptions: ServiceImageTiledLayerOptions?
     let groupLayerOptions: GroupLayerOptions?
 
@@ -126,75 +177,62 @@ struct FlutterLayer: Hashable, Equatable {
         case "GeodatabaseLayer":
             let layer = GroupLayer()
             let geodatabase = Geodatabase(fileURL: url!)
-            geodatabase.load { error in
-                if let error = error {
-                    print(error.localizedDescription)
-                } else {
-                    geodatabase.geodatabaseFeatureTables.forEach { table in
+            Task {
+                do {
+                    try await geodatabase.load()
+                    geodatabase.featureTables.forEach { table in
                         guard let featureLayersIds = featureLayersIds else {
                             let featureLayer = FeatureLayer(featureTable: table)
-                            layer.layers.add(featureLayer)
+                            layer.addLayer(featureLayer)
                             return
                         }
                         if featureLayersIds.contains(table.serviceLayerID)  {
                             let featureLayer = FeatureLayer(featureTable: table)
-                            layer.layers.add(featureLayer)
+                            layer.addLayer(featureLayer)
                         }
                     }
+                } catch {
+                    print(error.localizedDescription)
                 }
             }
             setupDefaultParams(layer: layer)
             return layer
         case "VectorTileLayer":
             let layer = ArcGISVectorTiledLayer(url: url!)
-            layer.credential = credential
             setupDefaultParams(layer: layer)
             return layer
         case "FeatureLayer":
             let featureLayer: FeatureLayer
             if let url = url {
                 let featureTable = ServiceFeatureTable(url: url)
-                featureTable.credential = credential
                 featureLayer = FeatureLayer(featureTable: featureTable)
             } else {
-                featureLayer = FeatureLayer(item: portalItem!, layerID: portalItemLayerId!)
+                featureLayer = FeatureLayer(featureServiceItem: portalItem!, layerID: portalItemLayerId!)
             }
             setupDefaultParams(layer: featureLayer)
             return featureLayer
         case "TiledLayer":
-            let layer: AGSArcGISTiledLayer
+            let layer: ArcGISTiledLayer
             if let tileCache = tileCache {
-                layer = AGSArcGISTiledLayer(tileCache: tileCache)
+                layer = ArcGISTiledLayer(tileCache: tileCache)
             } else {
-                layer = AGSArcGISTiledLayer(url: url!)
+                layer = ArcGISTiledLayer(url: url!)
             }
-            layer.credential = credential
             setupDefaultParams(layer: layer)
             return layer
         case "MapImageLayer":
-            let mapImageLayer = AGSArcGISMapImageLayer(url: url!)
-            mapImageLayer.credential = credential
+            let mapImageLayer = ArcGISMapImageLayer(url: url!)
             setupDefaultParams(layer: mapImageLayer)
             return mapImageLayer
         case "WmsLayer":
-            let wmsLayer = AGSWMSLayer(url: url!, layerNames: layersName!)
-            wmsLayer.credential = credential
+            let wmsLayer = WMSLayer(url: url!, layerNames: layersName!)
             setupDefaultParams(layer: wmsLayer)
             return wmsLayer
-        case "ServiceImageTiledLayer":
-            let layer = FlutterServiceImageTiledLayer(
-                    tileInfo: serviceImageTiledLayerOptions!.tileInfo,
-                    fullExtent: serviceImageTiledLayerOptions!.fullExtent,
-                    urlTemplate: serviceImageTiledLayerOptions!.urlTemplate,
-                    subdomains: serviceImageTiledLayerOptions!.subdomains,
-                    additionalOptions: serviceImageTiledLayerOptions!.additionalOptions)
-            setupDefaultParams(layer: layer)
-            return layer
         case "GroupLayer":
-            let groupLayer = AGSGroupLayer(childLayers: groupLayerOptions!.layers.map {
+            let groupLayer = GroupLayer(layers: groupLayerOptions!.layers.map {
                 $0.createNativeLayer()
             })
-            groupLayer.showChildrenInLegend = groupLayerOptions!.showChildrenInLegend
+            groupLayer.showsChildrenInLegend = groupLayerOptions!.showChildrenInLegend
             groupLayer.visibilityMode = groupLayerOptions!.visibilityMode
             setupDefaultParams(layer: groupLayer)
             return groupLayer
@@ -203,7 +241,7 @@ struct FlutterLayer: Hashable, Equatable {
         }
     }
 
-    private func setupDefaultParams(layer: AGSLayer) {
+    private func setupDefaultParams(layer: Layer) {
         layer.opacity = opacity
         layer.isVisible = isVisible
     }

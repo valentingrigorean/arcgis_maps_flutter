@@ -116,6 +116,45 @@ extension GeometryEngine.GeodeticCurveType {
     }
 }
 
+extension AreaUnit {
+    convenience init?(flutterValue: Int) {
+        switch flutterValue {
+        case 0:
+            self.init(areaID: .acres)
+            break
+        case 1:
+            self.init(areaID: .hectares)
+            break
+        case 2:
+            self.init(areaID: .squareCentimeters)
+            break
+        case 3:
+            self.init(areaID: .squareDecimeters)
+            break
+        case 4:
+            self.init(areaID: .squareFeet)
+            break
+        case 5:
+            self.init(areaID: .squareMeters)
+            break
+        case 6:
+            self.init(areaID: .squareKilometers)
+            break
+        case 7:
+            self.init(areaID: .squareMiles)
+            break
+        case 8:
+            self.init(areaID: .squareMillimeters)
+            break
+        case 9:
+            self.init(areaID: .squareYards)
+            break
+        default:
+            return nil
+        }
+    }
+}
+
 extension CoordinateFormatter.LatitudeLongitudeFormat {
     init(_ flutterValue: Int) {
         switch flutterValue {
