@@ -34,7 +34,7 @@ class CoordinateFormatterController {
             let from = Geometry.fromFlutter(data: data["from"] as! Dictionary<String, Any>) as! Point
             let format = data["format"] as! Int
             let decimalPlaces = data["decimalPlaces"] as! Int
-            result(CoordinateFormatter.latitudeLongitudeString(from: from, format: LatitudeLongitudeFormat(rawValue: format)!, decimalPlaces: decimalPlaces))
+            result(CoordinateFormatter.latitudeLongitudeString(from: from, format: CoordinateFormatter.LatitudeLongitudeFormat(format), decimalPlaces: decimalPlaces))
             break
         default:
             result(FlutterMethodNotImplemented)

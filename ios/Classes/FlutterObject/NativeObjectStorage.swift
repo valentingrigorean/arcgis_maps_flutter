@@ -22,14 +22,10 @@ class NativeObjectStorage {
     }
 
     func removeNativeObject(objectId: String) -> Void {
-        let object = nativeObjects.removeValue(forKey: objectId)
-        object?.dispose()
+        nativeObjects.removeValue(forKey: objectId)
     }
 
     func clearAll() {
-        for (_, nativeObject) in nativeObjects {
-            nativeObject.dispose()
-        }
         nativeObjects.removeAll()
     }
 }

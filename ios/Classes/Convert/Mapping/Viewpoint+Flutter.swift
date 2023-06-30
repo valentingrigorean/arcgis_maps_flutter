@@ -6,7 +6,7 @@ import Foundation
 import ArcGIS
 
 extension Viewpoint {
-    convenience init(data: Dictionary<String, Any>) {
+    init(data: Dictionary<String, Any>) {
         let scale = data["scale"] as! Double
         let targetGeometry = data["targetGeometry"] as! Dictionary<String, Any>
 

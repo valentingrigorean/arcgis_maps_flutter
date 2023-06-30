@@ -10,7 +10,7 @@ fileprivate let LOCATION_ATTRIBUTE_NAME = "my_location_attribute"
 class LocationDisplayController {
 
     private let mapView: MapView
-    private let locationDisplay: AGSLocationDisplay
+    private let locationDisplay: LocationDisplay
     private let locationGraphicsOverlay: GraphicsOverlay
     private let locationGraphic: Graphic
 

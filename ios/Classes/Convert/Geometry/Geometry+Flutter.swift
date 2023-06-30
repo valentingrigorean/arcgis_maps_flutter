@@ -14,32 +14,43 @@ enum GeometryType: Int, Hashable {
     case unknown = -1
 }
 
-extension LinearUnit.ID {
-    init(_ flutterValue: Int) {
+extension LinearUnit {
+    convenience init?(flutterValue: Int) {
         switch flutterValue {
         case 0:
-            self = .centimeters
+            self.init(linearID: .centimeters)
+            break
         case 1:
-            self = .feet
+            self.init(linearID: .feet)
+            break
         case 2:
-            self = .inches
+            self.init(linearID: .inches)
+            break
         case 3:
-            self = .kilometers
+            self.init(linearID: .kilometers)
+            break
         case 4:
-            self = .meters
+            self.init(linearID: .meters)
+            break
         case 5:
-            self = .miles
+            self.init(linearID: .miles)
+            break
         case 6:
-            self = .nauticalMiles
+            self.init(linearID: .millimeters)
+            break
         case 7:
-            self = .yards
+            self.init(linearID: .nauticalMiles)
+            break
+        case 8:
+            self.init(linearID: .yards)
+            break
         default:
-            fatalError("Unexpected flutter value: \(flutterValue)")
+            return nil
         }
     }
 
     func toFlutterValue() -> Int {
-        switch self {
+        switch linearID {
         case .centimeters:
             return 0
         case .feet:
@@ -58,6 +69,64 @@ extension LinearUnit.ID {
             return 7
         default:
             return 8
+        }
+    }
+}
+
+extension AngularUnit {
+    convenience init?(flutterValue: Int) {
+        switch flutterValue {
+        case 0:
+            self.init(angularID: .degrees)
+            break
+        case 1:
+            self.init(angularID: .minutes)
+            break
+        case 2:
+            self.init(angularID: .seconds)
+            break
+        case 3:
+            self.init(angularID: .grads)
+            break
+        case 4:
+            self.init(angularID: .radians)
+            break
+        default:
+            return nil
+        }
+    }
+}
+
+extension GeometryEngine.GeodeticCurveType {
+    init(_ flutterValue: Int) {
+        switch flutterValue {
+        case 0:
+            self = .geodesic
+        case 1:
+            self = .loxodrome
+        case 2:
+            self = .greatElliptic
+        case 3:
+            self = .normalSection
+        case 4:
+            self = .shapePreserving
+        default:
+            fatalError("Unexpected flutter value: \(flutterValue)")
+        }
+    }
+}
+
+extension CoordinateFormatter.LatitudeLongitudeFormat {
+    init(_ flutterValue: Int) {
+        switch flutterValue {
+        case 0:
+            self = .decimalDegrees
+        case 1:
+            self = .degreesDecimalMinutes
+        case 2:
+            self = .degreesMinutesSeconds
+        default:
+            fatalError("Unexpected flutter value: \(flutterValue)")
         }
     }
 }

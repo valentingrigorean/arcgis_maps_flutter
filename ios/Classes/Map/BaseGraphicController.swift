@@ -60,7 +60,7 @@ class BaseGraphicController: GraphicController {
         didSet {
             if oldValue != isSelected {
                 if isSelected {
-                    selectionPropertiesHandler?.setGraphicSelected(graphic: graphics, selectedColor: selectedColor)
+                    selectionPropertiesHandler?.setGraphicSelected(graphic: graphics, selectedColor: selectedColor?.toSwiftUIColor())
                 } else {
                     selectionPropertiesHandler?.clearGraphicsSelection(graphic: graphics)
                 }

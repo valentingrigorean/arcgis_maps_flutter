@@ -48,10 +48,10 @@ class GeometryEngineController {
             }
             let point1 = Point(data: data["point1"] as! Dictionary<String, Any>)
             let point2 = Point(data: data["point2"] as! Dictionary<String, Any>)
-            let distanceUnitId = LinearUnit.ID(data["distanceUnitId"] as! Int)
-            let azimuthUnitId = AngularUnit(data["azimuthUnitId"] as! Int)
-            let curveType = GeodeticCurveType(rawValue: data["curveType"] as! Int)!
-            let geodeticDistanceResult = GeometryEngine.geodeticDistance(from: point1, to: point2, distanceUnit: AGSLinearUnit(unitID: distanceUnitId)!, azimuthUnit: AGSAngularUnit(unitID: azimuthUnitId)!, curveType: curveType)
+            let distanceUnit = LinearUnit(flutterValue:data["distanceUnitId"] as! Int)
+            let azimuthUnit = AngularUnit(flutterValue: data["azimuthUnitId"] as! Int)
+            let curveType = GeometryEngine.GeodeticCurveType(data["curveType"] as! Int)
+            let geodeticDistanceResult = GeometryEngine.geodeticDistance(from: point1, to: point2, distanceUnit: distanceUnit, azimuthUnit: azimuthUnit, curveType: curveType)
             result(geodeticDistanceResult?.toJSONFlutter())
         case "bufferGeometry":
             guard let data = call.arguments as? Dictionary<String, Any> else {
@@ -60,7 +60,7 @@ class GeometryEngineController {
             }
             let geometry = Geometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
             let distance = data["distance"] as! Double
-            let polygon = AGSGeometryEngine.bufferGeometry(geometry, byDistance: distance)
+            let polygon = GeometryEngine.buffer(around: geometry, distance: distance)
             result(polygon?.toJSONFlutter())
             break
         case "geodeticBufferGeometry":
@@ -68,15 +68,12 @@ class GeometryEngineController {
                 result(nil)
                 return
             }
-            let geometry = AGSGeometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
+            let geometry = Geometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
             let distance = data["distance"] as! Double
-            let distanceUnitId = AGSLinearUnitID.fromFlutter(data["distanceUnit"] as! Int)
+            let distanceUnit = LinearUnit(flutterValue:data["distanceUnit"] as! Int)
             let maxDeviation = data["maxDeviation"] as! Double
-            let curveType = AGSGeodeticCurveType.init(rawValue: data["curveType"] as! Int)!
-            let polygon = AGSGeometryEngine.geodeticBufferGeometry(geometry, distance: distance,
-                    distanceUnit: AGSLinearUnit(unitID: distanceUnitId)!,
-                    maxDeviation: maxDeviation,
-                    curveType: curveType)
+            let curveType = GeometryEngine.GeodeticCurveType( data["curveType"] as! Int)
+            let polygon = GeometryEngine.geodeticBuffer(around: geometry, distance: distance, distanceUnit: distanceUnit, maxDeviation: maxDeviation, curveType: curveType)
             result(polygon?.toJSONFlutter())
             break
         case "intersection":
@@ -86,7 +83,7 @@ class GeometryEngineController {
             }
             let firstGeometry = Geometry.fromFlutter(data: data["firstGeometry"] as! Dictionary<String, Any>)!
             let secondGeometry = Geometry.fromFlutter(data: data["secondGeometry"] as! Dictionary<String, Any>)!
-            let geometry = AGSGeometryEngine.intersection(ofGeometry1: firstGeometry, geometry2: secondGeometry)
+            let geometry = GeometryEngine.intersection(firstGeometry, secondGeometry)
             result(geometry?.toJSONFlutter())
             break
         case "intersections":
@@ -94,15 +91,15 @@ class GeometryEngineController {
                 result([] as Any)
                 return
             }
-            let firstGeometry = AGSGeometry.fromFlutter(data: data["firstGeometry"] as! Dictionary<String, Any>)!
-            let secondGeometry = AGSGeometry.fromFlutter(data: data["secondGeometry"] as! Dictionary<String, Any>)!
-            guard let geometryList = AGSGeometryEngine.intersections(ofGeometry1: firstGeometry, geometry2: secondGeometry) else {
+            let firstGeometry = Geometry.fromFlutter(data: data["firstGeometry"] as! Dictionary<String, Any>)!
+            let secondGeometry = Geometry.fromFlutter(data: data["secondGeometry"] as! Dictionary<String, Any>)!
+            guard let geometryList = GeometryEngine.intersections(ofGeometry1: firstGeometry, geometry2: secondGeometry) else {
                 result([])
                 return
             }
             var geometryResults: [Any] = []
             geometryList.forEach { any in
-                if let geometry = any as? AGSGeometry {
+                if let geometry = any as? Geometry {
                     if let json = geometry.toJSONFlutter() {
                         geometryResults.append(json)
                     }
@@ -115,17 +112,17 @@ class GeometryEngineController {
                 result(false)
                 return
             }
-            let firstGeometry = AGSGeometry.fromFlutter(data: data["containerGeometry"] as! Dictionary<String, Any>)!
-            let secondGeometry = AGSGeometry.fromFlutter(data: data["withinGeometry"] as! Dictionary<String, Any>)!
-            result(AGSGeometryEngine.geometry(firstGeometry, contains: secondGeometry))
+            let firstGeometry = Geometry.fromFlutter(data: data["containerGeometry"] as! Dictionary<String, Any>)!
+            let secondGeometry = Geometry.fromFlutter(data: data["withinGeometry"] as! Dictionary<String, Any>)!
+            result(GeometryEngine.doesGeometry(firstGeometry, contain: secondGeometry))
             break
         case "geodesicSector":
             guard let data = call.arguments as? Dictionary<String, Any> else {
                 result(nil)
                 return
             }
-            let params = AGSGeodesicSectorParameters(data: data)
-            let geometry = AGSGeometryEngine.geodesicSector(with: params)
+            let params = GeodesicSectorParameters(data: data)
+            let geometry = GeometryEngine.geodesicSector(parameters: params)
             result(geometry?.toJSONFlutter())
             break
         case "geodeticMove":
@@ -137,11 +134,11 @@ class GeometryEngineController {
                 Point(data: $0)
             }
             let distance = data["distance"] as! Double
-            let distanceUnitId = AGSLinearUnitID.fromFlutter(data["distanceUnit"] as! Int)
+            let distanceUnitId = LinearUnit(flutterValue:data["distanceUnit"] as! Int)
             let azimuth = data["azimuth"] as! Double
             let azimuthUnitId = AGSAngularUnitID.fromFlutter(data["azimuthUnit"] as! Int)
-            let curveType = AGSGeodeticCurveType.init(rawValue: data["curveType"] as! Int)!
-            let results = AGSGeometryEngine.geodeticMove(points,
+            let curveType = GeometryEngine.GeodeticCurveType( data["curveType"] as! Int)!
+            let results = GeometryEngine.geodeticMove(points,
                     distance: distance,
                     distanceUnit: LinearUnit(unitID: distanceUnitId)!,
                     azimuth: azimuth,
@@ -169,22 +166,22 @@ class GeometryEngineController {
                 result(true)
                 return
             }
-            guard let originGeomtry = AGSGeometry.fromFlutter(data: geometryData) else {
+            guard let originGeomtry = Geometry.fromFlutter(data: geometryData) else {
                 result(true)
                 return
             }
-            result(AGSGeometryEngine.geometryIsSimple(originGeomtry))
+            result(GeometryEngine.geometryIsSimple(originGeomtry))
             break
         case "densifyGeodetic":
             guard let data = call.arguments as? Dictionary<String, Any> else {
                 result(nil)
                 return
             }
-            let geometry = AGSGeometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
+            let geometry = Geometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
             let maxSegmentLength = data["maxSegmentLength"] as! Double
-            let lengthUnitId = AGSLinearUnitID.fromFlutter(data["lengthUnit"] as! Int)
-            let curveType = AGSGeodeticCurveType.init(rawValue: data["curveType"] as! Int)!
-            let resultGeomtry = AGSGeometryEngine.geodeticDensifyGeometry(geometry, maxSegmentLength: maxSegmentLength , lengthUnit: AGSLinearUnit(unitID: lengthUnitId)!, curveType: curveType)
+            let lengthUnitId = LinearUnit(flutterValue:data["lengthUnit"] as! Int)
+            let curveType = GeometryEngine.GeodeticCurveType( data["curveType"] as! Int)!
+            let resultGeomtry = GeometryEngine.geodeticDensifyGeometry(geometry, maxSegmentLength: maxSegmentLength , lengthUnit: AGSLinearUnit(unitID: lengthUnitId)!, curveType: curveType)
             result(resultGeomtry?.toJSONFlutter())
             break
         case "lengthGeodetic":
@@ -192,10 +189,10 @@ class GeometryEngineController {
                 result(nil)
                 return
             }
-            let geometry = AGSGeometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
-            let lengthUnitId = AGSLinearUnitID.fromFlutter(data["lengthUnit"] as! Int)
-            let curveType = AGSGeodeticCurveType.init(rawValue: data["curveType"] as! Int)!
-            result(AGSGeometryEngine.geodeticLength(of: geometry, lengthUnit: AGSLinearUnit(unitID: lengthUnitId)!, curveType: curveType))
+            let geometry = Geometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
+            let lengthUnitId = LinearUnit(flutterValue:data["lengthUnit"] as! Int)
+            let curveType =GeometryEngine.GeodeticCurveType( data["curveType"] as! Int)!
+            result(GeometryEngine.geodeticLength(of: geometry, lengthUnit: AGSLinearUnit(unitID: lengthUnitId)!, curveType: curveType))
             break
         case "areaGeodetic":
             guard let data = call.arguments as? Dictionary<String, Any> else {
@@ -204,9 +201,9 @@ class GeometryEngineController {
             }
             let geometry = Geometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
             let areaUnitId = AGSAreaUnitID.fromFlutter(data["areaUnit"] as! Int)
-            let curveType = AGSGeodeticCurveType.init(rawValue: data["curveType"] as! Int)!
+            let curveType = GeometryEngine.GeodeticCurveType( data["curveType"] as! Int)!
     
-            result(AGSGeometryEngine.geodeticArea(of: geometry, areaUnit:AGSAreaUnit(unitID: areaUnitId)!, curveType: curveType))
+            result(GeometryEngine.geodeticArea(of: geometry, areaUnit:AGSAreaUnit(unitID: areaUnitId)!, curveType: curveType))
             break
         case "getExtent":
             guard let data = call.arguments as? Dictionary<String, Any> else {
@@ -214,8 +211,7 @@ class GeometryEngineController {
                 return
             }
             let geometry = Geometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
-            let resultGeomtry = geometry.extent
-            result(resultGeomtry.toJSONFlutter())
+            result(geometry.extent.toJSONFlutter())
             break
 
         default:

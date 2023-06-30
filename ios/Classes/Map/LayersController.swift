@@ -54,9 +54,9 @@ class LayersController {
     private var baseLayers = SharedSet<FlutterLayer>()
     private var referenceLayers = SharedSet<FlutterLayer>()
 
-    private var flutterOperationalLayersMap = SharedDictionary<String, AGSLayer>()
-    private var flutterBaseLayersMap = SharedDictionary<String, AGSLayer>()
-    private var flutterReferenceLayersMap = SharedDictionary<String, AGSLayer>()
+    private var flutterOperationalLayersMap = SharedDictionary<String, Layer>()
+    private var flutterBaseLayersMap = SharedDictionary<String, Layer>()
+    private var flutterReferenceLayersMap = SharedDictionary<String,Layer>()
 
 
     private let methodChannel: FlutterMethodChannel
@@ -76,7 +76,7 @@ class LayersController {
         addLayersToMap(layers: Array(referenceLayers.set), layerType: .reference)
     }
 
-    public func getLayerByLayerId(layerId: String) -> AGSLayer? {
+    public func getLayerByLayerId(layerId: String) -> Layer? {
         if let layer = flutterOperationalLayersMap[layerId] {
             return layer
         }
@@ -89,7 +89,7 @@ class LayersController {
         return nil
     }
 
-    public func getLayerIdByLayer(layer: AGSLayer) -> String? {
+    public func getLayerIdByLayer(layer: Layer) -> String? {
 
         if let layerId = LayersController.findLayerIdByLayer(layer: layer, data: flutterOperationalLayersMap) {
             return layerId
@@ -126,7 +126,7 @@ class LayersController {
             return
         }
 
-        guard let layer = getLayerByLayerId(layerId: layerId) as? AGSTimeAware else {
+        guard var layer = getLayerByLayerId(layerId: layerId) as? TimeAware else {
             return
         }
 
@@ -134,9 +134,7 @@ class LayersController {
             layer.timeOffset = nil
             return
         }
-
-        print("LayerId:\(layerId):\(timeValue)")
-        layer.timeOffset = AGSTimeValue(data: timeValue)
+        layer.timeOffset = TimeValue(data: timeValue)
     }
 
 
@@ -205,9 +203,9 @@ class LayersController {
             return
         }
 
-        map.operationalLayers.removeObjects(in: operationalLayersNative)
-        map.basemap.baseLayers.removeObjects(in: baseLayersNative)
-        map.basemap.referenceLayers.removeObjects(in: referenceLayersNative)
+        map.addOperationalLayers(operationalLayersNative)
+        map.basemap?.addBaseLayers(baseLayersNative)
+        map.basemap?.addReferenceLayers(referenceLayersNative)
     }
 
     private func addLayersToMap(layers: [FlutterLayer],
@@ -260,7 +258,7 @@ class LayersController {
     private func removeLayersFromMap(layers: [FlutterLayer],
                                      layerType: LayerType) {
 
-        var nativeLayersToRemove = [AGSLayer]()
+        var nativeLayersToRemove = [Layer]()
         let flutterMap = getFlutterMap(layerType: layerType)
         let flutterLayer = getFlutterLayerSet(layerType: layerType)
 
@@ -352,7 +350,7 @@ class LayersController {
         }
     }
 
-    private func getFlutterMap(layerType: LayerType) -> SharedDictionary<String, AGSLayer> {
+    private func getFlutterMap(layerType: LayerType) -> SharedDictionary<String, Layer> {
         switch layerType {
         case .operational:
             return flutterOperationalLayersMap
@@ -363,8 +361,8 @@ class LayersController {
         }
     }
 
-    private static func findLayerIdByLayer(layer: AGSLayer,
-                                           data: SharedDictionary<String, AGSLayer>) -> String? {
+    private static func findLayerIdByLayer(layer: Layer,
+                                           data: SharedDictionary<String, Layer>) -> String? {
         for (key, layer) in data.dict {
             if layer == layer {
                 return key

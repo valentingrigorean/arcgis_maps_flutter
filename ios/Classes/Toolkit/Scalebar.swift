@@ -446,7 +446,7 @@ public class Scalebar: UIView {
             let p2 = Point(x: mapCenter.x + (maxLengthPlanar * 0.5), y: mapCenter.y, spatialReference: sr)
             let polyline = AGSPolyline(points: [p1, p2])
             let baseUnits = units.baseUnits()
-            let maxLengthGeodetic = AGSGeometryEngine.geodeticLength(of: polyline, lengthUnit: baseUnits, curveType: Scalebar.geodeticCurveType)
+            let maxLengthGeodetic = GeometryEngine.geodeticLength(of: polyline, lengthUnit: baseUnits, curveType: Scalebar.geodeticCurveType)
             let roundNumberDistance = units.closestDistanceWithoutGoingOver(to: maxLengthGeodetic, units: baseUnits)
             let planarToGeodeticFactor = maxLengthPlanar / maxLengthGeodetic
             lineDisplayLength = CGFloat((roundNumberDistance * planarToGeodeticFactor) / unitsPerPoint)

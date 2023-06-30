@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 extension UIColor {
     convenience init?(data: Any?) {
@@ -13,5 +14,10 @@ extension UIColor {
                 green: CGFloat(Float(((value & 0xFF00) >> 8)) / 255.0),
                 blue: CGFloat(Float(((value & 0xFF))) / 255.0),
                 alpha: CGFloat(Float(((value & 0xFF000000) >> 24)) / 255.0))
+    }
+    
+    
+    func toSwiftUIColor() -> Color {
+        Color(self)
     }
 }

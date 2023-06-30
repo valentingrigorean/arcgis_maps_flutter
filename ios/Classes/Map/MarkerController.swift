@@ -6,7 +6,7 @@ import Foundation
 import ArcGIS
 
 class MarkerController: BaseGraphicController {
-    private var marker: AGSCompositeSymbol
+    private var marker: CompositeSymbol
     private var icon: BitmapDescriptor?
     private var iconSymbol: ScaleSymbolHelper?
     private var backgroundImage: BitmapDescriptor?
@@ -24,8 +24,8 @@ class MarkerController: BaseGraphicController {
     private var angle: Float = 0.0
 
     init(markerId: String) {
-        marker = AGSCompositeSymbol()
-        super.init(graphics: Graphic(geometry: nil, symbol: marker, attributes: ["markerId": markerId]))
+        marker = CompositeSymbol()
+        super.init(graphics: Graphic(geometry: nil, attributes: ["markerId": markerId], symbol: marker))
     }
 
     override var isSelected: Bool {
@@ -45,12 +45,13 @@ class MarkerController: BaseGraphicController {
             return
         }
         if icon != nil {
-            marker.symbols.remove(at: backgroundImage == nil ? 0 : 1)
+            let symbolIndex = backgroundImage == nil ? 0 : 1
+            marker.removeSymbol(marker.symbols[symbolIndex])
         }
         icon = bitmapDescription
         iconSymbol = ScaleSymbolHelper(symbol: createSymbol(bitmapDescription: bitmapDescription))
         offsetSymbol(symbol: iconSymbol!.symbol, offsetX: iconOffsetX, offsetY: iconOffsetY)
-        marker.symbols.insert(iconSymbol!.symbol, at: backgroundImage == nil ? 0 : 1)
+        marker.insertSymbol(iconSymbol!.symbol, at: backgroundImage == nil ? 0 : 1)
         updateCommonProps()
     }
 
@@ -59,12 +60,13 @@ class MarkerController: BaseGraphicController {
             return
         }
         if backgroundImage != nil {
-            marker.symbols.remove(at: 0)
+            let symbolIndex = icon == nil ? 0 : 1
+            marker.removeSymbol(marker.symbols[symbolIndex])
         }
 
         backgroundImage = bitmapDescription
         backgroundImageSymbol = ScaleSymbolHelper(symbol: createSymbol(bitmapDescription: bitmapDescription))
-        marker.symbols.insert(backgroundImageSymbol!.symbol, at: 0)
+        marker.insertSymbol(backgroundImageSymbol!.symbol, at: 0)
         updateCommonProps()
     }
 
@@ -78,7 +80,7 @@ class MarkerController: BaseGraphicController {
         iconOffsetY = offsetY
 
         if icon != nil {
-            guard  let symbol = marker.symbols.last as? AGSMarkerSymbol else {
+            guard let symbol = marker.symbols.last as? MarkerSymbol else {
                 return
             }
             offsetSymbol(symbol: symbol, offsetX: offsetX, offsetY: offsetY)
@@ -128,7 +130,7 @@ class MarkerController: BaseGraphicController {
     private func offsetSymbol(symbol: Symbol,
                               offsetX: CGFloat,
                               offsetY: CGFloat) {
-        guard let markerSymbol = symbol as? AGSMarkerSymbol else {
+        guard let markerSymbol = symbol as? MarkerSymbol else {
             return
         }
 
@@ -138,7 +140,7 @@ class MarkerController: BaseGraphicController {
 
     private func setGraphicsOpacity(opacity: Float) {
         for symbol in marker.symbols {
-            if let markerSymbol = symbol as? AGSPictureMarkerSymbol {
+            if let markerSymbol = symbol as? PictureMarkerSymbol {
                 markerSymbol.opacity = opacity
             }
         }
@@ -146,7 +148,7 @@ class MarkerController: BaseGraphicController {
 
     private func setGraphicsAngle(angle: Float) {
         for symbol in marker.symbols {
-            if let markerSymbol = symbol as? AGSMarkerSymbol {
+            if let markerSymbol = symbol as? MarkerSymbol {
                 markerSymbol.angle = angle
                 markerSymbol.angleAlignment = angle == 0 ? .screen : .map
             }
@@ -161,7 +163,7 @@ class MarkerController: BaseGraphicController {
 
     private func setOpacity(symbol: Symbol,
                             opacity: Float) {
-        guard let pictureSymbol = symbol as? AGSPictureMarkerSymbol else {
+        guard let pictureSymbol = symbol as? PictureMarkerSymbol else {
             return
         }
         pictureSymbol.opacity = opacity

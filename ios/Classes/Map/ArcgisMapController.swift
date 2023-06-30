@@ -265,7 +265,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             if let data = call.arguments as? Dictionary<String, Any> {
 
                 var queryLayerName = ""
-                let queryParams = AGSQueryParameters()
+                let queryParams = QueryParameters()
                 
                 for (key, value) in data {
                     switch (key) {
@@ -283,7 +283,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                             }
                             break
                         case "geometry":
-                            let geometry = AGSGeometry.fromFlutter(data: value as! Dictionary<String, Any>)!
+                            let geometry = Geometry.fromFlutter(data: value as! Dictionary<String, Any>)!
                             queryParams.geometry = geometry
                             break
                         case "spatialRelationship":
@@ -395,7 +395,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             break
         case "map#setViewpointGeometry":
             if let data = call.arguments as? Dictionary<String, Any> {
-                let geometry = AGSGeometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
+                let geometry = Geometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
 
                 if let padding = data["padding"] as? Double {
                     mapView.setViewpointGeometry(geometry.extent, padding: padding) { finished in
@@ -441,7 +441,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 var mapPoint = mapView.screen(toLocation: CGPoint(x: mapPoints[0], y: mapPoints[1]))
                 if let spatialReference = AGSSpatialReference(data: data["spatialReference"] as! Dictionary<String, Any>) {
                     if spatialReference.wkid != mapPoint.spatialReference?.wkid {
-                        mapPoint = AGSGeometryEngine.projectGeometry(mapPoint, to: spatialReference) as! Point
+                        mapPoint = GeometryEngine.projectGeometry(mapPoint, to: spatialReference) as! Point
                     }
                 }
                 result(try? mapPoint.toJSON())
