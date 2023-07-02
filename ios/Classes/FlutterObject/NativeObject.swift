@@ -12,8 +12,7 @@ protocol NativeHandler {
 
 
 class BaseNativeHandler<T>: NSObject,NativeHandler {
-    private var tasks: [Int: Task<Void, Error>] = [:]
-    private var taskIdCounter = 0
+    private let taskManager = TaskManager()
     
     var nativeHandler: T
     
@@ -23,7 +22,6 @@ class BaseNativeHandler<T>: NSObject,NativeHandler {
     
     deinit {
         messageSink = nil
-        cancelAllTasks()
     }
     
     var messageSink: NativeMessageSink?
@@ -38,25 +36,7 @@ class BaseNativeHandler<T>: NSObject,NativeHandler {
     
     @discardableResult
     func createTask(operation: @escaping @Sendable () async throws -> Void) -> Task<Void, Error> {
-        let taskId = taskIdCounter
-        let task = Task {
-            do {
-                try await operation()
-            } catch {
-                throw error
-            }
-        }
-        tasks[taskId] = task
-        taskIdCounter += 1
-        return task
-    }
-    
-    
-    private func cancelAllTasks() {
-        for (_, task) in tasks {
-            task.cancel()
-        }
-        tasks.removeAll()
+        taskManager.createTask(operation: operation)
     }
 }
 

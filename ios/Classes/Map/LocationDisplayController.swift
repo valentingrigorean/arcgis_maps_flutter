@@ -5,44 +5,50 @@
 import Foundation
 import ArcGIS
 
-fileprivate let LOCATION_ATTRIBUTE_NAME = "my_location_attribute"
+fileprivate let LOCATION_ATTRIBUTE_NAME = "arcgis_flutter_my_location_attribute"
 
 class LocationDisplayController {
 
-    private let mapView: MapView
+    private let taskManager = TaskManager()
     private let locationDisplay: LocationDisplay
     private let locationGraphicsOverlay: GraphicsOverlay
     private let locationGraphic: Graphic
 
     private let methodChannel: FlutterMethodChannel
 
-    var isDisposed: Bool = false
+    private let mapViewModel: MapViewModel
 
-    init(methodChannel: FlutterMethodChannel, mapView: MapView) {
+
+    private func dataSourceStatusChanged(status: Bool) {
+
+        locationGraphic.geometry = locationDisplay.mapLocation
+    }
+
+    init(methodChannel: FlutterMethodChannel, mapViewModel: MapViewModel) {
         self.methodChannel = methodChannel
-        self.mapView = mapView
-        locationDisplay = mapView.locationDisplay
+        self.mapViewModel = mapViewModel
+        locationDisplay = mapViewModel.locationDisplay
         locationGraphicsOverlay = GraphicsOverlay()
         locationGraphicsOverlay.opacity = 0;
         locationGraphic = Graphic()
-        locationGraphic.attributes[LOCATION_ATTRIBUTE_NAME] = true
+        locationGraphic.setAttributeValue(true, forKey: LOCATION_ATTRIBUTE_NAME)
         locationGraphic.symbol = locationDisplay.defaultSymbol
         locationGraphic.zIndex = Int.max
         locationGraphic.geometry = locationDisplay.mapLocation
-        locationGraphicsOverlay.graphics.add(locationGraphic)
-        locationDisplay.autoPanModeChangedHandler = { [weak self] mode in
-            DispatchQueue.main.dispatchMainIfNeeded {
-                self?.autoPanModeChanged(mode)
+        locationGraphicsOverlay.addGraphic(locationGraphic)
+
+        taskManager.createTask {
+            for await autoPanMode in self.locationDisplay.$autoPanMode {
+                self.methodChannel.invokeMethod("onAutoPanModeChanged", arguments: autoPanMode.toFlutterValue())
             }
         }
-        locationDisplay.locationChangedHandler = { [weak self] location in
-            DispatchQueue.main.dispatchMainIfNeeded {
-                self?.locationChanged(location: location)
-            }
-        }
-        locationDisplay.dataSourceStatusChangedHandler = { [weak self] status in
-            DispatchQueue.main.dispatchMainIfNeeded {
-                self?.dataSourceStatusChanged(status: status)
+
+        taskManager.createTask {
+            for await location in self.locationDisplay.$location {
+                self.locationGraphic.geometry = location?.position
+                if let location = location {
+                    methodChannel.invokeMethod("onLocationChanged", arguments: location.toJSONFlutter())
+                }
             }
         }
 
@@ -50,10 +56,6 @@ class LocationDisplayController {
     }
 
     deinit {
-        isDisposed = true
-        locationDisplay.autoPanModeChangedHandler = nil
-        locationDisplay.locationChangedHandler = nil
-        locationDisplay.dataSourceStatusChangedHandler = nil
         methodChannel.setMethodCallHandler(nil)
     }
 
@@ -61,9 +63,9 @@ class LocationDisplayController {
     var trackUserLocationTap: Bool = false {
         didSet {
             if (trackUserLocationTap) {
-                mapView.graphicsOverlays.add(locationGraphicsOverlay)
+                mapViewModel.addGraphicOverlay(locationGraphicsOverlay)
             } else {
-                mapView.graphicsOverlays.remove(locationGraphicsOverlay)
+                mapViewModel.removeGraphicOverlay(locationGraphicsOverlay)
             }
         }
     }
@@ -82,10 +84,10 @@ class LocationDisplayController {
     private func methodCallHandler(call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch (call.method) {
         case "getStarted":
-            result(locationDisplay.started)
+            result(locationDisplay.dataSource.status == .started)
             break
         case "setAutoPanMode":
-            locationDisplay.autoPanMode = AGSLocationDisplayAutoPanMode(rawValue: call.arguments as! Int) ?? .off
+            locationDisplay.autoPanMode = LocationDisplay.AutoPanMode(call.arguments as! Int)
             result(nil)
             break
         case "setInitialZoomScale":
@@ -110,7 +112,7 @@ class LocationDisplayController {
             result(locationDisplay.heading)
             break
         case "setUseCourseSymbolOnMovement":
-            locationDisplay.useCourseSymbolOnMovement = call.arguments as! Bool
+            locationDisplay.usesCourseSymbolOnMovement = call.arguments as! Bool
             result(nil)
             break
         case "setOpacity":
@@ -118,58 +120,36 @@ class LocationDisplayController {
             result(nil)
             break
         case "setShowAccuracy":
-            locationDisplay.showAccuracy = call.arguments as! Bool
+            locationDisplay.showsAccuracy = call.arguments as! Bool
             result(nil)
             break
         case "setShowLocation":
-            locationDisplay.showLocation = call.arguments as! Bool
+            locationDisplay.showsLocation = call.arguments as! Bool
             result(nil)
             break
         case "setShowPingAnimationSymbol":
-            locationDisplay.showPingAnimationSymbol = call.arguments as! Bool
+            locationDisplay.showsPingAnimationSymbol = call.arguments as! Bool
             result(nil)
             break
         case "start":
-            locationDisplay.start { (error) in
-                if let error = error {
-                    result(FlutterError(code: "start", message: error.localizedDescription, details: nil))
-                } else {
+            taskManager.createTask {
+                do {
+                    try await self.locationDisplay.dataSource.start()
                     result(nil)
+                } catch {
+                    result(FlutterError(code: "start", message: error.localizedDescription, details: nil))
                 }
             }
             break
         case "stop":
-            locationDisplay.stop()
-            result(nil)
+            taskManager.createTask {
+                await self.locationDisplay.dataSource.stop()
+                result(nil)
+            }
             break
         default:
             result(FlutterMethodNotImplemented)
         }
-    }
-
-    private func autoPanModeChanged(_ mode: AGSLocationDisplayAutoPanMode) {
-        if (isDisposed) {
-            return
-        }
-        methodChannel.invokeMethod("onAutoPanModeChanged", arguments: mode.rawValue)
-    }
-
-    private func locationChanged(location: AGSLocation) {
-        if (isDisposed) {
-            return
-        }
-        methodChannel.invokeMethod("onLocationChanged", arguments: location.toJSONFlutter())
-        guard let position = location.position else {
-            return
-        }
-        locationGraphic.geometry = position
-    }
-
-    private func dataSourceStatusChanged(status: Bool) {
-        if (isDisposed) {
-            return
-        }
-        locationGraphic.geometry = locationDisplay.mapLocation
     }
 }
 

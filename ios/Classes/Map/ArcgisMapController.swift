@@ -7,27 +7,30 @@ import SwiftUI
 import ArcGIS
 
 
-struct ContentView : View{
-    @State public var map: Map?
+struct ContentView: View {
+    @ObservedObject var viewModel: MapViewModel
 
-    var body : some View{
+    init(viewModel: MapViewModel) {
+        self.viewModel = viewModel
+    }
 
-        ZStack{
-            if let map = map{
-                MapView(map: map)
-                        .onSingleTapGesture(perform: { point in
-                            print("Single tap at \(point)")
-                        })
-            }
+
+    var body: some View {
+        MapViewReader { proxy in
+            MapView(map: viewModel.map, graphicsOverlays: viewModel.graphicsOverlays)
+                    .locationDisplay(viewModel.locationDisplay)
+                    .onAppear {
+                        viewModel.geoProxyView = proxy
+                    }
         }
     }
 }
 
 public class ArcgisMapController: NSObject, FlutterPlatformView {
 
-    private let mapView: MapView
-
-
+    private let taskManager = TaskManager()
+    private let mapViewModel = MapViewModel()
+    private let hostingView = HostingView()
 
 
     private let selectionPropertiesHandler: SelectionPropertiesHandler
@@ -70,20 +73,15 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private var minScale = 0.0 {
         didSet {
-            if let map = mapView.map {
-                map.minScale = minScale
-            }
+            mapViewModel.map.minScale = minScale
         }
     }
 
     private var maxScale = 0.0 {
         didSet {
-            if let map = mapView.map {
-                map.maxScale = maxScale
-            }
+            mapViewModel.map.maxScale = maxScale
         }
     }
-
 
     public init(
             withRegistrar registrar: FlutterPluginRegistrar,
@@ -93,8 +91,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)", binaryMessenger: registrar.messenger())
 
-        mapView = MapView()
-        mapView.frame = frame
+        hostingView.frame = frame
+        hostingView.setView(AnyView(ContentView(viewModel: mapViewModel)))
+
 
         selectionPropertiesHandler = SelectionPropertiesHandler(geoView: mapView)
 
@@ -107,7 +106,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         symbolsControllers = [polygonsController, polylinesController, markersController]
 
-        mapView.graphicsOverlays.add(graphicsOverlay)
+        mapViewModel.addGraphicOverlay(graphicsOverlay)
 
 
         layersController = LayersController(methodChannel: channel)
@@ -116,7 +115,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         layersChangedController = LayersChangedController(geoView: mapView, channel: channel, layersController: layersController)
         let locationDisplayChannel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)_location_display", binaryMessenger: registrar.messenger())
-        locationDisplayController = LocationDisplayController(methodChannel: locationDisplayChannel, mapView: mapView)
+        locationDisplayController = LocationDisplayController(methodChannel: locationDisplayChannel, mapViewModel: mapViewModel)
         graphicsTouchDelegates = [markersController, polygonsController, polylinesController, locationDisplayController]
 
         super.init()
@@ -137,17 +136,17 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     deinit {
+        hostingView.removeView()
         channel.setMethodCallHandler(nil)
         locationDisplayController.locationTapHandler = nil
         timeExtentObservation?.invalidate()
         timeExtentObservation = nil
         clearSymbolsControllers()
         symbolVisibilityFilterController.clear()
-        mapView.viewpointChangedHandler = nil
     }
 
     public func view() -> UIView {
-        mapView
+        hostingView
     }
 
     private func setMethodCallHandlers() -> Void {
@@ -195,7 +194,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             legendInfoControllers.append(legendInfoController)
             break
         case "map#getMapMaxExtend":
-            if let map = mapView.map {
+            if let map = mapViewModel.map {
                 map.load { error in
                     if error == nil {
                         result(map.maxExtent?.toJSONFlutter())
@@ -284,7 +283,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             result(mapView.locationDisplay.wanderExtentFactor)
             break
         case "map#queryFeatureTableFromLayer":
-            handleQueryFeatureTableFromLayer(data: call.arguments as! Dictionary<String,Any>, result: result)
+            handleQueryFeatureTableFromLayer(data: call.arguments as! Dictionary<String, Any>, result: result)
             break
         case "map#getTimeAwareLayerInfos":
             handleTimeAwareLayerInfos(result: result)
@@ -301,7 +300,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         case "map#getInitialViewpoint":
             if let json = try? mapView.map?.initialViewpoint?.toJSON() {
                 result(json)
-            } else{
+            } else {
                 result(nil)
             }
             break
@@ -439,7 +438,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         }
     }
 
-    private func handleQueryFeatureTableFromLayer(data:Dictionary<String,Any>, result: @escaping FlutterResult){
+    private func handleQueryFeatureTableFromLayer(data: Dictionary<String, Any>, result: @escaping FlutterResult) {
         result(FlutterMethodNotImplemented)
 //        if let data = call.arguments as? Dictionary<String, Any> {
 //
@@ -853,8 +852,8 @@ extension ArcgisMapController: AGSGeoViewTouchDelegate {
     }
 
     public func geoView(_ geoView: AGSGeoView, didEndLongPressAtScreenPoint screenPoint: CGPoint, mapPoint: Point) {
-            sendOnMapLongPressEnd(screenPoint: screenPoint)
-        }
+        sendOnMapLongPressEnd(screenPoint: screenPoint)
+    }
 
 
     private func identifyGraphicsOverlaysCallback(results: [AGSIdentifyGraphicsOverlayResult]?,
@@ -933,13 +932,13 @@ extension ArcgisMapController: AGSGeoViewTouchDelegate {
     }
 
     private func sendOnMapLongPressEnd(screenPoint: CGPoint) {
-            if let json = mapView.screen(toLocation: screenPoint).toJSONFlutter() {
-                channel.invokeMethod("map#onLongPressEnd", arguments: ["screenPoint": screenPoint.toJSONFlutter(), "position": json])
-            }
+        if let json = mapView.screen(toLocation: screenPoint).toJSONFlutter() {
+            channel.invokeMethod("map#onLongPressEnd", arguments: ["screenPoint": screenPoint.toJSONFlutter(), "position": json])
         }
+    }
 
     private func sendUserLocationTap() {
         channel.invokeMethod("map#onUserLocationTap", arguments: nil)
     }
-    
+
 }
