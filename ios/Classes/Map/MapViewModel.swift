@@ -18,7 +18,7 @@ struct MapContentView: View {
 
     var body: some View {
         MapViewReader { proxy in
-            MapView(map: viewModel.map, viewpoint: viewModel.viewPoint, timeExtent: $viewModel.timeExtent, graphicsOverlays: viewModel.graphicsOverlays)
+            MapView(map: viewModel.map, viewpoint: viewModel.viewpoint, timeExtent: $viewModel.timeExtent, graphicsOverlays: viewModel.graphicsOverlays)
                     .locationDisplay(viewModel.locationDisplay)
                     .selectionColor(viewModel.selectedColor)
                     .interactionModes(viewModel.interactionModes)
@@ -26,10 +26,12 @@ struct MapContentView: View {
                         viewModel.currentScale = newScale
                     }
                     .onViewpointChanged(kind: .centerAndScale) { viewpoint in
-                        viewModel.viewPoint = viewpoint
+                        viewModel.viewpoint = viewpoint
+                        viewModel.viewpointCenterAndScale = viewpoint
                     }
                     .onViewpointChanged(kind: .boundingGeometry) { viewpoint in
-                        viewModel.viewPoint = viewpoint
+                        viewModel.viewpoint = viewpoint
+                        viewModel.viewpointBoundingGeometry = viewpoint
                     }
                     .disabled(!viewModel.interactionsEnabled)
                     .onAppear {
@@ -49,7 +51,10 @@ class MapViewModel: ObservableObject {
 
     @Published var selectedColor: Color = .cyan
 
-    @Published var viewPoint: Viewpoint?
+    @Published var viewpoint: Viewpoint?
+
+    @Published var viewpointCenterAndScale: Viewpoint?
+    @Published var viewpointBoundingGeometry: Viewpoint?
 
     @Published var timeExtent: TimeExtent?
 
@@ -59,7 +64,7 @@ class MapViewModel: ObservableObject {
 
     let locationDisplay = LocationDisplay()
 
-    var geoProxyView: GeoViewProxy?
+    var geoProxyView: MapViewProxy?
 
     func addGraphicOverlay(_ graphicsOverlay: GraphicsOverlay) {
         graphicsOverlays.append(graphicsOverlay)

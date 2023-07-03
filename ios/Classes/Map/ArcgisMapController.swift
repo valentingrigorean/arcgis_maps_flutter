@@ -98,9 +98,10 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         initSymbolsControllers()
 
-        mapViewModel.$viewPoint.sink{ _ in
-            self.viewpointChangedHandler()
-        }.store(in: &cancellables)
+        mapViewModel.$viewPoint.sink { _ in
+                    self.viewpointChangedHandler()
+                }
+                .store(in: &cancellables)
 
         locationDisplayController.locationTapHandler = { [weak self] in
             self?.sendUserLocationTap()
@@ -147,11 +148,11 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 result(nil)
                 break
             }
-            taskManager.createTask{
-                do{
+            taskManager.createTask {
+                do {
                     let image = try await proxyView.exportImage()
                     result(image.pngData())
-                }catch{
+                } catch {
                     result(FlutterError(code: "exportImage_error", message: error.localizedDescription, details: nil))
                 }
             }
@@ -240,57 +241,53 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             handleTimeAwareLayerInfos(result: result)
             break
         case "map#getCurrentViewpoint":
-            let type = (call.arguments as! Int).toViewpointType()
-            let currentViewPoint = mapView.currentViewpoint(with: type)
-            if let json = try? currentViewPoint?.toJSON() {
-                result(json)
-            } else {
+            guard let proxyView = mapViewModel.geoProxyView else {
                 result(nil)
+                break
             }
+            let type = Viewpoint.Kind(call.arguments as! Int)
+            let currentViewPoint = type == .centerAndScale ? mapViewModel.viewpointCenterAndScale : mapViewModel.viewpointBoundingGeometry
+            result(currentViewPoint?.toJSON())
             break
         case "map#getInitialViewpoint":
-            if let json = try? mapViewModel.map.initialViewpoint?.toJSON() {
-                result(json)
-            } else {
-                result(nil)
-            }
+
+            result(mapViewModel.map.initialViewpoint?.toJSON())
+
             break
         case "map#setViewpoint":
             setViewpoint(args: call.arguments, animated: true, result: result)
             break
         case "map#setViewpointGeometry":
-            if let data = call.arguments as? Dictionary<String, Any> {
-                let geometry = Geometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
-
-                if let padding = data["padding"] as? Double {
-                    mapView.setViewpointGeometry(geometry.extent, padding: padding) { finished in
-                        result(finished)
-                    }
-                } else {
-                    mapView.setViewpointGeometry(geometry.extent) { finished in
-                        result(finished)
-                    }
-                }
-            } else {
+            guard let proxyView = mapViewModel.geoProxyView else {
                 result(false)
+                break
+            }
+            taskManager.createTask {
+                let data = call.arguments as! Dictionary<String, Any>
+                let geometry = Geometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
+                result(await proxyView.setViewpointGeometry(geometry.extent, padding: data["padding"] as? Double ?? 0))
             }
             break
         case "map#setViewpointCenter":
-            if let data = call.arguments as? Dictionary<String, Any> {
+            guard let proxyView = mapViewModel.geoProxyView else {
+                result(false)
+                break
+            }
+            taskManager.createTask {
+                let data = call.arguments as! Dictionary<String, Any>
                 let center = Point.fromFlutter(data: data["center"] as! Dictionary<String, Any>)! as! Point
                 let scale = data["scale"] as! Double
-                mapView.setViewpointCenter(center, scale: scale) { finished in
-                    result(finished)
-                }
-            } else {
-                result(false)
+                result(await proxyView.setViewpointCenter(center, scale: scale))
             }
             break
         case "map#setViewpointRotation":
-            if let angleDegrees = call.arguments as? Double {
-                mapView.setViewpointRotation(angleDegrees)
+            guard let proxyView = mapViewModel.geoProxyView else {
+                result(false)
+                break
             }
-            result(nil)
+            taskManager.createTask {
+                result(await proxyView.setViewpointRotation(call.arguments as! Double))
+            }
             break
         case "map#locationToScreen":
             if let mapPointData = call.arguments as? Dictionary<String, Any> {
