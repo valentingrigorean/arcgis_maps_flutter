@@ -5,6 +5,7 @@ import com.arcgismaps.mapping.ArcGISMap
 import com.arcgismaps.mapping.layers.Layer
 import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toTimeValueOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
+import com.valentingrigorean.arcgis_maps_flutter.map.MapChangeAware
 import com.valentingrigorean.arcgis_maps_flutter.utils.StringUtils
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.CoroutineScope

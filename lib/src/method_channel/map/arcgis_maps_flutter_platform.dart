@@ -268,10 +268,6 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
         'onViewpointChangedListener() has not been implemented.');
   }
 
-  Stream<LayersChangedEvent> onLayersChanged({required int mapId}) {
-    throw UnimplementedError('onLayersChanged() has not been implemented.');
-  }
-
   Stream<TimeExtentChangedEvent> onTimeExtentChanged({required int mapId}) {
     throw UnimplementedError('onTimeExtentChanged() has not been implemented.');
   }

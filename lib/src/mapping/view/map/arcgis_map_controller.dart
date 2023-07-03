@@ -8,11 +8,6 @@ class ArcgisMapController {
     ArcgisMapsFlutterPlatform.instance
         .setViewpointChangedListenerEvents(mapId, register);
   });
-  late final _EventBaseHandler<LayersChangedListener> _layersChangedHandlers =
-      _EventBaseHandler((register) {
-    ArcgisMapsFlutterPlatform.instance
-        .setLayersChangedListener(mapId, register);
-  });
   late final _EventBaseHandler<TimeExtentChangedListener>
       _timeExtentChangedHandlers = _EventBaseHandler((register) {
     ArcgisMapsFlutterPlatform.instance
@@ -118,16 +113,6 @@ class ArcgisMapController {
   void removeViewpointChangedListener(ViewpointChangedListener listener) {
     if (_isDisposed) return;
     _viewpointChangedHandlers.removeHandler(listener);
-  }
-
-  void addLayersChangedListener(LayersChangedListener listener) {
-    if (_isDisposed) return;
-    _layersChangedHandlers.addHandler(listener);
-  }
-
-  void removeLayersChangedListener(LayersChangedListener listener) {
-    if (_isDisposed) return;
-    _layersChangedHandlers.removeHandler(listener);
   }
 
   void addTimeExtentChangedListener(TimeExtentChangedListener listener) {
@@ -285,7 +270,6 @@ class ArcgisMapController {
     }
     _isDisposed = true;
     _viewpointChangedHandlers.clearAll();
-    _layersChangedHandlers.clearAll();
     _timeExtentChangedHandlers.clearAll();
     locationDisplay.dispose();
     ArcgisMapsFlutterPlatform.instance.dispose(mapId);
@@ -328,17 +312,6 @@ class ArcgisMapController {
         .listen((ViewpointChangedEvent event) {
       for (final listener in _viewpointChangedHandlers.handlers) {
         listener.viewpointChanged();
-      }
-    });
-
-    ArcgisMapsFlutterPlatform.instance
-        .onLayersChanged(mapId: mapId)
-        .listen((LayersChangedEvent event) {
-      for (final listener in _layersChangedHandlers.handlers) {
-        listener.onLayersChanged(
-          event.value,
-          event.layerChangeType,
-        );
       }
     });
 

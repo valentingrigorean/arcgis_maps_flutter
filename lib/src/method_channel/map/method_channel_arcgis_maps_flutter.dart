@@ -507,11 +507,6 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Stream<LayersChangedEvent> onLayersChanged({required int mapId}) {
-    return _events(mapId).whereType<LayersChangedEvent>();
-  }
-
-  @override
   Stream<TimeExtentChangedEvent> onTimeExtentChanged({required int mapId}) {
     return _events(mapId).whereType<TimeExtentChangedEvent>();
   }
@@ -528,14 +523,6 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
             mapId,
           ),
         );
-        break;
-      case 'map#onLayersChanged':
-        final LayersChangedEvent event = LayersChangedEvent(
-          mapId,
-          LayerType.values[call.arguments['layerType']!],
-          LayerChangeType.values[call.arguments['layerChangeType']!],
-        );
-        _mapEventStreamController.add(event);
         break;
       case 'marker#onTap':
         _mapEventStreamController.add(

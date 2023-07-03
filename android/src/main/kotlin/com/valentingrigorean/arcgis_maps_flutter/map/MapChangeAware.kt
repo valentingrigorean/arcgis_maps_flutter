@@ -1,4 +1,4 @@
-package com.valentingrigorean.arcgis_maps_flutter.layers
+package com.valentingrigorean.arcgis_maps_flutter.map
 
 import com.arcgismaps.mapping.ArcGISMap
 

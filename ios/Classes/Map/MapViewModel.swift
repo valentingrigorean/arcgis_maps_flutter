@@ -8,6 +8,8 @@
 import Foundation
 import ArcGIS
 
+
+
 class MapViewModel: ObservableObject {
     @Published var map = Map()
     @Published var graphicsOverlays: [GraphicsOverlay] = []

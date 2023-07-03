@@ -242,6 +242,7 @@ struct FlutterLayer: Hashable, Equatable {
     }
 
     private func setupDefaultParams(layer: Layer) {
+        layer.id = Layer.ID(rawValue: layerId)
         layer.opacity = opacity
         layer.isVisible = isVisible
     }

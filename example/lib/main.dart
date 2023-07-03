@@ -13,7 +13,6 @@ import 'package:arcgis_maps_flutter_example/map_page_geodesic_sector.dart';
 import 'package:arcgis_maps_flutter_example/map_page_geometry_engine.dart';
 import 'package:arcgis_maps_flutter_example/map_page_gesture.dart';
 import 'package:arcgis_maps_flutter_example/map_page_group_layer.dart';
-import 'package:arcgis_maps_flutter_example/map_page_layers_change.dart';
 import 'package:arcgis_maps_flutter_example/map_page_legend.dart';
 import 'package:arcgis_maps_flutter_example/map_page_locator.dart';
 import 'package:arcgis_maps_flutter_example/map_page_marker_from_widget.dart';
@@ -30,7 +29,6 @@ import 'package:arcgis_maps_flutter_example/map_page_scalerbar.dart';
 import 'package:arcgis_maps_flutter_example/map_page_screen_location.dart';
 import 'package:arcgis_maps_flutter_example/map_page_scrolling_list.dart';
 import 'package:arcgis_maps_flutter_example/map_page_tile_cache.dart';
-import 'package:arcgis_maps_flutter_example/map_page_time_slider.dart';
 import 'package:arcgis_maps_flutter_example/map_page_view_insests.dart';
 import 'package:arcgis_maps_flutter_example/scene_page.dart';
 import 'package:flutter/material.dart';
@@ -349,34 +347,12 @@ class MainPage extends StatelessWidget {
                 },
               ),
               ElevatedButton(
-                child: const Text('Map Time Slider'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const MapPageTimeSlider(),
-                    ),
-                  );
-                },
-              ),
-              ElevatedButton(
                 child: const Text('Map Asset Marker'),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const MapPageASsetsMarker(),
-                    ),
-                  );
-                },
-              ),
-              ElevatedButton(
-                child: const Text('Map Layers changed'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const MapPageLayersChange(),
                     ),
                   );
                 },

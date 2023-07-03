@@ -3,12 +3,9 @@ package com.valentingrigorean.arcgis_maps_flutter.map
 import android.content.Context
 import android.view.View
 import android.widget.FrameLayout
-import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
 import com.arcgismaps.LoadStatus
 import com.arcgismaps.arcgisservices.TimeAware
-import com.arcgismaps.data.QueryParameters
 import com.arcgismaps.geometry.Envelope
 import com.arcgismaps.geometry.GeometryEngine
 import com.arcgismaps.mapping.ArcGISMap
@@ -17,12 +14,9 @@ import com.arcgismaps.mapping.MobileMapPackage
 import com.arcgismaps.mapping.Viewpoint
 import com.arcgismaps.mapping.ViewpointType
 import com.arcgismaps.mapping.layers.ArcGISVectorTiledLayer
-import com.arcgismaps.mapping.layers.FeatureLayer
-import com.arcgismaps.mapping.layers.GroupLayer
 import com.arcgismaps.mapping.view.GraphicsOverlay
 import com.arcgismaps.mapping.view.MapView
 import com.valentingrigorean.arcgis_maps_flutter.convert.arcgisservices.toFlutterJson
-import com.valentingrigorean.arcgis_maps_flutter.convert.data.toSpatialRelationship
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toPointOrNull
@@ -34,10 +28,8 @@ import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toViewpointType
 import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterValue
 import com.valentingrigorean.arcgis_maps_flutter.extensions.loadAll
-import com.valentingrigorean.arcgis_maps_flutter.layers.LayersChangedController
 import com.valentingrigorean.arcgis_maps_flutter.layers.LayersController
 import com.valentingrigorean.arcgis_maps_flutter.layers.LegendInfoController
-import com.valentingrigorean.arcgis_maps_flutter.layers.MapChangeAware
 import com.valentingrigorean.arcgis_maps_flutter.map.LocationDisplayController.LocationDisplayControllerDelegate
 import com.valentingrigorean.arcgis_maps_flutter.mapping.symbology.MarkersController
 import com.valentingrigorean.arcgis_maps_flutter.mapping.symbology.PolygonsController
@@ -54,7 +46,6 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 class ArcgisMapController(
     id: Int,
@@ -72,7 +63,6 @@ class ArcgisMapController(
     private val symbolControllers = ArrayList<SymbolsController>()
     private val mapChangeAwares = ArrayList<MapChangeAware>()
     private val symbolVisibilityFilterController: SymbolVisibilityFilterController
-    private val layersChangedController: LayersChangedController
     private val locationDisplayController: LocationDisplayController
     private val container: FrameLayout = FrameLayout(context)
     private var mapView: MapView
@@ -103,8 +93,6 @@ class ArcgisMapController(
         symbolVisibilityFilterController = SymbolVisibilityFilterController(mapView, scope)
         layersController = LayersController(methodChannel, scope)
         mapChangeAwares.add(layersController)
-        layersChangedController = LayersChangedController(methodChannel)
-        mapChangeAwares.add(layersChangedController)
         val graphicsOverlay = GraphicsOverlay()
         markersController = MarkersController(context, methodChannel, graphicsOverlay)
         symbolControllers.add(markersController)
@@ -235,11 +223,6 @@ class ArcgisMapController(
 
             "map#setMap" -> {
                 changeMapType(call.arguments)
-                result.success(null)
-            }
-
-            "map#setLayersChangedListener" -> {
-                layersChangedController.setTrackLayersChange(call.arguments()!!)
                 result.success(null)
             }
 

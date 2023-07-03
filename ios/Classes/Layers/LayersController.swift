@@ -50,13 +50,15 @@ class LayersController {
 
     }
 
+    private let taskManager = TaskManager()
+
     private var operationalLayers = SharedSet<FlutterLayer>()
     private var baseLayers = SharedSet<FlutterLayer>()
     private var referenceLayers = SharedSet<FlutterLayer>()
 
     private var flutterOperationalLayersMap = SharedDictionary<String, Layer>()
     private var flutterBaseLayersMap = SharedDictionary<String, Layer>()
-    private var flutterReferenceLayersMap = SharedDictionary<String,Layer>()
+    private var flutterReferenceLayersMap = SharedDictionary<String, Layer>()
 
 
     private let methodChannel: FlutterMethodChannel
@@ -76,7 +78,7 @@ class LayersController {
         addLayersToMap(layers: Array(referenceLayers.set), layerType: .reference)
     }
 
-    public func getLayerByLayerId(layerId: String) -> Layer? {
+    public func getLayerByLayerId(_ layerId: String) -> Layer? {
         if let layer = flutterOperationalLayersMap[layerId] {
             return layer
         }
@@ -199,7 +201,7 @@ class LayersController {
         flutterBaseLayersMap.removeAll()
         flutterReferenceLayersMap.removeAll()
 
-        guard  let map = map else {
+        guard let map = map else {
             return
         }
 
@@ -224,32 +226,27 @@ class LayersController {
                 flutterMap[layer.layerId] = nativeLayer
             }
 
-            nativeLayer.load { [weak self] error in
-                if flutterMap.dict[layer.layerId] == nil {
-                    return
-                }
-
-                guard let channel = self?.methodChannel else {
-                    return
-                }
+            taskManager.createTask {
                 var args = [String: Any]()
-                if error != nil {
-                    args["error"] = error?.toJSON()
-                }
                 args["layerId"] = layer.layerId
-                channel.invokeMethod("layer#loaded", arguments: args)
+                do {
+                    try await nativeLayer.load()
+                } catch (let error) {
+                    args["error"] = error.toJSONFlutter(withStackTrace: false)
+                }
+                self.methodChannel.invokeMethod("layer#loaded", arguments: args)
             }
 
             switch layerType {
 
             case .operational:
-                map.operationalLayers.add(nativeLayer)
+                map.addOperationalLayer(nativeLayer)
                 break
             case .base:
-                map.basemap.baseLayers.add(nativeLayer)
+                map.basemap?.addBaseLayer(nativeLayer)
                 break
             case .reference:
-                map.basemap.referenceLayers.add(nativeLayer)
+                map.basemap?.addReferenceLayer(nativeLayer)
                 break
             }
         }
@@ -274,18 +271,16 @@ class LayersController {
         }
 
         for layer in nativeLayersToRemove {
-            layer.load { error in
-                switch layerType {
-                case .operational:
-                    map.operationalLayers.remove(layer)
-                    break
-                case .base:
-                    map.basemap.baseLayers.remove(layer)
-                    break
-                case .reference:
-                    map.basemap.referenceLayers.remove(layer)
-                    break
-                }
+            switch layerType {
+            case .operational:
+                map.removeOperationalLayer(layer)
+                break
+            case .base:
+                map.basemap?.removeBaseLayer(layer)
+                break
+            case .reference:
+                map.basemap?.removeReferenceLayer(layer)
+                break
             }
         }
     }
@@ -364,7 +359,7 @@ class LayersController {
     private static func findLayerIdByLayer(layer: Layer,
                                            data: SharedDictionary<String, Layer>) -> String? {
         for (key, layer) in data.dict {
-            if layer == layer {
+            if layer.id == layer.id {
                 return key
             }
         }

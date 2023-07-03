@@ -130,18 +130,6 @@ class ViewpointChangedEvent extends MapEvent<void> {
   const ViewpointChangedEvent(int mapId) : super(mapId, null);
 }
 
-class LayersChangedEvent extends MapEvent<LayerType> {
-  const LayersChangedEvent(
-    int mapId,
-    LayerType layerType,
-    this.layerChangeType,
-  ) : super(
-          mapId,
-          layerType,
-        );
-
-  final LayerChangeType layerChangeType;
-}
 
 class TimeExtentChangedEvent extends MapEvent<TimeExtent?> {
   const TimeExtentChangedEvent(int mapId, TimeExtent? value)

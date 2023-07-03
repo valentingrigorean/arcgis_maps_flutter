@@ -179,6 +179,7 @@ class FlutterLayer(private val data: Map<*, *>) {
 
             else -> throw UnsupportedOperationException("not implemented.")
         }
+        layer.id = layerId
         layer.opacity = opacity
         layer.isVisible = isVisible
         return layer
