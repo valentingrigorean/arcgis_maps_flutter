@@ -285,14 +285,6 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<void> setLayersChangedListener(int mapId, bool value) {
-    return channel(mapId).invokeMethod<void>(
-      'map#setLayersChangedListener',
-      value,
-    );
-  }
-
-  @override
   Future<TimeExtent?> getTimeExtent(int mapId) async {
     final result = await channel(mapId)
         .invokeMapMethod<String, dynamic>("map#getTimeExtent");

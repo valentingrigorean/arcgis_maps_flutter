@@ -20,15 +20,14 @@ class SymbolVisibilityFilterController {
     private var graphicControllers = Dictionary<UInt, GraphicControllerInfo>()
     private var initialValues = Dictionary<UInt, Bool>()
 
-    private weak var mapView: MapView?
+
     private var scaleObservation: NSKeyValueObservation?
 
     private var mapScale: Double
 
 
-    init(mapView: MapView) {
-        self.mapView = mapView
-        mapScale = mapView.mapScale
+    init(mapViewModel:MapViewModel) {
+
     }
 
     deinit {

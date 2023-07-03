@@ -5,33 +5,14 @@
 import Foundation
 import SwiftUI
 import ArcGIS
+import Combine
 
-
-struct ContentView: View {
-    @ObservedObject var viewModel: MapViewModel
-
-    init(viewModel: MapViewModel) {
-        self.viewModel = viewModel
-    }
-
-
-    var body: some View {
-        MapViewReader { proxy in
-            MapView(map: viewModel.map, graphicsOverlays: viewModel.graphicsOverlays)
-                    .locationDisplay(viewModel.locationDisplay)
-                    .onAppear {
-                        viewModel.geoProxyView = proxy
-                    }
-        }
-    }
-}
 
 public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private let taskManager = TaskManager()
     private let mapViewModel = MapViewModel()
     private let hostingView = HostingView()
-
 
     private let selectionPropertiesHandler: SelectionPropertiesHandler
 
@@ -47,29 +28,23 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private let scaleBarController: ScaleBarController
 
-    private let layersChangedController: LayersChangedController
-
     private var lastScreenPoint = CGPoint.zero
 
     private var graphicsTouchDelegates: [MapGraphicTouchDelegate]
 
     private let symbolsControllers: [SymbolsController]
 
-    private var viewpoint: Viewpoint?
-
-    private var graphicsHandle: Cancelable?
-
-    private var layerHandle: Cancelable?
+    private var cancellables = Set<AnyCancellable>()
 
     private var trackIdentityLayers = false
+
+    private var trackTimeExtent = false
 
     private var trackViewpointChangedListenerEvent = false
 
     private var haveScaleBar = false
 
     private var legendInfoControllers = Array<LegendInfoController>()
-
-    private var timeExtentObservation: NSKeyValueObservation?
 
     private var minScale = 0.0 {
         didSet {
@@ -92,12 +67,12 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)", binaryMessenger: registrar.messenger())
 
         hostingView.frame = frame
-        hostingView.setView(AnyView(ContentView(viewModel: mapViewModel)))
+        hostingView.setView(AnyView(MapContentView(viewModel: mapViewModel)))
 
 
-        selectionPropertiesHandler = SelectionPropertiesHandler(geoView: mapView)
+        selectionPropertiesHandler = SelectionPropertiesHandler(mapViewModel: mapViewModel)
 
-        symbolVisibilityFilterController = SymbolVisibilityFilterController(mapView: mapView)
+        symbolVisibilityFilterController = SymbolVisibilityFilterController(mapViewModel: mapViewModel)
 
         let graphicsOverlay = GraphicsOverlay()
         polygonsController = PolygonsController(methodChannel: channel, graphicsOverlays: graphicsOverlay)
@@ -113,7 +88,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         scaleBarController = ScaleBarController(mapView: mapView)
 
-        layersChangedController = LayersChangedController(geoView: mapView, channel: channel, layersController: layersController)
         let locationDisplayChannel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)_location_display", binaryMessenger: registrar.messenger())
         locationDisplayController = LocationDisplayController(methodChannel: locationDisplayChannel, mapViewModel: mapViewModel)
         graphicsTouchDelegates = [markersController, polygonsController, polylinesController, locationDisplayController]
@@ -124,10 +98,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         initSymbolsControllers()
 
-        mapView.touchDelegate = self
-        mapView.viewpointChangedHandler = { [weak self] in
-            self?.viewpointChangedHandler()
-        }
+        mapViewModel.$viewPoint.sink{ _ in
+            self.viewpointChangedHandler()
+        }.store(in: &cancellables)
 
         locationDisplayController.locationTapHandler = { [weak self] in
             self?.sendUserLocationTap()
@@ -139,8 +112,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         hostingView.removeView()
         channel.setMethodCallHandler(nil)
         locationDisplayController.locationTapHandler = nil
-        timeExtentObservation?.invalidate()
-        timeExtentObservation = nil
         clearSymbolsControllers()
         symbolVisibilityFilterController.clear()
     }
@@ -172,11 +143,16 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             result(nil)
             break
         case "map#exportImage":
-            mapView.exportImage { image, error in
-                if let error = error {
+            guard let proxyView = mapViewModel.geoProxyView else {
+                result(nil)
+                break
+            }
+            taskManager.createTask{
+                do{
+                    let image = try await proxyView.exportImage()
+                    result(image.pngData())
+                }catch{
                     result(FlutterError(code: "exportImage_error", message: error.localizedDescription, details: nil))
-                } else {
-                    result(image?.toJSONFlutter())
                 }
             }
             break
@@ -194,20 +170,12 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             legendInfoControllers.append(legendInfoController)
             break
         case "map#getMapMaxExtend":
-            if let map = mapViewModel.map {
-                map.load { error in
-                    if error == nil {
-                        result(map.maxExtent?.toJSONFlutter())
-                    } else {
-                        result(nil)
-                    }
-                }
-            } else {
-                result(nil)
-            }
+            let map = mapViewModel.map
+            let extent = map.maxExtent
+            result(extent?.toJSONFlutter())
             break
         case "map#getLocation":
-            let location = mapView.locationDisplay.location
+            let location = mapViewModel.locationDisplay.location
             if location == nil {
                 result(nil)
             } else {
@@ -215,7 +183,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             }
             break
         case "map#getMapLocation":
-            let mapLocation = mapView.locationDisplay.mapLocation
+            let mapLocation = mapViewModel.locationDisplay.mapLocation
             if mapLocation == nil {
                 result(nil)
             } else {
@@ -225,7 +193,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         case "map#setMapMaxExtent":
             if let extent = call.arguments as? Dictionary<String, Any> {
                 let maxExtent = Envelope(data: extent)
-                mapView.map?.maxExtent = maxExtent
+                mapViewModel.map.maxExtent = maxExtent
             }
             result(nil)
             break
@@ -239,48 +207,31 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             }
             result(nil)
             break
-        case "map#setLayersChangedListener":
-            if let val = call.arguments as? Bool {
-                layersChangedController.trackLayersChange = val
-            }
-            result(nil)
-            break
         case "map#setTimeExtentChangedListener":
             if let val = call.arguments as? Bool {
-                if val, timeExtentObservation == nil {
-                    timeExtentObservation = mapView.observe(\.timeExtent, options: .new) { [weak self] (_,
-                                                                                                        _) in
-                        guard let self = self else {
-                            return
-                        }
-                        self.onTimeExtentChanged(timeExtent: self.mapView.timeExtent)
-                    }
-                } else {
-                    timeExtentObservation?.invalidate()
-                    timeExtentObservation = nil
-                }
+                trackTimeExtent = val
             }
             result(nil)
             break
         case "map#setTimeExtent":
             if let timeExtentRaw = call.arguments as? Dictionary<String, Any> {
                 let timeExtent = TimeExtent(data: timeExtentRaw)
-                if mapView.timeExtent != timeExtent {
-                    mapView.timeExtent = timeExtent
+                if mapViewModel.timeExtent != timeExtent {
+                    mapViewModel.timeExtent = timeExtent
                 }
             } else {
-                mapView.timeExtent = nil
+                mapViewModel.timeExtent = nil
             }
             print("map#setTimeExtent")
             break
         case "map#getTimeExtent":
-            result(mapView.timeExtent?.toJSONFlutter())
+            result(mapViewModel.timeExtent?.toJSONFlutter())
             break
         case "map#getMapRotation":
-            result(mapView.rotation)
+            result(mapViewModel.rotation)
             break
         case "map#getWanderExtentFactor":
-            result(mapView.locationDisplay.wanderExtentFactor)
+            result(mapViewModel.locationDisplay.wanderExtentFactor)
             break
         case "map#queryFeatureTableFromLayer":
             handleQueryFeatureTableFromLayer(data: call.arguments as! Dictionary<String, Any>, result: result)
@@ -298,7 +249,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             }
             break
         case "map#getInitialViewpoint":
-            if let json = try? mapView.map?.initialViewpoint?.toJSON() {
+            if let json = try? mapViewModel.map.initialViewpoint?.toJSON() {
                 result(json)
             } else {
                 result(nil)
@@ -569,10 +520,10 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 return
             }
 
-            var timeAwareLayers = [AGSTimeAware]()
+            var timeAwareLayers = [TimeAware]()
 
             layers.forEach { (layer) in
-                guard let timeAwareLayer = layer as? AGSTimeAware else {
+                guard let timeAwareLayer = layer as? TimeAware else {
                     return
                 }
                 timeAwareLayers.append(timeAwareLayer)
@@ -601,7 +552,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         }
     }
 
-    private func onTimeExtentChanged(timeExtent: AGSTimeExtent?) {
+    private func onTimeExtentChanged(timeExtent: TimeExtent?) {
         channel.invokeMethod("map#timeExtentChanged", arguments: timeExtent?.toJSONFlutter())
     }
 
@@ -680,7 +631,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         }
         map.minScale = minScale
         map.maxScale = maxScale
-        mapView.map = map
+        mapViewModel.map = map
         layersController.setMap(map)
 
         if viewPoint != nil {
@@ -692,13 +643,13 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     private func updateMapOptions(mapOptions: Dictionary<String, Any>) {
 
         if let interactionOptions = mapOptions["interactionOptions"] as? Dictionary<String, Any> {
-            updateInteractionOptions(interactionOptions: interactionOptions)
+            mapViewModel.updateInteractionOptions(with: interactionOptions)
         }
 
         if let myLocationEnabled = mapOptions["myLocationEnabled"] as? Bool {
-            mapView.locationDisplay.showLocation = myLocationEnabled
+            mapViewModel.locationDisplay.showsLocation = myLocationEnabled
             if myLocationEnabled {
-                mapView.locationDisplay.start()
+                mapViewModel.locationDisplay.start()
             } else {
                 mapView.locationDisplay.stop()
             }
@@ -745,26 +696,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         }
     }
 
-    private func updateInteractionOptions(interactionOptions: Dictionary<String, Any>) {
-        if let isEnabled = interactionOptions["isEnabled"] as? Bool {
-            mapView.interactionOptions.isEnabled = isEnabled
-        }
-        if let isRotateEnabled = interactionOptions["isRotateEnabled"] as? Bool {
-            mapView.interactionOptions.isRotateEnabled = isRotateEnabled
-        }
-        if let isPanEnabled = interactionOptions["isPanEnabled"] as? Bool {
-            mapView.interactionOptions.isPanEnabled = isPanEnabled
-        }
-        if let isZoomEnabled = interactionOptions["isZoomEnabled"] as? Bool {
-            mapView.interactionOptions.isZoomEnabled = isZoomEnabled
-        }
-        if let isMagnifierEnabled = interactionOptions["isMagnifierEnabled"] as? Bool {
-            mapView.interactionOptions.isMagnifierEnabled = isMagnifierEnabled
-        }
-        if let allowMagnifierToPan = interactionOptions["allowMagnifierToPan"] as? Bool {
-            mapView.interactionOptions.allowMagnifierToPan = allowMagnifierToPan
-        }
-    }
 
     private func setViewpoint(args: Any?,
                               animated: Bool, result: FlutterResult?) {
@@ -894,7 +825,7 @@ extension ArcgisMapController: AGSGeoViewTouchDelegate {
         channel.invokeMethod("map#onIdentifyLayers", arguments: ["results": results.toJSONFlutter(), "screenPoint": lastScreenPoint.toJSONFlutter(), "position": position.toJSONFlutter()])
     }
 
-    private func onTapGraphicsCompleted(results: [AGSIdentifyGraphicsOverlayResult]?,
+    private func onTapGraphicsCompleted(results: [IdentifyGraphicsOverlayResult]?,
                                         screenPoint: CGPoint) -> Bool {
         if results != nil {
             for result in results! {

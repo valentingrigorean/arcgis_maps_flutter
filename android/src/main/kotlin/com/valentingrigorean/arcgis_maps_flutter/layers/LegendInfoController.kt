@@ -28,6 +28,7 @@ class LegendInfoController(
                 }.awaitAll()
 
                 return@coroutineScope Result.success(mapOf(
+                    "layerId" to layer.id,
                     "layerName" to layer.name,
                     "results" to results
                 ))

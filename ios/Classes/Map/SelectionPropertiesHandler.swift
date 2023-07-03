@@ -6,20 +6,20 @@ import SwiftUI
 import ArcGIS
 
 class SelectionPropertiesHandler {
-    private let geoView: any GeoView
+    private let mapViewModel: MapViewModel
     private let defaultSelectedColor: Color
     private var selectedColor: Color
 
-    init(geoView: any GeoView) {
-        self.geoView = geoView
-        defaultSelectedColor = Color.cyan
+    init(mapViewModel: MapViewModel) {
+        self.mapViewModel = mapViewModel
+        defaultSelectedColor = mapViewModel.selectedColor
         selectedColor = defaultSelectedColor
     }
 
     func setGraphicSelected(graphic: Graphic,
                             selectedColor: Color?) {
         if let newSelectedColor = selectedColor {
-            geoView.selectionColor(newSelectedColor)
+            mapViewModel.selectedColor = newSelectedColor
             self.selectedColor = newSelectedColor
         } else {
             reset()
@@ -37,6 +37,6 @@ class SelectionPropertiesHandler {
             return
         }
         selectedColor = defaultSelectedColor
-        geoView.selectionColor(selectedColor)
+        mapViewModel.selectedColor = defaultSelectedColor
     }
 }

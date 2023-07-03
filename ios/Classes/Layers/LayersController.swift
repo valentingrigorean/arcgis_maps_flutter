@@ -128,7 +128,7 @@ class LayersController {
             return
         }
 
-        guard var layer = getLayerByLayerId(layerId: layerId) as? TimeAware else {
+        guard var layer = getLayerByLayerId(layerId) as? TimeAware else {
             return
         }
 
