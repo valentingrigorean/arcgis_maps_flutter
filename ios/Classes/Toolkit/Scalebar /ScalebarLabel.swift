@@ -26,6 +26,6 @@ struct ScalebarLabel {
     
     /// The vertical offset of this label.
     static var yOffset: CGFloat {
-        return Scalebar.fontHeight / 2.0
+        Scalebar.fontHeight / 2.0
     }
 }

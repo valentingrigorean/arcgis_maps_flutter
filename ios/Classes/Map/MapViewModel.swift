@@ -30,11 +30,9 @@ struct MapContentView: View {
                         viewModel.currentScale = newScale
                     }
                     .onViewpointChanged(kind: .centerAndScale) { viewpoint in
-                        viewModel.viewpoint = viewpoint
                         viewModel.viewpointCenterAndScale = viewpoint
                     }
                     .onViewpointChanged(kind: .boundingGeometry) { viewpoint in
-                        viewModel.viewpoint = viewpoint
                         viewModel.viewpointBoundingGeometry = viewpoint
                     }
                     .onUnitsPerPointChanged {
@@ -53,6 +51,20 @@ struct MapContentView: View {
                     .onAppear {
                         viewModel.mapViewProxy = proxy
                     }
+                    .overlay(alignment: viewModel.scalebarConfig.alignment ?? .topLeading) {
+                        if viewModel.haveScaleBar {
+                            Scalebar(
+                                    maxWidth: viewModel.scalebarConfig.maxWidth,
+                                    settings: viewModel.scalebarConfig.settings,
+                                    spatialReference: $viewModel.spatialReference,
+                                    style: viewModel.scalebarConfig.style,
+                                    units: viewModel.scalebarConfig.units,
+                                    unitsPerPoint: $viewModel.unitsPerPoint,
+                                    viewpoint: $viewModel.viewpoint
+                            )
+                                    .offset(viewModel.scalebarConfig.offset ?? .zero)
+                        }
+                    }
 
         }
     }
@@ -60,8 +72,10 @@ struct MapContentView: View {
 
 struct FlutterScalebarConfig {
     var settings: ScalebarSettings
-    var unit: ScalebarUnits
+    var units: ScalebarUnits
     var style: ScalebarStyle
+    var alignment: Alignment?
+    var offset: CGSize?
     var maxWidth: Double = 175.0
 }
 
@@ -100,7 +114,7 @@ class MapViewModel: ObservableObject {
 
     @Published var haveScaleBar: Bool = true
 
-    @Published var scalebarConfig: FlutterScalebarConfig = FlutterScalebarConfig(settings: ScalebarSettings(), unit: .metric, style: .line)
+    @Published var scalebarConfig: FlutterScalebarConfig = FlutterScalebarConfig(settings: ScalebarSettings(), units: NSLocale.current.usesMetricSystem ? .metric : .imperial, style: .alternatingBar)
 
     @Published var spatialReference: SpatialReference?
 
@@ -201,6 +215,48 @@ extension MapViewModel {
     }
 
     private func createScalebarConfig(data: [String: Any]) -> FlutterScalebarConfig {
+        let units = ScalebarUnits(data["units"] as! Int)
+        let style = ScalebarStyle(data["style"] as! Int)
+        let settings = ScalebarSettings(data: data)
+        let maxWidth = data["maxWidth"] as? Double ?? 175.0
+        let alignment = data["alignment"] as? Int
+        let offset = data["offset"] as? [Double]
 
+        return FlutterScalebarConfig(
+                settings: settings,
+                units: units,
+                style: style,
+                alignment: alignment == nil ? nil : getSwiftUIAlignment(value: alignment!),
+                offset: offset == nil ? nil : CGSize(width: offset![0], height: offset![1]),
+                maxWidth: maxWidth
+        )
+    }
+
+
+    private func getSwiftUIAlignment(value: Int) -> Alignment {
+        switch value {
+        case 0:
+            return .bottomLeading
+        case 1:
+            return .bottomTrailing
+        case 2:
+            return .bottom // For CENTER alignment
+        default:
+            fatalError("Invalid alignment value")
+        }
+    }
+
+}
+
+extension ScalebarSettings {
+    init(data: [String: Any]) {
+        autoHide = data["autoHide"] as? Bool ?? true
+        autoHideDelay = (data["autoHideDelay"] as? Double ?? 2000.0) / 1000.0
+        fillColor1 = Color(data: data["fillColor"] as! UInt)
+        fillColor2 = Color(data: data["alternateFillColor"] as! UInt)
+        lineColor = Color(data: data["lineColor"] as! UInt)
+        shadowColor = Color(data: data["shadowColor"] as! UInt)
+        textColor = Color(data: data["textColor"] as! UInt)
+        textShadowColor = Color(data: data["textShadowColor"] as! UInt)
     }
 }

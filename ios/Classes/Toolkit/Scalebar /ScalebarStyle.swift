@@ -17,16 +17,47 @@ import Foundation
 public enum ScalebarStyle {
     /// Displays a single unit with segemeted bars of alternating fill color.
     case alternatingBar
-    
+
     /// Displays a single unit.
     case bar
-    
+
     /// Displays both metric and imperial units. The primary unit is displayed on top.
     case dualUnitLine
-    
+
     /// Displays a single unit with tick marks.
     case graduatedLine
-    
+
     /// Displays a single unit with endpoint tick marks.
     case line
+
+    /// Displays both metric or imperial and nautical units. The primary unit is displayed on top.
+    case dualUnitLineNauticalMiles
+}
+
+
+extension ScalebarStyle {
+    init(_ flutterValue: Int) {
+        switch flutterValue {
+        case 0:
+            self = .line
+            break
+        case 1:
+            self = .bar
+            break
+        case 2:
+            self = .graduatedLine
+            break
+        case 3:
+            self = .alternatingBar
+            break
+        case 4:
+            self = .dualUnitLine
+            break
+        case 5:
+            self = .dualUnitLineNauticalMiles
+            break
+        default:
+            fatalError("Unknown ScalebarStyle: \(flutterValue)")
+        }
+    }
 }

@@ -15,7 +15,7 @@ enum GeometryType: Int, Hashable {
 }
 
 extension LinearUnit {
-    convenience init?(flutterValue: Int) {
+    convenience init?(_ flutterValue: Int) {
         switch flutterValue {
         case 0:
             self.init(linearID: .centimeters)

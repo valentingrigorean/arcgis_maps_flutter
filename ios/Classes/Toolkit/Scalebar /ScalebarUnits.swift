@@ -174,3 +174,22 @@ public enum ScalebarUnits {
         }
     }
 }
+
+
+extension ScalebarUnits {
+    init(_ flutterValue: Int) {
+        switch flutterValue {
+        case 0:
+            self = .imperial
+            break
+        case 1:
+            self = .metric
+            break
+        case 2:
+            self = .nauticalMiles
+            break
+        default:
+            self = NSLocale.current.usesMetricSystem ? .metric : .imperial
+        }
+    }
+}

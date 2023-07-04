@@ -126,6 +126,7 @@ extension Scalebar {
                 .frame(height: Scalebar.fontHeight)
         }
     }
+
     
     /// Renders a scalebar with `ScalebarStyle.graduatedLine`.
     var graduatedLineStyleRenderer: some View {

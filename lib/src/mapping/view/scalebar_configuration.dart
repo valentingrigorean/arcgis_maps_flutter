@@ -133,12 +133,11 @@ class ScalebarConfiguration {
   Object toJson() {
     final Map<String, Object> json = <String, Object>{};
     json['showInMap'] = showInMap;
-    if (!showInMap) {
-      json['width'] = width;
-      json['offset'] = [offset.dx, offset.dy];
-    } else {
-      json['inMapAlignment'] = inMapAlignment.index;
-    }
+
+    json['width'] = width;
+    json['offset'] = [offset.dx, offset.dy];
+
+    json['inMapAlignment'] = inMapAlignment.index;
 
     json['autoHide'] = autoHide;
     json['hideAfter'] = hideAfter.inMilliseconds;

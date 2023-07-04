@@ -28,45 +28,11 @@ final class ScalebarViewModel: ObservableObject {
     
     // - MARK: Public vars
     
-    /// A screen length and displayable string for the equivalent length in the alternate unit.
-    var alternateUnit: (screenLength: CGFloat, label: String) {
-        guard let displayUnit = displayUnit else {
-            return (.zero, "")
-        }
-        let altUnit: ScalebarUnits = units == .imperial ? .metric : .imperial
-        let altMapBaseLength = displayUnit.convert(
-            to: altUnit.baseLinearUnit,
-            value: lineMapLength
-        )
-        let altClosestBaseLength = altUnit.closestDistanceWithoutGoingOver(
-            to: altMapBaseLength,
-            units: altUnit.baseLinearUnit
-        )
-        let altDisplayUnits = altUnit.linearUnits(
-            forDistance: altClosestBaseLength
-        )
-        let altMapLength = altUnit.baseLinearUnit.convert(
-            to: altDisplayUnits, value: altClosestBaseLength
-        )
-        let displayFactor = lineMapLength / displayLength
-        let convertedDisplayFactor = displayUnit.convert(
-            to: altDisplayUnits,
-            value: displayFactor
-        )
-        let altScreenLength = altMapLength / convertedDisplayFactor
-        let numberString = numberFormatter.string(
-            from: NSNumber(value: altMapLength)
-        ) ?? ""
-        let bottomUnitsText = " \(altDisplayUnits.abbreviation)"
-        let label = "\(numberString)\(bottomUnitsText)"
-        return (altScreenLength, label)
-    }
-    
     /// A subject to which viewpoint updates can be submitted.
     var viewpointSubject = PassthroughSubject<Viewpoint?, Never>()
     
     // - MARK: Public methods
-    
+    var alternateUnit : (screenLength: CGFloat, label: String)
     /// A scalebar view model controls the underlying data used to render a scalebar.
     /// - Parameters:
     ///   - maxWidth: The maximum screen width allotted to the scalebar.
@@ -84,6 +50,7 @@ final class ScalebarViewModel: ObservableObject {
         _ spatialReference: Binding<SpatialReference?>,
         _ style: ScalebarStyle,
         _ units: ScalebarUnits,
+        _ alternativeUnits: ScalebarUnits?,
         _ unitsPerPoint: Binding<Double?>,
         _ useGeodeticCalculations: Bool,
         _ viewpoint: Viewpoint?
@@ -96,6 +63,7 @@ final class ScalebarViewModel: ObservableObject {
         self.unitsPerPoint = unitsPerPoint
         self.useGeodeticCalculations = useGeodeticCalculations
         self.viewpoint = viewpoint
+        alternateUnit = getAlternateUnit(alternativeUnits)
         
         viewpointSubscription = viewpointSubject
             .debounce(for: delay, scheduler: DispatchQueue.main)
@@ -139,7 +107,7 @@ final class ScalebarViewModel: ObservableObject {
     /// Determines the amount of display space to use based on the scalebar style.
     private var availableLineDisplayLength: CGFloat {
         switch style {
-        case .alternatingBar, .dualUnitLine, .graduatedLine:
+        case .alternatingBar, .dualUnitLine, .graduatedLine,.dualUnitLineNauticalMiles:
             // " km" will render wider than " mi"
             let maxUnitDisplayWidth = " km".size(withAttributes: [.font: Scalebar.font.uiFont]).width
             return maxWidth - (Scalebar.lineWidth / 2.0) - maxUnitDisplayWidth
@@ -176,7 +144,45 @@ final class ScalebarViewModel: ObservableObject {
     private var viewpointSubscription: AnyCancellable?
     
     // - MARK: Private methods
-    
+
+    /// A screen length and displayable string for the equivalent length in the alternate unit.
+    private func getAlternateUnit(_ alternateUnit: ScalebarUnits? = nil) -> (screenLength: CGFloat, label: String) {
+        guard let displayUnit = displayUnit else {
+            return (.zero, "")
+        }
+
+        let altUnit = alternateUnit ?? (units == .imperial ? .metric : .imperial)
+
+        let altMapBaseLength = displayUnit.convert(
+                to: altUnit.baseLinearUnit,
+                value: lineMapLength
+        )
+        let altClosestBaseLength = altUnit.closestDistanceWithoutGoingOver(
+                to: altMapBaseLength,
+                units: altUnit.baseLinearUnit
+        )
+        let altDisplayUnits = altUnit.linearUnits(
+                forDistance: altClosestBaseLength
+        )
+        let altMapLength = altUnit.baseLinearUnit.convert(
+                to: altDisplayUnits, value: altClosestBaseLength
+        )
+        let displayFactor = lineMapLength / displayLength
+        let convertedDisplayFactor = displayUnit.convert(
+                to: altDisplayUnits,
+                value: displayFactor
+        )
+        let altScreenLength = altMapLength / convertedDisplayFactor
+        let numberString = numberFormatter.string(
+                from: NSNumber(value: altMapLength)
+        ) ?? ""
+        let bottomUnitsText = " \(altDisplayUnits.abbreviation)"
+        let label = "\(numberString)\(bottomUnitsText)"
+
+        return (altScreenLength, label)
+    }
+
+
     /// Updates the labels to be displayed by the scalebar.
     private func updateLabels() {
         let lineDisplayLength = displayLength
