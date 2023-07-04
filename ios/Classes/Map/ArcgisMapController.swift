@@ -22,6 +22,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     private let polygonsController: PolygonsController
     private let polylinesController: PolylinesController
 
+    private let legendInfoController: LegendInfoController
+
     private let locationDisplayController: LocationDisplayController
 
     private let symbolVisibilityFilterController: SymbolVisibilityFilterController
@@ -43,20 +45,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     private var trackViewpointChangedListenerEvent = false
 
     private var haveScaleBar = false
-
-    private var legendInfoControllers = Array<LegendInfoController>()
-
-    private var minScale = 0.0 {
-        didSet {
-            mapViewModel.map.minScale = minScale
-        }
-    }
-
-    private var maxScale = 0.0 {
-        didSet {
-            mapViewModel.map.maxScale = maxScale
-        }
-    }
 
     public init(
             withRegistrar registrar: FlutterPluginRegistrar,
@@ -86,11 +74,13 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         layersController = LayersController(methodChannel: channel)
 
-        scaleBarController = ScaleBarController(mapView: mapView)
+        scaleBarController = ScaleBarController(mapViewModel: mapViewModel, container: hostingView)
 
         let locationDisplayChannel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)_location_display", binaryMessenger: registrar.messenger())
         locationDisplayController = LocationDisplayController(methodChannel: locationDisplayChannel, mapViewModel: mapViewModel)
         graphicsTouchDelegates = [markersController, polygonsController, polylinesController, locationDisplayController]
+
+        legendInfoController = LegendInfoController(layersController: layersController)
 
         super.init()
 
@@ -98,7 +88,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         initSymbolsControllers()
 
-        mapViewModel.$viewPoint.sink { _ in
+        mapViewModel.$viewpoint.sink { _ in
                     self.viewpointChangedHandler()
                 }
                 .store(in: &cancellables)
@@ -110,6 +100,10 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     deinit {
+        for cancellable in cancellables {
+            cancellable.cancel()
+        }
+        cancellables.removeAll()
         hostingView.removeView()
         channel.setMethodCallHandler(nil)
         locationDisplayController.locationTapHandler = nil
@@ -158,17 +152,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             }
             break
         case "map#getLegendInfos":
-            let legendInfoController = LegendInfoController(layersController: layersController)
-            legendInfoController.loadAsync(args: call.arguments, result: { [weak self] items in
-                guard let self = self else {
-                    return
-                }
-                result(items)
-                self.legendInfoControllers = self.legendInfoControllers.filter {
-                    $0 !== legendInfoController
-                }
-            })
-            legendInfoControllers.append(legendInfoController)
+            taskManager.createTask {
+                result(await self.legendInfoController.loadAsync(args: call.arguments))
+            }
             break
         case "map#getMapMaxExtend":
             let map = mapViewModel.map
@@ -250,9 +236,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             result(currentViewPoint?.toJSON())
             break
         case "map#getInitialViewpoint":
-
             result(mapViewModel.map.initialViewpoint?.toJSON())
-
             break
         case "map#setViewpoint":
             setViewpoint(args: call.arguments, animated: true, result: result)
@@ -289,30 +273,44 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 result(await proxyView.setViewpointRotation(call.arguments as! Double))
             }
             break
+        case "map#setViewpointScaleAsync":
+            guard let proxyView = mapViewModel.geoProxyView else {
+                result(false)
+                break
+            }
+            taskManager.createTask {
+                let data = call.arguments as! Dictionary<String, Any>
+                let scale = data["scale"] as! Double
+                result(await proxyView.setViewpointScale(scale))
+            }
+            break
         case "map#locationToScreen":
-            if let mapPointData = call.arguments as? Dictionary<String, Any> {
-                let screenPoint = mapView.location(toScreen: Point(data: mapPointData))
+            guard let proxyView = mapViewModel.geoProxyView else {
+                result(nil)
+                break
+            }
+            if let screenPoint = proxyView.screenPoint(fromLocation: Point(data: call.arguments as! Dictionary<String, Any>)) {
                 result([screenPoint.x, screenPoint.y])
             } else {
                 result(nil)
             }
             break
         case "map#screenToLocation":
-            if let data = call.arguments as? Dictionary<String, Any> {
-                let mapPoints = data["position"] as! [Double]
-                var mapPoint = mapView.screen(toLocation: CGPoint(x: mapPoints[0], y: mapPoints[1]))
-                if let spatialReference = AGSSpatialReference(data: data["spatialReference"] as! Dictionary<String, Any>) {
-                    if spatialReference.wkid != mapPoint.spatialReference?.wkid {
-                        mapPoint = GeometryEngine.projectGeometry(mapPoint, to: spatialReference) as! Point
-                    }
-                }
-                result(try? mapPoint.toJSON())
-            } else {
+            guard let proxyView = mapViewModel.geoProxyView else {
                 result(nil)
+                break
             }
+            let data = call.arguments as! Dictionary<String, Any>
+            let mapPoints = data["position"] as! [Double]
+            var mapPoint = proxyView.location(fromScreenPoint: CGPoint(x: mapPoints[0], y: mapPoints[1]))
+            let spatialReference = SpatialReference(data: data["spatialReference"] as! Dictionary<String, Any>)!
+            if mapPoint != nil && spatialReference.wkid != mapPoint?.spatialReference?.wkid {
+                mapPoint = GeometryEngine.project(mapPoint!, into: spatialReference) as! Point
+            }
+            result(mapPoint?.toJSON())
             break
         case "map#getMapScale":
-            result(mapView.mapScale)
+            result(mapViewModel.currentScale)
             break
         case "layers#update":
             layersController.updateFromArgs(args: call.arguments as Any)
@@ -369,16 +367,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         case "layer#setTimeOffset":
             layersController.setTimeOffset(arguments: call.arguments)
             result(nil)
-            break
-        case "map#setViewpointScaleAsync":
-            if let data = call.arguments as? Dictionary<String, Any> {
-                let scale = data["scale"] as! Double
-                mapView.setViewpointScale(scale, completion: { finished in
-                    result(finished)
-                })
-            } else {
-                result(false)
-            }
             break
         default:
             result(FlutterMethodNotImplemented)
@@ -500,39 +488,40 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     private func handleTimeAwareLayerInfos(result: @escaping FlutterResult) {
-        guard let layers = mapView.map?.operationalLayers as AnyObject as? [AGSLayer], layers.count > 0 else {
-            result([])
-            return
-        }
-
-        AGSLoadObjects(layers) { [weak self] (loaded) in
-
-            guard loaded else {
-                result([])
-                return
-            }
-
-            guard let self = self else {
-                result([])
-                return
-            }
-
-            var timeAwareLayers = [TimeAware]()
-
-            layers.forEach { (layer) in
-                guard let timeAwareLayer = layer as? TimeAware else {
-                    return
-                }
-                timeAwareLayers.append(timeAwareLayer)
-            }
-            result(timeAwareLayers.map { (layer) -> Any in
-                var layerId: String?
-                if layer is AGSLayer {
-                    layerId = self.layersController.getLayerIdByLayer(layer: layer as! AGSLayer)
-                }
-                return layer.toJSONFlutter(layerId: layerId)
-            })
-        }
+        result(FlutterMethodNotImplemented)
+//        guard let layers = mapView.map?.operationalLayers as AnyObject as? [AGSLayer], layers.count > 0 else {
+//            result([])
+//            return
+//        }
+//
+//        AGSLoadObjects(layers) { [weak self] (loaded) in
+//
+//            guard loaded else {
+//                result([])
+//                return
+//            }
+//
+//            guard let self = self else {
+//                result([])
+//                return
+//            }
+//
+//            var timeAwareLayers = [TimeAware]()
+//
+//            layers.forEach { (layer) in
+//                guard let timeAwareLayer = layer as? TimeAware else {
+//                    return
+//                }
+//                timeAwareLayers.append(timeAwareLayer)
+//            }
+//            result(timeAwareLayers.map { (layer) -> Any in
+//                var layerId: String?
+//                if layer is AGSLayer {
+//                    layerId = self.layersController.getLayerIdByLayer(layer: layer as! AGSLayer)
+//                }
+//                return layer.toJSONFlutter(layerId: layerId)
+//            })
+//        }
     }
 
     private func initSymbolsControllers() {
@@ -582,8 +571,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         switch ext {
         case "vtpk":
             // .vtpk extension is automatically added by the ArcGIS Runtime
-            let vectorTileLayer = ArcGISVectorTiledLayer(name: offlinePath.replacingOccurrences(of: ".vtpk", with: ""))
-            let basemap = AGSBasemap(baseLayer: vectorTileLayer)
+            let url = URL(fileURLWithPath: offlinePath.replacingOccurrences(of: ".vtpk", with: ""))
+            let vectorTileLayer = ArcGISVectorTiledLayer(url: url)
+            let basemap = Basemap(baseLayer: vectorTileLayer)
             let map = Map(basemap: basemap)
             changeMap(map: map)
             return
@@ -594,26 +584,20 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     private func loadMobileMapPackage(offlinePath: String, mapIndex: Int) {
-        let mobileMapPackage = AGSMobileMapPackage(fileURL: URL(string: offlinePath)!)
-        mobileMapPackage.load { [weak self] error in
-            guard let self = self else {
-                return
-            }
+        let mobileMapPackage = MobileMapPackage(fileURL: URL(string: offlinePath)!)
 
-            if error != nil {
-                print(error.debugDescription)
-                self.channel.invokeMethod("map#loaded", arguments: error?.toJSON())
-                return
+        taskManager.createTask {
+            do {
+                try await mobileMapPackage.load()
+                if mobileMapPackage.maps.isEmpty {
+                    self.channel.invokeMethod("map#loaded", arguments: "No maps in the package")
+                    return
+                }
+                let map = mobileMapPackage.maps[mapIndex]
+                self.changeMap(map: map)
+            } catch {
+                self.channel.invokeMethod("map#loaded", arguments: error.localizedDescription)
             }
-
-            if mobileMapPackage.maps.isEmpty {
-                print("No maps in the package")
-                self.channel.invokeMethod("map#loaded", arguments: error?.toJSON())
-                return
-            }
-
-            let map = mobileMapPackage.maps[mapIndex]
-            self.changeMap(map: map)
         }
     }
 
@@ -639,35 +623,14 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private func updateMapOptions(mapOptions: Dictionary<String, Any>) {
 
-        if let interactionOptions = mapOptions["interactionOptions"] as? Dictionary<String, Any> {
-            mapViewModel.updateInteractionOptions(with: interactionOptions)
-        }
-
-        if let myLocationEnabled = mapOptions["myLocationEnabled"] as? Bool {
-            mapViewModel.locationDisplay.showsLocation = myLocationEnabled
-            if myLocationEnabled {
-                mapViewModel.locationDisplay.start()
-            } else {
-                mapView.locationDisplay.stop()
-            }
-        }
+        mapViewModel.updateMapOptions(with: mapOptions)
 
         if let trackIdentityLayers = mapOptions["trackIdentifyLayers"] as? Bool {
             self.trackIdentityLayers = trackIdentityLayers
         }
 
         if let insetsContentInsetFromSafeArea = mapOptions["insetsContentInsetFromSafeArea"] as? Bool {
-            mapView.insetsContentInsetFromSafeArea = insetsContentInsetFromSafeArea
-        }
-
-        if let isAttributionTextVisible = mapOptions["isAttributionTextVisible"] as? Bool {
-            mapView.isAttributionTextVisible = isAttributionTextVisible
-        }
-
-        if let contentInsets = mapOptions["contentInsets"] as? [Double] {
-            // order is left,top,right,bottom
-            mapView.contentInset = UIEdgeInsets(top: CGFloat(contentInsets[1]), left: CGFloat(contentInsets[0]),
-                    bottom: CGFloat(contentInsets[3]), right: CGFloat(contentInsets[2]))
+            mapViewModel.ignoresSafeAreaEdges = insetsContentInsetFromSafeArea
         }
 
         if let haveScaleBar = mapOptions["haveScalebar"] as? Bool {
@@ -683,24 +646,12 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         if let trackUserLocationTap = mapOptions["trackUserLocationTap"] as? Bool {
             locationDisplayController.trackUserLocationTap = trackUserLocationTap
         }
-
-        if let minScale = mapOptions["minScale"] as? Double {
-            self.minScale = minScale
-        }
-
-        if let maxScale = mapOptions["maxScale"] as? Double {
-            self.maxScale = maxScale
-        }
     }
 
 
     private func setViewpoint(args: Any?,
                               animated: Bool, result: FlutterResult?) {
-        guard let data = args as? Dictionary<String, Any> else {
-            result?(nil)
-            return
-        }
-
+        let data = args as! Dictionary<String, Any>
         let newViewpoint = Viewpoint(data: data)
         viewpoint = newViewpoint
 

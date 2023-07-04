@@ -10,7 +10,8 @@ import UIKit
 fileprivate let defaultWidth = 175
 
 class ScaleBarController: NSObject {
-    private let mapView: MapView
+    private let mapViewModel: MapViewModel
+    private let container: UIView
     private let scaleBar: Scalebar
 
     private let constraintWidth: NSLayoutConstraint
@@ -36,23 +37,24 @@ class ScaleBarController: NSObject {
     private var autoHide = false
     private var hideAfterMs = 2000
 
-    init(mapView: MapView) {
-        self.mapView = mapView
+    init(mapViewModel: MapViewModel,container:UIView) {
+        self.mapViewModel = mapViewModel
+        self.container = container
         scaleBar = Scalebar(mapView: mapView)
         scaleBar.mapView = nil
         scaleBar.isHidden = true
-        mapView.addSubview(scaleBar)
+        container.addSubview(scaleBar)
         scaleBar.translatesAutoresizingMaskIntoConstraints = false
 
         constraintWidth = scaleBar.widthAnchor.constraint(equalToConstant: CGFloat(defaultWidth))
-        constraintLeft = scaleBar.leadingAnchor.constraint(equalTo: mapView.leadingAnchor)
-        constraintTop = scaleBar.topAnchor.constraint(equalTo: mapView.topAnchor)
+        constraintLeft = scaleBar.leadingAnchor.constraint(equalTo: container.leadingAnchor)
+        constraintTop = scaleBar.topAnchor.constraint(equalTo: container.topAnchor)
 
         customConstraints = [constraintWidth, constraintLeft, constraintTop]
 
-        constrainXCenter = scaleBar.centerXAnchor.constraint(equalTo: mapView.centerXAnchor)
-        constraintRight = scaleBar.trailingAnchor.constraint(equalTo: mapView.trailingAnchor)
-        constraintBottom = scaleBar.bottomAnchor.constraint(equalTo: mapView.attributionTopAnchor, constant: -10)
+        constrainXCenter = scaleBar.centerXAnchor.constraint(equalTo: container.centerXAnchor)
+        constraintRight = scaleBar.trailingAnchor.constraint(equalTo: container.trailingAnchor)
+        constraintBottom = scaleBar.bottomAnchor.constraint(equalTo: container.attributionTopAnchor, constant: -10)
 
         inMapConstraints = [constraintWidth, constraintBottom]
 
