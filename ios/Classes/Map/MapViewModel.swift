@@ -10,6 +10,13 @@ import ArcGIS
 import SwiftUI
 
 struct MapContentView: View {
+
+    /// Allows for communication between the `Scalebar` and `MapView`.
+    @State private var spatialReference: SpatialReference?
+
+    /// Allows for communication between the `Scalebar` and `MapView`.
+    @State private var unitsPerPoint: Double?
+
     @ObservedObject var viewModel: MapViewModel
 
     init(viewModel: MapViewModel) {
@@ -30,6 +37,12 @@ struct MapContentView: View {
                         viewModel.viewpoint = viewpoint
                         viewModel.viewpointBoundingGeometry = viewpoint
                     }
+                    .onUnitsPerPointChanged {
+                        viewModel.unitsPerPoint = $0
+                    }
+                    .onSpatialReferenceChanged {
+                        viewModel.spatialReference = $0
+                    }
                     .attributionBarHidden(viewModel.isAttributionTextVisible)
                     .locationDisplay(viewModel.locationDisplay)
                     .selectionColor(viewModel.selectedColor)
@@ -38,14 +51,28 @@ struct MapContentView: View {
                     .padding(viewModel.contentInsets)
                     .disabled(!viewModel.interactionsEnabled)
                     .onAppear {
-                        viewModel.geoProxyView = proxy
+                        viewModel.mapViewProxy = proxy
                     }
+
         }
     }
 }
 
+struct FlutterScalebarConfig {
+    var settings: ScalebarSettings
+    var unit: ScalebarUnits
+    var style: ScalebarStyle
+    var maxWidth: Double = 175.0
+}
+
+
 class MapViewModel: ObservableObject {
-    @Published var map = Map()
+    @Published var map: Map = Map() {
+        didSet {
+            map.minScale = minScale
+            map.maxScale = maxScale
+        }
+    }
     @Published var graphicsOverlays: [GraphicsOverlay] = []
 
     @Published var currentScale: Double?
@@ -71,10 +98,17 @@ class MapViewModel: ObservableObject {
 
     @Published var isAttributionTextVisible: Bool = true
 
+    @Published var haveScaleBar: Bool = true
+
+    @Published var scalebarConfig: FlutterScalebarConfig = FlutterScalebarConfig(settings: ScalebarSettings(), unit: .metric, style: .line)
+
+    @Published var spatialReference: SpatialReference?
+
+    @Published var unitsPerPoint: Double?
 
     let locationDisplay = LocationDisplay()
 
-    var geoProxyView: MapViewProxy?
+    var mapViewProxy: MapViewProxy?
 
     var minScale: Double? {
         didSet {
@@ -123,6 +157,10 @@ extension MapViewModel {
                     bottom: CGFloat(contentInsets[3]), trailing: CGFloat(contentInsets[2]))
         }
 
+        if let insetsContentInsetFromSafeArea = options["insetsContentInsetFromSafeArea"] as? Bool {
+            ignoresSafeAreaEdges = insetsContentInsetFromSafeArea
+        }
+
         if let minScale = options["minScale"] as? Double {
             self.minScale = minScale
         }
@@ -130,9 +168,17 @@ extension MapViewModel {
         if let maxScale = options["maxScale"] as? Double {
             self.maxScale = maxScale
         }
+
+        if let haveScaleBar = options["haveScalebar"] as? Bool {
+            self.haveScaleBar = haveScaleBar
+        }
+
+        if let scalebarConfiguration = options["scalebarConfiguration"] as? [String: Any] {
+            scalebarConfig = createScalebarConfig(data: scalebarConfiguration)
+        }
     }
 
-    func updateInteractionOptions(with options: [String: Any]) {
+    private func updateInteractionOptions(with options: [String: Any]) {
         var newInteractionModes: MapViewInteractionModes = []
 
         if let isEnabled = options["isEnabled"] as? Bool {
@@ -152,5 +198,9 @@ extension MapViewModel {
         }
 
         interactionModes = newInteractionModes
+    }
+
+    private func createScalebarConfig(data: [String: Any]) -> FlutterScalebarConfig {
+
     }
 }

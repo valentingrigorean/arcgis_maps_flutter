@@ -11,7 +11,7 @@ import Combine
 public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private let taskManager = TaskManager()
-    private let mapViewModel = MapViewModel()
+    private let viewModel = MapViewModel()
     private let hostingView = HostingView()
 
     private let selectionPropertiesHandler: SelectionPropertiesHandler
@@ -55,12 +55,12 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)", binaryMessenger: registrar.messenger())
 
         hostingView.frame = frame
-        hostingView.setView(AnyView(MapContentView(viewModel: mapViewModel)))
+        hostingView.setView(AnyView(MapContentView(viewModel: viewModel)))
 
 
-        selectionPropertiesHandler = SelectionPropertiesHandler(mapViewModel: mapViewModel)
+        selectionPropertiesHandler = SelectionPropertiesHandler(mapViewModel: viewModel)
 
-        symbolVisibilityFilterController = SymbolVisibilityFilterController(mapViewModel: mapViewModel)
+        symbolVisibilityFilterController = SymbolVisibilityFilterController(mapViewModel: viewModel)
 
         let graphicsOverlay = GraphicsOverlay()
         polygonsController = PolygonsController(methodChannel: channel, graphicsOverlays: graphicsOverlay)
@@ -69,15 +69,15 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         symbolsControllers = [polygonsController, polylinesController, markersController]
 
-        mapViewModel.addGraphicOverlay(graphicsOverlay)
+        viewModel.addGraphicOverlay(graphicsOverlay)
 
 
         layersController = LayersController(methodChannel: channel)
 
-        scaleBarController = ScaleBarController(mapViewModel: mapViewModel, container: hostingView)
+        scaleBarController = ScaleBarController(mapViewModel: viewModel, container: hostingView)
 
         let locationDisplayChannel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)_location_display", binaryMessenger: registrar.messenger())
-        locationDisplayController = LocationDisplayController(methodChannel: locationDisplayChannel, mapViewModel: mapViewModel)
+        locationDisplayController = LocationDisplayController(methodChannel: locationDisplayChannel, mapViewModel: viewModel)
         graphicsTouchDelegates = [markersController, polygonsController, polylinesController, locationDisplayController]
 
         legendInfoController = LegendInfoController(layersController: layersController)
@@ -88,14 +88,10 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         initSymbolsControllers()
 
-        mapViewModel.$viewpoint.sink { _ in
+        viewModel.$viewpoint.sink { _ in
                     self.viewpointChangedHandler()
                 }
                 .store(in: &cancellables)
-
-        locationDisplayController.locationTapHandler = { [weak self] in
-            self?.sendUserLocationTap()
-        }
         initWithArgs(args: args)
     }
 
@@ -106,7 +102,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         cancellables.removeAll()
         hostingView.removeView()
         channel.setMethodCallHandler(nil)
-        locationDisplayController.locationTapHandler = nil
         clearSymbolsControllers()
         symbolVisibilityFilterController.clear()
     }
@@ -138,7 +133,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             result(nil)
             break
         case "map#exportImage":
-            guard let proxyView = mapViewModel.geoProxyView else {
+            guard let proxyView = viewModel.mapViewProxy else {
                 result(nil)
                 break
             }
@@ -157,12 +152,12 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             }
             break
         case "map#getMapMaxExtend":
-            let map = mapViewModel.map
+            let map = viewModel.map
             let extent = map.maxExtent
             result(extent?.toJSONFlutter())
             break
         case "map#getLocation":
-            let location = mapViewModel.locationDisplay.location
+            let location = viewModel.locationDisplay.location
             if location == nil {
                 result(nil)
             } else {
@@ -170,7 +165,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             }
             break
         case "map#getMapLocation":
-            let mapLocation = mapViewModel.locationDisplay.mapLocation
+            let mapLocation = viewModel.locationDisplay.mapLocation
             if mapLocation == nil {
                 result(nil)
             } else {
@@ -180,7 +175,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         case "map#setMapMaxExtent":
             if let extent = call.arguments as? Dictionary<String, Any> {
                 let maxExtent = Envelope(data: extent)
-                mapViewModel.map.maxExtent = maxExtent
+                viewModel.map.maxExtent = maxExtent
             }
             result(nil)
             break
@@ -203,22 +198,22 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         case "map#setTimeExtent":
             if let timeExtentRaw = call.arguments as? Dictionary<String, Any> {
                 let timeExtent = TimeExtent(data: timeExtentRaw)
-                if mapViewModel.timeExtent != timeExtent {
-                    mapViewModel.timeExtent = timeExtent
+                if viewModel.timeExtent != timeExtent {
+                    viewModel.timeExtent = timeExtent
                 }
             } else {
-                mapViewModel.timeExtent = nil
+                viewModel.timeExtent = nil
             }
             print("map#setTimeExtent")
             break
         case "map#getTimeExtent":
-            result(mapViewModel.timeExtent?.toJSONFlutter())
+            result(viewModel.timeExtent?.toJSONFlutter())
             break
         case "map#getMapRotation":
-            result(mapViewModel.rotation)
+            result(viewModel.rotation)
             break
         case "map#getWanderExtentFactor":
-            result(mapViewModel.locationDisplay.wanderExtentFactor)
+            result(viewModel.locationDisplay.wanderExtentFactor)
             break
         case "map#queryFeatureTableFromLayer":
             handleQueryFeatureTableFromLayer(data: call.arguments as! Dictionary<String, Any>, result: result)
@@ -227,22 +222,18 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             handleTimeAwareLayerInfos(result: result)
             break
         case "map#getCurrentViewpoint":
-            guard let proxyView = mapViewModel.geoProxyView else {
-                result(nil)
-                break
-            }
             let type = Viewpoint.Kind(call.arguments as! Int)
-            let currentViewPoint = type == .centerAndScale ? mapViewModel.viewpointCenterAndScale : mapViewModel.viewpointBoundingGeometry
+            let currentViewPoint = type == .centerAndScale ? viewModel.viewpointCenterAndScale : viewModel.viewpointBoundingGeometry
             result(currentViewPoint?.toJSON())
             break
         case "map#getInitialViewpoint":
-            result(mapViewModel.map.initialViewpoint?.toJSON())
+            result(viewModel.map.initialViewpoint?.toJSON())
             break
         case "map#setViewpoint":
             setViewpoint(args: call.arguments, animated: true, result: result)
             break
         case "map#setViewpointGeometry":
-            guard let proxyView = mapViewModel.geoProxyView else {
+            guard let proxyView = viewModel.mapViewProxy else {
                 result(false)
                 break
             }
@@ -253,7 +244,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             }
             break
         case "map#setViewpointCenter":
-            guard let proxyView = mapViewModel.geoProxyView else {
+            guard let proxyView = viewModel.mapViewProxy else {
                 result(false)
                 break
             }
@@ -265,7 +256,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             }
             break
         case "map#setViewpointRotation":
-            guard let proxyView = mapViewModel.geoProxyView else {
+            guard let proxyView = viewModel.mapViewProxy else {
                 result(false)
                 break
             }
@@ -274,7 +265,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             }
             break
         case "map#setViewpointScaleAsync":
-            guard let proxyView = mapViewModel.geoProxyView else {
+            guard let proxyView = viewModel.mapViewProxy else {
                 result(false)
                 break
             }
@@ -285,7 +276,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             }
             break
         case "map#locationToScreen":
-            guard let proxyView = mapViewModel.geoProxyView else {
+            guard let proxyView = viewModel.mapViewProxy else {
                 result(nil)
                 break
             }
@@ -296,7 +287,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             }
             break
         case "map#screenToLocation":
-            guard let proxyView = mapViewModel.geoProxyView else {
+            guard let proxyView = viewModel.mapViewProxy else {
                 result(nil)
                 break
             }
@@ -305,12 +296,12 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             var mapPoint = proxyView.location(fromScreenPoint: CGPoint(x: mapPoints[0], y: mapPoints[1]))
             let spatialReference = SpatialReference(data: data["spatialReference"] as! Dictionary<String, Any>)!
             if mapPoint != nil && spatialReference.wkid != mapPoint?.spatialReference?.wkid {
-                mapPoint = GeometryEngine.project(mapPoint!, into: spatialReference) as! Point
+                mapPoint = GeometryEngine.project(mapPoint!, into: spatialReference)
             }
             result(mapPoint?.toJSON())
             break
         case "map#getMapScale":
-            result(mapViewModel.currentScale)
+            result(viewModel.currentScale)
             break
         case "layers#update":
             layersController.updateFromArgs(args: call.arguments as Any)
@@ -602,45 +593,29 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     private func changeMap(map: Map) {
-        let viewPoint = viewpoint ?? mapView.currentViewpoint(with: ViewpointType.centerAndScale)
-        map.load { [weak self]  error in
-            guard let channel = self?.channel else {
-                return
-            }
-
-            channel.invokeMethod("map#loaded", arguments: error?.toJSON())
-        }
-        map.minScale = minScale
-        map.maxScale = maxScale
-        mapViewModel.map = map
+        let viewPoint = viewModel.viewpointCenterAndScale
+        viewModel.map = map
         layersController.setMap(map)
 
-        if viewPoint != nil {
-            mapView.setViewpoint(viewPoint!, duration: 0)
+        taskManager.createTask {
+            do {
+                try await map.load()
+                self.channel.invokeMethod("map#loaded", arguments: nil)
+            } catch {
+                self.channel.invokeMethod("map#loaded", arguments: error.toJSONFlutter(withStackTrace: false))
+            }
+
+            guard let proxyView = self.viewModel.mapViewProxy else {
+                return
+            }
         }
-        viewpoint = nil
     }
 
     private func updateMapOptions(mapOptions: Dictionary<String, Any>) {
-
-        mapViewModel.updateMapOptions(with: mapOptions)
+        viewModel.updateMapOptions(with: mapOptions)
 
         if let trackIdentityLayers = mapOptions["trackIdentifyLayers"] as? Bool {
             self.trackIdentityLayers = trackIdentityLayers
-        }
-
-        if let insetsContentInsetFromSafeArea = mapOptions["insetsContentInsetFromSafeArea"] as? Bool {
-            mapViewModel.ignoresSafeAreaEdges = insetsContentInsetFromSafeArea
-        }
-
-        if let haveScaleBar = mapOptions["haveScalebar"] as? Bool {
-            if self.haveScaleBar && !haveScaleBar {
-                scaleBarController.removeScaleBar()
-            }
-        }
-
-        if let scalebarConfiguration = mapOptions["scalebarConfiguration"] {
-            scaleBarController.interpretConfiguration(args: scalebarConfiguration)
         }
 
         if let trackUserLocationTap = mapOptions["trackUserLocationTap"] as? Bool {
@@ -652,27 +627,17 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     private func setViewpoint(args: Any?,
                               animated: Bool, result: FlutterResult?) {
         let data = args as! Dictionary<String, Any>
-        let newViewpoint = Viewpoint(data: data)
-        viewpoint = newViewpoint
-
-        guard let _ = mapView.map else {
+        let viewpoint = Viewpoint(data: data)
+        viewModel.viewpoint = viewpoint
+        guard let proxyView = viewModel.mapViewProxy else {
             result?(nil)
             return
         }
 
-        if animated {
-            mapView.setViewpoint(newViewpoint, completion: { [weak self] _ in
-                guard let result = result else {
-                    return
-                }
-                result(nil)
-            })
-        } else {
-            mapView.setViewpoint(newViewpoint, duration: 0)
+        taskManager.createTask {
+            await proxyView.setViewpoint(viewpoint, duration: animated ? 1 : 0)
             result?(nil)
         }
-
-        viewpoint = nil
     }
 
     private func initWithArgs(args: Any?) {
@@ -703,121 +668,4 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             updateMapOptions(mapOptions: options)
         }
     }
-
-}
-
-extension ArcgisMapController: AGSGeoViewTouchDelegate {
-
-    public func geoView(_ geoView: AGSGeoView,
-                        didTapAtScreenPoint screenPoint: CGPoint,
-                        mapPoint: Point) {
-        graphicsHandle?.cancel()
-        layerHandle?.cancel()
-
-        lastScreenPoint = screenPoint
-
-        if canConsumeGraphics() {
-            graphicsHandle = mapView.identifyGraphicsOverlays(atScreenPoint: screenPoint, tolerance: 12, returnPopupsOnly: false, completion: identifyGraphicsOverlaysCallback)
-        } else if trackIdentityLayers {
-            layerHandle = mapView.identifyLayers(atScreenPoint: screenPoint, tolerance: 12, returnPopupsOnly: false, completion: identifyLayersCallback)
-        } else {
-            sendOnMapTap(screenPoint: screenPoint)
-        }
-    }
-
-
-    public func geoView(_ geoView: AGSGeoView, didLongPressAtScreenPoint screenPoint: CGPoint, mapPoint: Point) {
-        sendOnMapLongPress(screenPoint: screenPoint)
-    }
-
-    public func geoView(_ geoView: AGSGeoView, didEndLongPressAtScreenPoint screenPoint: CGPoint, mapPoint: Point) {
-        sendOnMapLongPressEnd(screenPoint: screenPoint)
-    }
-
-
-    private func identifyGraphicsOverlaysCallback(results: [AGSIdentifyGraphicsOverlayResult]?,
-                                                  error: Error?) {
-        graphicsHandle = nil
-        if error != nil {
-            return
-        }
-
-        if onTapGraphicsCompleted(results: results, screenPoint: lastScreenPoint) {
-            return
-        }
-
-        if trackIdentityLayers {
-            layerHandle = mapView.identifyLayers(atScreenPoint: lastScreenPoint, tolerance: 10, returnPopupsOnly: false, completion: identifyLayersCallback)
-        } else {
-            sendOnMapTap(screenPoint: lastScreenPoint)
-        }
-    }
-
-    private func identifyLayersCallback(results: [AGSIdentifyLayerResult]?,
-                                        error: Error?) {
-        layerHandle = nil
-        if error != nil {
-            return
-        }
-        guard let results = results else {
-            sendOnMapTap(screenPoint: lastScreenPoint)
-            return
-        }
-        if results.isEmpty {
-            sendOnMapTap(screenPoint: lastScreenPoint)
-            return
-        }
-
-        let position = mapView.screen(toLocation: lastScreenPoint)
-
-        channel.invokeMethod("map#onIdentifyLayers", arguments: ["results": results.toJSONFlutter(), "screenPoint": lastScreenPoint.toJSONFlutter(), "position": position.toJSONFlutter()])
-    }
-
-    private func onTapGraphicsCompleted(results: [IdentifyGraphicsOverlayResult]?,
-                                        screenPoint: CGPoint) -> Bool {
-        if results != nil {
-            for result in results! {
-                for graphic in result.graphics {
-                    for del in graphicsTouchDelegates {
-                        if del.didHandleGraphic(graphic: graphic) {
-                            return true
-                        }
-                    }
-                }
-            }
-        }
-        return false
-    }
-
-    private func canConsumeGraphics() -> Bool {
-        for del in graphicsTouchDelegates {
-            if del.canConsumeTaps() {
-                return true
-            }
-        }
-        return false
-    }
-
-    private func sendOnMapTap(screenPoint: CGPoint) {
-        if let json = mapView.screen(toLocation: screenPoint).toJSONFlutter() {
-            channel.invokeMethod("map#onTap", arguments: ["screenPoint": screenPoint.toJSONFlutter(), "position": json])
-        }
-    }
-
-    private func sendOnMapLongPress(screenPoint: CGPoint) {
-        if let json = mapView.screen(toLocation: screenPoint).toJSONFlutter() {
-            channel.invokeMethod("map#onLongPress", arguments: ["screenPoint": screenPoint.toJSONFlutter(), "position": json])
-        }
-    }
-
-    private func sendOnMapLongPressEnd(screenPoint: CGPoint) {
-        if let json = mapView.screen(toLocation: screenPoint).toJSONFlutter() {
-            channel.invokeMethod("map#onLongPressEnd", arguments: ["screenPoint": screenPoint.toJSONFlutter(), "position": json])
-        }
-    }
-
-    private func sendUserLocationTap() {
-        channel.invokeMethod("map#onUserLocationTap", arguments: nil)
-    }
-
 }
