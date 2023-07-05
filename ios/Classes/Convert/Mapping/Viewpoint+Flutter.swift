@@ -15,8 +15,23 @@ extension Viewpoint {
 
     func toJSONFlutter() -> Any {
         [
-            "scale": scale,
+            "scale": targetScale,
             "targetGeometry": targetGeometry.toJSONFlutter()
         ]
+    }
+}
+
+extension Viewpoint.Kind{
+    init(_ flutterValue:Int){
+        switch flutterValue{
+        case 0:
+            self = .centerAndScale
+            break
+        case 1:
+            self = .boundingGeometry
+            break
+        default:
+            fatalError("Unknown Viewpoint.Kind")
+        }
     }
 }

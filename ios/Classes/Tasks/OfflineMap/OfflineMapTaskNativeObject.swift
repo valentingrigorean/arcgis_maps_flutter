@@ -28,22 +28,23 @@ class OfflineMapTaskNativeObject: BaseNativeObject<OfflineMapTask> {
     }
 
     private func defaultGenerateOfflineMapParameters(data: [String: Any], result: @escaping FlutterResult) {
-        let areaOfInterest = Geometry.fromFlutter(data: data["areaOfInterest"] as! [String: Any])!
-        let minScale = data["minScale"] as? Double
-        let maxScale = data["maxScale"] as? Double
-        nativeObject.makeDefaultGenerateOfflineMapParameters(areaOfInterest: areaOfInterest, completion: { (parameters, error) in
-            if let error = error {
-                result(FlutterError(code: "ERROR", message: error.localizedDescription, details: nil))
-            } else {
-                result(parameters?.toJSONFlutter())
+        createTask {
+            let areaOfInterest = Geometry.fromFlutter(data: data["areaOfInterest"] as! [String: Any])!
+            let minScale = data["minScale"] as? Double
+            let maxScale = data["maxScale"] as? Double
+            do {
+                let params = try await self.nativeObject.makeDefaultGenerateOfflineMapParameters(areaOfInterest: areaOfInterest, minScale: minScale, maxScale: maxScale)
+                result(params.toJSONFlutter())
+            } catch {
+                result(error.toJSONFlutter(withStackTrace: false))
             }
-        })
+        }
     }
 
     private func generateOfflineMap(data: [String: Any], result: @escaping FlutterResult) {
-        let parameters = AGSGenerateOfflineMapParameters(data: data["parameters"] as! [String: Any])
+        let parameters = GenerateOfflineMapParameters(data: data["parameters"] as! [String: Any])
         let downloadDirectory = data["downloadDirectory"] as! String
-        let offlineMapJob = nativeObject.generateOfflineMapJob(with: parameters, downloadDirectory: URL(string: downloadDirectory)!)
+        let offlineMapJob = nativeObject.makeGenerateOfflineMapJob(parameters: parameters, downloadDirectory: URL(string: downloadDirectory)!)
         let jobId = NSUUID().uuidString
         let jobNativeObject = GenerateOfflineMapJobNativeObject(objectId: jobId, job: offlineMapJob, messageSink: messageSink)
         storage.addNativeObject(object: jobNativeObject)

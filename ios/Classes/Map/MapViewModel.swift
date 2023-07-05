@@ -8,6 +8,7 @@
 import Foundation
 import ArcGIS
 import SwiftUI
+import Combine
 
 struct MapContentView: View {
 
@@ -16,6 +17,11 @@ struct MapContentView: View {
 
     /// Allows for communication between the `Scalebar` and `MapView`.
     @State private var unitsPerPoint: Double?
+
+    @State private var isLongPress = false
+
+    @State private var lastLongPressEvent: (CGPoint, ArcGIS.Point, MapViewProxy)?
+
 
     @ObservedObject var viewModel: MapViewModel
 
@@ -41,16 +47,35 @@ struct MapContentView: View {
                     .onSpatialReferenceChanged {
                         viewModel.spatialReference = $0
                     }
+                    .onSingleTapGesture { screenPoint, mapPoint in
+                        viewModel.handleSingleTap(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: proxy)
+                    }
+                    .onLongPressGesture { screenPoint, mapPoint in
+                        lastLongPressEvent = (screenPoint, mapPoint, proxy)
+                        viewModel.handleSingleTap(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: proxy)
+                    }
                     .attributionBarHidden(viewModel.isAttributionTextVisible)
                     .locationDisplay(viewModel.locationDisplay)
                     .selectionColor(viewModel.selectedColor)
                     .interactionModes(viewModel.interactionModes)
+                    .contentInsets(viewModel.contentInsets)
                     .edgesIgnoringSafeArea(viewModel.ignoresSafeAreaEdges ? .all : [])
-                    .padding(viewModel.contentInsets)
                     .disabled(!viewModel.interactionsEnabled)
                     .onAppear {
                         viewModel.mapViewProxy = proxy
                     }
+                    .onLongPressGesture(minimumDuration: .infinity, maximumDistance: .infinity, pressing: { pressing in
+                        if pressing {
+                            isLongPress = true
+                        } else {
+                            if isLongPress {
+                                isLongPress = false
+                                if let lastLongPressEvent = lastLongPressEvent {
+                                    viewModel.handleLongTapEnded(screenPoint: lastLongPressEvent.0, mapPoint: lastLongPressEvent.1, mapViewProxy: lastLongPressEvent.2)
+                                }
+                            }
+                        }
+                    }, perform: {})
                     .overlay(alignment: viewModel.scalebarConfig.alignment ?? .topLeading) {
                         if viewModel.haveScaleBar {
                             Scalebar(
@@ -120,6 +145,10 @@ class MapViewModel: ObservableObject {
 
     @Published var unitsPerPoint: Double?
 
+    let singleTapEvent = PassthroughSubject<(CGPoint, ArcGIS.Point, MapViewProxy), Never>()
+    let longTapEvent = PassthroughSubject<(CGPoint, ArcGIS.Point, MapViewProxy), Never>()
+    let longTapEndedEvent = PassthroughSubject<(CGPoint, ArcGIS.Point, MapViewProxy), Never>()
+
     let locationDisplay = LocationDisplay()
 
     var mapViewProxy: MapViewProxy?
@@ -144,6 +173,18 @@ class MapViewModel: ObservableObject {
         graphicsOverlays.removeAll {
             $0 === graphicsOverlay
         }
+    }
+
+    func handleSingleTap(screenPoint: CGPoint, mapPoint: ArcGIS.Point, mapViewProxy: MapViewProxy) {
+        singleTapEvent.send((screenPoint, mapPoint, mapViewProxy))
+    }
+
+    func handleLongTap(screenPoint: CGPoint, mapPoint: ArcGIS.Point, mapViewProxy: MapViewProxy) {
+        longTapEvent.send((screenPoint, mapPoint, mapViewProxy))
+    }
+
+    func handleLongTapEnded(screenPoint: CGPoint, mapPoint: ArcGIS.Point, mapViewProxy: MapViewProxy) {
+        longTapEndedEvent.send((screenPoint, mapPoint, mapViewProxy))
     }
 }
 

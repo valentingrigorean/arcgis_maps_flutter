@@ -37,7 +37,7 @@ class OfflineMapSyncTaskNativeObject: NativeObject {
     }
 
     private func loadOfflineMap() {
-        let mobilePackages = AGSMobileMapPackage(fileURL: URL(string: offlineMapPath)!)
+        let mobilePackages = MobileMapPackage(fileURL: URL(string: offlineMapPath)!)
         mobilePackages.load { error in
             if self.isDisposed {
                 return

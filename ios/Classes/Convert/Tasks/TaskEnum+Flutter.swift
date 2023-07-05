@@ -23,8 +23,8 @@ extension Job.Status{
             return 4
         case .canceling:
             return 5
-        @unknown default:
-            <#fatalError()#>
+        default:
+            fatalError("Invalid Job.Status type \(self)")
         }
     }
 }
@@ -38,7 +38,7 @@ extension JobMessage.Severity{
             return 1
         case .error:
             return 2
-        @unknown default:
+        default:
             return -1
         }
     }
@@ -51,8 +51,8 @@ extension JobMessage.Source{
             return 0
         case .service:
             return 1
-        @unknown default:
-            <#fatalError()#>
+        default:
+            fatalError("Invalid JobMessage.Source type \(self)")
         }
     }
 }

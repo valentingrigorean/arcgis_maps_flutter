@@ -14,15 +14,15 @@ extension TimeAware {
         }
 
         if let fullTimeExtent = fullTimeExtent {
-            let fullTimeExtentData = fullTimeExtent.toJSONFlutter()
+            let json = fullTimeExtent.toJSONFlutter()
 
-            if let fullTimeExtentData = fullTimeExtentData {
+            if let fullTimeExtentData = json {
                 data["fullTimeExtent"] = fullTimeExtentData
             }
         }
 
         data["supportsTimeFiltering"] = supportsTimeFiltering
-        data["isTimeFilteringEnabled"] = isTimeFilteringEnabled
+        data["isTimeFilteringEnabled"] = timeFilteringIsEnabled
 
         if let timeOffset = timeOffset {
             data["timeOffset"] = timeOffset.toJSONFlutter()

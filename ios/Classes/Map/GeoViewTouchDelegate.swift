@@ -6,71 +6,151 @@
 //
 
 import Foundation
+import ArcGIS
+import Combine
 
-class GeoViewTouchDelegate{
-    public func geoView(_ geoView: AGSGeoView,
-                        didTapAtScreenPoint screenPoint: CGPoint,
-                        mapPoint: Point) {
-        graphicsHandle?.cancel()
-        layerHandle?.cancel()
+protocol MapGraphicTouchDelegate: AnyObject {
+    func canConsumeTaps() -> Bool
 
-        lastScreenPoint = screenPoint
+    func didHandleGraphic(graphic: Graphic) -> Bool
+}
 
-        if canConsumeGraphics() {
-            graphicsHandle = mapView.identifyGraphicsOverlays(atScreenPoint: screenPoint, tolerance: 12, returnPopupsOnly: false, completion: identifyGraphicsOverlaysCallback)
-        } else if trackIdentityLayers {
-            layerHandle = mapView.identifyLayers(atScreenPoint: screenPoint, tolerance: 12, returnPopupsOnly: false, completion: identifyLayersCallback)
-        } else {
-            sendOnMapTap(screenPoint: screenPoint)
+
+class GeoViewTouchDelegate {
+    private let taskManager = TaskManager()
+    private let methodChannel: FlutterMethodChannel
+    private let viewModel: MapViewModel
+    private var graphicsTouchDelegates = [MapGraphicTouchDelegate]()
+    private var cancellables = Set<AnyCancellable>()
+
+    private var isLongPress = false
+
+
+    init(methodChannel: FlutterMethodChannel, viewModel: MapViewModel) {
+        self.methodChannel = methodChannel
+        self.viewModel = viewModel
+
+        viewModel.singleTapEvent.sink(receiveValue: { screenPoint, mapPoint, mapViewProxy in
+                    self.taskManager.cancelTask(withKey: "singleTapTask")
+                    self.taskManager.createTask(key: "singleTapTask") {
+                        await self.handleSingleTap(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: mapViewProxy)
+                    }
+                })
+                .store(in: &cancellables)
+
+        viewModel.longTapEvent.sink(receiveValue: { screenPoint, mapPoint, mapViewProxy in
+                    self.isLongPress = true
+                    self.taskManager.cancelTask(withKey: "longTapTask")
+                    self.taskManager.createTask(key: "longTapTask") {
+                        await self.handleLongTap(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: mapViewProxy)
+                    }
+                })
+                .store(in: &cancellables)
+
+
+        viewModel.longTapEndedEvent.sink(receiveValue: { screenPoint, mapPoint, mapViewProxy in
+                    self.isLongPress = false
+                    self.taskManager.cancelTask(withKey: "longTapTask")
+                    self.taskManager.createTask(key: "longTapTask") {
+                        await self.handleLongTap(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: mapViewProxy)
+                    }
+                })
+                .store(in: &cancellables)
+    }
+
+    deinit {
+        graphicsTouchDelegates.removeAll()
+    }
+
+
+    public func addDelegate(graphicTouchDelegate: MapGraphicTouchDelegate) {
+        graphicsTouchDelegates.append(graphicTouchDelegate)
+    }
+
+    public func removeDelegate(graphicTouchDelegate: MapGraphicTouchDelegate) {
+        graphicsTouchDelegates.removeAll {
+            $0 === graphicTouchDelegate
         }
     }
 
 
-    public func geoView(_ geoView: AGSGeoView, didLongPressAtScreenPoint screenPoint: CGPoint, mapPoint: Point) {
-        sendOnMapLongPress(screenPoint: screenPoint)
+    public func addDelegates(graphicTouchDelegates: [MapGraphicTouchDelegate]) {
+        graphicsTouchDelegates.append(contentsOf: graphicTouchDelegates)
     }
 
-    public func geoView(_ geoView: AGSGeoView, didEndLongPressAtScreenPoint screenPoint: CGPoint, mapPoint: Point) {
-        sendOnMapLongPressEnd(screenPoint: screenPoint)
-    }
-
-
-    private func identifyGraphicsOverlaysCallback(results: [AGSIdentifyGraphicsOverlayResult]?,
-                                                  error: Error?) {
-        graphicsHandle = nil
-        if error != nil {
-            return
-        }
-
-        if onTapGraphicsCompleted(results: results, screenPoint: lastScreenPoint) {
-            return
-        }
-
-        if trackIdentityLayers {
-            layerHandle = mapView.identifyLayers(atScreenPoint: lastScreenPoint, tolerance: 10, returnPopupsOnly: false, completion: identifyLayersCallback)
-        } else {
-            sendOnMapTap(screenPoint: lastScreenPoint)
+    public func removeDelegates(graphicTouchDelegates: [MapGraphicTouchDelegate]) {
+        for delegate in graphicTouchDelegates {
+            removeDelegate(graphicTouchDelegate: delegate)
         }
     }
 
-    private func identifyLayersCallback(results: [AGSIdentifyLayerResult]?,
-                                        error: Error?) {
-        layerHandle = nil
-        if error != nil {
-            return
+    private func handleSingleTap(screenPoint: CGPoint, mapPoint: ArcGIS.Point, mapViewProxy: MapViewProxy) async {
+
+        let result = await withTaskGroup(of: Bool.self) { group in
+
+            group.addTask {
+                await self.handleIdentifyGraphicsOverlays(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: mapViewProxy)
+            }
+            group.addTask {
+                 await self.handleIdentifyLayers(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: mapViewProxy)
+            }
+
+            for await result in group {
+                if result {
+                    return true
+                }
+            }
+
+            return false
         }
-        guard let results = results else {
-            sendOnMapTap(screenPoint: lastScreenPoint)
-            return
-        }
-        if results.isEmpty {
-            sendOnMapTap(screenPoint: lastScreenPoint)
+
+        if (result) {
             return
         }
 
-        let position = mapView.screen(toLocation: lastScreenPoint)
 
-        channel.invokeMethod("map#onIdentifyLayers", arguments: ["results": results.toJSONFlutter(), "screenPoint": lastScreenPoint.toJSONFlutter(), "position": position.toJSONFlutter()])
+        if let json = mapPoint.toJSONFlutter() {
+            methodChannel.invokeMethod("map#onLongPressEnd", arguments: ["screenPoint": screenPoint.toJSONFlutter(), "position": json])
+        }
+    }
+
+    private func handleLongTap(screenPoint: CGPoint, mapPoint: ArcGIS.Point, mapViewProxy: MapViewProxy) async {
+        if let json = mapPoint.toJSONFlutter() {
+            methodChannel.invokeMethod("map#onLongPress", arguments: ["screenPoint": screenPoint.toJSONFlutter(), "position": json])
+        }
+    }
+
+    private func handleLongTapEnded(screenPoint: CGPoint, mapPoint: ArcGIS.Point, mapViewProxy: MapViewProxy) async {
+        if let json = mapPoint.toJSONFlutter() {
+            methodChannel.invokeMethod("map#onLongPress", arguments: ["screenPoint": screenPoint.toJSONFlutter(), "position": json])
+        }
+    }
+
+
+    private func handleIdentifyGraphicsOverlays(screenPoint: CGPoint, mapPoint: ArcGIS.Point, mapViewProxy: MapViewProxy) async -> Bool {
+        if !canConsumeGraphics() {
+            return false
+        }
+        do {
+            let results = try await mapViewProxy.identifyGraphicsOverlays(screenPoint: screenPoint, tolerance: 12)
+            if onTapGraphicsCompleted(results: results, screenPoint: screenPoint) {
+                return true
+            }
+        } catch {
+            return false
+        }
+    }
+
+    private func handleIdentifyLayers(screenPoint: CGPoint, mapPoint: ArcGIS.Point, mapViewProxy: MapViewProxy) async -> Bool {
+        do {
+            let results = try await mapViewProxy.identifyLayers(screenPoint: screenPoint, tolerance: 12)
+            if results.isEmpty {
+                return false
+            }
+            methodChannel.invokeMethod("map#onIdentifyLayers", arguments: ["results": results.toJSONFlutter(), "screenPoint": screenPoint.toJSONFlutter(), "position": mapPoint.toJSONFlutter()])
+        } catch {
+            return false
+        }
     }
 
     private func onTapGraphicsCompleted(results: [IdentifyGraphicsOverlayResult]?,
@@ -98,25 +178,9 @@ class GeoViewTouchDelegate{
         return false
     }
 
-    private func sendOnMapTap(screenPoint: CGPoint) {
-        if let json = mapView.screen(toLocation: screenPoint).toJSONFlutter() {
-            channel.invokeMethod("map#onTap", arguments: ["screenPoint": screenPoint.toJSONFlutter(), "position": json])
+    private func sendOnMapTap(screenPoint: CGPoint, mapViewProxy: MapViewProxy) {
+        if let json = mapViewProxy.location(fromScreenPoint: screenPoint)?.toJSONFlutter() {
+            methodChannel.invokeMethod("map#onTap", arguments: ["screenPoint": screenPoint.toJSONFlutter(), "position": json])
         }
-    }
-
-    private func sendOnMapLongPress(screenPoint: CGPoint) {
-        if let json = mapView.screen(toLocation: screenPoint).toJSONFlutter() {
-            channel.invokeMethod("map#onLongPress", arguments: ["screenPoint": screenPoint.toJSONFlutter(), "position": json])
-        }
-    }
-
-    private func sendOnMapLongPressEnd(screenPoint: CGPoint) {
-        if let json = mapView.screen(toLocation: screenPoint).toJSONFlutter() {
-            channel.invokeMethod("map#onLongPressEnd", arguments: ["screenPoint": screenPoint.toJSONFlutter(), "position": json])
-        }
-    }
-
-    private func sendUserLocationTap() {
-        channel.invokeMethod("map#onUserLocationTap", arguments: nil)
     }
 }

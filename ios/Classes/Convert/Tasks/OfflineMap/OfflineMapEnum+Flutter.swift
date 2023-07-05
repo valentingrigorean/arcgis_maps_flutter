@@ -10,6 +10,20 @@ import ArcGIS
 
 
 extension GenerateOfflineMapParameters.OnlineOnlyServicesOption {
+
+    init(_ flutterValue: Int) {
+        switch flutterValue {
+        case 0:
+            self = .exclude
+        case 1:
+            self = .include
+        case 2:
+            self = .useAuthoredSettings
+        default:
+            fatalError("Unexpected value: \(flutterValue)")
+        }
+    }
+
     func toFlutterValue() -> Int {
         switch self {
         case .exclude:
@@ -22,22 +36,26 @@ extension GenerateOfflineMapParameters.OnlineOnlyServicesOption {
             fatalError("Unexpected value: \(self)")
         }
     }
-    
-    static func fromFlutter(_ flutterValue: Int) -> GenerateOfflineMapParameters.OnlineOnlyServicesOption {
+
+
+}
+
+extension ReturnLayerAttachmentOption {
+    init(_ flutterValue: Int) {
         switch flutterValue {
         case 0:
-            return .exclude
+            self = .notIncluded
         case 1:
-            return .include
+            self = .allLayers
         case 2:
-            return .useAuthoredSettings
+            self = .readOnlyLayers
+        case 3:
+            self = .editableLayers
         default:
             fatalError("Unexpected value: \(flutterValue)")
         }
     }
-}
 
-extension ReturnLayerAttachmentOption {
     func toFlutterValue() -> Int {
         switch self {
         case .notIncluded:
@@ -52,24 +70,22 @@ extension ReturnLayerAttachmentOption {
             fatalError("Unexpected value: \(self)")
         }
     }
-    
-    static func fromFlutter(_ flutterValue: Int) -> ReturnLayerAttachmentOption {
+
+
+}
+
+extension DownloadPreplannedOfflineMapParameters.UpdateMode {
+    init(_ flutterValue: Int) {
         switch flutterValue {
         case 0:
-            return .notIncluded
+            self = .syncWithFeatureServices
         case 1:
-            return .allLayers
-        case 2:
-            return .readOnlyLayers
-        case 3:
-            return .editableLayers
+            self = .noUpdates
         default:
             fatalError("Unexpected value: \(flutterValue)")
         }
     }
-}
 
-extension DownloadPreplannedOfflineMapParameters.UpdateMode {
     func toFlutterValue() -> Int {
         switch self {
         case .syncWithFeatureServices:
@@ -80,20 +96,20 @@ extension DownloadPreplannedOfflineMapParameters.UpdateMode {
             fatalError("Unexpected value: \(self)")
         }
     }
-    
-    static func fromFlutter(_ flutterValue: Int) -> DownloadPreplannedOfflineMapParameters.UpdateMode {
+}
+
+extension GenerateOfflineMapParameters.DestinationTableRowFilter {
+    init(_ flutterValue: Int) {
         switch flutterValue {
         case 0:
-            return .syncWithFeatureServices
+            self = .all
         case 1:
-            return .noUpdates
+            self = .relatedOnly
         default:
             fatalError("Unexpected value: \(flutterValue)")
         }
     }
-}
 
-extension GenerateOfflineMapParameters.DestinationTableRowFilter {
     func toFlutterValue() -> Int {
         switch self {
         case .all:
@@ -104,20 +120,22 @@ extension GenerateOfflineMapParameters.DestinationTableRowFilter {
             fatalError("Unexpected value: \(self)")
         }
     }
-    
-    static func fromFlutter(_ flutterValue: Int) -> GenerateOfflineMapParameters.DestinationTableRowFilter {
+
+}
+
+extension OfflineMapSyncParameters.PreplannedScheduledUpdatesOption {
+
+    init(_ flutterValue: Int) {
         switch flutterValue {
         case 0:
-            return .all
+            self = .noUpdates
         case 1:
-            return .relatedOnly
+            self = .downloadAllUpdates
         default:
             fatalError("Unexpected value: \(flutterValue)")
         }
     }
-}
 
-extension OfflineMapSyncParameters.PreplannedScheduledUpdatesOption {
     func toFlutterValue() -> Int {
         switch self {
         case .noUpdates:
@@ -128,20 +146,24 @@ extension OfflineMapSyncParameters.PreplannedScheduledUpdatesOption {
             fatalError("Unexpected value: \(self)")
         }
     }
-    
-    static func fromFlutter(_ flutterValue: Int) -> OfflineMapSyncParameters.PreplannedScheduledUpdatesOption {
+
+}
+
+extension OfflineMapUpdatesInfo.Availability {
+
+    init(_ flutterValue: Int) {
         switch flutterValue {
+        case -1:
+            self = .indeterminate
         case 0:
-            return .noUpdates
+            self = .available
         case 1:
-            return .downloadAllUpdates
+            self = .noneAvailable
         default:
             fatalError("Unexpected value: \(flutterValue)")
         }
     }
-}
 
-extension OfflineMapUpdatesInfo.Availability {
     func toFlutterValue() -> Int {
         switch self {
         case .indeterminate:
@@ -152,19 +174,6 @@ extension OfflineMapUpdatesInfo.Availability {
             return 1
         default:
             fatalError("Unexpected value: \(self)")
-        }       
-    }
-    
-    static func fromFlutter(_ flutterValue: Int) -> OfflineMapUpdatesInfo.Availability {
-        switch flutterValue {
-        case -1:
-            return .indeterminate
-        case 0:
-            return .available
-        case 1:
-            return .noneAvailable
-        default:
-            fatalError("Unexpected value: \(flutterValue)")
         }
     }
 }

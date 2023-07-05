@@ -7,7 +7,7 @@ import ArcGIS
 
 class TileCacheNativeObject: BaseNativeObject<TileCache> {
 
-    init(objectId: String, tileCache: AGSTileCache, messageSink: NativeMessageSink) {
+    init(objectId: String, tileCache: TileCache, messageSink: NativeMessageSink) {
         super.init(objectId: objectId,nativeObject: tileCache, nativeHandlers: [
             LoadableNativeHandler(loadable: tileCache)
         ], messageSink: messageSink)
@@ -16,10 +16,10 @@ class TileCacheNativeObject: BaseNativeObject<TileCache> {
     override func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) {
         switch (method) {
         case "tileCache#getAntialiasing":
-            result(nativeObject.antialiasing)
+            result(nativeObject.isAntialiasing)
             break
         case "tileCache#getCacheStorageFormat":
-            result(nativeObject.cacheStorageFormat.rawValue)
+            result(nativeObject.storageFormat?.toFlutterValue())
             break
         case "tileCache#getTileInfo":
             result(nativeObject.tileInfo?.toJSONFlutter())

@@ -8,39 +8,35 @@
 import Foundation
 
 class TaskManager {
-    private var tasks: [UUID: Task<Void, Error>] = [:]
+    private var tasks: [String: Task<Void, Error>] = [:]
 
     deinit {
         cancelAllTasks()
     }
 
     @discardableResult
-    func createTask(operation: @escaping @Sendable () async throws -> Void) -> Task<Void, Error> {
-        let taskId = UUID()
-        let task = Task {
+    func createTask(key: String? = nil, operation: @escaping @Sendable () async throws -> Void) -> Task<Void, Error> {
+        let taskKey = key ?? UUID().uuidString
+        let task = Task(priority: .userInitiated) {
             do {
                 try await operation()
             } catch {
-                throw error
+                if error is CancellationError {
+                    print("Task \(taskKey) was cancelled")
+                } else {
+                    throw error
+                }
             }
+            tasks.removeValue(forKey: taskKey)
         }
 
-        let wrapperTask = Task {
-            do {
-                try await task.value
-            } catch {
-                throw error
-            }
-            tasks.removeValue(forKey: taskId)
-        }
-
-        tasks[taskId] = wrapperTask
-        return wrapperTask
+        tasks[taskKey] = task
+        return task
     }
 
-    func cancelTask(withId id: UUID) {
-        tasks[id]?.cancel()
-        tasks.removeValue(forKey: id)
+    func cancelTask(withKey key: String) {
+        tasks[key]?.cancel()
+        tasks.removeValue(forKey: key)
     }
 
     func cancelAllTasks() {
@@ -50,3 +46,4 @@ class TaskManager {
         tasks.removeAll()
     }
 }
+

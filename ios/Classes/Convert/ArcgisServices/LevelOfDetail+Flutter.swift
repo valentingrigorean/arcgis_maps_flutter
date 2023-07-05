@@ -6,7 +6,7 @@ import Foundation
 import ArcGIS
 
 extension LevelOfDetail {
-    convenience init(data: [Any]) {
+    init(data: [Any]) {
         self.init(level: data[0] as! Int, resolution: data[1] as! Double, scale: data[2] as! Double)
     }
 

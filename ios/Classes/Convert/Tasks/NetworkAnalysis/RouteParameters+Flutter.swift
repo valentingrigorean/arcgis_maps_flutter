@@ -11,12 +11,12 @@ extension RouteParameters {
         for accumlateAttributeName in data["accumulateAttributeNames"] as! [String]{
             addAccumulateAttributeName(accumlateAttributeName)
         }
-        directionsDistanceUnits = UnitSystem.fromFlutter(data["directionsDistanceUnits"] as! Int)
+        directionsDistanceUnits = UnitSystem(data["directionsDistanceUnits"] as! Int)
         directionsLanguage = data["directionsLanguage"] as! String
         directionsStyle = DirectionsStyle(data["directionsStyle"] as! Int)
         findsBestSequence = data["findBestSequence"] as! Bool
         if let startTime = data["startTime"] as? String {
-            self.startDate = startTime.toDateFromIso8601()
+            startDate = startTime.toDateFromIso8601()
         }
         if let outputSpatialReference = data["outputSpatialReference"] as? Dictionary<String, Any> {
             self.outputSpatialReference = SpatialReference(data: outputSpatialReference)

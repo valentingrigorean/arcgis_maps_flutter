@@ -13,11 +13,11 @@ extension DirectionsStyle {
     init(_ flutterValue: Int) {
         switch flutterValue {
         case 0:
-            return DirectionsStyle.desktop
+            self = DirectionsStyle.desktop
         case 1:
-            return DirectionsStyle.navigation
+            self = DirectionsStyle.navigation
         case 2:
-            return DirectionsStyle.campus
+            self = DirectionsStyle.campus
         default:
             fatalError("Unexpected value: $this")
         }
@@ -42,9 +42,9 @@ extension RouteShapeType {
     init(_ flutterValue: Int) {
         switch flutterValue {
         case 1:
-            return .straightLine
+            self = .straightLine
         case 2:
-            return .trueShapeWithMeasures
+            self = .trueShapeWithMeasures
         default:
             fatalError("Unexpected flutterValue: \(flutterValue)")
         }
@@ -66,13 +66,13 @@ extension TravelMode.UTurnPolicy {
     init(_ flutterValue: Int) {
         switch flutterValue {
         case 0:
-            return .notAllowed
+            self = .notAllowed
         case 1:
-            return .allowedAtDeadEnds
+            self = .allowedAtDeadEnds
         case 2:
-            return .allowedAtIntersections
+            self = .allowedAtIntersections
         case 3:
-            return .allowedAtDeadEndsAndIntersections
+            self = .allowedAtDeadEndsAndIntersections
         default:
             fatalError("Unexpected value: \(flutterValue)")
         }
@@ -98,35 +98,35 @@ extension CostAttribute.Unit {
     init(_ flutterValue: Int) {
         switch flutterValue {
         case 1:
-            return .inches
+            self = .inches
         case 2:
-            return .feet
+            self = .feet
         case 3:
-            return .yards
+            self = .yards
         case 4:
-            return .miles
+            self = .miles
         case 5:
-            return .millimeters
+            self = .millimeters
         case 6:
-            return .centimeters
+            self = .centimeters
         case 7:
-            return .meters
+            self = .meters
         case 8:
-            return .kilometers
+            self = .kilometers
         case 9:
-            return .nauticalMiles
+            self = .nauticalMiles
         case 10:
-            return .decimalDegrees
+            self = .decimalDegrees
         case 11:
-            return .seconds
+            self = .seconds
         case 12:
-            return .minutes
+            self = .minutes
         case 13:
-            return .hours
+            self = .hours
         case 14:
-            return .days
+            self = .days
         case 15:
-            return .decimeters
+            self = .decimeters
         default:
             fatalError("Unexpected value: \(flutterValue)")
         }
@@ -187,11 +187,11 @@ extension Stop.Kind {
     init(_ flutterValue: Int) {
         switch flutterValue {
         case 0:
-            return .stop
+            self = .stop
         case 1:
-            return .waypoint
+            self =  .waypoint
         case 2:
-            return .restBreak
+            self =  .restBreak
         default:
             fatalError("Unexpected value: (flutterValue)")
         }
@@ -215,13 +215,13 @@ extension CurbApproach {
     init(_ flutterValue: Int) {
         switch flutterValue {
         case 0:
-            return .eitherSide
+            self =  .eitherSide
         case 1:
-            return .leftSide
+            self =  .leftSide
         case 2:
-            return .rightSide
+            self =  .rightSide
         case 3:
-            return .noUTurn
+            self =  .noUTurn
         default:
             fatalError("Unexpected value: \(flutterValue)")
         }

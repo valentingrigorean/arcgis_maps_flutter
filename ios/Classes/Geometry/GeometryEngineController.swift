@@ -176,7 +176,7 @@ class GeometryEngineController {
             }
             let geometry = Geometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
             let maxSegmentLength = data["maxSegmentLength"] as! Double
-            let lengthUnit = LinearUnit(flutterValue: data["lengthUnit"] as! Int)
+            let lengthUnit = LinearUnit(data["lengthUnit"] as! Int)
             let curveType = GeometryEngine.GeodeticCurveType(data["curveType"] as! Int)
             let resultGeometry = GeometryEngine.geodeticDensify(geometry, maxSegmentLength: maxSegmentLength, lengthUnit:lengthUnit, curveType: curveType)
             result(resultGeometry?.toJSONFlutter())

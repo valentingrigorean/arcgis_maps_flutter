@@ -4,6 +4,7 @@
 
 import Foundation
 import ArcGIS
+import Combine
 
 struct SymbolVisibilityFilter: Hashable {
 
@@ -19,24 +20,21 @@ struct SymbolVisibilityFilter: Hashable {
 class SymbolVisibilityFilterController {
     private var graphicControllers = Dictionary<UInt, GraphicControllerInfo>()
     private var initialValues = Dictionary<UInt, Bool>()
+    private var cancellables = Set<AnyCancellable>()
 
-
-    private var scaleObservation: NSKeyValueObservation?
 
     private var mapScale: Double
 
+    init(mapViewModel: MapViewModel) {
 
-    init(mapViewModel:MapViewModel) {
-
-    }
-
-    deinit {
-        unbindFromMapView(mapView: mapView)
+        mapScale = mapViewModel.currentScale ?? 0
+        mapViewModel.$currentScale.sink { scale in
+                    self.mapScaleChanged(currentZoom: scale ?? 0)
+                }
+                .store(in: &cancellables)
     }
 
     func clear() {
-        unbindFromMapView(mapView: mapView)
-
         for item in (graphicControllers.values) {
             item.graphicController.isVisible = initialValues[objectIdentifierFor(item.graphicController)]!
         }
@@ -44,7 +42,6 @@ class SymbolVisibilityFilterController {
         initialValues.removeAll()
         graphicControllers.removeAll()
     }
-
 
     func containsGraphicController(graphicController: BaseGraphicController) -> Bool {
         let id = objectIdentifierFor(graphicController)
@@ -60,7 +57,7 @@ class SymbolVisibilityFilterController {
         initialValues[id] = initValue
     }
 
-    func invalidateAll(){
+    func invalidateAll() {
         for item in (graphicControllers.values) {
             handleGraphicsFilterZoom(graphicControllerInfo: item, currentZoom: mapScale)
         }
@@ -94,8 +91,6 @@ class SymbolVisibilityFilterController {
         }
 
         graphicControllers[id] = graphicControllerInfo
-
-        handleRegistrationToScaleChanged()
     }
 
     func removeGraphicsController(graphicController: BaseGraphicController) {
@@ -106,14 +101,11 @@ class SymbolVisibilityFilterController {
         }
 
         graphicControllerInfo.graphicController.isVisible = initialValues[id]!
-        handleRegistrationToScaleChanged()
+
     }
 
 
-    private func mapScaleChanged() {
-        guard let currentZoom = mapView?.mapScale else {
-            return
-        }
+    private func mapScaleChanged(currentZoom: Double) {
         mapScale = currentZoom
         for item in (graphicControllers.values) {
             handleGraphicsFilterZoom(graphicControllerInfo: item, currentZoom: mapScale)
@@ -132,27 +124,6 @@ class SymbolVisibilityFilterController {
             graphicController.isVisible = initialValues[objectIdentifierFor(graphicController)]!
         } else {
             graphicController.isVisible = false
-        }
-    }
-
-    private func bindToMapView(mapView: MapView?) {
-        scaleObservation = mapView?.observe(\.mapScale, options: .new) { [weak self] _,
-                                                                                     _ in
-            self?.mapScaleChanged()
-        }
-    }
-
-    private func unbindFromMapView(mapView: MapView?) {
-        // invalidate observations and set to nil
-        scaleObservation?.invalidate()
-        scaleObservation = nil
-    }
-
-    private func handleRegistrationToScaleChanged() {
-        if graphicControllers.count > 0 && scaleObservation == nil {
-            bindToMapView(mapView: mapView)
-        } else if graphicControllers.count == 0 && scaleObservation != nil {
-            unbindFromMapView(mapView: mapView)
         }
     }
 

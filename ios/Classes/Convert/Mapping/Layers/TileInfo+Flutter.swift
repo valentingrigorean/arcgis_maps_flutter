@@ -46,6 +46,8 @@ extension TileImageFormat {
             return 5
         case .lerc:
             return 6
+        default:
+            fatalError("Invalid TileImageFormat value \(self)")
         }
     }
 
@@ -71,7 +73,7 @@ extension TileInfo {
     func toJSONFlutter() -> Dictionary<String, Any> {
         [
             "dpi": dpi,
-            "imageFormat": format.toFlutterValue(),
+            "imageFormat": format?.toFlutterValue(),
             "levelOfDetails": levelsOfDetail.map {
                 $0.toJSONFlutter()
             },

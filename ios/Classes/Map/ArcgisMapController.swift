@@ -28,11 +28,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private let symbolVisibilityFilterController: SymbolVisibilityFilterController
 
-    private let scaleBarController: ScaleBarController
+    private let geoViewTouchDelegate: GeoViewTouchDelegate
 
     private var lastScreenPoint = CGPoint.zero
-
-    private var graphicsTouchDelegates: [MapGraphicTouchDelegate]
 
     private let symbolsControllers: [SymbolsController]
 
@@ -74,11 +72,12 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         layersController = LayersController(methodChannel: channel)
 
-        scaleBarController = ScaleBarController(mapViewModel: viewModel, container: hostingView)
-
         let locationDisplayChannel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)_location_display", binaryMessenger: registrar.messenger())
         locationDisplayController = LocationDisplayController(methodChannel: locationDisplayChannel, mapViewModel: viewModel)
-        graphicsTouchDelegates = [markersController, polygonsController, polylinesController, locationDisplayController]
+
+        geoViewTouchDelegate = GeoViewTouchDelegate(methodChannel: channel, viewModel: viewModel)
+        geoViewTouchDelegate.addDelegates(graphicTouchDelegates: [markersController, polygonsController, polylinesController, locationDisplayController])
+
 
         legendInfoController = LegendInfoController(layersController: layersController)
 
@@ -605,8 +604,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 self.channel.invokeMethod("map#loaded", arguments: error.toJSONFlutter(withStackTrace: false))
             }
 
-            guard let proxyView = self.viewModel.mapViewProxy else {
-                return
+            if let viewPoint = viewPoint {
+                self.setViewpoint(args: viewPoint, animated: false, result: nil)
             }
         }
     }

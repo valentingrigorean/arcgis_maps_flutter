@@ -91,7 +91,7 @@ extension TimeValue.Unit {
 
 extension TileCache.StorageFormat {
 
-    init(_ flutterValue: Int)  {
+    init?(_ flutterValue: Int) {
         switch flutterValue {
         case 0:
             self = .compact
@@ -100,7 +100,7 @@ extension TileCache.StorageFormat {
         case 2:
             self = .exploded
         default:
-            fatalError("Unknown TileCache.StorageFormat value \(flutterValue)")
+            return nil
         }
     }
 
@@ -112,6 +112,8 @@ extension TileCache.StorageFormat {
             return 1
         case .exploded:
             return 2
+        default:
+            return -1
         }
     }
 }

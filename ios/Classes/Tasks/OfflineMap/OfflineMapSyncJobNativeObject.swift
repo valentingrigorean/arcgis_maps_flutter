@@ -9,7 +9,6 @@ class OfflineMapSyncJobNativeObject: BaseNativeObject<OfflineMapSyncJob> {
     init(objectId: String, job: OfflineMapSyncJob, messageSink: NativeMessageSink) {
         super.init(objectId: objectId, nativeObject: job, nativeHandlers: [
             JobNativeHandler(job: job),
-            RemoteResourceNativeHandler(remoteResource: job)
         ], messageSink: messageSink)
     }
 
@@ -21,10 +20,13 @@ class OfflineMapSyncJobNativeObject: BaseNativeObject<OfflineMapSyncJob> {
             })
             break
         case "offlineMapSyncJob#getResult":
-            if let res = nativeObject.result {
-                result(res.toJSONFlutter())
-            } else {
-                result(nil)
+            createTask {
+                do{
+                    let jobResult = try await self.nativeObject.result.get()
+                    result(jobResult.toJSONFlutter())
+                }catch{
+                    result(nil)
+                }
             }
             break
         default:

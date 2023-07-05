@@ -9,23 +9,25 @@ extension TravelMode{
 
     convenience init(data:Dictionary<String,Any>){
         self.init()
-        attributeParameterValues = (data["attributeParameterValues"] as? [Dictionary<String,Any>])!.map { AttributeParameterValue(data: $0) }
-        travelModeDescription = data["travelModeDescription"] as! String
+        let attributeParameterValues = (data["attributeParameterValues"] as? [Dictionary<String,Any>])!.map { AttributeParameterValue(data: $0) }
+        addAttributeParameterValues(attributeParameterValues)
+        description = data["travelModeDescription"] as! String
         distanceAttributeName = data["distanceAttributeName"] as! String
         impedanceAttributeName = data["impedanceAttributeName"] as! String
         name = data["name"] as! String
         outputGeometryPrecision = data["outputGeometryPrecision"] as! Double
-        restrictionAttributeNames = data["restrictionAttributeNames"] as! [String]
+        let restrictionAttributeNames = data["restrictionAttributeNames"] as! [String]
+        addRestrictionAttributeNames(restrictionAttributeNames)
         timeAttributeName = data["timeAttributeName"] as! String
         type = data["type"] as! String
-        useHierarchy = data["useHierarchy"] as! Bool
-        uTurnPolicy = AGSUTurnPolicy(rawValue: data["uTurnPolicy"] as! Int)!
+        usesHierarchy = data["useHierarchy"] as! Bool
+        uTurnPolicy = TravelMode.UTurnPolicy(data["uTurnPolicy"] as! Int)
     }
 
     func toJSONFlutter() -> Any {
         var json = [String: Any]()
         json["attributeParameterValues"] = attributeParameterValues.map { $0.toJSONFlutter() }
-        json["travelModeDescription" ] = travelModeDescription
+        json["travelModeDescription" ] = description
         json["distanceAttributeName"] = distanceAttributeName
         json["impedanceAttributeName"] = impedanceAttributeName
         json["name"] = name
@@ -33,8 +35,8 @@ extension TravelMode{
         json["restrictionAttributeNames"] = restrictionAttributeNames
         json["timeAttributeName"] = timeAttributeName
         json["type"] = type
-        json["useHierarchy"] = useHierarchy
-        json["uTurnPolicy"] = uTurnPolicy.rawValue
+        json["useHierarchy"] = usesHierarchy
+        json["uTurnPolicy"] = uTurnPolicy.toFlutterValue()
         return json
     }
 }
