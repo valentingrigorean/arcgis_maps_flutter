@@ -9,7 +9,7 @@ extension GenerateLayerOption {
     convenience init(data: Dictionary<String, Any>) {
         self.init(layerID: data["layerId"] as! Int)
         includesRelated = data["includeRelated"] as! Bool
-        queryOption = GenerateLayerOption.QueryOption(flutterValue: data["queryOption"] as! Int)
+        queryOption = GenerateLayerOption.QueryOption(data["queryOption"] as! Int)
         usesGeometry = data["useGeometry"] as! Bool
         whereClause = data["whereClause"] as! String
     }

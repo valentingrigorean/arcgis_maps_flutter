@@ -18,15 +18,13 @@ class OfflineMapSyncTaskNativeObject: NativeObject {
         loadOfflineMap()
     }
 
+    deinit {
+        isDisposed = true
+    }
+
     let objectId: String
 
     let messageSink: NativeMessageSink
-
-    func dispose() {
-        isDisposed = true
-        task?.dispose()
-        task = nil
-    }
 
     func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) {
         if let task = task {
@@ -37,28 +35,25 @@ class OfflineMapSyncTaskNativeObject: NativeObject {
     }
 
     private func loadOfflineMap() {
-        let mobilePackages = MobileMapPackage(fileURL: URL(string: offlineMapPath)!)
-        mobilePackages.load { error in
-            if self.isDisposed {
-                return
-            }
-            if let error = error {
-                self.messageSink.send(method: "offlineMapSyncTask#loadError", arguments: error.toJSON())
-                return
-            }
+        Task {
+            let mobilePackages = MobileMapPackage(fileURL: URL(string: offlineMapPath)!)
 
-            if mobilePackages.maps.isEmpty {
-                self.messageSink.send(method: "offlineMapSyncTask#loadError", arguments: NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No maps in the package"]).toJSON())
-                return
+            do {
+                await try mobilePackages.load()
+                if mobilePackages.maps.isEmpty {
+                    self.messageSink.send(method: "offlineMapSyncTask#loadError", arguments: FlutterError(code: "no_maps", message: "No maps in the package", details: nil))
+                    return
+                }
+                let map = mobilePackages.maps[0]
+                let task = OfflineMapSyncTask(map: map)
+                self.task = OfflineMapSyncTaskNativeObjectWrapper(objectId: self.objectId, task: task, messageSink: self.messageSink)
+                self.pendingMessages.forEach { methodCall in
+                    self.task?.onMethodCall(method: methodCall.method, arguments: methodCall.arguments, result: methodCall.result)
+                }
+                self.pendingMessages.removeAll()
+            } catch {
+                self.messageSink.send(method: "offlineMapSyncTask#loadError", arguments: error.toJSONFlutter())
             }
-
-            let map = mobilePackages.maps[0]
-            let task = AGSOfflineMapSyncTask(map: map)
-            self.task = OfflineMapSyncTaskNativeObjectWrapper(objectId: self.objectId, task: task, messageSink: self.messageSink)
-            self.pendingMessages.forEach { methodCall in
-                self.task?.onMethodCall(method: methodCall.method, arguments: methodCall.arguments, result: methodCall.result)
-            }
-            self.pendingMessages.removeAll()
         }
     }
 
@@ -87,20 +82,22 @@ fileprivate class OfflineMapSyncTaskNativeObjectWrapper: BaseNativeObject<Offlin
             }
             break
         case "offlineMapSyncTask#checkForUpdates":
-            nativeObject.checkForUpdates { info, error in
-                if let error = error {
-                    result(error.toJSON())
-                } else {
-                    result(info!.toJSONFlutter())
+            createTask {
+                do {
+                    let updateInfo = try await self.nativeObject.checkForUpdates()
+                    result(updateInfo.toJSONFlutter())
+                } catch {
+                    result(error.toJSONFlutter(withStackTrace: false))
                 }
             }
             break
         case "offlineMapSyncTask#defaultOfflineMapSyncParameters":
-            nativeObject.defaultOfflineMapSyncParameters { parameters, error in
-                if let error = error {
-                    result(error.toJSON())
-                } else {
-                    result(parameters!.toJSONFlutter())
+            createTask {
+                do {
+                    let params = try await self.nativeObject.makeDefaultOfflineMapSyncParameters()
+                    result(params.toJSONFlutter())
+                } catch {
+                    result(error.toJSONFlutter(withStackTrace: false))
                 }
             }
             break
@@ -113,12 +110,11 @@ fileprivate class OfflineMapSyncTaskNativeObjectWrapper: BaseNativeObject<Offlin
     }
 
     private func createJob(data: [String: Any], result: @escaping FlutterResult) {
-        let parameters = AGSOfflineMapSyncParameters(data: data)
-        let job = nativeObject.offlineMapSyncJob(with: parameters)
+        let parameters = OfflineMapSyncParameters(data: data)
+        let job = nativeObject.makeSyncOfflineMapJob(parameters: parameters)
         let jobId = NSUUID().uuidString
-        let jobNativeObject = AGSOfflineMapSyncJobNativeObject(objectId: jobId, job: job, messageSink: messageSink)
+        let jobNativeObject = OfflineMapSyncJobNativeObject(objectId: jobId, job: job, messageSink: messageSink)
         storage.addNativeObject(object: jobNativeObject)
         result(jobId)
     }
-
 }

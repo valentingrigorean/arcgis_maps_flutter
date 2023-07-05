@@ -49,6 +49,8 @@ extension LinearUnit {
         }
     }
 
+    static let defaultFlutterValue = 8
+
     func toFlutterValue() -> Int {
         switch linearID {
         case .centimeters:
@@ -68,13 +70,13 @@ extension LinearUnit {
         case .yards:
             return 7
         default:
-            return 8
+            return LinearUnit.defaultFlutterValue
         }
     }
 }
 
 extension AngularUnit {
-    convenience init?(flutterValue: Int) {
+    convenience init?(_ flutterValue: Int) {
         switch flutterValue {
         case 0:
             self.init(angularID: .degrees)

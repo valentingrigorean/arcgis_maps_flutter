@@ -133,9 +133,7 @@ class GeoViewTouchDelegate {
         }
         do {
             let results = try await mapViewProxy.identifyGraphicsOverlays(screenPoint: screenPoint, tolerance: 12)
-            if onTapGraphicsCompleted(results: results, screenPoint: screenPoint) {
-                return true
-            }
+            return onTapGraphicsCompleted(results: results, screenPoint: screenPoint)
         } catch {
             return false
         }
@@ -151,6 +149,7 @@ class GeoViewTouchDelegate {
         } catch {
             return false
         }
+        return true
     }
 
     private func onTapGraphicsCompleted(results: [IdentifyGraphicsOverlayResult]?,

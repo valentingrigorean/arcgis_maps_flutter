@@ -8,11 +8,10 @@ import ArcGIS
 extension GeodeticDistanceResult {
     func toJSONFlutter() -> Any {
         [
-            "distance": distance,
-            "distanceUnitId": distanceUnit?.unitID.toFlutter() ?? AGSLinearUnitID.other.toFlutter(),
-            "azimuth1": azimuth1,
-            "azimuth2": azimuth2,
-            "angularUnitId": azimuthUnit?.unitID.toFlutter() ?? AGSAngularUnitID.other.toFlutter(),
-        ]
+            "distance": distance.value,
+            "distanceUnitId": distance.unit.linearUnit?.toFlutterValue() ?? LinearUnit.defaultFlutterValue,
+            "azimuth1": azimuth1.value,
+            "azimuth2": azimuth2.value,
+        ] as [String: Any]
     }
 }

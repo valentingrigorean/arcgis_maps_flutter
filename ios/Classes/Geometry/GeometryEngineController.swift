@@ -26,10 +26,7 @@ class GeometryEngineController {
                         result: @escaping FlutterResult) -> Void {
         switch (call.method) {
         case "project":
-            guard let data = call.arguments as? Dictionary<String, Any> else {
-                result(nil)
-                return
-            }
+            let data = call.arguments as! Dictionary<String, Any>
             let spatialReference = SpatialReference(data: data["spatialReference"] as! Dictionary<String, Any>)!
             guard let geometry = Geometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>) else {
                 result(nil)
@@ -42,45 +39,33 @@ class GeometryEngineController {
             result(projectedGeometry.toJSONFlutter())
             break
         case "distanceGeodetic":
-            guard let data = call.arguments as? Dictionary<String, Any> else {
-                result(nil)
-                return
-            }
+            let data = call.arguments as! Dictionary<String, Any>             
             let point1 = Point(data: data["point1"] as! Dictionary<String, Any>)
             let point2 = Point(data: data["point2"] as! Dictionary<String, Any>)
-            let distanceUnit = LinearUnit(flutterValue: data["distanceUnitId"] as! Int)
-            let azimuthUnit = AngularUnit(flutterValue: data["azimuthUnitId"] as! Int)
+            let distanceUnit = LinearUnit(data["distanceUnitId"] as! Int)
+            let azimuthUnit = AngularUnit(data["azimuthUnitId"] as! Int)
             let curveType = GeometryEngine.GeodeticCurveType(data["curveType"] as! Int)
             let geodeticDistanceResult = GeometryEngine.geodeticDistance(from: point1, to: point2, distanceUnit: distanceUnit, azimuthUnit: azimuthUnit, curveType: curveType)
             result(geodeticDistanceResult?.toJSONFlutter())
         case "bufferGeometry":
-            guard let data = call.arguments as? Dictionary<String, Any> else {
-                result(nil)
-                return
-            }
+            let data = call.arguments as! Dictionary<String, Any>
             let geometry = Geometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
             let distance = data["distance"] as! Double
             let polygon = GeometryEngine.buffer(around: geometry, distance: distance)
             result(polygon?.toJSONFlutter())
             break
         case "geodeticBufferGeometry":
-            guard let data = call.arguments as? Dictionary<String, Any> else {
-                result(nil)
-                return
-            }
+            let data = call.arguments as! Dictionary<String, Any>
             let geometry = Geometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
             let distance = data["distance"] as! Double
-            let distanceUnit = LinearUnit(flutterValue: data["distanceUnit"] as! Int)
+            let distanceUnit = LinearUnit(data["distanceUnit"] as! Int)
             let maxDeviation = data["maxDeviation"] as! Double
             let curveType = GeometryEngine.GeodeticCurveType(data["curveType"] as! Int)
             let polygon = GeometryEngine.geodeticBuffer(around: geometry, distance: distance, distanceUnit: distanceUnit, maxDeviation: maxDeviation, curveType: curveType)
             result(polygon?.toJSONFlutter())
             break
         case "intersection":
-            guard let data = call.arguments as? Dictionary<String, Any> else {
-                result(nil)
-                return
-            }
+            let data = call.arguments as! Dictionary<String, Any>
             let firstGeometry = Geometry.fromFlutter(data: data["firstGeometry"] as! Dictionary<String, Any>)!
             let secondGeometry = Geometry.fromFlutter(data: data["secondGeometry"] as! Dictionary<String, Any>)!
             let geometry = GeometryEngine.intersection(firstGeometry, secondGeometry)
@@ -114,26 +99,20 @@ class GeometryEngineController {
             result(GeometryEngine.doesGeometry(firstGeometry, contain: secondGeometry))
             break
         case "geodesicSector":
-            guard let data = call.arguments as? Dictionary<String, Any> else {
-                result(nil)
-                return
-            }
+            let data = call.arguments as! Dictionary<String, Any>
             let params = GeodesicSectorParameters.createGeodesicSectorParameters(data: data)
             let geometry = GeometryEngine.geodesicSector(parameters: params)
             result(geometry?.toJSONFlutter())
             break
         case "geodeticMove":
-            guard let data = call.arguments as? Dictionary<String, Any> else {
-                result(nil)
-                return
-            }
+            let data = call.arguments as! Dictionary<String, Any>
             let points = (data["points"] as! [Dictionary<String, Any>]).map {
                 Point(data: $0)
             }
             let distance = data["distance"] as! Double
-            let distanceUnit = LinearUnit(flutterValue: data["distanceUnit"] as! Int)
+            let distanceUnit = LinearUnit(data["distanceUnit"] as! Int)
             let azimuth = data["azimuth"] as! Double
-            let azimuthUnit = AngularUnit(flutterValue: data["azimuthUnit"] as! Int)
+            let azimuthUnit = AngularUnit(data["azimuthUnit"] as! Int)
             let curveType = GeometryEngine.GeodeticCurveType(data["curveType"] as! Int)
             let results = GeometryEngine.geodeticMove(points,
                     distance: distance,
@@ -170,10 +149,7 @@ class GeometryEngineController {
             result(GeometryEngine.isSimple(originGeometry))
             break
         case "densifyGeodetic":
-            guard let data = call.arguments as? Dictionary<String, Any> else {
-                result(nil)
-                return
-            }
+            let data = call.arguments as! Dictionary<String, Any>
             let geometry = Geometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
             let maxSegmentLength = data["maxSegmentLength"] as! Double
             let lengthUnit = LinearUnit(data["lengthUnit"] as! Int)
@@ -182,20 +158,14 @@ class GeometryEngineController {
             result(resultGeometry?.toJSONFlutter())
             break
         case "lengthGeodetic":
-            guard let data = call.arguments as? Dictionary<String, Any> else {
-                result(nil)
-                return
-            }
+            let data = call.arguments as! Dictionary<String, Any>
             let geometry = Geometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
-            let lengthUnit = LinearUnit(flutterValue: data["lengthUnit"] as! Int)
+            let lengthUnit = LinearUnit(data["lengthUnit"] as! Int)
             let curveType = GeometryEngine.GeodeticCurveType(data["curveType"] as! Int)
             result(GeometryEngine.geodeticLength(of: geometry, lengthUnit: lengthUnit, curveType: curveType))
             break
         case "areaGeodetic":
-            guard let data = call.arguments as? Dictionary<String, Any> else {
-                result(nil)
-                return
-            }
+            let data = call.arguments as! Dictionary<String, Any>
             let geometry = Geometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
             let areaUnit = AreaUnit(flutterValue: data["areaUnit"] as! Int)
             let curveType = GeometryEngine.GeodeticCurveType(data["curveType"] as! Int)
@@ -203,14 +173,10 @@ class GeometryEngineController {
             result(GeometryEngine.geodeticArea(of: geometry, unit: areaUnit, curveType: curveType))
             break
         case "getExtent":
-            guard let data = call.arguments as? Dictionary<String, Any> else {
-                result(nil)
-                return
-            }
+            let data = call.arguments as! Dictionary<String, Any>
             let geometry = Geometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
             result(geometry.extent.toJSONFlutter())
             break
-
         default:
             result(FlutterMethodNotImplemented)
             break

@@ -96,7 +96,7 @@ class GeodeticDistanceResult extends Equatable {
 
   final double azimuth2;
 
-  final AngularUnitId angularUnitId;
+  final AngularUnitId? angularUnitId;
 
   factory GeodeticDistanceResult.fromJson(Map<dynamic, dynamic> json) {
     return GeodeticDistanceResult(
@@ -104,7 +104,9 @@ class GeodeticDistanceResult extends Equatable {
       distanceUnitId: LinearUnitId.fromValue(json['distanceUnitId']),
       azimuth1: json['azimuth1'],
       azimuth2: json['azimuth2'],
-      angularUnitId: AngularUnitId.fromValue(json['angularUnitId']),
+      angularUnitId: json.containsKey('angularUnitId')
+          ? AngularUnitId.fromValue(json['angularUnitId'])
+          : null,
     );
   }
 

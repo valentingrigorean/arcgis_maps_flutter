@@ -10,9 +10,9 @@ extension Stop {
         let point = Geometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>) as! Point
         self.init(point: point)
         name = data["name"] as? String ?? ""
-        kind = Stop.Kind.fromFlutter(data["stopType"] as! Int)
+        kind = Stop.Kind(data["stopType"] as! Int)
         routeName = data["routeName"] as? String ?? ""
-        curbApproach = CurbApproach.fromFlutter(data["curbApproach"] as! Int)
+        curbApproach = CurbApproach(data["curbApproach"] as! Int)
         currentBearingTolerance = data["currentBearingTolerance"] as? Double ?? Double.nan
         navigationLatency = data["navigationLatency"] as? Double ?? Double.nan
         navigationSpeed = data["navigationSpeed"] as? Double ?? Double.nan

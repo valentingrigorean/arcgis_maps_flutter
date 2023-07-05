@@ -189,7 +189,7 @@ class GenerateOfflineMapParameters {
 
   factory GenerateOfflineMapParameters.fromJson(Map<dynamic, dynamic> json) {
     return GenerateOfflineMapParameters(
-      areaOfInterest: Geometry.fromJson(json['areaOfInterest'])!,
+      areaOfInterest: Geometry.fromJson(json['areaOfInterest']),
       minScale: (json['minScale'] as num?)?.toDouble(),
       maxScale: (json['maxScale'] as num?)?.toDouble(),
       onlineOnlyServicesOption: OnlineOnlyServicesOption.fromValue(
@@ -226,7 +226,7 @@ class GenerateOfflineMapParameters {
   /// according to the polygon geometry, which can help
   /// reduce the size of the resulting offline map. Note that the filtered set
   /// of tiles may vary, depending on the underlying service.
-  final Geometry areaOfInterest;
+  final Geometry? areaOfInterest;
 
   /// The minimum scale for how far out data will be in tile caches.
   /// The [minScale] 0 default means extract all the available detailed levels to global scales.

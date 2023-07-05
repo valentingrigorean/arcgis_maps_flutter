@@ -26,7 +26,7 @@ extension TileImageFormat {
         case 7:
             self = .png
         default:
-            fatalError("Invalid TileImageFormat value \(self)")
+            fatalError("Invalid TileImageFormat value \(flutterValue)")
         }
     }
 

@@ -30,7 +30,7 @@ extension SimpleMarkerSymbol.Style {
             self = .x
             break
         default:
-            fatalError("Invalid SimpleMarkerSymbol.Style value \(self)")
+            fatalError("Invalid SimpleMarkerSymbol.Style value \(flutterValue)")
         }
     }
 }

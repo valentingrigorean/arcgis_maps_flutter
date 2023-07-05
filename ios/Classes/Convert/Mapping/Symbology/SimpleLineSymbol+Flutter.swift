@@ -48,7 +48,7 @@ extension SimpleLineSymbol.Style {
             self = .solid
             break
         default:
-            fatalError("Invalid SimpleLineSymbol.Style value \(self)")
+            fatalError("Invalid SimpleLineSymbol.Style value \(flutterValue)")
         }
     }
 }

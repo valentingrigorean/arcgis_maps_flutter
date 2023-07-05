@@ -146,7 +146,30 @@ extension OfflineMapSyncParameters.PreplannedScheduledUpdatesOption {
             fatalError("Unexpected value: \(self)")
         }
     }
+}
 
+extension GenerateOfflineMapParameters.UpdateMode {
+    init(_ flutterValue: Int) {
+        switch flutterValue {
+        case 0:
+            self = .syncWithFeatureServices
+        case 1:
+            self = .noUpdates
+        default:
+            fatalError("Unexpected value: \(flutterValue)")
+        }
+    }
+
+    func toFlutterValue() -> Int {
+        switch self {
+        case .syncWithFeatureServices:
+            return 0
+        case .noUpdates:
+            return 1
+        default:
+            fatalError("Unexpected value: \(self)")
+        }
+    }
 }
 
 extension OfflineMapUpdatesInfo.Availability {

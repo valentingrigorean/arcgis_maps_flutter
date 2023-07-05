@@ -63,7 +63,7 @@ final class ScalebarViewModel: ObservableObject {
         self.unitsPerPoint = unitsPerPoint
         self.useGeodeticCalculations = useGeodeticCalculations
         self.viewpoint = viewpoint
-        alternateUnit = getAlternateUnit(alternativeUnits)
+        alternateUnit = self.getAlternateUnit(alternativeUnits)
         
         viewpointSubscription = viewpointSubject
             .debounce(for: delay, scheduler: DispatchQueue.main)

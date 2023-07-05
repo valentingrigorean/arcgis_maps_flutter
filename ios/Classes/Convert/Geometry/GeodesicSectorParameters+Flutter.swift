@@ -13,8 +13,8 @@ extension GeodesicSectorParameters {
         semiAxis2Length = data["semiAxis2Length"] as! Double
         startDirection = data["startDirection"] as! Double
         sectorAngle = data["sectorAngle"] as! Double
-        linearUnit = LinearUnit(flutterValue: data["linearUnit"] as! Int)!
-        angularUnit = AngularUnit(flutterValue: data["angularUnit"] as! Int)!
+        linearUnit = LinearUnit(data["linearUnit"] as! Int)!
+        angularUnit = AngularUnit(data["angularUnit"] as! Int)!
         axisDirection = data["axisDirection"] as! Double
         if let maxSegmentLength = data["maxSegmentLength"] as? Double {
             self.maxSegmentLength = maxSegmentLength

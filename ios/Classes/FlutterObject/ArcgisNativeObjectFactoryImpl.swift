@@ -14,7 +14,7 @@ class ArcgisNativeObjectFactoryImpl: ArcgisNativeObjectFactory {
             return ExportTileCacheTaskNativeObject(objectId: objectId, task: exportTileCacheTask, messageSink: messageSink)
         case "TileCache":
             let url = arguments as! String
-            return TileCacheNativeObject(objectId: objectId, tileCache: TileCache(fileURL: URL(filePath: url)), messageSink: messageSink)
+            return TileCacheNativeObject(objectId: objectId, tileCache: TileCache(fileURL: URL(fileURLWithPath: url)), messageSink: messageSink)
         case "GeodatabaseSyncTask":
             let url = arguments as! String
             return GeodatabaseSyncTaskNativeObject(objectId: objectId, task: GeodatabaseSyncTask(url: URL(string: url)!), messageSink: messageSink)

@@ -293,10 +293,12 @@ extension ScalebarSettings {
     init(data: [String: Any]) {
         autoHide = data["autoHide"] as? Bool ?? true
         autoHideDelay = (data["autoHideDelay"] as? Double ?? 2000.0) / 1000.0
+        barCornerRadius = data["barCornerRadius"] as? Double ?? 2.5
         fillColor1 = Color(data: data["fillColor"] as! UInt)
         fillColor2 = Color(data: data["alternateFillColor"] as! UInt)
         lineColor = Color(data: data["lineColor"] as! UInt)
         shadowColor = Color(data: data["shadowColor"] as! UInt)
+        shadowRadius = data["shadowRadius"] as? Double ?? 1.0
         textColor = Color(data: data["textColor"] as! UInt)
         textShadowColor = Color(data: data["textShadowColor"] as! UInt)
     }

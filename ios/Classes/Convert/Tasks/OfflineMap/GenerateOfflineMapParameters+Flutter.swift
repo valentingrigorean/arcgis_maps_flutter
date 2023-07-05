@@ -15,44 +15,44 @@ extension GenerateOfflineMapParameters {
         if let itemInfo = data["itemInfo"] as? [String: Any] {
             self.itemInfo = OfflineMapItemInfo(data: itemInfo)
         }
-        attachmentSyncDirection = AttachmentSyncDirection.fromFlutter(flutterValue: data["attachmentSyncDirection"] as! Int)
-        continueOnErrors = data["continueOnErrors"] as! Bool
-        includeBasemap = data["includeBasemap"] as! Bool
-        isDefinitionExpressionFilterEnabled = data["isDefinitionExpressionFilterEnabled"] as! Bool
-        returnLayerAttachmentOption = ReturnLayerAttachmentOption.fromFlutter(data["returnLayerAttachmentOption"] as! Int)
-        returnSchemaOnlyForEditableLayers = data["returnSchemaOnlyForEditableLayers"] as! Bool
-        updateMode = GenerateOfflineMapUpdateMode(rawValue: data["updateMode"] as! Int)
-        destinationTableRowFilter = AGSDestinationTableRowFilter(rawValue: data["destinationTableRowFilter"] as! Int)!
-        esriVectorTilesDownloadOption = AGSEsriVectorTilesDownloadOption(rawValue: data["esriVectorTilesDownloadOption"] as! Int)!
+        attachmentSyncDirection = AttachmentSyncDirection(data["attachmentSyncDirection"] as! Int)
+        continuesOnErrors = data["continueOnErrors"] as! Bool
+        includesBasemap = data["includeBasemap"] as! Bool
+        definitionExpressionFilterIsEnabled = data["isDefinitionExpressionFilterEnabled"] as! Bool
+        returnLayerAttachmentOption = ReturnLayerAttachmentOption(data["returnLayerAttachmentOption"] as! Int)
+        returnsSchemaOnlyForEditableLayers = data["returnSchemaOnlyForEditableLayers"] as! Bool
+        updateMode = GenerateOfflineMapParameters.UpdateMode(data["updateMode"] as! Int)
+        destinationTableRowFilter = GenerateOfflineMapParameters.DestinationTableRowFilter(data["destinationTableRowFilter"] as! Int)
+        esriVectorTilesDownloadOption = EsriVectorTilesDownloadOption(data["esriVectorTilesDownloadOption"] as! Int)
         if let referenceBasemapDirectory = data["referenceBasemapDirectory"] as? String {
-            self.referenceBasemapDirectory = URL(string: referenceBasemapDirectory)
+            referenceBasemapDirectoryURL = URL(string: referenceBasemapDirectory)
         }
         referenceBasemapFilename = data["referenceBasemapFilename"] as! String
     }
 
     func toJSONFlutter() -> Any {
         var data = [
-            "areaOfInterest": areaOfInterest.toJSONFlutter(),
+            "areaOfInterest": areaOfInterest?.toJSONFlutter(),
             "minScale": minScale,
             "maxScale": maxScale,
             "onlineOnlyServicesOption": onlineOnlyServicesOption.toFlutterValue(),
-            "attachmentSyncDirection": attachmentSyncDirection.rawValue,
-            "continueOnErrors": continueOnErrors,
-            "includeBasemap": includeBasemap,
-            "isDefinitionExpressionFilterEnabled": isDefinitionExpressionFilterEnabled,
-            "returnLayerAttachmentOption": returnLayerAttachmentOption.rawValue,
-            "returnSchemaOnlyForEditableLayers": returnSchemaOnlyForEditableLayers,
-            "updateMode": updateMode.rawValue,
-            "destinationTableRowFilter": destinationTableRowFilter.rawValue,
-            "esriVectorTilesDownloadOption": esriVectorTilesDownloadOption.rawValue,
+            "attachmentSyncDirection": attachmentSyncDirection.toFlutterValue(),
+            "continueOnErrors": continuesOnErrors,
+            "includeBasemap": includesBasemap,
+            "isDefinitionExpressionFilterEnabled": definitionExpressionFilterIsEnabled,
+            "returnLayerAttachmentOption": returnLayerAttachmentOption.toFlutterValue(),
+            "returnSchemaOnlyForEditableLayers": returnsSchemaOnlyForEditableLayers,
+            "updateMode": updateMode.toFlutterValue(),
+            "destinationTableRowFilter": destinationTableRowFilter.toFlutterValue(),
+            "esriVectorTilesDownloadOption": esriVectorTilesDownloadOption.toFlutterValue(),
             "referenceBasemapFilename": referenceBasemapFilename,
-        ]
+        ] as [String: Any]
 
         if let itemInfo = itemInfo {
             data["itemInfo"] = itemInfo.toJSONFlutter()
         }
 
-        if let referenceBasemapDirectory = referenceBasemapDirectory {
+        if let referenceBasemapDirectory = referenceBasemapDirectoryURL {
             data["referenceBasemapDirectory"] = referenceBasemapDirectory.absoluteString
         }
 

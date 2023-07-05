@@ -13,11 +13,11 @@ extension AttachmentSyncDirection {
     init(_ flutterValue: Int) {
         switch flutterValue {
         case 1:
-            return AttachmentSyncDirection.upload
+            self = AttachmentSyncDirection.upload
         case 2:
-            return AttachmentSyncDirection.bidirectional
+            self = AttachmentSyncDirection.bidirectional
         default:
-            return AttachmentSyncDirection.noSync
+            self = AttachmentSyncDirection.noSync
         }
     }
 
@@ -29,7 +29,7 @@ extension AttachmentSyncDirection {
             return 2
         case .noSync:
             return 0
-        @unknown default:
+        default:
             return 0
         }
     }
@@ -38,16 +38,16 @@ extension AttachmentSyncDirection {
 
 extension GenerateLayerOption.QueryOption {
 
-    init(flutterValue: Int) {
+    init(_ flutterValue: Int) {
         switch flutterValue {
         case 0:
-            return GenerateLayerOption.QueryOption.all
+            self = GenerateLayerOption.QueryOption.all
         case 1:
-            return GenerateLayerOption.QueryOption.noneOrRelatedOnly
+            self = GenerateLayerOption.QueryOption.noneOrRelatedOnly
         case 2:
-            return GenerateLayerOption.QueryOption.useFilter
+            self = GenerateLayerOption.QueryOption.useFilter
         default:
-            return GenerateLayerOption.QueryOption.all
+            self = GenerateLayerOption.QueryOption.all
         }
     }
 
@@ -59,7 +59,7 @@ extension GenerateLayerOption.QueryOption {
             return 1
         case .useFilter:
             return 2
-        @unknown default:
+        default:
             return 0
         }
     }
@@ -70,11 +70,11 @@ extension Geodatabase.SyncModel {
     init(_ flutterValue: Int) {
         switch flutterValue {
         case 1:
-            return Geodatabase.SyncModel.geodatabase
+            self = Geodatabase.SyncModel.geodatabase
         case 2:
-            return Geodatabase.SyncModel.layer
+            self = Geodatabase.SyncModel.layer
         default:
-            return Geodatabase.SyncModel.disabled
+            self = Geodatabase.SyncModel.disabled
         }
     }
 
@@ -86,7 +86,7 @@ extension Geodatabase.SyncModel {
             return 1
         case .layer:
             return 2
-        @unknown default:
+        default:
             return 0
         }
     }
@@ -95,14 +95,14 @@ extension Geodatabase.SyncModel {
 
 extension UtilityNetworkSyncMode {
 
-    init(flutterValue: Int) {
+    init(_ flutterValue: Int) {
         switch flutterValue {
         case 1:
-            return UtilityNetworkSyncMode.syncSystemTables
+            self = UtilityNetworkSyncMode.syncSystemTables
         case 2:
-            return UtilityNetworkSyncMode.syncSystemAndTopologyTables
+            self = UtilityNetworkSyncMode.syncSystemAndTopologyTables
         default:
-            return UtilityNetworkSyncMode.noSync
+            self = UtilityNetworkSyncMode.noSync
         }
     }
 
@@ -115,7 +115,7 @@ extension UtilityNetworkSyncMode {
             return 1
         case .syncSystemAndTopologyTables:
             return 2
-        @unknown default:
+        default:
             return 0
         }
     }
@@ -127,13 +127,13 @@ extension SyncDirection {
     init(_ flutterValue: Int) {
         switch flutterValue {
         case 1:
-            return SyncDirection.download
+            self = SyncDirection.download
         case 2:
-            return SyncDirection.download
+            self = SyncDirection.download
         case 3:
-            return SyncDirection.bidirectional
+            self = SyncDirection.bidirectional
         default:
-            return SyncDirection.noSync
+            self = SyncDirection.noSync
         }
     }
 

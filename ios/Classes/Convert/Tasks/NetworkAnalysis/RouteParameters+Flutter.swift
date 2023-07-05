@@ -8,9 +8,7 @@ import ArcGIS
 extension RouteParameters {
     convenience init(data: Dictionary<String, Any>) {
         self.init()
-        for accumlateAttributeName in data["accumulateAttributeNames"] as! [String]{
-            addAccumulateAttributeName(accumlateAttributeName)
-        }
+        addAccumulateAttributeNames(data["accumulateAttributeNames"] as! [String])
         directionsDistanceUnits = UnitSystem(data["directionsDistanceUnits"] as! Int)
         directionsLanguage = data["directionsLanguage"] as! String
         directionsStyle = DirectionsStyle(data["directionsStyle"] as! Int)

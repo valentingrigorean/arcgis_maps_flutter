@@ -9,7 +9,7 @@ extension OfflineMapSyncParameters {
     convenience init(data: Dictionary<String, Any>) {
         self.init()
         keepsGeodatabaseDeltas = data["keepGeodatabaseDeltas"] as! Bool
-        preplannedScheduledUpdatesOption = PreplannedScheduledUpdatesOption.fromFlutter( data["preplannedScheduledUpdatesOption"] as! Int)
+        preplannedScheduledUpdatesOption = PreplannedScheduledUpdatesOption(data["preplannedScheduledUpdatesOption"] as! Int)
         shouldRollbackOnFailure = data["rollbackOnFailure"] as! Bool
         syncDirection = SyncDirection(data["syncDirection"] as! Int)
     }
@@ -20,6 +20,6 @@ extension OfflineMapSyncParameters {
             "preplannedScheduledUpdatesOption": preplannedScheduledUpdatesOption.toFlutterValue(),
             "rollbackOnFailure": shouldRollbackOnFailure,
             "syncDirection": syncDirection.toFlutterValue(),
-        ] as [String:Any]
+        ] as [String: Any]
     }
 }

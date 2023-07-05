@@ -15,7 +15,7 @@ extension Point {
 
         let spatialReferenceData = data["spatialReference"] as? Dictionary<String,Any>
 
-        let spatialReference = spatialReferenceData == nil ? nil : AGSSpatialReference(data: spatialReferenceData!)
+        let spatialReference = spatialReferenceData == nil ? nil : SpatialReference(data: spatialReferenceData!)
 
         if z != nil && m != nil && spatialReference != nil {
             self.init(x: x, y: y, z: z!, m: m!, spatialReference: spatialReference)
