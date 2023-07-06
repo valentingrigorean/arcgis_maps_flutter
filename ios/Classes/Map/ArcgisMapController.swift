@@ -130,8 +130,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             result(nil)
             break
         case "map#update":
-            if let data = call.arguments as? Dictionary<String, Any> {
-                if let mapOptions = data["options"] as? Dictionary<String, Any> {
+            if let data = call.arguments as? [String: Any] {
+                if let mapOptions = data["options"] as? [String: Any] {
                     updateMapOptions(mapOptions: mapOptions)
                 }
             }
@@ -158,7 +158,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             break
         case "map#getMapMaxExtend":
             let map = viewModel.map
-            let extent = map.maxExtent
+            let extent = map?.maxExtent
             result(extent?.toJSONFlutter())
             break
         case "map#getLocation":
@@ -178,9 +178,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             }
             break
         case "map#setMapMaxExtent":
-            if let extent = call.arguments as? Dictionary<String, Any> {
+            if let extent = call.arguments as? [String: Any] {
                 let maxExtent = Envelope(data: extent)
-                viewModel.map.maxExtent = maxExtent
+                viewModel.map?.maxExtent = maxExtent
             }
             result(nil)
             break
@@ -201,7 +201,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             result(nil)
             break
         case "map#setTimeExtent":
-            if let timeExtentRaw = call.arguments as? Dictionary<String, Any> {
+            if let timeExtentRaw = call.arguments as? [String: Any] {
                 let timeExtent = TimeExtent(data: timeExtentRaw)
                 if viewModel.timeExtent != timeExtent {
                     viewModel.timeExtent = timeExtent
@@ -221,7 +221,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             result(viewModel.locationDisplay.wanderExtentFactor)
             break
         case "map#queryFeatureTableFromLayer":
-            handleQueryFeatureTableFromLayer(data: call.arguments as! Dictionary<String, Any>, result: result)
+            handleQueryFeatureTableFromLayer(data: call.arguments as! [String: Any], result: result)
             break
         case "map#getTimeAwareLayerInfos":
             handleTimeAwareLayerInfos(result: result)
@@ -232,7 +232,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             result(currentViewPoint?.toJSONFlutter())
             break
         case "map#getInitialViewpoint":
-            result(viewModel.map.initialViewpoint?.toJSONFlutter())
+            result(viewModel.map?.initialViewpoint?.toJSONFlutter())
             break
         case "map#setViewpoint":
             setViewpoint(args: call.arguments, animated: true, result: result)
@@ -243,8 +243,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 break
             }
             taskManager.createTask {
-                let data = call.arguments as! Dictionary<String, Any>
-                let geometry = Geometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>)!
+                let data = call.arguments as! [String: Any]
+                let geometry = Geometry.fromFlutter(data: data["geometry"] as! [String: Any])!
                 result(await proxyView.setViewpointGeometry(geometry.extent, padding: data["padding"] as? Double ?? 0))
             }
             break
@@ -254,8 +254,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 break
             }
             taskManager.createTask {
-                let data = call.arguments as! Dictionary<String, Any>
-                let center = Point.fromFlutter(data: data["center"] as! Dictionary<String, Any>)! as! Point
+                let data = call.arguments as! [String: Any]
+                let center = Point.fromFlutter(data: data["center"] as! [String: Any])! as! Point
                 let scale = data["scale"] as! Double
                 result(await proxyView.setViewpointCenter(center, scale: scale))
             }
@@ -275,7 +275,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 break
             }
             taskManager.createTask {
-                let data = call.arguments as! Dictionary<String, Any>
+                let data = call.arguments as! [String: Any]
                 let scale = data["scale"] as! Double
                 result(await proxyView.setViewpointScale(scale))
             }
@@ -285,7 +285,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 result(nil)
                 break
             }
-            if let screenPoint = proxyView.screenPoint(fromLocation: Point(data: call.arguments as! Dictionary<String, Any>)) {
+            if let screenPoint = proxyView.screenPoint(fromLocation: Point(data: call.arguments as! [String: Any])) {
                 result([screenPoint.x, screenPoint.y])
             } else {
                 result(nil)
@@ -296,10 +296,10 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 result(nil)
                 break
             }
-            let data = call.arguments as! Dictionary<String, Any>
+            let data = call.arguments as! [String: Any]
             let mapPoints = data["position"] as! [Double]
             var mapPoint = proxyView.location(fromScreenPoint: CGPoint(x: mapPoints[0], y: mapPoints[1]))
-            let spatialReference = SpatialReference(data: data["spatialReference"] as! Dictionary<String, Any>)!
+            let spatialReference = SpatialReference(data: data["spatialReference"] as! [String: Any])!
             if mapPoint != nil && spatialReference.wkid != mapPoint?.spatialReference?.wkid {
                 mapPoint = GeometryEngine.project(mapPoint!, into: spatialReference)
             }
@@ -313,11 +313,11 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             result(nil)
             break
         case "markers#update":
-            if let markersUpdate = call.arguments as? Dictionary<String, Any> {
-                if let markersToAdd = markersUpdate["markersToAdd"] as? [Dictionary<String, Any>] {
+            if let markersUpdate = call.arguments as? [String: Any] {
+                if let markersToAdd = markersUpdate["markersToAdd"] as? [[String: Any]] {
                     markersController.addMarkers(markersToAdd: markersToAdd)
                 }
-                if let markersToChange = markersUpdate["markersToChange"] as? [Dictionary<String, Any>] {
+                if let markersToChange = markersUpdate["markersToChange"] as? [[String: Any]] {
                     markersController.changeMarkers(markersToChange: markersToChange)
                 }
                 if let markerIdsToRemove = markersUpdate["markerIdsToRemove"] as? [String] {
@@ -333,11 +333,11 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             result(nil)
             break
         case "polygons#update":
-            if let polygonUpdates = call.arguments as? Dictionary<String, Any> {
-                if let polygonsToAdd = polygonUpdates["polygonsToAdd"] as? [Dictionary<String, Any>] {
+            if let polygonUpdates = call.arguments as? [String: Any] {
+                if let polygonsToAdd = polygonUpdates["polygonsToAdd"] as? [[String: Any]] {
                     polygonsController.addPolygons(polygonsToAdd: polygonsToAdd)
                 }
-                if let polygonsToChange = polygonUpdates["polygonsToChange"] as? [Dictionary<String, Any>] {
+                if let polygonsToChange = polygonUpdates["polygonsToChange"] as? [[String: Any]] {
                     polygonsController.changePolygons(polygonsToChange: polygonsToChange)
                 }
                 if let polygonIdsToRemove = polygonUpdates["polygonIdsToRemove"] as? [String] {
@@ -347,11 +347,11 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             result(nil)
             break
         case "polylines#update":
-            if let polylineUpdates = call.arguments as? Dictionary<String, Any> {
-                if let polylinesToAdd = polylineUpdates["polylinesToAdd"] as? [Dictionary<String, Any>] {
+            if let polylineUpdates = call.arguments as? [String: Any] {
+                if let polylinesToAdd = polylineUpdates["polylinesToAdd"] as? [[String: Any]] {
                     polylinesController.addPolylines(polylinesToAdd: polylinesToAdd)
                 }
-                if let polylinesToChange = polylineUpdates["polylinesToChange"] as? [Dictionary<String, Any>] {
+                if let polylinesToChange = polylineUpdates["polylinesToChange"] as? [[String: Any]] {
                     polylinesController.changePolylines(polylinesToChange: polylinesToChange)
                 }
                 if let polylineIdsToRemove = polylineUpdates["polylineIdsToRemove"] as? [String] {
@@ -370,9 +370,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         }
     }
 
-    private func handleQueryFeatureTableFromLayer(data: Dictionary<String, Any>, result: @escaping FlutterResult) {
+    private func handleQueryFeatureTableFromLayer(data: [String: Any], result: @escaping FlutterResult) {
         result(FlutterMethodNotImplemented)
-//        if let data = call.arguments as? Dictionary<String, Any> {
+//        if let data = call.arguments as? [String: Any] {
 //
 //            var queryLayerName = ""
 //            let queryParams = QueryParameters()
@@ -393,7 +393,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 //                    }
 //                    break
 //                case "geometry":
-//                    let geometry = Geometry.fromFlutter(data: value as! Dictionary<String, Any>)!
+//                    let geometry = Geometry.fromFlutter(data: value as! [String: Any])!
 //                    queryParams.geometry = geometry
 //                    break
 //                case "spatialRelationship":
@@ -545,7 +545,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     private func changeMapType(args: Any?) {
-        guard let dict = args as? Dictionary<String, Any> else {
+        guard let dict = args as? [String: Any] else {
             return
         }
 
@@ -558,7 +558,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         changeMap(map: map)
     }
 
-    private func loadOfflineMap(args: Dictionary<String, Any>) {
+    private func loadOfflineMap(args: [String: Any]) {
         let offlinePath = args["offlinePath"] as! String
         let mapIndex = args["offlineMapIndex"] as! Int
 
@@ -616,7 +616,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         }
     }
 
-    private func updateMapOptions(mapOptions: Dictionary<String, Any>) {
+    private func updateMapOptions(mapOptions: [String: Any]) {
         viewModel.updateMapOptions(with: mapOptions)
 
         if let trackIdentityLayers = mapOptions["trackIdentifyLayers"] as? Bool {
@@ -631,7 +631,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private func setViewpoint(args: Any?,
                               animated: Bool, result: FlutterResult?) {
-        let data = args as! Dictionary<String, Any>
+        let data = args as! [String: Any]
         let viewpoint = Viewpoint(data: data)
         viewModel.viewpoint = viewpoint
         guard let proxyView = viewModel.mapViewProxy else {
@@ -646,7 +646,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     private func initWithArgs(args: Any?) {
-        guard let dict = args as? Dictionary<String, Any> else {
+        guard let dict = args as? [String: Any] else {
             return
         }
         if let mapType = dict["map"] {
@@ -657,19 +657,19 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         }
 
         layersController.updateFromArgs(args: dict)
-        if let markersToAdd = dict["markersToAdd"] as? [Dictionary<String, Any>] {
+        if let markersToAdd = dict["markersToAdd"] as? [[String: Any]] {
             markersController.addMarkers(markersToAdd: markersToAdd)
         }
 
-        if let polygonsToAdd = dict["polygonsToAdd"] as? [Dictionary<String, Any>] {
+        if let polygonsToAdd = dict["polygonsToAdd"] as? [[String: Any]] {
             polygonsController.addPolygons(polygonsToAdd: polygonsToAdd)
         }
 
-        if let polylinesToAdd = dict["polylinesToAdd"] as? [Dictionary<String, Any>] {
+        if let polylinesToAdd = dict["polylinesToAdd"] as? [[String: Any]] {
             polylinesController.addPolylines(polylinesToAdd: polylinesToAdd)
         }
 
-        if let options = dict["options"] as? Dictionary<String, Any> {
+        if let options = dict["options"] as? [String: Any] {
             updateMapOptions(mapOptions: options)
         }
     }

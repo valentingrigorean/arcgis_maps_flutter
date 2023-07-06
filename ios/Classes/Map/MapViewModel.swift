@@ -22,7 +22,6 @@ struct MapContentView: View {
 
     @State private var lastLongPressEvent: (CGPoint, ArcGIS.Point, MapViewProxy)?
 
-
     @ObservedObject var viewModel: MapViewModel
 
     init(viewModel: MapViewModel) {
@@ -31,66 +30,69 @@ struct MapContentView: View {
 
     var body: some View {
         MapViewReader { proxy in
-            MapView(map: viewModel.map, viewpoint: viewModel.viewpoint, timeExtent: $viewModel.timeExtent, graphicsOverlays: viewModel.graphicsOverlays)
-                    .onScaleChanged { newScale in
-                        viewModel.currentScale = newScale
-                    }
-                    .onViewpointChanged(kind: .centerAndScale) { viewpoint in
-                        viewModel.viewpointCenterAndScale = viewpoint
-                    }
-                    .onViewpointChanged(kind: .boundingGeometry) { viewpoint in
-                        viewModel.viewpointBoundingGeometry = viewpoint
-                    }
-                    .onUnitsPerPointChanged {
-                        viewModel.unitsPerPoint = $0
-                    }
-                    .onSpatialReferenceChanged {
-                        viewModel.spatialReference = $0
-                    }
-                    .onSingleTapGesture { screenPoint, mapPoint in
-                        viewModel.handleSingleTap(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: proxy)
-                    }
-                    .onLongPressGesture { screenPoint, mapPoint in
-                        lastLongPressEvent = (screenPoint, mapPoint, proxy)
-                        viewModel.handleSingleTap(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: proxy)
-                    }
-                    .attributionBarHidden(viewModel.isAttributionTextVisible)
-                    .locationDisplay(viewModel.locationDisplay)
-                    .selectionColor(viewModel.selectedColor)
-                    .interactionModes(viewModel.interactionModes)
-                    .contentInsets(viewModel.contentInsets)
-                    .edgesIgnoringSafeArea(viewModel.ignoresSafeAreaEdges ? .all : [])
-                    .disabled(!viewModel.interactionsEnabled)
-                    .onAppear {
-                        viewModel.mapViewProxy = proxy
-                    }
-                    .onLongPressGesture(minimumDuration: .infinity, maximumDistance: .infinity, pressing: { pressing in
-                        if pressing {
-                            isLongPress = true
-                        } else {
-                            if isLongPress {
-                                isLongPress = false
-                                if let lastLongPressEvent = lastLongPressEvent {
-                                    viewModel.handleLongTapEnded(screenPoint: lastLongPressEvent.0, mapPoint: lastLongPressEvent.1, mapViewProxy: lastLongPressEvent.2)
+            if viewModel.map == nil {
+                EmptyView()
+            } else {
+                MapView(map: viewModel.map!, viewpoint: viewModel.viewpoint, timeExtent: $viewModel.timeExtent, graphicsOverlays: viewModel.graphicsOverlays)
+                        .onScaleChanged { newScale in
+                            viewModel.currentScale = newScale
+                        }
+                        .onViewpointChanged(kind: .centerAndScale) { viewpoint in
+                            viewModel.viewpointCenterAndScale = viewpoint
+                        }
+                        .onViewpointChanged(kind: .boundingGeometry) { viewpoint in
+                            viewModel.viewpointBoundingGeometry = viewpoint
+                        }
+                        .onUnitsPerPointChanged {
+                            viewModel.unitsPerPoint = $0
+                        }
+                        .onSpatialReferenceChanged {
+                            viewModel.spatialReference = $0
+                        }
+                        .onSingleTapGesture { screenPoint, mapPoint in
+                            viewModel.handleSingleTap(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: proxy)
+                        }
+                        .onLongPressGesture { screenPoint, mapPoint in
+                            lastLongPressEvent = (screenPoint, mapPoint, proxy)
+                            viewModel.handleSingleTap(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: proxy)
+                        }
+                        .attributionBarHidden(viewModel.isAttributionTextVisible)
+                        .locationDisplay(viewModel.locationDisplay)
+                        .selectionColor(viewModel.selectedColor)
+                        .interactionModes(viewModel.interactionModes)
+                        .contentInsets(viewModel.contentInsets)
+                        .edgesIgnoringSafeArea(viewModel.ignoresSafeAreaEdges ? .all : [])
+                        .disabled(!viewModel.interactionsEnabled)
+                        .onAppear {
+                            viewModel.mapViewProxy = proxy
+                        }
+                        .onLongPressGesture(minimumDuration: .infinity, maximumDistance: .infinity, pressing: { pressing in
+                            if pressing {
+                                isLongPress = true
+                            } else {
+                                if isLongPress {
+                                    isLongPress = false
+                                    if let lastLongPressEvent = lastLongPressEvent {
+                                        viewModel.handleLongTapEnded(screenPoint: lastLongPressEvent.0, mapPoint: lastLongPressEvent.1, mapViewProxy: lastLongPressEvent.2)
+                                    }
                                 }
                             }
+                        }, perform: {})
+                        .overlay(alignment: viewModel.scalebarConfig.alignment ?? .topLeading) {
+                            if viewModel.haveScaleBar {
+                                Scalebar(
+                                        maxWidth: viewModel.scalebarConfig.maxWidth,
+                                        settings: viewModel.scalebarConfig.settings,
+                                        spatialReference: $viewModel.spatialReference,
+                                        style: viewModel.scalebarConfig.style,
+                                        units: viewModel.scalebarConfig.units,
+                                        unitsPerPoint: $viewModel.unitsPerPoint,
+                                        viewpoint: $viewModel.viewpoint
+                                )
+                                        .offset(viewModel.scalebarConfig.offset ?? .zero)
+                            }
                         }
-                    }, perform: {})
-                    .overlay(alignment: viewModel.scalebarConfig.alignment ?? .topLeading) {
-                        if viewModel.haveScaleBar {
-                            Scalebar(
-                                    maxWidth: viewModel.scalebarConfig.maxWidth,
-                                    settings: viewModel.scalebarConfig.settings,
-                                    spatialReference: $viewModel.spatialReference,
-                                    style: viewModel.scalebarConfig.style,
-                                    units: viewModel.scalebarConfig.units,
-                                    unitsPerPoint: $viewModel.unitsPerPoint,
-                                    viewpoint: $viewModel.viewpoint
-                            )
-                                    .offset(viewModel.scalebarConfig.offset ?? .zero)
-                        }
-                    }
-
+            }
         }
     }
 }
@@ -106,10 +108,10 @@ struct FlutterScalebarConfig {
 
 
 class MapViewModel: ObservableObject {
-    @Published var map: Map = Map() {
+    @Published var map: Map? {
         didSet {
-            map.minScale = minScale
-            map.maxScale = maxScale
+            map?.minScale = minScale
+            map?.maxScale = maxScale
         }
     }
     @Published var graphicsOverlays: [GraphicsOverlay] = []
@@ -155,13 +157,13 @@ class MapViewModel: ObservableObject {
 
     var minScale: Double? {
         didSet {
-            map.minScale = minScale
+            map?.minScale = minScale
         }
     }
 
     var maxScale: Double? {
         didSet {
-            map.maxScale = maxScale
+            map?.maxScale = maxScale
         }
     }
 
@@ -193,7 +195,7 @@ extension MapViewModel {
 
     func updateMapOptions(with options: [String: Any]) {
 
-        if let interactionOptions = options["interactionOptions"] as? Dictionary<String, Any> {
+        if let interactionOptions = options["interactionOptions"] as? [String: Any] {
             updateInteractionOptions(with: interactionOptions)
         }
 

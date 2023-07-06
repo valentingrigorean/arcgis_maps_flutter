@@ -25,7 +25,7 @@ class MarkersController: NSObject, SymbolsController {
         self.graphicsOverlays = graphicsOverlays
     }
 
-    func addMarkers(markersToAdd: [Dictionary<String, Any>]) {
+    func addMarkers(markersToAdd: [[String: Any]]) {
         for marker in markersToAdd {
             let markerId = marker["markerId"] as! String
             let controller = MarkerController(markerId: markerId)
@@ -36,7 +36,7 @@ class MarkersController: NSObject, SymbolsController {
         }
     }
 
-    func changeMarkers(markersToChange: [Dictionary<String, Any>]) {
+    func changeMarkers(markersToChange: [[String: Any]]) {
         for marker in markersToChange {
             let markerId = marker["markerId"] as! String
             guard let controller = markerIdToController[markerId] else {
@@ -65,22 +65,22 @@ class MarkersController: NSObject, SymbolsController {
         symbolVisibilityFilterController?.invalidate(graphicController: selectedMarker)
     }
 
-    private func updateMarker(data: Dictionary<String, Any>,
+    private func updateMarker(data: [String: Any],
                               controller: MarkerController) {
 
         updateController(controller: controller, data: data)
 
-        if let position = data["position"] as? Dictionary<String, Any> {
+        if let position = data["position"] as? [String: Any] {
             controller.geometry = Point(data: position)
         }
 
-        if let icon = data["icon"] as? Dictionary<String, Any> {
+        if let icon = data["icon"] as? [String: Any] {
             controller.setIcon(bitmapDescription: BitmapDescriptor(data: icon))
         }
 
         controller.setIconOffset(offsetX: CGFloat(data["iconOffsetX"] as! Double), offsetY: CGFloat(data["iconOffsetY"] as! Double))
 
-        if let backgroundImage = data["backgroundImage"] as? Dictionary<String, Any> {
+        if let backgroundImage = data["backgroundImage"] as? [String: Any] {
             controller.setBackground(bitmapDescription: BitmapDescriptor(data: backgroundImage))
         }
 

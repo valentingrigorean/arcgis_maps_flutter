@@ -6,9 +6,9 @@ import Foundation
 import ArcGIS
 
 extension GeodesicSectorParameters {
-    init(data: Dictionary<String, Any>) where Geometry: ArcGIS.Multipart {
+    init(data: [String: Any]) where Geometry: ArcGIS.Multipart {
         self.init()
-        center = Point(data: data["center"] as! Dictionary<String, Any>)
+        center = Point(data: data["center"] as! [String: Any])
         semiAxis1Length = data["semiAxis1Length"] as! Double
         semiAxis2Length = data["semiAxis2Length"] as! Double
         startDirection = data["startDirection"] as! Double
@@ -22,7 +22,7 @@ extension GeodesicSectorParameters {
         maxPointCount = data["maxPointCount"] as! Int
     }
 
-    static func createGeodesicSectorParameters(data: Dictionary<String, Any>) -> GeodesicSectorParameters<Geometry> {
+    static func createGeodesicSectorParameters(data: [String: Any]) -> GeodesicSectorParameters<Geometry> {
         let geometryType = GeometryType(rawValue: data["geometryType"] as! Int)!
         switch geometryType {
         case .polyline:

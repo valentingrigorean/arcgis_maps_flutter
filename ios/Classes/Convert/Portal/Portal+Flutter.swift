@@ -6,7 +6,7 @@ import Foundation
 import ArcGIS
 
 extension Portal {
-    convenience init(data: Dictionary<String, Any>) {
+    convenience init(data: [String: Any]) {
         let postalUrl = data["url"] as! String
         self.init(url: URL(string: postalUrl)!, connection: toConnection(value: data["connection"] as? Int))
     }

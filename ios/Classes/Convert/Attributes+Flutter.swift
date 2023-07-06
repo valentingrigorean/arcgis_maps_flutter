@@ -5,7 +5,7 @@
 import Foundation
 
 extension Dictionary where Key == String, Value == Any {
-    func toFlutterTypes() -> Dictionary<String, Any> {
+    func toFlutterTypes() -> [String: Any] {
         var flutterAttributes = [String: Any]()
 
         for attr in self {
@@ -16,7 +16,7 @@ extension Dictionary where Key == String, Value == Any {
 }
 
 extension NSMutableDictionary {
-    func toFlutterTypes() -> Dictionary<String, Any> {
+    func toFlutterTypes() -> [String: Any] {
         var flutterAttributes = [String: Any]()
 
         for attr in self {

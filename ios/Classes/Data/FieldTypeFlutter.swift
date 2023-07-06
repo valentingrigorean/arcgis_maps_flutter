@@ -98,7 +98,7 @@ func toFlutterFieldType(obj: Any?) -> Any {
     ]
 }
 
-func fromFlutterField(data: Dictionary<String, Any>) -> Any? {
+func fromFlutterField(data: [String: Any]) -> Any? {
     let type = FieldTypeFlutter(rawValue: data["type"] as! Int)!
     var value = data["value"]
     switch type {
@@ -108,7 +108,7 @@ func fromFlutterField(data: Dictionary<String, Any>) -> Any? {
         }
         break
     case .geometry:
-        if let geometry = value as? Dictionary<String, Any> {
+        if let geometry = value as? [String: Any] {
             value = Geometry.fromFlutter(data: geometry)
         }
         break

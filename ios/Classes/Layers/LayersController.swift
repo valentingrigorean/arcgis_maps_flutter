@@ -110,7 +110,7 @@ class LayersController {
 
 
     public func updateFromArgs(args: Any) {
-        guard let dict = args as? Dictionary<String, Any> else {
+        guard let dict = args as? [String: Any] else {
             return
         }
 
@@ -120,7 +120,7 @@ class LayersController {
     }
 
     func setTimeOffset(arguments: Any?) {
-        guard let data = arguments as? Dictionary<String, Any> else {
+        guard let data = arguments as? [String: Any] else {
             return
         }
 
@@ -132,7 +132,7 @@ class LayersController {
             return
         }
 
-        guard let timeValue = data["timeValue"] as? Dictionary<String, Any> else {
+        guard let timeValue = data["timeValue"] as? [String: Any] else {
             layer.timeOffset = nil
             return
         }
@@ -143,7 +143,7 @@ class LayersController {
     private func addLayers(args: Any,
                            layerType: LayerType) {
 
-        guard let layersArgs = args as? [Dictionary<String, Any>] else {
+        guard let layersArgs = args as? [[String: Any]] else {
             return
         }
 
@@ -285,7 +285,7 @@ class LayersController {
         }
     }
 
-    private func updateFromData(data: Dictionary<String, Any>,
+    private func updateFromData(data: [String: Any],
                                 layerType: LayerType) {
 
         let objectName = getObjectName(layerType: layerType)

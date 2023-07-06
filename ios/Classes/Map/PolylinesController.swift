@@ -23,7 +23,7 @@ class PolylinesController: NSObject, SymbolsController {
         self.graphicsOverlays = graphicsOverlays
     }
 
-    func addPolylines(polylinesToAdd: [Dictionary<String, Any>]) {
+    func addPolylines(polylinesToAdd: [[String: Any]]) {
         for polyline in polylinesToAdd {
             let polylineId = polyline["polylineId"] as! String
             let controller = PolylineController(polylineId: polylineId)
@@ -33,7 +33,7 @@ class PolylinesController: NSObject, SymbolsController {
         }
     }
 
-    func changePolylines(polylinesToChange: [Dictionary<String, Any>]) {
+    func changePolylines(polylinesToChange: [[String: Any]]) {
         for polyline in polylinesToChange {
             let polylineId = polyline["polylineId"] as! String
             guard let controller = polylineIdToController[polylineId] else {
@@ -53,7 +53,7 @@ class PolylinesController: NSObject, SymbolsController {
         }
     }
 
-    private func updatePolyline(data: Dictionary<String, Any>,
+    private func updatePolyline(data: [String: Any],
                                 controller: PolylineController) {
         updateController(controller: controller, data: data)
 
@@ -65,7 +65,7 @@ class PolylinesController: NSObject, SymbolsController {
             controller.setStyle(style:  SimpleLineSymbol.Style(styleIndex))
         }
 
-        if let pointsData = data["points"] as? [Dictionary<String, Any>] {
+        if let pointsData = data["points"] as? [[String: Any]] {
             var points: [Point] = []
             for data in pointsData {
                 points.append(Point(data: data))

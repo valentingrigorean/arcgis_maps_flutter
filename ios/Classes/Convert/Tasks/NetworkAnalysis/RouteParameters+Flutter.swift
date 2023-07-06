@@ -6,7 +6,7 @@ import Foundation
 import ArcGIS
 
 extension RouteParameters {
-    convenience init(data: Dictionary<String, Any>) {
+    convenience init(data: [String: Any]) {
         self.init()
         addAccumulateAttributeNames(data["accumulateAttributeNames"] as! [String])
         directionsDistanceUnits = UnitSystem(data["directionsDistanceUnits"] as! Int)
@@ -16,7 +16,7 @@ extension RouteParameters {
         if let startTime = data["startTime"] as? String {
             startDate = startTime.toDateFromIso8601()
         }
-        if let outputSpatialReference = data["outputSpatialReference"] as? Dictionary<String, Any> {
+        if let outputSpatialReference = data["outputSpatialReference"] as? [String: Any] {
             self.outputSpatialReference = SpatialReference(data: outputSpatialReference)
         }
         preservesFirstStop = data["preserveFirstStop"] as! Bool
@@ -28,10 +28,10 @@ extension RouteParameters {
         returnsRoutes = data["returnRoutes"] as! Bool
         returnsStops = data["returnStops"] as! Bool
         routeShapeType = RouteShapeType(data["routeShapeType"] as! Int)
-        if let travelMode = data["travelMode"] as? Dictionary<String, Any> {
+        if let travelMode = data["travelMode"] as? [String: Any] {
             self.travelMode = TravelMode(data: travelMode)
         }
-        if let stops = data["stops"] as? [Dictionary<String, Any>] {
+        if let stops = data["stops"] as? [[String: Any]] {
             setStops(stops.map {
                 Stop(data: $0)
             })

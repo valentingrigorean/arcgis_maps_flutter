@@ -6,7 +6,7 @@ import Foundation
 import ArcGIS
 
 extension GenerateLayerOption {
-    convenience init(data: Dictionary<String, Any>) {
+    convenience init(data: [String: Any]) {
         self.init(layerID: data["layerId"] as! Int)
         includesRelated = data["includeRelated"] as! Bool
         queryOption = GenerateLayerOption.QueryOption(data["queryOption"] as! Int)

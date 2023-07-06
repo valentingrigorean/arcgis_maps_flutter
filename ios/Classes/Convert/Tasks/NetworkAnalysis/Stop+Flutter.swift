@@ -6,8 +6,8 @@ import Foundation
 import ArcGIS
 
 extension Stop {
-    convenience init(data: Dictionary<String, Any>) {
-        let point = Geometry.fromFlutter(data: data["geometry"] as! Dictionary<String, Any>) as! Point
+    convenience init(data: [String: Any]) {
+        let point = Geometry.fromFlutter(data: data["geometry"] as! [String: Any]) as! Point
         self.init(point: point)
         name = data["name"] as? String ?? ""
         kind = Stop.Kind(data["stopType"] as! Int)

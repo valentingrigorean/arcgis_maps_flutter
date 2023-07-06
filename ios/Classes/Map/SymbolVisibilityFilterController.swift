@@ -11,7 +11,7 @@ struct SymbolVisibilityFilter: Hashable {
     let minZoom: Double
     let maxZoom: Double
 
-    init(data: Dictionary<String, Any>) {
+    init(data: [String: Any]) {
         minZoom = data["minZoom"] as! Double
         maxZoom = data["maxZoom"] as! Double
     }

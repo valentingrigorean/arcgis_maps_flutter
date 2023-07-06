@@ -6,7 +6,7 @@ import Foundation
 import ArcGIS
 
 extension TimeExtent {
-    init(data: Dictionary<String, Any>) {
+    init(data: [String: Any]) {
         let startTime: Date?
         let endTime: Date?
 
@@ -26,7 +26,7 @@ extension TimeExtent {
     }
 
     func toJSONFlutter() -> Any? {
-        var data = Dictionary<String, Any>()
+        var data = [String: Any]()
         if let startTime = startDate {
             data["startTime"] = startTime.toIso8601String()
         }

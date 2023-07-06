@@ -21,19 +21,19 @@ class LocatorTaskNativeObject: BaseNativeObject<LocatorTask> {
             getLocatorInfo(result: result)
             break
         case "locatorTask#geocode":
-            geocode(arguments: arguments as! Dictionary<String, Any>, result: result)
+            geocode(arguments: arguments as! [String: Any], result: result)
             break
         case "locatorTask#geocodeSuggestResult":
-            geocodeSuggestResult(arguments: arguments as! Dictionary<String, Any>, result: result)
+            geocodeSuggestResult(arguments: arguments as! [String: Any], result: result)
             break
         case "locatorTask#geocodeSearchValues":
-            geocodeSearchValues(arguments: arguments as! Dictionary<String, Any>, result: result)
+            geocodeSearchValues(arguments: arguments as! [String: Any], result: result)
             break
         case "locatorTask#reverseGeocode":
-            reverseGeocode(arguments: arguments as! Dictionary<String, Any>, result: result)
+            reverseGeocode(arguments: arguments as! [String: Any], result: result)
             break
         case "locatorTask#suggest":
-            suggest(arguments: arguments as! Dictionary<String, Any>, result: result)
+            suggest(arguments: arguments as! [String: Any], result: result)
             break
         case "locatorTask#releaseSuggestResults":
             releaseSuggestResults(arguments: arguments)
@@ -55,10 +55,10 @@ class LocatorTaskNativeObject: BaseNativeObject<LocatorTask> {
         }
     }
     
-    private func geocode(arguments: Dictionary<String, Any>, result: @escaping FlutterResult) {
+    private func geocode(arguments: [String: Any], result: @escaping FlutterResult) {
         createTask {
             let searchTerm = arguments["searchText"] as! String
-            let paramsRaw = arguments["parameters"] as? Dictionary<String, Any>
+            let paramsRaw = arguments["parameters"] as? [String: Any]
             let params = paramsRaw == nil ? nil : GeocodeParameters(data: paramsRaw!)
             do {
                 let results = try await self.nativeObject.geocode(forSearchText: searchTerm,using:params)
@@ -72,7 +72,7 @@ class LocatorTaskNativeObject: BaseNativeObject<LocatorTask> {
     private func geocodeSuggestResult(arguments: [String: Any], result: @escaping FlutterResult) {
         createTask {
             let suggestResult = self.suggestResultMap[arguments["suggestResultId"] as! String]!
-            let paramsRaw = arguments["parameters"] as? Dictionary<String, Any>
+            let paramsRaw = arguments["parameters"] as? [String: Any]
             let params = paramsRaw == nil ? nil : GeocodeParameters(data: paramsRaw!)
             do {
                 let results = try await self.nativeObject.geocode(forSuggestResult: suggestResult,using:params)
@@ -86,7 +86,7 @@ class LocatorTaskNativeObject: BaseNativeObject<LocatorTask> {
     private func geocodeSearchValues(arguments: [String: Any], result: @escaping FlutterResult) {
         createTask {
             let searchValues = arguments["searchValues"] as! [String: String]
-            let paramsRaw = arguments["parameters"] as? Dictionary<String, Any>
+            let paramsRaw = arguments["parameters"] as? [String: Any]
             let params = paramsRaw == nil ? nil : GeocodeParameters(data: paramsRaw!)
             do {
                 let results = try await self.nativeObject.geocode(forSearchValues: searchValues,using:params)
@@ -97,10 +97,10 @@ class LocatorTaskNativeObject: BaseNativeObject<LocatorTask> {
         }
     }
     
-    private func reverseGeocode(arguments: Dictionary<String, Any>, result: @escaping FlutterResult) {
+    private func reverseGeocode(arguments: [String: Any], result: @escaping FlutterResult) {
         createTask {
-            let location = Geometry.fromFlutter(data: arguments["location"] as! Dictionary<String, Any>) as! Point
-            let paramsRaw = arguments["parameters"] as? Dictionary<String, Any>
+            let location = Geometry.fromFlutter(data: arguments["location"] as! [String: Any]) as! Point
+            let paramsRaw = arguments["parameters"] as? [String: Any]
             let params = paramsRaw == nil ? nil : ReverseGeocodeParameters(data: paramsRaw!)
             do {
                 let results = try await  self.nativeObject.reverseGeocode(forLocation: location,parameters:params)
@@ -112,10 +112,10 @@ class LocatorTaskNativeObject: BaseNativeObject<LocatorTask> {
         }
     }
     
-    private func suggest(arguments: Dictionary<String, Any>, result: @escaping FlutterResult) {
+    private func suggest(arguments: [String: Any], result: @escaping FlutterResult) {
         createTask {
             let searchTerm = arguments["searchText"] as! String
-            let paramsRaw = arguments["parameters"] as? Dictionary<String, Any>
+            let paramsRaw = arguments["parameters"] as? [String: Any]
             let params = paramsRaw == nil ? nil : SuggestParameters(data: paramsRaw!)
             do {
                 let results = try await  self.nativeObject.suggest(forSearchText: searchTerm,parameters:params)

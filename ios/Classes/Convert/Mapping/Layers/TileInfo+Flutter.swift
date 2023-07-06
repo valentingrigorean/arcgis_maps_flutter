@@ -55,22 +55,22 @@ extension TileImageFormat {
 }
 
 extension TileInfo {
-    convenience init(data: Dictionary<String, Any>) {
+    convenience init(data: [String: Any]) {
         let dpi = data["dpi"] as! Int
         let imageFormat = data["imageFormat"] as! Int
         let levelOfDetails = (data["levelOfDetails"] as! [Any]).map {
             LevelOfDetail(data: $0 as! [Any])
         }
 
-        let origin = Point(data: data["origin"] as! Dictionary<String, Any>)
-        let spatialReference = SpatialReference(data: data["spatialReference"] as! Dictionary<String, Any>)!
+        let origin = Point(data: data["origin"] as! [String: Any])
+        let spatialReference = SpatialReference(data: data["spatialReference"] as! [String: Any])!
         let tileHeight = data["tileHeight"] as! Int
         let tileWidth = data["tileWidth"] as! Int
 
         self.init(dpi: dpi, format: TileImageFormat(imageFormat), levelsOfDetail: levelOfDetails, origin: origin, spatialReference: spatialReference, tileHeight: tileHeight, tileWidth: tileWidth)
     }
 
-    func toJSONFlutter() -> Dictionary<String, Any> {
+    func toJSONFlutter() -> [String: Any] {
         [
             "dpi": dpi,
             "imageFormat": format?.toFlutterValue(),

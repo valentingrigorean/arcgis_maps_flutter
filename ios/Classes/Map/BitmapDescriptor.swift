@@ -15,7 +15,7 @@ class BitmapDescriptorOptions: NSObject {
 
     let tintColor: UIColor?
 
-    init(data: Dictionary<String, Any>) {
+    init(data: [String: Any]) {
         fileName = data["fromNativeAsset"] as! String
 
         if let tintColor = data["tintColor"] {
@@ -97,7 +97,7 @@ class BitmapDescriptor: Hashable {
     private let bitmapDescriptor: FlutterBitmapDescriptor
 
 
-    init(data: Dictionary<String, Any>) {
+    init(data: [String: Any]) {
         bitmapDescriptor = BitmapDescriptor.createFlutterBitmapDescriptor(data: data)
     }
 
@@ -123,7 +123,7 @@ class BitmapDescriptor: Hashable {
         return true
     }
 
-    private static func createFlutterBitmapDescriptor(data: Dictionary<String, Any>) -> FlutterBitmapDescriptor {
+    private static func createFlutterBitmapDescriptor(data: [String: Any]) -> FlutterBitmapDescriptor {
         if let fromBytes = data["fromBytes"] as? FlutterStandardTypedData {
             return RawBitmapDescriptor(rawData: fromBytes)
         }
@@ -131,7 +131,7 @@ class BitmapDescriptor: Hashable {
             return AssetBitmapDescriptor(bitmapOptions: BitmapDescriptorOptions(data: data))
         }
 
-        if let descriptors = data["descriptors"] as? [Dictionary<String, Any>] {
+        if let descriptors = data["descriptors"] as? [[String: Any]] {
             var bitmaps = [FlutterBitmapDescriptor]()
             for descriptor in descriptors {
                 bitmaps.append(createFlutterBitmapDescriptor(data: descriptor))

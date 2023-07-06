@@ -12,13 +12,13 @@ protocol SymbolsController {
 
 extension SymbolsController {
     func updateController(controller: BaseGraphicController,
-                          data: Dictionary<String, Any>) {
+                          data: [String: Any]) {
         if let consumeTapEvents = data["consumeTapEvents"] as? Bool {
             controller.consumeTapEvents = consumeTapEvents
         }
 
         if let visible = data["visible"] as? Bool {
-            let visibilityFilter = data["visibilityFilter"] as? Dictionary<String, Any>
+            let visibilityFilter = data["visibilityFilter"] as? [String: Any]
             let symbolVisibilityFilterController = symbolVisibilityFilterController
             if visibilityFilter != nil && symbolVisibilityFilterController != nil {
                 symbolVisibilityFilterController?.addGraphicsController(graphicController: controller, visibilityFilter: SymbolVisibilityFilter(data: visibilityFilter!), initValue: visible)

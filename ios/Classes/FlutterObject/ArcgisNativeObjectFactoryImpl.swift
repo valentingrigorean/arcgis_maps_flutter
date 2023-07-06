@@ -39,9 +39,9 @@ class ArcgisNativeObjectFactoryImpl: ArcgisNativeObjectFactory {
 
     private func createOfflineMapTask(data: [String: Any]) -> OfflineMapTask {
         var offlineMapTask: OfflineMapTask
-        if let map = data["map"] as? Dictionary<String, Any> {
+        if let map = data["map"] as? [String: Any] {
             offlineMapTask = OfflineMapTask(onlineMap: Map(data: map))
-        } else if let portalItem = data["portalItem"] as? Dictionary<String, Any> {
+        } else if let portalItem = data["item"] as? [String: Any] {
             offlineMapTask = OfflineMapTask(portalItem: PortalItem(data: portalItem))
         } else {
             fatalError("Invalid offline map task")

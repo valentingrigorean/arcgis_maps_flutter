@@ -10,11 +10,11 @@
 //        var json = [String: Any]()
 //        json["geometry"] = geometry?.toJSONFlutter()
 //
-//        var featureTableMap: Dictionary<String, Any> = [:];
+//        var featureTableMap: [String: Any] = [:];
 //        featureTableMap["displayName"] = featureTable?.displayName
 //        featureTableMap["tableName"] = featureTable?.tableName
 //
-//        var fields: [Dictionary<String, Any>] = []
+//        var fields: [[String: Any]] = []
 //        if let f = featureTable?.fields {
 //            f.forEach { field in
 //                fields.append([
@@ -25,11 +25,11 @@
 //            }
 //        }
 //
-//        var featureTypesList: [Dictionary<String, Any>] = []
+//        var featureTypesList: [[String: Any]] = []
 //        if let agft = self.featureTable as? ArcGISFeatureTable {
 ////            agf.featureTable?.feature
 //            agft.featureTypes.forEach { type in
-//                var map: Dictionary<String, Any> = [:];
+//                var map: [String: Any] = [:];
 //                if (type.typeID is Int || type.typeID is Int16 || type.typeID is Int32 || type.typeID is Double || type.typeID is Float) {
 //                    map["id"] = type.typeID
 //                    map["name"] = type.name
@@ -41,7 +41,7 @@
 //        featureTableMap["featureTypes"] = featureTypesList
 //        json["featureTable"] = featureTableMap
 //
-//        var attributesMap: Dictionary<String, Any> = [:]
+//        var attributesMap: [String: Any] = [:]
 //        attributes.forEach { key, value in
 //            let f = featureTable?.fields.first(where: { (agsf: AGSField) -> Bool in
 //                if let k = key as? String {

@@ -108,18 +108,18 @@ extension Basemap.Style {
 
 
 extension Basemap {
-    convenience init(data: Dictionary<String, Any>) {
+    convenience init(data: [String: Any]) {
         if let basemapStyle = data["basemapStyle"] as? Int {
             self.init(style: Basemap.Style(basemapStyle))
             return
         }
 
-        if let portalItem = data["portalItem"] as? Dictionary<String, Any> {
+        if let portalItem = data["portalItem"] as? [String: Any] {
             self.init(item: PortalItem(data: portalItem))
             return
         }
 
-        if let baseLayer = data["baseLayer"] as? Dictionary<String, Any> {
+        if let baseLayer = data["baseLayer"] as? [String: Any] {
             let flutterLayer = FlutterLayer(data: baseLayer)
             self.init(baseLayer: flutterLayer.createNativeLayer())
             return
@@ -130,12 +130,12 @@ extension Basemap {
             return
         }
 
-        let baseLayers = (data["baseLayers"] as? [Dictionary<String, Any>] ?? []).map { (baseLayer) -> Layer in
+        let baseLayers = (data["baseLayers"] as? [[String: Any]] ?? []).map { (baseLayer) -> Layer in
             let flutterLayer = FlutterLayer(data: baseLayer)
             return flutterLayer.createNativeLayer()
         }
 
-        let referenceLayers = (data["referenceLayers"] as? [Dictionary<String, Any>] ?? []).map { (baseLayer) -> Layer in
+        let referenceLayers = (data["referenceLayers"] as? [[String: Any]] ?? []).map { (baseLayer) -> Layer in
             let flutterLayer = FlutterLayer(data: baseLayer)
             return flutterLayer.createNativeLayer()
         }

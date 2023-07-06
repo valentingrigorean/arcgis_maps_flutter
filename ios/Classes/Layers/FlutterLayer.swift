@@ -83,7 +83,7 @@ extension GroupLayer.VisibilityMode{
 
 struct FlutterLayer: Hashable, Equatable {
 
-    init(data: Dictionary<String, Any>) {
+    init(data: [String: Any]) {
         layerId = data["layerId"] as! String
         layerType = data["layerType"] as! String
         featureLayersIds = data["featureLayersIds"] as? [Int]
@@ -91,11 +91,11 @@ struct FlutterLayer: Hashable, Equatable {
             self.url = URL(string: url)
             portalItem = nil
             tileCache = nil
-        } else if let portalItemData = data["portalItem"] as? Dictionary<String, Any> {
+        } else if let portalItemData = data["portalItem"] as? [String: Any] {
             url = nil
             tileCache = nil
             portalItem = PortalItem(data: portalItemData)
-        } else if let tileCache = data["tileCache"] as? Dictionary<String, Any> {
+        } else if let tileCache = data["tileCache"] as? [String: Any] {
             url = nil
             portalItem = nil
             self.tileCache = TileCache.createFlutter(data: tileCache)
@@ -113,8 +113,8 @@ struct FlutterLayer: Hashable, Equatable {
         switch (layerType) {
         case "ServiceImageTiledLayer":
             serviceImageTiledLayerOptions = ServiceImageTiledLayerOptions(
-                    tileInfo: TileInfo(data: data["tileInfo"] as! Dictionary<String, Any>),
-                    fullExtent: Envelope(data: data["fullExtent"] as! Dictionary<String, Any>),
+                    tileInfo: TileInfo(data: data["tileInfo"] as! [String: Any]),
+                    fullExtent: Envelope(data: data["fullExtent"] as! [String: Any]),
                     urlTemplate: data["url"] as! String,
                     subdomains: data["subdomains"] as! [String],
                     additionalOptions: data["additionalOptions"] as! Dictionary<String, String>
@@ -127,7 +127,7 @@ struct FlutterLayer: Hashable, Equatable {
                     showChildrenInLegend: data["showChildrenInLegend"] as! Bool,
                     visibilityMode: GroupLayer.VisibilityMode(data["visibilityMode"] as! Int),
                     layers: (data["layers"] as! [Any]).map {
-                        FlutterLayer(data: $0 as! Dictionary<String, Any>)
+                        FlutterLayer(data: $0 as! [String: Any])
                     })
             serviceImageTiledLayerOptions = nil
             portalItemLayerId = nil

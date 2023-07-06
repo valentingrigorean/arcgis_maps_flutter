@@ -102,7 +102,7 @@ fileprivate class OfflineMapSyncTaskNativeObjectWrapper: BaseNativeObject<Offlin
             }
             break
         case "offlineMapSyncTask#offlineMapSyncJob":
-            createJob(data: arguments as! Dictionary<String, Any>, result: result)
+            createJob(data: arguments as! [String: Any], result: result)
             break
         default:
             super.onMethodCall(method: method, arguments: arguments, result: result)

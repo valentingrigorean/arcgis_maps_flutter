@@ -6,7 +6,7 @@ import Foundation
 import ArcGIS
 
 extension Map {
-    convenience init(data: Dictionary<String, Any>) {
+    convenience init(data: [String: Any]) {
         if let basemap = data["basemap"] as? Dictionary<String,Any> {
             self.init(basemap: Basemap(data: basemap))
             return
@@ -17,12 +17,12 @@ extension Map {
             return
         }
 
-        if let item = data["item"] as? Dictionary<String, Any> {
+        if let item = data["item"] as? [String: Any] {
             self.init(item: PortalItem(data: item))
             return
         }
 
-        if let spatialReference = data["spatialReference"] as? Dictionary<String, Any> {
+        if let spatialReference = data["spatialReference"] as? [String: Any] {
             self.init(spatialReference: SpatialReference(data: spatialReference))
             return
         }

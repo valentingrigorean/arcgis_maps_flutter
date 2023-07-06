@@ -6,9 +6,9 @@ import Foundation
 import ArcGIS
 
 extension ExportTileCacheParameters {
-    convenience init(data: Dictionary<String, Any>) {
+    convenience init(data: [String: Any]) {
         self.init()
-        if let geometry = data["geometry"] as? Dictionary<String, Any> {
+        if let geometry = data["geometry"] as? [String: Any] {
             areaOfInterest = Geometry.fromFlutter(data: geometry)
         }
         compressionQuality = data["compressionQuality"] as! Float

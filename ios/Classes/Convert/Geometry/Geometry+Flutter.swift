@@ -173,7 +173,7 @@ extension CoordinateFormatter.LatitudeLongitudeFormat {
 }
 
 extension Geometry {
-    static func fromFlutter(data: Dictionary<String, Any>) -> Geometry? {
+    static func fromFlutter(data: [String: Any]) -> Geometry? {
         guard let geometryType = data["type"] as? Int,
               let geometryType = GeometryType(rawValue: geometryType)
         else {
@@ -210,7 +210,7 @@ extension Geometry {
     }
 
 
-    private static func tryParseAsJson(data: Dictionary<String, Any>) -> Geometry? {
+    private static func tryParseAsJson(data: [String: Any]) -> Geometry? {
         do {
             // Convert the dictionary to JSON data
             let jsonData = try JSONSerialization.data(withJSONObject: data, options: .fragmentsAllowed)

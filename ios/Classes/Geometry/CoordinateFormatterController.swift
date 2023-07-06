@@ -27,8 +27,8 @@ class CoordinateFormatterController {
                         result: @escaping FlutterResult) -> Void {
         switch call.method {
         case "latitudeLongitudeString":
-            let data = call.arguments as! Dictionary<String, Any>
-            let from = Geometry.fromFlutter(data: data["from"] as! Dictionary<String, Any>) as! Point
+            let data = call.arguments as! [String: Any]
+            let from = Geometry.fromFlutter(data: data["from"] as! [String: Any]) as! Point
             let format = data["format"] as! Int
             let decimalPlaces = data["decimalPlaces"] as! Int
             result(CoordinateFormatter.latitudeLongitudeString(from: from, format: CoordinateFormatter.LatitudeLongitudeFormat(format), decimalPlaces: decimalPlaces))

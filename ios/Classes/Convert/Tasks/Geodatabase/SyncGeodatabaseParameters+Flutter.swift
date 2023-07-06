@@ -6,11 +6,11 @@ import Foundation
 import ArcGIS
 
 extension SyncGeodatabaseParameters {
-    convenience init(data: Dictionary<String, Any>) {
+    convenience init(data: [String: Any]) {
         self.init()
         keepsGeodatabaseDeltas = data["keepGeodatabaseDeltas"] as! Bool
         geodatabaseSyncDirection = SyncDirection(data["geodatabaseSyncDirection"] as! Int)
-        let layersOptions = (data["layerOptions"] as! [Dictionary<String, Any>]).map {
+        let layersOptions = (data["layerOptions"] as! [[String: Any]]).map {
             SyncLayerOption(data: $0)
         }
         for layerOption in layersOptions {

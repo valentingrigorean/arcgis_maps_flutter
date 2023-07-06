@@ -6,7 +6,7 @@ import Foundation
 import ArcGIS
 
 extension Point {
-    convenience init(data: Dictionary<String, Any>) {
+    convenience init(data: [String: Any]) {
         let x = data["x"] as! Double
         let y = data["y"] as! Double
 

@@ -8,8 +8,8 @@ import ArcGIS
 extension GenerateOfflineMapParameters {
     convenience init(data: [String: Any]) {
         let areaOfInterest = Geometry.fromFlutter(data: data["areaOfInterest"] as! [String: Any])!
-        let minScale = data["minScale"] as! Double
-        let maxScale = data["maxScale"] as! Double
+        let minScale = data["minScale"] as? Double
+        let maxScale = data["maxScale"] as? Double
         self.init(areaOfInterest: areaOfInterest, minScale: minScale, maxScale: maxScale)
         onlineOnlyServicesOption = GenerateOfflineMapParameters.OnlineOnlyServicesOption(data["onlineOnlyServicesOption"] as! Int)
         if let itemInfo = data["itemInfo"] as? [String: Any] {

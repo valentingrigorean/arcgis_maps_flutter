@@ -6,7 +6,7 @@ import Foundation
 import ArcGIS
 
 extension OfflineMapSyncParameters {
-    convenience init(data: Dictionary<String, Any>) {
+    convenience init(data: [String: Any]) {
         self.init()
         keepsGeodatabaseDeltas = data["keepGeodatabaseDeltas"] as! Bool
         preplannedScheduledUpdatesOption = PreplannedScheduledUpdatesOption(data["preplannedScheduledUpdatesOption"] as! Int)

@@ -24,7 +24,7 @@ class PolygonsController: NSObject, SymbolsController {
         self.graphicsOverlays = graphicsOverlays
     }
 
-    func addPolygons(polygonsToAdd: [Dictionary<String, Any>]) {
+    func addPolygons(polygonsToAdd: [[String: Any]]) {
         for polygon in polygonsToAdd {
             let polygonId = polygon["polygonId"] as! String
             let controller = PolygonController(polygonId: polygonId)
@@ -34,7 +34,7 @@ class PolygonsController: NSObject, SymbolsController {
         }
     }
 
-    func changePolygons(polygonsToChange: [Dictionary<String, Any>]) {
+    func changePolygons(polygonsToChange: [[String: Any]]) {
         for polygon in polygonsToChange {
             let polygonId = polygon["polygonId"] as! String
             guard let controller = polygonIdToController[polygonId] else {
@@ -55,7 +55,7 @@ class PolygonsController: NSObject, SymbolsController {
         }
     }
 
-    private func updatePolygon(data: Dictionary<String, Any>,
+    private func updatePolygon(data: [String: Any],
                                controller: PolygonController) {
 
         updateController(controller: controller, data: data)
@@ -76,7 +76,7 @@ class PolygonsController: NSObject, SymbolsController {
             controller.setStrokeStyle(style: SimpleLineSymbol.Style(strokeStyle))
         }
 
-        if let pointsData = data["points"] as? [Dictionary<String, Any>] {
+        if let pointsData = data["points"] as? [[String: Any]] {
             var points: [Point] = []
             for data in pointsData {
                 points.append(Point(data: data))

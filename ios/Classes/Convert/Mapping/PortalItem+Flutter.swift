@@ -6,8 +6,8 @@ import Foundation
 import ArcGIS
 
 extension PortalItem {
-    convenience init(data: Dictionary<String, Any>) {
-        let portal = Portal(data: data["portal"] as! Dictionary<String, Any>)
+    convenience init(data: [String: Any]) {
+        let portal = Portal(data: data["portal"] as! [String: Any])
         let itemId = data["itemId"] as! String
         self.init(portal: portal, id: ID(itemId)!)
     }

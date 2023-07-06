@@ -7,11 +7,11 @@ import ArcGIS
 
 extension AttributeParameterValue {
 
-    convenience init(data: Dictionary<String, Any>) {
+    convenience init(data: [String: Any]) {
         self.init()
         attributeName = data["attributeName"] as! String
         parameterName = data["parameterName"] as! String
-        if let parameterValue = data["parameterValue"] as? Dictionary<String, Any> {
+        if let parameterValue = data["parameterValue"] as? [String: Any] {
             self.parameterValue = fromFlutterField(data: parameterValue)
         }
     }

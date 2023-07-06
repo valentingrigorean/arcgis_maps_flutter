@@ -6,8 +6,8 @@ import Foundation
 import ArcGIS
 
 extension SuggestResult {
-    func toJSONFlutter(suggestResultId: String) -> Dictionary<String, Any> {
-        var result = Dictionary<String, Any>()
+    func toJSONFlutter(suggestResultId: String) -> [String: Any] {
+        var result = [String: Any]()
         result["label"] = label
         result["isCollection"] = isCollection
         result["suggestResultId"] = suggestResultId

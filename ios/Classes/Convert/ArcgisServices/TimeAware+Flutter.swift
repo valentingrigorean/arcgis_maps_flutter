@@ -7,7 +7,7 @@ import ArcGIS
 
 extension TimeAware {
     func toJSONFlutter(layerId: String? = nil) -> Any {
-        var data = Dictionary<String, Any>()
+        var data = [String: Any]()
 
         if let layerId = layerId {
             data["layerId"] = layerId

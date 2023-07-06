@@ -5,7 +5,7 @@
 import Foundation
 
 extension Error {
-    func toJSONFlutter(withStackTrace: Bool = true) -> Dictionary<String, Any> {
+    func toJSONFlutter(withStackTrace: Bool = true) -> [String: Any] {
         var dict = [String: Any]()
         dict["domain"] = 2
         if let nsError = self as NSError? {

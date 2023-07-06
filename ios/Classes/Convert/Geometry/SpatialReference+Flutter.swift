@@ -6,7 +6,7 @@ import Foundation
 import ArcGIS
 
 extension SpatialReference {
-    init?(data: Dictionary<String, Any>) {
+    init?(data: [String: Any]) {
         if let wkId = data["wkid"] as? Int {
             self.init(wkid: WKID(rawValue: wkId)!)
             return
