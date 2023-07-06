@@ -199,7 +199,7 @@ extension Geometry {
                 return nil
             }
             if var dictionary = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
-                dictionary["type"] = geometryType()
+                dictionary["type"] = geometryType().rawValue
                 return dictionary
             }
         } catch {

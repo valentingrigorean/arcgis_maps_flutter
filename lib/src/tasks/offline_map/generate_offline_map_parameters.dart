@@ -361,7 +361,7 @@ class GenerateOfflineMapParameters {
 
   Object toJson() {
     final Map<String, dynamic> json = {};
-    json['areaOfInterest'] = areaOfInterest.toJson();
+    json['areaOfInterest'] = areaOfInterest!.toJson();
     json['minScale'] = minScale;
     json['maxScale'] = maxScale;
     json['onlineOnlyServicesOption'] = onlineOnlyServicesOption.value;

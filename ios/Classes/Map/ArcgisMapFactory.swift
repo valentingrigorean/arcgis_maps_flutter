@@ -21,6 +21,6 @@ public class ArcgisMapFactory: NSObject, FlutterPlatformViewFactory {
     }
 
     public func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
-        FlutterStandardMessageCodec(readerWriter: FlutterStandardReaderWriter())
+        FlutterStandardMessageCodec.sharedInstance()
     }
 }

@@ -110,7 +110,7 @@ class GeoViewTouchDelegate {
 
 
         if let json = mapPoint.toJSONFlutter() {
-            methodChannel.invokeMethod("map#onLongPressEnd", arguments: ["screenPoint": screenPoint.toJSONFlutter(), "position": json])
+            methodChannel.invokeMethod("map#onTap", arguments: ["screenPoint": screenPoint.toJSONFlutter(), "position": json])
         }
     }
 
@@ -122,7 +122,7 @@ class GeoViewTouchDelegate {
 
     private func handleLongTapEnded(screenPoint: CGPoint, mapPoint: ArcGIS.Point, mapViewProxy: MapViewProxy) async {
         if let json = mapPoint.toJSONFlutter() {
-            methodChannel.invokeMethod("map#onLongPress", arguments: ["screenPoint": screenPoint.toJSONFlutter(), "position": json])
+            methodChannel.invokeMethod("map#onLongPressEnd", arguments: ["screenPoint": screenPoint.toJSONFlutter(), "position": json])
         }
     }
 
@@ -143,6 +143,16 @@ class GeoViewTouchDelegate {
         do {
             let results = try await mapViewProxy.identifyLayers(screenPoint: screenPoint, tolerance: 12)
             if results.isEmpty {
+                return false
+            }
+            var isEmpty = true;
+            for result in results {
+                if !result.geoElements.isEmpty {
+                    isEmpty = false
+                    break
+                }
+            }
+            if isEmpty {
                 return false
             }
             methodChannel.invokeMethod("map#onIdentifyLayers", arguments: ["results": results.toJSONFlutter(), "screenPoint": screenPoint.toJSONFlutter(), "position": mapPoint.toJSONFlutter()])

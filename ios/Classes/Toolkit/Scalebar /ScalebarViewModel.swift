@@ -18,6 +18,8 @@ import SwiftUI
 
 @MainActor
 final class ScalebarViewModel: ObservableObject {
+    private let alternateUnitValue: ScalebarUnits?
+
     // - MARK: Published vars
     
     /// The computed display length of the scalebar.
@@ -32,7 +34,7 @@ final class ScalebarViewModel: ObservableObject {
     var viewpointSubject = PassthroughSubject<Viewpoint?, Never>()
     
     // - MARK: Public methods
-    var alternateUnit : (screenLength: CGFloat, label: String)
+    lazy var alternateUnit : (screenLength: CGFloat, label: String) = getAlternateUnit(alternateUnitValue)
     /// A scalebar view model controls the underlying data used to render a scalebar.
     /// - Parameters:
     ///   - maxWidth: The maximum screen width allotted to the scalebar.
@@ -60,11 +62,11 @@ final class ScalebarViewModel: ObservableObject {
         self.spatialReference = spatialReference
         self.style = style
         self.units = units
+        alternateUnitValue = alternativeUnits
         self.unitsPerPoint = unitsPerPoint
         self.useGeodeticCalculations = useGeodeticCalculations
         self.viewpoint = viewpoint
-        alternateUnit = self.getAlternateUnit(alternativeUnits)
-        
+
         viewpointSubscription = viewpointSubject
             .debounce(for: delay, scheduler: DispatchQueue.main)
             .sink(receiveValue: { [weak self] in
