@@ -18,11 +18,6 @@ class LocationDisplayController {
 
     private let mapViewModel: MapViewModel
 
-    private func dataSourceStatusChanged(status: Bool) {
-
-        locationGraphic.geometry = locationDisplay.mapLocation
-    }
-
     init(methodChannel: FlutterMethodChannel, mapViewModel: MapViewModel) {
         self.methodChannel = methodChannel
         self.mapViewModel = mapViewModel
@@ -58,6 +53,8 @@ class LocationDisplayController {
         methodChannel.setMethodCallHandler(nil)
     }
 
+
+    var onLocationTapCallback: (() -> Void)?
 
     var trackUserLocationTap: Bool = false {
         didSet {
@@ -159,7 +156,7 @@ extension LocationDisplayController: MapGraphicTouchDelegate {
     func didHandleGraphic(graphic: Graphic) -> Bool {
         let result = graphic.attributes[LOCATION_ATTRIBUTE_NAME] != nil
         if result {
-            methodChannel.invokeMethod("map#onUserLocationTap", arguments: nil)
+            onLocationTapCallback?()
         }
         return result
     }

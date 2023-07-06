@@ -49,6 +49,9 @@ class GeoViewTouchDelegate {
 
 
         viewModel.longTapEndedEvent.sink(receiveValue: { screenPoint, mapPoint, mapViewProxy in
+                    if !self.isLongPress {
+                        return
+                    }
                     self.isLongPress = false
                     self.taskManager.cancelTask(withKey: "longTapTask")
                     self.taskManager.createTask(key: "longTapTask") {
@@ -92,7 +95,7 @@ class GeoViewTouchDelegate {
                 await self.handleIdentifyGraphicsOverlays(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: mapViewProxy)
             }
             group.addTask {
-                 await self.handleIdentifyLayers(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: mapViewProxy)
+                await self.handleIdentifyLayers(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: mapViewProxy)
             }
 
             for await result in group {

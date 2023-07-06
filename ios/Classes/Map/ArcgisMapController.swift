@@ -75,6 +75,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         let locationDisplayChannel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)_location_display", binaryMessenger: registrar.messenger())
         locationDisplayController = LocationDisplayController(methodChannel: locationDisplayChannel, mapViewModel: viewModel)
 
+
         geoViewTouchDelegate = GeoViewTouchDelegate(methodChannel: channel, viewModel: viewModel)
         geoViewTouchDelegate.addDelegates(graphicTouchDelegates: [markersController, polygonsController, polylinesController, locationDisplayController])
 
@@ -87,6 +88,10 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         initSymbolsControllers()
 
+        locationDisplayController.onLocationTapCallback = { [weak self] in
+            self?.channel.invokeMethod("map#onUserLocationTap", arguments: nil)
+        }
+
         viewModel.$viewpoint.sink { _ in
                     self.viewpointChangedHandler()
                 }
@@ -98,6 +103,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         for cancellable in cancellables {
             cancellable.cancel()
         }
+        locationDisplayController.onLocationTapCallback = nil
         cancellables.removeAll()
         hostingView.removeView()
         channel.setMethodCallHandler(nil)
@@ -223,10 +229,10 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         case "map#getCurrentViewpoint":
             let type = Viewpoint.Kind(call.arguments as! Int)
             let currentViewPoint = type == .centerAndScale ? viewModel.viewpointCenterAndScale : viewModel.viewpointBoundingGeometry
-            result(currentViewPoint?.toJSON())
+            result(currentViewPoint?.toJSONFlutter())
             break
         case "map#getInitialViewpoint":
-            result(viewModel.map.initialViewpoint?.toJSON())
+            result(viewModel.map.initialViewpoint?.toJSONFlutter())
             break
         case "map#setViewpoint":
             setViewpoint(args: call.arguments, animated: true, result: result)
@@ -297,7 +303,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             if mapPoint != nil && spatialReference.wkid != mapPoint?.spatialReference?.wkid {
                 mapPoint = GeometryEngine.project(mapPoint!, into: spatialReference)
             }
-            result(mapPoint?.toJSON())
+            result(mapPoint?.toJSONFlutter())
             break
         case "map#getMapScale":
             result(viewModel.currentScale)
