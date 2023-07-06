@@ -18,6 +18,11 @@ class JobNativeHandler<T: Job & JobProtocol > : BaseNativeHandler<T> {
                 self.sendMessage(method:"job#onMessageAdded", arguments: message.toJSONFlutter())
             }
         }
+        createTask {
+            for await status in self.nativeHandler.$status {
+                self.sendMessage(method:"job#onStatusChanged", arguments: status.toFlutterValue())
+            }
+        }
         job.progress.addObserver(self, forKeyPath: "fractionCompleted", options: [.old, .new], context: nil)
     }
     

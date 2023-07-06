@@ -21,7 +21,7 @@ extension SpatialReference {
 
     func toJSONFlutter() -> Any {
         [
-            "wkid": wkid,
+            "wkid": wkid?.rawValue,
             "wkText": wkText
         ]
     }
