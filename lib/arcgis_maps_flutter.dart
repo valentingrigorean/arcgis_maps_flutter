@@ -7,7 +7,6 @@ import 'package:arcgis_maps_flutter/src/arcgis_method_channel.dart';
 import 'package:arcgis_maps_flutter/src/arcgis_native_object.dart';
 import 'package:arcgis_maps_flutter/src/data/field_type.dart';
 import 'package:arcgis_maps_flutter/src/io/api_key_resource.dart';
-import 'package:arcgis_maps_flutter/src/io/remote_resource.dart';
 import 'package:arcgis_maps_flutter/src/layers/base_tile_layer.dart';
 import 'package:arcgis_maps_flutter/src/layers/layer_updates.dart';
 import 'package:arcgis_maps_flutter/src/mapping/view/location_display_impl.dart';
@@ -138,9 +137,6 @@ part 'src/mapping/view/zoom_level.dart';
 part 'src/mapping/arcgis_scene.dart';
 part 'src/mapping/view/scene/arcgis_scene_controller.dart';
 part 'src/mapping/view/scene/arcgis_scene_view.dart';
-
-part 'src/security/credential.dart';
-part 'src/security/user_credential.dart';
 
 part 'src/symbology/bitmap_descriptor.dart';
 part 'src/symbology/marker.dart';

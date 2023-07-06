@@ -6,7 +6,6 @@ import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:arcgis_maps_flutter_example/utils/credentials.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:path_provider/path_provider.dart';
 
 class MapPageTileCache extends StatefulWidget {
@@ -26,18 +25,10 @@ class _MapPageTileCacheState extends State<MapPageTileCache> {
 
   late ArcgisMapController _mapController;
 
-  bool _didLoadCredentials = false;
-
   bool _isDownloading = false;
   bool _isDownloaded = false;
 
   double _progress = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadCredentials();
-  }
 
   @override
   void dispose() {
@@ -66,7 +57,7 @@ class _MapPageTileCacheState extends State<MapPageTileCache> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed:
-            _isDownloading || !_didLoadCredentials ? null : _downloadTileCache,
+            _isDownloading ? null : _downloadTileCache,
         child: _isDownloading
             ? CircularProgressIndicator(
                 value: _progress,
@@ -79,27 +70,10 @@ class _MapPageTileCacheState extends State<MapPageTileCache> {
     );
   }
 
-  void _loadCredentials() async {
-
-    //await _addCredential('geodataCredentialsUsername', 'geodataCredentialsPassword', 'https://services.geodataonline.no/');
-    await _addCredential('snla_maps_arcgis_username', 'snla_maps_arcgis_password', 'https://www.arcgis.com');
-
-    _didLoadCredentials = true;
-  }
-
-
-  Future<void> _addCredential(String userKey,String passwordKey,String url) async{
-    final username = dotenv.env[userKey]!;
-    final password = dotenv.env[passwordKey]!;
-
-    await ArcGISCredentialStore().addCredential(
-      url: url,
-      username: username,
-      password: password,
-    );
-  }
-
   void _downloadTileCache() async {
+
+    await setGeodataCredentials();
+
     setState(() {
       _isDownloading = true;
       _progress = 0;
@@ -111,8 +85,6 @@ class _MapPageTileCacheState extends State<MapPageTileCache> {
     if (kDebugMode) {
       print('appDocPath: $appDocPath');
     }
-
-    await _tileCacheTask.setCredential(geodataCredentials);
 
     final viewPoint = await _mapController
         .getCurrentViewpoint(ViewpointType.boundingGeometry);

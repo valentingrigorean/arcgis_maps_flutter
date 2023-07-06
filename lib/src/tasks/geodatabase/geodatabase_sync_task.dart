@@ -1,7 +1,7 @@
 part of arcgis_maps_flutter;
 
 class GeodatabaseSyncTask extends ArcgisNativeObject
-    with Loadable, RemoteResource, ApiKeyResource {
+    with Loadable, ApiKeyResource {
   final String _url;
 
   GeodatabaseSyncTask({required String url}) : _url = url;
@@ -43,7 +43,6 @@ class GeodatabaseSyncTask extends ArcgisNativeObject
           .map((e) => SyncLayerResult._fromJson(e))
           .toList();
     } on PlatformException catch (e) {
-      print(e.toString());
       return null;
     }
 

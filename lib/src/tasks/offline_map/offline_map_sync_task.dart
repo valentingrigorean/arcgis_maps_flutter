@@ -253,7 +253,7 @@ class OfflineMapSyncParameters {
 /// changes between feature layers and tables of an offlinemap and
 /// their originating ArcGIS feature services.
 class OfflineMapSyncTask extends ArcgisNativeObject
-    with Loadable, RemoteResource {
+    with Loadable {
   Object? _error;
 
   OfflineMapSyncTask({

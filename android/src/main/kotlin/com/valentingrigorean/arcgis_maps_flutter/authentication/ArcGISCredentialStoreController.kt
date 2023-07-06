@@ -2,6 +2,8 @@ package com.valentingrigorean.arcgis_maps_flutter.authentication
 
 import com.arcgismaps.ArcGISEnvironment
 import com.arcgismaps.httpcore.authentication.ArcGISCredentialStore
+import com.arcgismaps.httpcore.authentication.NetworkCredential
+import com.arcgismaps.httpcore.authentication.PasswordCredential
 import com.arcgismaps.httpcore.authentication.TokenCredential
 import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
 import io.flutter.plugin.common.BinaryMessenger
@@ -32,7 +34,7 @@ class ArcGISCredentialStoreController(
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-
+        ArcGISEnvironment.authenticationManager.networkCredentialStore.
         when (call.method) {
             "arcGISCredentialStore#makePersistent" ->{
                 scope.launch {

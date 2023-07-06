@@ -1,17 +1,11 @@
 part of arcgis_maps_flutter;
 
-class RouteTask extends ArcgisNativeObject
-    with Loadable, RemoteResource, ApiKeyResource {
+class RouteTask extends ArcgisNativeObject with Loadable, ApiKeyResource {
   final String _url;
 
   RouteTask({
     required String url,
-    Credential? credential,
-  }) : _url = url {
-    if (credential != null) {
-      setCredential(credential);
-    }
-  }
+  }) : _url = url;
 
   @override
   String get type => 'RouteTask';

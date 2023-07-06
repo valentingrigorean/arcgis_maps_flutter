@@ -5,7 +5,6 @@ class WmsLayer extends BaseTileLayer {
     String url, {
     LayerId? layerId,
     required this.layersName,
-    Credential? credential,
     bool isVisible = true,
     double opacity = 1,
   }) : super.fromUrl(
@@ -14,7 +13,6 @@ class WmsLayer extends BaseTileLayer {
           layerId: layerId ?? LayerId(url),
           url: url,
           type: 'WmsLayer',
-          credential: credential,
         );
 
   final List<String> layersName;
@@ -38,7 +36,6 @@ class WmsLayer extends BaseTileLayer {
     return WmsLayer.fromUrl(
       url!,
       layerId: layerId,
-      credential: credential,
       layersName: layersName,
       isVisible: isVisibleParam ?? isVisible,
       opacity: opacityParam ?? opacity,

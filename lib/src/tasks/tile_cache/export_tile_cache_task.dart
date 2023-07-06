@@ -1,7 +1,7 @@
 part of arcgis_maps_flutter;
 
 class ExportTileCacheTask extends ArcgisNativeObject
-    with RemoteResource, ApiKeyResource, Loadable {
+    with ApiKeyResource, Loadable {
   final String _url;
 
   ExportTileCacheTask({required String url}) : _url = url;
@@ -44,7 +44,7 @@ class ExportTileCacheTask extends ArcgisNativeObject
   }) async {
     final jobId = await invokeMethod<String>(
       'exportTileCacheTask#exportTileCacheJob',
-      arguments:{
+      arguments: {
         'parameters': parameters.toJson(),
         'fileNameWithPath': fileNameWithPath,
       },

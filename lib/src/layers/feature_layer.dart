@@ -5,7 +5,6 @@ class FeatureLayer extends BaseTileLayer {
   FeatureLayer.fromUrl(
     String url, {
     LayerId? layerId,
-    Credential? credential,
     bool isVisible = true,
     double opacity = 1,
   })  : portalItemLayerId = -1,
@@ -15,7 +14,6 @@ class FeatureLayer extends BaseTileLayer {
           layerId: layerId ?? LayerId(url),
           url: url,
           type: 'FeatureLayer',
-          credential: credential,
         );
 
   const FeatureLayer.fromPortalItem({
@@ -56,7 +54,6 @@ class FeatureLayer extends BaseTileLayer {
       return FeatureLayer.fromUrl(
         url!,
         layerId: layerId,
-        credential: credential,
         isVisible: isVisibleParam ?? isVisible,
         opacity: opacityParam ?? opacity,
       );

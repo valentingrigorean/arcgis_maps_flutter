@@ -38,7 +38,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  // await ArcGISEnvironment.setApiKey(dotenv.env['apiKey'] ?? 'apiKey');
+  await ArcGISEnvironment.setApiKey(dotenv.env['apiKey'] ?? 'apiKey');
   final result = await ArcGISEnvironment.setLicense(
       dotenv.env['licenseKey'] ?? 'licenseKey');
   final apiVersion = await ArcGISEnvironment.getAPIVersion();

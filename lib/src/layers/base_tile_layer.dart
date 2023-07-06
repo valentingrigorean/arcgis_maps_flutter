@@ -4,7 +4,6 @@ abstract class BaseTileLayer extends Layer {
   const BaseTileLayer({
     required LayerId layerId,
     required this.type,
-    this.credential,
     bool isVisible = true,
     double opacity = 1,
   })  : url = null,
@@ -19,7 +18,6 @@ abstract class BaseTileLayer extends Layer {
     required LayerId layerId,
     required String url,
     required this.type,
-    this.credential,
     bool isVisible = true,
     double opacity = 1,
   })  : portalItem = null,
@@ -38,7 +36,6 @@ abstract class BaseTileLayer extends Layer {
     bool isVisible = true,
     double opacity = 1,
   })  : url = null,
-        credential = null,
         // ignore: prefer_initializing_formals
         portalItem = portalItem,
         super(
@@ -51,8 +48,6 @@ abstract class BaseTileLayer extends Layer {
 
   final String type;
 
-  final Credential? credential;
-
   final PortalItem? portalItem;
 
   @override
@@ -63,9 +58,7 @@ abstract class BaseTileLayer extends Layer {
       json["url"] = url!;
     }
     json["layerId"] = layerId.value;
-    if (credential != null) {
-      json["credential"] = credential!.toJson();
-    }
+
     if (portalItem != null) {
       json['portalItem'] = portalItem!.toJson();
     }
@@ -77,7 +70,6 @@ abstract class BaseTileLayer extends Layer {
     ..addAll([
       type,
       url,
-      credential,
       portalItem,
     ]);
 }

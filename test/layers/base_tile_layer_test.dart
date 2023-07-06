@@ -6,14 +6,12 @@ class BaseTileLayerMock extends BaseTileLayer {
   BaseTileLayerMock.fromUrl({
     LayerId? layerId,
     required String url,
-    Credential? credential,
     bool isVisible = true,
     double opacity = 1,
   }) : super.fromUrl(
           layerId: layerId ?? LayerId(url),
           url: url,
           type: 'mock',
-          credential: credential,
           isVisible: isVisible,
           opacity: opacity,
         );
@@ -42,17 +40,12 @@ void main() {
     var baseTileLayer = BaseTileLayerMock.fromUrl(
       layerId: const LayerId('layerId'),
       url: 'url',
-      credential: const UserCredential.createUserCredential(
-        username: 'username',
-        password: 'password',
-      ),
     );
 
     final json = baseTileLayer.toJson();
 
     expect(json['url'], 'url');
     expect(json['layerId'], 'layerId');
-    assert(json['credential'] != null);
     assert(json['portalItem'] == null);
   });
 

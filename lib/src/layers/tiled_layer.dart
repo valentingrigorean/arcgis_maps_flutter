@@ -6,7 +6,6 @@ class TiledLayer extends BaseTileLayer {
   TiledLayer.fromUrl(
     String url, {
     LayerId? layerId,
-    Credential? credential,
     bool isVisible = true,
     double opacity = 1,
   })  : _tileCache = null,
@@ -16,20 +15,17 @@ class TiledLayer extends BaseTileLayer {
           layerId: layerId ?? LayerId(url),
           url: url,
           type: 'TiledLayer',
-          credential: credential,
         );
 
   TiledLayer.fromTileCache({
     required TileCache tileCache,
     LayerId? layerId,
-    Credential? credential,
     bool isVisible = true,
     double opacity = 1,
   })  : _tileCache = tileCache,
         super(
           layerId: layerId ?? LayerId(tileCache.path),
           type: 'TiledLayer',
-          credential: credential,
           isVisible: isVisible,
           opacity: opacity,
         );
@@ -47,7 +43,6 @@ class TiledLayer extends BaseTileLayer {
       return TiledLayer.fromTileCache(
         tileCache: _tileCache!,
         layerId: layerId,
-        credential: credential,
         isVisible: isVisibleParam ?? isVisible,
         opacity: opacityParam ?? opacity,
       );
@@ -56,7 +51,6 @@ class TiledLayer extends BaseTileLayer {
     return TiledLayer.fromUrl(
       url!,
       layerId: layerId,
-      credential: credential,
       isVisible: isVisibleParam ?? isVisible,
       opacity: opacityParam ?? opacity,
     );

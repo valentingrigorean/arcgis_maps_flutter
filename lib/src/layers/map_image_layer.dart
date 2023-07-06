@@ -5,7 +5,6 @@ class MapImageLayer extends BaseTileLayer {
   MapImageLayer.fromUrl(
     String url, {
     LayerId? layerId,
-    Credential? credential,
     bool isVisible = true,
     double opacity = 1,
   }) : super.fromUrl(
@@ -14,7 +13,6 @@ class MapImageLayer extends BaseTileLayer {
           layerId: layerId ?? LayerId(url),
           url: url,
           type: 'MapImageLayer',
-          credential: credential,
         );
 
   @override
@@ -29,7 +27,6 @@ class MapImageLayer extends BaseTileLayer {
     return MapImageLayer.fromUrl(
       url!,
       layerId: layerId,
-      credential: credential,
       isVisible: isVisibleParam ?? isVisible,
       opacity: opacityParam ?? opacity,
     );

@@ -118,7 +118,7 @@ class JobMessage {
   }
 }
 
-abstract class Job extends ArcgisNativeObject with RemoteResource {
+abstract class Job extends ArcgisNativeObject {
   final StreamController<double> _progressController =
       StreamController<double>.broadcast();
   final StreamController<JobStatus> _statusController =

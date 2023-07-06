@@ -5,10 +5,6 @@ void main() {
   test('Clone with url', () {
     final featureLayer = FeatureLayer.fromUrl(
       'url',
-      credential: const UserCredential.createUserCredential(
-        username: 'username',
-        password: 'password',
-      ),
       isVisible: false,
       opacity: 0.5,
     );
