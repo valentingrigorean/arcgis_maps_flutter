@@ -3,6 +3,7 @@ library arcgis_maps_flutter;
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
+import 'package:arcgis_maps_flutter/src/arcgis_method_channel.dart';
 import 'package:arcgis_maps_flutter/src/arcgis_native_object.dart';
 import 'package:arcgis_maps_flutter/src/data/field_type.dart';
 import 'package:arcgis_maps_flutter/src/io/api_key_resource.dart';
@@ -11,6 +12,7 @@ import 'package:arcgis_maps_flutter/src/layers/base_tile_layer.dart';
 import 'package:arcgis_maps_flutter/src/layers/layer_updates.dart';
 import 'package:arcgis_maps_flutter/src/mapping/view/location_display_impl.dart';
 import 'package:arcgis_maps_flutter/src/maps_object.dart';
+import 'package:arcgis_maps_flutter/src/method_channel/authentication/token_credential_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/symbology/marker_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polygon_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polyline_updates.dart';
@@ -46,6 +48,10 @@ part 'src/arcgis_environment.dart';
 
 part 'src/arcgisservices/level_of_detail.dart';
 part 'src/arcgisservices/tile_info.dart';
+
+part 'src/authentication/arcgis_credential_store.dart';
+part 'src/authentication/token_credential.dart';
+part 'src/authentication/token_info.dart';
 
 part 'src/concurrent/job.dart';
 

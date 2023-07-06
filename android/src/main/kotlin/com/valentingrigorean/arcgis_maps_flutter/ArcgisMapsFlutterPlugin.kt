@@ -6,6 +6,7 @@ import com.arcgismaps.ApiKey
 import com.arcgismaps.ArcGISEnvironment
 import com.arcgismaps.LicenseKey
 import com.arcgismaps.LicenseStatus
+import com.valentingrigorean.arcgis_maps_flutter.authentication.ArcGISCredentialStoreController
 import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterValue
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.ArcgisNativeObjectFactoryImpl
 import com.valentingrigorean.arcgis_maps_flutter.flutterobject.ArcgisNativeObjectsController
@@ -32,6 +33,7 @@ class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
     private var geometryEngineController: GeometryEngineController? = null
     private var coordinateFormatterController: CoordinateFormatterController? = null
     private var nativeObjectsController: ArcgisNativeObjectsController? = null
+    private var arcGISCredentialStoreController: ArcGISCredentialStoreController? = null
     private var scope: CoroutineScope? = null
 
     private lateinit var channel: MethodChannel
@@ -55,6 +57,8 @@ class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
             binding.binaryMessenger,
             ArcgisNativeObjectFactoryImpl(scope!!),
         )
+        arcGISCredentialStoreController =
+            ArcGISCredentialStoreController(binding.binaryMessenger, scope!!)
     }
 
     override fun onDetachedFromEngine(binding: FlutterPluginBinding) {
@@ -68,6 +72,8 @@ class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
         coordinateFormatterController = null
         nativeObjectsController?.dispose()
         nativeObjectsController = null
+        arcGISCredentialStoreController?.dispose()
+        arcGISCredentialStoreController = null
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {

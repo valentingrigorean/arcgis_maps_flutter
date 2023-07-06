@@ -15,22 +15,6 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final Set<Layer> _lakeLayers = {
-    FeatureLayer.fromUrl(
-      'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/1',
-      opacity: 0.4,
-    ),
-    FeatureLayer.fromUrl(
-        'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/2'),
-    FeatureLayer.fromUrl(
-        'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/3'),
-    FeatureLayer.fromUrl(
-        'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/4'),
-    FeatureLayer.fromUrl(
-        'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/5'),
-    FeatureLayer.fromUrl(
-        'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/6'),
-  };
 
   final bool _showLayers = false;
 
@@ -40,7 +24,7 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
 
   ArcgisMapController? _mapController;
 
-  CompassController? _compasController;
+  CompassController? _compassController;
 
   @override
   Widget build(BuildContext context) {
@@ -83,25 +67,17 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
           ),
         )
       },
-      referenceLayers: _showLayers ? _lakeLayers : const {},
-      onLayerLoaded: (layer, error) {
-        if (error != null) {
-          print('Failed to load $layer:$error');
-        } else {
-          print('Loaded layer $layer');
-        }
-      },
     );
 
     return Stack(
       children: [
         mapView,
-        if (_compasController != null)
+        if (_compassController != null)
           Positioned(
             right: 16,
             top: 16,
             child: Compass(
-              controller: _compasController!,
+              controller: _compassController!,
             ),
           )
       ],
@@ -139,7 +115,7 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
   void onMapCreated(ArcgisMapController mapController) {
     _mapController = mapController;
     mapController.locationDisplay.autoPanMode = AutoPanMode.navigation;
-    _compasController = CompassController.fromMapController(mapController);
+    _compassController = CompassController.fromMapController(mapController);
     setState(() {});
   }
 

@@ -1,10 +1,11 @@
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
+import 'package:arcgis_maps_flutter/src/arcgis_method_channel.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/arcgis_flutter_platform.dart';
 import 'package:flutter/services.dart';
 
 class MethodChannelArcgisFlutter extends ArcgisFlutterPlatform {
   final MethodChannel _channel =
-      const OptionalMethodChannel("plugins.flutter.io/arcgis_channel");
+      const ArcgisMethodChannel("plugins.flutter.io/arcgis_channel");
 
   bool _didSetApiKey = false;
 

@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
+import 'package:arcgis_maps_flutter_example/credential_page.dart';
 import 'package:arcgis_maps_flutter_example/map_page.dart';
 import 'package:arcgis_maps_flutter_example/map_page_assets_marker.dart';
 import 'package:arcgis_maps_flutter_example/map_page_auto_pan_mode.dart';
@@ -37,7 +38,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  await ArcGISEnvironment.setApiKey(dotenv.env['apiKey'] ?? 'apiKey');
+  // await ArcGISEnvironment.setApiKey(dotenv.env['apiKey'] ?? 'apiKey');
   final result = await ArcGISEnvironment.setLicense(
       dotenv.env['licenseKey'] ?? 'licenseKey');
   final apiVersion = await ArcGISEnvironment.getAPIVersion();
@@ -120,6 +121,17 @@ class MainPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const MapPageCurrentLocationTap(),
+                    ),
+                  );
+                },
+              ),
+              ElevatedButton(
+                child: const Text('Credentials'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CredentialPage(),
                     ),
                   );
                 },

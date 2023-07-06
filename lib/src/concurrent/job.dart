@@ -151,7 +151,6 @@ abstract class Job extends ArcgisNativeObject with RemoteResource {
   Future<ArcgisError?> get error async {
     final result = await invokeMethod(
       'job#getError',
-      parseErrors: false,
     );
     if (result == null) {
       return null;

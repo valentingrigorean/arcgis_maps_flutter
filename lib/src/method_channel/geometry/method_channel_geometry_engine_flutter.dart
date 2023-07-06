@@ -1,9 +1,10 @@
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
+import 'package:arcgis_maps_flutter/src/arcgis_method_channel.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/geometry/geometry_engine_flutter_platform.dart';
 import 'package:flutter/services.dart';
 
 class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
-  final MethodChannel _channel = const OptionalMethodChannel(
+  final MethodChannel _channel = const ArcgisMethodChannel(
       "plugins.flutter.io/arcgis_channel/geometry_engine");
 
   @override

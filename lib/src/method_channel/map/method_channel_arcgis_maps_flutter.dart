@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:arcgis_maps_flutter/src/arcgis_method_channel.dart';
 import 'package:arcgis_maps_flutter/src/symbology/marker_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polygon_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polyline_updates.dart';
@@ -42,7 +43,7 @@ class UnknownMapIDError extends Error {
 class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   // Keep a collection of id -> channel
   // Every method call passes the int mapId
-  final _channels = <int, MethodChannel>{};
+  final _channels = <int, ArcgisMethodChannel>{};
 
   // The controller we need to broadcast the different events coming
   // from handleMethodCall.
@@ -63,9 +64,9 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
 
   @override
   Future<void> init(int mapId) {
-    MethodChannel? channel = _channels[mapId];
+    ArcgisMethodChannel? channel = _channels[mapId];
     if (channel == null) {
-      channel = OptionalMethodChannel('plugins.flutter.io/arcgis_maps_$mapId');
+      channel = ArcgisMethodChannel('plugins.flutter.io/arcgis_maps_$mapId');
       channel.setMethodCallHandler(
           (MethodCall call) => _handleMethodCall(call, mapId));
       _channels[mapId] = channel;

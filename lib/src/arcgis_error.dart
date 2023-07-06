@@ -1,6 +1,5 @@
 part of arcgis_maps_flutter;
 
-
 @immutable
 class ArcgisError implements Exception {
   const ArcgisError({
@@ -32,6 +31,6 @@ class ArcgisError implements Exception {
 
   @override
   String toString() {
-    return 'ArcgisError{errorMessage: $errorMessage, additionalMessage: $additionalMessage, innerErrorMessage: $innerErrorMessage}';
+    return 'ArcgisError{errorMessage: $errorMessage, nativeStackTrace: $nativeStackTrace, additionalMessage: $additionalMessage, innerErrorMessage: $innerErrorMessage}';
   }
 }

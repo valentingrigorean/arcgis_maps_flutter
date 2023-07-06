@@ -6,8 +6,8 @@ import Foundation
 import ArcGIS
 
 
-class JobNativeHandler<T: Job & JobProtocol > : BaseNativeHandler<T> {
-    
+class JobNativeHandler<T: Job & JobProtocol>: BaseNativeHandler<T> {
+
     private var status: Job.Status
 
     init(job: T) {
@@ -15,30 +15,30 @@ class JobNativeHandler<T: Job & JobProtocol > : BaseNativeHandler<T> {
         super.init(nativeHandler: job)
         createTask {
             for await message in self.nativeHandler.messages {
-                self.sendMessage(method:"job#onMessageAdded", arguments: message.toJSONFlutter())
+                self.sendMessage(method: "job#onMessageAdded", arguments: message.toJSONFlutter())
             }
         }
         createTask {
             for await status in self.nativeHandler.$status {
-                self.sendMessage(method:"job#onStatusChanged", arguments: status.toFlutterValue())
+                self.sendMessage(method: "job#onStatusChanged", arguments: status.toFlutterValue())
             }
         }
         job.progress.addObserver(self, forKeyPath: "fractionCompleted", options: [.old, .new], context: nil)
     }
-    
+
     deinit {
         nativeHandler.progress.removeObserver(self, forKeyPath: "fractionCompleted")
     }
-    
+
     override func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) -> Bool {
         switch (method) {
         case "job#getError":
             createTask {
                 do {
-                    let output = try await self.nativeHandler.result.get()
+                    _ = try await self.nativeHandler.result.get()
                     result(nil)
                 } catch {
-                    result(error.toJSONFlutter())
+                    result(error.toJSONFlutter(addFlutterFlag: false))
                 }
             }
             return true
@@ -75,7 +75,7 @@ class JobNativeHandler<T: Job & JobProtocol > : BaseNativeHandler<T> {
             return false
         }
     }
-    
+
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
         switch (keyPath) {
         case "fractionCompleted":
@@ -86,7 +86,7 @@ class JobNativeHandler<T: Job & JobProtocol > : BaseNativeHandler<T> {
             break
         }
     }
-    
+
     func getCurrentMessages() async -> [JobMessage] {
         var messages: [JobMessage] = []
         for await message in nativeHandler.messages {

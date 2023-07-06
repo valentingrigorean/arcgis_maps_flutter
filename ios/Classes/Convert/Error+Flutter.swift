@@ -5,7 +5,7 @@
 import Foundation
 
 extension Error {
-    func toJSONFlutter(withStackTrace: Bool = true) -> [String: Any] {
+    func toJSONFlutter(withStackTrace: Bool = true,addFlutterFlag: Bool = true) -> [String: Any] {
         var dict = [String: Any]()
         dict["domain"] = 2
         if let nsError = self as NSError? {
@@ -19,6 +19,10 @@ extension Error {
         
         if withStackTrace {
             dict["nativeStackTrace"] = Thread.callStackSymbols.joined(separator: "\n")
+        }
+
+        if addFlutterFlag {
+            dict["flutterError"] = true
         }
         
         return dict

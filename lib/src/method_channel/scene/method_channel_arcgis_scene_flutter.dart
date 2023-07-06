@@ -1,4 +1,5 @@
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
+import 'package:arcgis_maps_flutter/src/arcgis_method_channel.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/scene/arcgis_scene_flutter_platform.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +29,7 @@ class UnknownSceneIDError extends Error {
 class MethodChannelArcgisSceneFlutter extends ArcgisSceneFlutterPlatform {
   // Keep a collection of id -> channel
   // Every method call passes the int mapId
-  final Map<int, MethodChannel> _channels = {};
+  final Map<int, ArcgisMethodChannel> _channels = {};
 
   /// Accesses the MethodChannel associated to the passed mapId.
   MethodChannel channel(int sceneId) {
@@ -41,9 +42,9 @@ class MethodChannelArcgisSceneFlutter extends ArcgisSceneFlutterPlatform {
 
   @override
   Future<void> init(int sceneId) {
-    MethodChannel? channel = _channels[sceneId];
+    ArcgisMethodChannel? channel = _channels[sceneId];
     if (channel == null) {
-      channel = OptionalMethodChannel('plugins.flutter.io/arcgis_maps_$sceneId');
+      channel = ArcgisMethodChannel('plugins.flutter.io/arcgis_maps_$sceneId');
       channel.setMethodCallHandler(
           (MethodCall call) => _handleMethodCall(call, sceneId));
       _channels[sceneId] = channel;

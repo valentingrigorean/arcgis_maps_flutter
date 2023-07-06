@@ -49,7 +49,7 @@ class JobNativeHandler<T>(job: Job<T>) :
                     nativeHandler.checkStatus().onSuccess {
                         result.success(null)
                     }.onFailure {
-                        result.success(it.toFlutterJson())
+                        result.success(it.toFlutterJson(addFlutterFlag = false))
                     }
                 }
                 true
