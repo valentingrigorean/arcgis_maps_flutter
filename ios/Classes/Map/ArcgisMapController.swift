@@ -549,8 +549,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             return
         }
 
-        if dict["offlinePath"] != nil {
-            loadOfflineMap(args: dict)
+        if let offlineInfo = dict["offlineInfo"] as? [String:Any] {
+            loadOfflineMap(args: offlineInfo)
             return
         }
 
@@ -559,8 +559,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     private func loadOfflineMap(args: [String: Any]) {
-        let offlinePath = args["offlinePath"] as! String
-        let mapIndex = args["offlineMapIndex"] as! Int
+        let offlinePath = args["path"] as! String
+        let mapIndex = args["index"] as! Int
 
         let ext = offlinePath.components(separatedBy: ".").last
 
@@ -580,7 +580,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
     private func loadMobileMapPackage(offlinePath: String, mapIndex: Int) {
-        let mobileMapPackage = MobileMapPackage(fileURL: URL(string: offlinePath)!)
+        let mobileMapPackage = MobileMapPackage(fileURL: URL(fileURLWithPath: offlinePath))
 
         taskManager.createTask {
             do {

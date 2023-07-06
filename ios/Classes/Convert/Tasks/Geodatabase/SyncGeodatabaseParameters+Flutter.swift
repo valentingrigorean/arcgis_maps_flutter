@@ -22,7 +22,7 @@ extension SyncGeodatabaseParameters {
     func toJSONFlutter() -> Any {
         [
             "keepGeodatabaseDeltas": keepsGeodatabaseDeltas,
-            "geodatabaseSyncDirection": geodatabaseSyncDirection,
+            "geodatabaseSyncDirection": geodatabaseSyncDirection.toFlutterValue(),
             "layerOptions": layerOptions.map {
                 $0.toJSONFlutter()
             },

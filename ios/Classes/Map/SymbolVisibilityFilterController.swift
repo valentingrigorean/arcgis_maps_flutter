@@ -120,10 +120,10 @@ class SymbolVisibilityFilterController {
 
         let visibilityFilter = graphicControllerInfo.visibilityFilter
         let graphicController = graphicControllerInfo.graphicController
-        if currentZoom < visibilityFilter.minZoom && currentZoom > visibilityFilter.maxZoom {
-            graphicController.isVisible = initialValues[objectIdentifierFor(graphicController)]!
-        } else {
+        if currentZoom < visibilityFilter.minZoom || currentZoom > visibilityFilter.maxZoom {
             graphicController.isVisible = false
+        } else {
+            graphicController.isVisible = initialValues[objectIdentifierFor(graphicController)] ?? true
         }
     }
 

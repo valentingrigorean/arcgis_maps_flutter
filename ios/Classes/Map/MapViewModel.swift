@@ -10,13 +10,8 @@ import ArcGIS
 import SwiftUI
 import Combine
 
+
 struct MapContentView: View {
-
-    /// Allows for communication between the `Scalebar` and `MapView`.
-    @State private var spatialReference: SpatialReference?
-
-    /// Allows for communication between the `Scalebar` and `MapView`.
-    @State private var unitsPerPoint: Double?
 
     @State private var isLongPress = false
 
@@ -29,10 +24,10 @@ struct MapContentView: View {
     }
 
     var body: some View {
-        MapViewReader { proxy in
-            if viewModel.map == nil {
-                EmptyView()
-            } else {
+        if viewModel.map == nil {
+            EmptyView()
+        } else {
+            MapViewReader { proxy in
                 MapView(map: viewModel.map!, viewpoint: viewModel.viewpoint, timeExtent: $viewModel.timeExtent, graphicsOverlays: viewModel.graphicsOverlays)
                         .onScaleChanged { newScale in
                             viewModel.currentScale = newScale
@@ -78,21 +73,22 @@ struct MapContentView: View {
                                 }
                             }
                         }, perform: {})
-                        .overlay(alignment: viewModel.scalebarConfig.alignment ?? .topLeading) {
-                            if viewModel.haveScaleBar {
-                                Scalebar(
-                                        maxWidth: viewModel.scalebarConfig.maxWidth,
-                                        settings: viewModel.scalebarConfig.settings,
-                                        spatialReference: $viewModel.spatialReference,
-                                        style: viewModel.scalebarConfig.style,
-                                        units: viewModel.scalebarConfig.units,
-                                        unitsPerPoint: $viewModel.unitsPerPoint,
-                                        viewpoint: $viewModel.viewpoint
-                                )
-                                        .offset(viewModel.scalebarConfig.offset ?? .zero)
-                            }
+            }.overlay(alignment: viewModel.scalebarConfig.alignment ?? .topLeading) {
+                        if viewModel.haveScaleBar {
+                            Scalebar(
+                                    maxWidth: viewModel.scalebarConfig.maxWidth,
+                                    settings: viewModel.scalebarConfig.settings,
+                                    spatialReference: $viewModel.spatialReference,
+                                    style: viewModel.scalebarConfig.style,
+                                    units: viewModel.scalebarConfig.units,
+                                    unitsPerPoint: $viewModel.unitsPerPoint,
+                                    viewpoint: $viewModel.viewpointCenterAndScale
+                            )
+                                    .offset(viewModel.scalebarConfig.offset ?? .zero)
+                        }else{
+                            EmptyView()
                         }
-            }
+                    }
         }
     }
 }
