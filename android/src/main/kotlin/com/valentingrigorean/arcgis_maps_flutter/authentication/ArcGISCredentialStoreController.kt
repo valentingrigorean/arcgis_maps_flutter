@@ -34,7 +34,6 @@ class ArcGISCredentialStoreController(
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        ArcGISEnvironment.authenticationManager.networkCredentialStore.
         when (call.method) {
             "arcGISCredentialStore#makePersistent" ->{
                 scope.launch {
