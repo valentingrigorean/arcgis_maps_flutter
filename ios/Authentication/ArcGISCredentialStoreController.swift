@@ -99,6 +99,3 @@ class ArcGISCredentialStoreController {
         }
     }
 }
-
-
-
