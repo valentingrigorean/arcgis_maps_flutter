@@ -33,26 +33,12 @@ class MarkerController(val context: Context, markerId: String) : BaseGraphicCont
             handleScaleChange()
         }
 
-    override var selectedScale: Float = 1f
+    override var selectedScale: Float = 1.4f
         set(value) {
             field = value
             handleScaleChange()
         }
-    override var icon: BitmapDescriptor? = null
-        get() = field
-        set(value) {
-            if (field == value) {
-                return
-            }
-            field = value
-            if (iconScaleSymbolController != null) {
-                marker.symbols.remove(iconScaleSymbolController!!.symbol)
-            }
-            iconScaleSymbolController = value?.let {
-                ScaleSymbolController(createSymbol(it))
-            }
-            handleScaleChange()
-        }
+
     override var background: BitmapDescriptor? = null
         set(value) {
             if (field == value) {
@@ -63,10 +49,27 @@ class MarkerController(val context: Context, markerId: String) : BaseGraphicCont
                 marker.symbols.remove(backgroundScaleSymbolController!!.symbol)
             }
             backgroundScaleSymbolController = value?.let {
-                ScaleSymbolController(createSymbol(it))
+                ScaleSymbolController(createSymbol(it,0))
             }
             handleScaleChange()
         }
+
+    override var icon: BitmapDescriptor? = null
+        set(value) {
+            if (field == value) {
+                return
+            }
+            field = value
+            if (iconScaleSymbolController != null) {
+                marker.symbols.remove(iconScaleSymbolController!!.symbol)
+            }
+            iconScaleSymbolController = value?.let {
+                ScaleSymbolController(createSymbol(it,1))
+            }
+            handleScaleChange()
+        }
+
+
     override var opacity: Float = 1f
         set(value) {
             if (field == value) {
@@ -77,8 +80,8 @@ class MarkerController(val context: Context, markerId: String) : BaseGraphicCont
                 setOpacity(symbol, value)
             }
         }
+
     override var angle: Float = 0f
-        get() = field
         set(value) {
             if (field == value) {
                 return
@@ -95,17 +98,19 @@ class MarkerController(val context: Context, markerId: String) : BaseGraphicCont
         symbolVisibilityFilterController: SymbolVisibilityFilterController?
     ) {
         super.interpretGraphicController(data, symbolVisibilityFilterController)
-        this.geometry  = data["position"]?.toGeometryOrNull()
+        this.geometry = data["position"]?.toGeometryOrNull()
+        val backgroundImage = data["backgroundImage"]
+        if (backgroundImage != null) {
+            this.background = BitmapDescriptorFactory.fromRawData(context, backgroundImage)
+        }
         val icon = data["icon"]
         if (icon != null) {
             this.icon = BitmapDescriptorFactory.fromRawData(context, icon)
         }
-        val backgroundImage = data["backgroundImage"]
-        if (backgroundImage != null) {
-            this.background = BitmapDescriptorFactory.fromRawData(context, backgroundImage)
-
-        }
-        setIconOffset((data["iconOffsetX"] as Double).toFloat(), (data["iconOffsetY"] as Double).toFloat())
+        setIconOffset(
+            (data["iconOffsetX"] as Double).toFloat(),
+            (data["iconOffsetY"] as Double).toFloat()
+        )
         val opacity = data["opacity"] as Double?
         if (opacity != null) {
             this.opacity = opacity.toFloat()
@@ -132,11 +137,15 @@ class MarkerController(val context: Context, markerId: String) : BaseGraphicCont
         }
     }
 
-    private fun createSymbol(bitmapDescriptor: BitmapDescriptor): Symbol {
+    private fun createSymbol(bitmapDescriptor: BitmapDescriptor,index:Int): Symbol {
         val symbol = bitmapDescriptor.createSymbol()
         setOpacity(symbol, opacity)
         setAngle(symbol, angle)
-        marker.symbols.add(symbol)
+        if(index in 0 until marker.symbols.size) {
+            marker.symbols.add(index, symbol)
+        } else {
+            marker.symbols.add(symbol)
+        }
         return symbol
     }
 

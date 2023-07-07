@@ -55,7 +55,7 @@ private class GroupLayerOptions(data: Map<*, *>) {
 }
 
 class FlutterLayer(private val data: Map<*, *>) {
-    val layerId: String = data["layerId"] as String
+    val layerId = data["layerId"] as String
     private val layerType: String? = data["layerType"] as String?
     private var url: String? = null
     private val isVisible: Boolean

@@ -27,6 +27,7 @@ class _MapPageTileCacheState extends State<MapPageTileCache> {
 
   bool _isDownloading = false;
   bool _isDownloaded = false;
+  bool _isAuthenticated = false;
 
   double _progress = 0;
 
@@ -51,13 +52,21 @@ class _MapPageTileCacheState extends State<MapPageTileCache> {
             basemapStyle: BasemapStyle.arcGISCommunity,
           ),
         ),
+        referenceLayers: {
+          if (_isAuthenticated)
+            TiledLayer.fromUrl(
+                'https://services.geodataonline.no/arcgis/rest/services/Geocache_UTM33_EUREF89/GeocacheHelning/MapServer'),
+        },
         onMapCreated: (controller) {
           _mapController = controller;
         },
+        onLayerLoaded: (layer, error) {
+          debugPrint('layer: $layer');
+          if (error != null) debugPrint('error: $error');
+        },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed:
-            _isDownloading ? null : _downloadTileCache,
+        onPressed: _isDownloading ? null : _downloadTileCache,
         child: _isDownloading
             ? CircularProgressIndicator(
                 value: _progress,
@@ -71,9 +80,13 @@ class _MapPageTileCacheState extends State<MapPageTileCache> {
   }
 
   void _downloadTileCache() async {
-
-    await setGeodataCredentials();
-
+    try {
+      await setGeodataCredentials();
+      _isAuthenticated = true;
+    } catch (ex) {
+      debugPrint('Error: $ex');
+      _isAuthenticated = false;
+    }
     setState(() {
       _isDownloading = true;
       _progress = 0;

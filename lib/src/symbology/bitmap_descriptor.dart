@@ -49,7 +49,12 @@ class BitmapDescriptor {
     required double size,
   }) {
     return BitmapDescriptor._(
-        _SimpleStyleMarkerBitmapDescriptor(style, color, size));
+      _SimpleStyleMarkerBitmapDescriptor(
+        style,
+        color,
+        size,
+      ),
+    );
   }
 
   /// Creates a BitmapDescriptorFactory using an array of bytes that must be encoded

@@ -1,11 +1,12 @@
 import 'dart:async';
+import 'package:arcgis_maps_flutter/src/arcgis_method_channel.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/native/arcgis_native_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/native/native_message.dart';
 import 'package:flutter/services.dart';
 
 class MethodChannelArcgisNativeFlutter extends ArcgisNativeFlutterPlatform {
   final MethodChannel _channel =
-      const OptionalMethodChannel('plugins.flutter.io/arcgis_channel/native_objects');
+      const ArcgisMethodChannel('plugins.flutter.io/arcgis_channel/native_objects');
 
   final StreamController<NativeMessage> _onMessage =
       StreamController<NativeMessage>.broadcast();

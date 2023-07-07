@@ -1,5 +1,6 @@
 package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 
+import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.graphics.Bitmap
@@ -43,7 +44,7 @@ object BitmapDescriptorFactory {
             val size = data["size"] as Double
             return StyleMarkerBitmapDescriptor(styleMarker, color, size)
         }
-        val descriptors = data["descriptors"] as List<Objects>?
+        val descriptors = data["descriptors"] as List<*>?
         if (descriptors != null) {
             val bitmapDescriptors = ArrayList<BitmapDescriptor>()
             for (descriptor in descriptors) {
@@ -94,14 +95,22 @@ object BitmapDescriptorFactory {
                     bitmap
                 )
             )
+            bitmapDescriptorOptions.width?.let {
+                symbol.width = it
+            }
+
+            bitmapDescriptorOptions.height?.let {
+                symbol.height = it
+            }
+
             cache.put(bitmapDescriptorOptions, symbol)
             return symbol
         }
 
-        override fun equals(o: Any?): Boolean {
-            if (this === o) return true
-            if (o == null || javaClass != o.javaClass) return false
-            val that = o as AssetBitmapDescriptor
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other == null || javaClass != other.javaClass) return false
+            val that = other as AssetBitmapDescriptor
             return bitmapDescriptorOptions == that.bitmapDescriptorOptions
         }
 
@@ -116,9 +125,7 @@ object BitmapDescriptorFactory {
             val compositeSymbol = CompositeSymbol()
             for (bitmapDescriptor in bitmapDescriptors) {
                 val symbol = bitmapDescriptor.createSymbol()
-                if (symbol != null) {
-                    compositeSymbol.symbols.add(symbol)
-                }
+                compositeSymbol.symbols.add(symbol)
             }
             return compositeSymbol
         }
@@ -134,10 +141,10 @@ object BitmapDescriptorFactory {
             return SimpleMarkerSymbol(style, color, size.toFloat())
         }
 
-        override fun equals(o: Any?): Boolean {
-            if (this === o) return true
-            if (o == null || javaClass != o.javaClass) return false
-            val that = o as StyleMarkerBitmapDescriptor
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other == null || javaClass != other.javaClass) return false
+            val that = other as StyleMarkerBitmapDescriptor
             return color == that.color && that.size.compareTo(size) == 0 && style == that.style
         }
 
@@ -165,7 +172,7 @@ object BitmapDescriptorFactory {
                 return drawable.bitmap
             }
             val bitmap = Bitmap.createBitmap(
-                drawable!!.intrinsicWidth,
+                drawable.intrinsicWidth,
                 drawable.intrinsicHeight,
                 Bitmap.Config.ARGB_8888
             )
@@ -175,8 +182,9 @@ object BitmapDescriptorFactory {
             return bitmap
         }
 
+        @SuppressLint("DiscouragedApi")
         private fun createDrawable(context: Context): Drawable {
-            var drawableResourceId: Int
+            val drawableResourceId: Int
             if (resourceIdCache.containsKey(resourceName)) {
                 drawableResourceId = resourceIdCache[resourceName]!!
             } else {
@@ -200,10 +208,10 @@ object BitmapDescriptorFactory {
             return wrappedDrawable
         }
 
-        override fun equals(o: Any?): Boolean {
-            if (this === o) return true
-            if (o == null || javaClass != o.javaClass) return false
-            val that = o as BitmapDescriptorOptions
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other == null || javaClass != other.javaClass) return false
+            val that = other as BitmapDescriptorOptions
             return resourceName == that.resourceName && tintColor == that.tintColor && width == that.width && height == that.height
         }
 

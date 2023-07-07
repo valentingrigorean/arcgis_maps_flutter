@@ -21,7 +21,7 @@ Future<void> setGeodataCredentials() async {
     return;
   }
   await ArcGISCredentialStore().addCredential(
-    url: 'https://services.geodataonline.no/',
+    url: 'https://services.geodataonline.no/arcgis/rest/info?f=json',
     username: dotenv.env['geodataCredentialsUsername'] ?? '',
     password: dotenv.env['geodataCredentialsPassword'] ?? '',
   );

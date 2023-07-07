@@ -1,5 +1,6 @@
 package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 
+import android.graphics.drawable.BitmapDrawable
 import com.arcgismaps.mapping.symbology.CompositeSymbol
 import com.arcgismaps.mapping.symbology.PictureFillSymbol
 import com.arcgismaps.mapping.symbology.PictureMarkerSymbol
@@ -41,12 +42,14 @@ class ScaleSymbolController(val symbol: Symbol) {
         private var height = 0f
         private var haveSize = false
         private var scale = 1f
+        private var originalImage: BitmapDrawable? = null
 
         init {
             when (symbol) {
                 is PictureMarkerSymbol -> {
                     val pictureMarkerSymbol = symbol
                     haveSize = true
+                    originalImage = pictureMarkerSymbol.image
                     width = pictureMarkerSymbol.width
                     height = pictureMarkerSymbol.height
                 }
@@ -54,6 +57,7 @@ class ScaleSymbolController(val symbol: Symbol) {
                 is PictureFillSymbol -> {
                     val pictureFillSymbol = symbol
                     haveSize = true
+                    originalImage = pictureFillSymbol.image
                     width = pictureFillSymbol.width
                     height = pictureFillSymbol.height
                 }

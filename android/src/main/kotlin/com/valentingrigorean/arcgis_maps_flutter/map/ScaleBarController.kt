@@ -5,9 +5,10 @@ import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
 import android.widget.FrameLayout
 import com.arcgismaps.mapping.view.MapView
-import com.valentingrigorean.arcgis_maps_flutter.ConvertUtils
 import com.valentingrigorean.arcgis_maps_flutter.convert.fromFlutterColor
 import com.valentingrigorean.arcgis_maps_flutter.convert.toUnitSystem
+import com.valentingrigorean.arcgis_maps_flutter.extensions.dp
+import com.valentingrigorean.arcgis_maps_flutter.extensions.sp
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.Scalebar
 import com.valentingrigorean.arcgis_maps_flutter.toolkit.scalebar.style.Style
 import kotlinx.coroutines.CoroutineScope
@@ -15,7 +16,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 class ScaleBarController(
-    private val context: Context,
+    context: Context,
     private val mapView: MapView,
     private val container: FrameLayout,
     private val scope: CoroutineScope
@@ -83,16 +84,10 @@ class ScaleBarController(
             if (width < 0) {
                 layoutParams!!.width = ViewGroup.LayoutParams.WRAP_CONTENT
             } else {
-                layoutParams!!.width = ConvertUtils.dpToPixelsI(
-                    context, width
-                )
+                layoutParams!!.width = width.dp
             }
-            layoutParams!!.leftMargin = ConvertUtils.dpToPixelsI(
-                context, offsetPoints[0]
-            )
-            layoutParams!!.topMargin = ConvertUtils.dpToPixelsI(
-                context, offsetPoints[1]
-            )
+            layoutParams!!.leftMargin = offsetPoints[0].dp
+            layoutParams!!.topMargin = offsetPoints[1].dp
             scalebar.requestLayout()
         }
         isAutoHide = data["autoHide"] as Boolean
@@ -111,9 +106,7 @@ class ScaleBarController(
         scalebar.shadowColor = data["shadowColor"]!!.fromFlutterColor()
         scalebar.textColor = data["textColor"]!!.fromFlutterColor()
         scalebar.textShadowColor = data["textShadowColor"]!!.fromFlutterColor()
-        scalebar.textSize = ConvertUtils.spToPixels(
-            context, data["textSize"] as Int
-        )
+        scalebar.textSize = (data["textSize"] as Int).sp.toInt()
 
         if (scaleBarState != ScaleBarState.NONE && isAutoHide) {
             displayScaleBar()
@@ -130,7 +123,7 @@ class ScaleBarController(
             scalebar.bindTo(mapView, scope)
             layoutParams = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
-                ConvertUtils.dpToPixelsI(context, 50)
+                50.dp
             )
             container.addView(scalebar, layoutParams)
             scaleBarState = ScaleBarState.IN_CONTAINER

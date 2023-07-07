@@ -4,6 +4,7 @@
 
 import Foundation
 import ArcGIS
+import Combine
 
 enum LayerType: Int, CaseIterable {
     case operational = 0
@@ -70,12 +71,14 @@ class LayersController {
     }
 
     public func setMap(_ map: Map) {
-        clearMap()
+        clearMap(map: self.map)
         self.map = map
-
-        addLayersToMap(layers: Array(operationalLayers.set), layerType: .operational)
-        addLayersToMap(layers: Array(baseLayers.set), layerType: .base)
-        addLayersToMap(layers: Array(referenceLayers.set), layerType: .reference)
+        taskManager.cancelTask(withKey: "load_map")
+        taskManager.createTask(key: "load_map"){ [self] in
+            addLayersToMap(layers: Array(operationalLayers.set), layerType: .operational)
+            addLayersToMap(layers: Array(baseLayers.set), layerType: .base)
+            addLayersToMap(layers: Array(referenceLayers.set), layerType: .reference)
+        }
     }
 
     public func getLayerByLayerId(_ layerId: String) -> Layer? {
@@ -191,23 +194,13 @@ class LayersController {
         removeLayersFromMap(layers: layersToRemove, layerType: layerType)
     }
 
-    private func clearMap() {
-
-        let operationalLayersNative = flutterOperationalLayersMap.values
-        let baseLayersNative = flutterBaseLayersMap.values
-        let referenceLayersNative = flutterReferenceLayersMap.values
-
-        flutterOperationalLayersMap.removeAll()
-        flutterBaseLayersMap.removeAll()
-        flutterReferenceLayersMap.removeAll()
-
+    private func clearMap(map: Map?) {
         guard let map = map else {
             return
         }
-
-        map.addOperationalLayers(operationalLayersNative)
-        map.basemap?.addBaseLayers(baseLayersNative)
-        map.basemap?.addReferenceLayers(referenceLayersNative)
+        map.removeOperationalLayers(flutterOperationalLayersMap.values)
+        map.basemap?.removeBaseLayers(flutterBaseLayersMap.values)
+        map.basemap?.removeReferenceLayers(flutterReferenceLayersMap.values)
     }
 
     private func addLayersToMap(layers: [FlutterLayer],
@@ -232,7 +225,7 @@ class LayersController {
                 do {
                     try await nativeLayer.load()
                 } catch (let error) {
-                    args["error"] = error.toJSONFlutter(withStackTrace: false)
+                    args["error"] = error.toJSONFlutter(withStackTrace: false,addFlutterFlag: false)
                 }
                 self.methodChannel.invokeMethod("layer#loaded", arguments: args)
             }
@@ -264,6 +257,10 @@ class LayersController {
             flutterMap.removeValue(forKey: layer.layerId)
             flutterLayer.set.remove(layer)
             nativeLayersToRemove.append(nativeLayer)
+        }
+
+        if nativeLayersToRemove.isEmpty {
+            return
         }
 
         guard let map = map else {
@@ -333,7 +330,6 @@ class LayersController {
 
     private func getFlutterLayerSet(layerType: LayerType) -> SharedSet<FlutterLayer> {
         switch layerType {
-
         case .operational:
             return operationalLayers
         case .base:
@@ -352,6 +348,24 @@ class LayersController {
         case .reference:
             return flutterReferenceLayersMap
         }
+    }
+
+    private func removeBasemapLayers(baseLayers: [Layer], referenceLayers: [Layer]) {
+        guard let basemap = map?.basemap else {
+            return
+        }
+
+        let baseLayers = basemap.baseLayers.filter { layer in
+            !baseLayers.contains(where: { $0 === layer })
+        }
+        basemap.removeAllBaseLayers()
+        basemap.addBaseLayers(baseLayers)
+
+        let referenceLayers = basemap.referenceLayers.filter { layer in
+            !referenceLayers.contains(where: { $0 === layer })
+        }
+        basemap.removeAllReferenceLayers()
+        basemap.addReferenceLayers(referenceLayers)
     }
 
     private static func findLayerIdByLayer(layer: Layer,

@@ -1,5 +1,6 @@
 package com.valentingrigorean.arcgis_maps_flutter.tasks.tilecache
 
+import com.arcgismaps.mapping.layers.Layer
 import com.arcgismaps.tasks.tilecache.ExportTileCacheTask
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.tasks.tilecache.toExportTileCacheParametersOrNull
