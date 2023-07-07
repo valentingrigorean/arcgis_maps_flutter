@@ -191,8 +191,8 @@ class LayersController(
         var map = this.map ?: return
         when (layerType) {
             LayerType.OPERATIONAL -> map.operationalLayers.removeAll(nativeLayersToRemove)
-            LayerType.BASE -> map?.basemap?.value?.baseLayers?.removeAll(nativeLayersToRemove)
-            LayerType.REFERENCE -> map?.basemap?.value?.referenceLayers?.removeAll(nativeLayersToRemove)
+            LayerType.BASE -> map.basemap.value?.baseLayers?.removeAll(nativeLayersToRemove)
+            LayerType.REFERENCE -> map.basemap.value?.referenceLayers?.removeAll(nativeLayersToRemove)
         }
     }
 
@@ -205,8 +205,8 @@ class LayersController(
         flutterReferenceLayersMap.clear()
         var map = this.map ?: return
         map.operationalLayers.removeAll(operationalLayersNative)
-        map.basemap?.value?.baseLayers?.removeAll(baseLayersNative)
-        map.basemap?.value?.referenceLayers?.removeAll(referenceLayersNative)
+        map.basemap.value?.baseLayers?.removeAll(baseLayersNative)
+        map.basemap.value?.referenceLayers?.removeAll(referenceLayersNative)
     }
 
 
@@ -215,7 +215,6 @@ class LayersController(
             LayerType.OPERATIONAL -> "operationalLayer"
             LayerType.BASE -> "baseLayer"
             LayerType.REFERENCE -> "referenceLayer"
-            else -> throw UnsupportedOperationException()
         }
     }
 
@@ -232,7 +231,6 @@ class LayersController(
             LayerType.OPERATIONAL -> flutterOperationalLayersMap
             LayerType.BASE -> flutterBaseLayersMap
             LayerType.REFERENCE -> flutterReferenceLayersMap
-            else -> throw UnsupportedOperationException()
         }
     }
 

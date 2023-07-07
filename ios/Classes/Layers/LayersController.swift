@@ -270,18 +270,16 @@ class LayersController {
             return
         }
 
-        for layer in nativeLayersToRemove {
-            switch layerType {
-            case .operational:
-                map.removeOperationalLayer(layer)
-                break
-            case .base:
-                map.basemap?.removeBaseLayer(layer)
-                break
-            case .reference:
-                map.basemap?.removeReferenceLayer(layer)
-                break
-            }
+        switch layerType {
+        case .operational:
+            map.removeOperationalLayers(nativeLayersToRemove)
+            break
+        case .base:
+            map.basemap?.removeBaseLayers(nativeLayersToRemove)
+            break
+        case .reference:
+            map.basemap?.removeReferenceLayers(nativeLayersToRemove)
+            break
         }
     }
 
