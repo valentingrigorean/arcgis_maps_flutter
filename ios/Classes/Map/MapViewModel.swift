@@ -86,7 +86,7 @@ struct MapContentView: View {
                                     units: viewModel.scalebarConfig.units,
                                     unitsPerPoint: $viewModel.unitsPerPoint,
                                     viewpoint: $viewModel.viewpointCenterAndScale
-                            )
+                            ).ignoresSafeArea()
                                     .offset(viewModel.scalebarConfig.offset ?? .zero)
                         }else{
                             EmptyView()
