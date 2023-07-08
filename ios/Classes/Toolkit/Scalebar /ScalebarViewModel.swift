@@ -34,7 +34,9 @@ final class ScalebarViewModel: ObservableObject {
     var viewpointSubject = PassthroughSubject<Viewpoint?, Never>()
     
     // - MARK: Public methods
-    lazy var alternateUnit : (screenLength: CGFloat, label: String) = getAlternateUnit(alternateUnitValue)
+    var alternateUnit : (screenLength: CGFloat, label: String){
+        getAlternateUnit(alternateUnitValue)
+    }
     /// A scalebar view model controls the underlying data used to render a scalebar.
     /// - Parameters:
     ///   - maxWidth: The maximum screen width allotted to the scalebar.

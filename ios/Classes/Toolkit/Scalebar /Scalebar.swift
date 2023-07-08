@@ -108,7 +108,7 @@ public struct Scalebar: View {
                         spatialReference,
                         style,
                         units,
-                        style == .dualUnitLineNauticalMiles ? .metric : nil,
+                        style == .dualUnitLineNauticalMiles ? .nauticalMiles : nil,
                         unitsPerPoint,
                         useGeodeticCalculations,
                         viewpoint.wrappedValue

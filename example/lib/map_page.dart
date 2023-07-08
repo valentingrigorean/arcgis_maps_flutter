@@ -46,6 +46,7 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
   Widget _buildMap() {
     var mapView = ArcgisMapView(
       map: map,
+      scalebarConfiguration: const ScalebarConfiguration(style: ScalebarStyle.dualUnitLineNauticalMile),
       onMapCreated: onMapCreated,
       onMapLoaded: (error) {
         if (error != null) {
