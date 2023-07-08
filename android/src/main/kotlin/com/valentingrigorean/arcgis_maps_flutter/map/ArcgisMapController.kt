@@ -645,6 +645,10 @@ class ArcgisMapController(
                 trackUserLocationTap
             )
         }
+        val myLocationEnabled = data["myLocationEnabled"] as? Boolean
+        if (myLocationEnabled != null) {
+            mapView.locationDisplay.showLocation = myLocationEnabled
+        }
         val trackIdentifyLayers = data["trackIdentifyLayers"] as Boolean?
         if (trackIdentifyLayers != null) {
             mapViewOnTouchListener.trackIdentityLayers = trackIdentifyLayers

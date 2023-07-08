@@ -200,7 +200,6 @@ extension MapViewModel {
 
         if let myLocationEnabled = options["myLocationEnabled"] as? Bool {
             locationDisplay.showsLocation = myLocationEnabled
-
         }
 
         if let isAttributionTextVisible = options["isAttributionTextVisible"] as? Bool {
