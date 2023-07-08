@@ -32,6 +32,9 @@ struct MapContentView: View {
                         .onScaleChanged { newScale in
                             viewModel.currentScale = newScale
                         }
+                        .onRotationChanged { newRotation in
+                            viewModel.rotation = newRotation
+                        }
                         .onViewpointChanged(kind: .centerAndScale) { viewpoint in
                             viewModel.viewpointCenterAndScale = viewpoint
                         }

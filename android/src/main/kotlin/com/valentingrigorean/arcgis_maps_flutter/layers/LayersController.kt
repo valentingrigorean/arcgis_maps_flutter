@@ -148,7 +148,7 @@ class LayersController(
         var map = this.map ?: return
         val flutterMap = getFlutterMap(layerType)
         for (layer in layers) {
-            val nativeLayer = layer.createLayer()
+            val nativeLayer = flutterMap[layer.layerId] ?: layer.createLayer()
             flutterMap[layer.layerId] = nativeLayer
             scope.launch {
                 nativeLayer.load()
@@ -163,15 +163,15 @@ class LayersController(
                         if (flutterMap.containsKey(layer.layerId)) {
                             val args: MutableMap<String, Any?> = HashMap(2)
                             args["layerId"] = layer.layerId
-                            args["error"] = it.toFlutterJson(withStackTrace = false)
+                            args["error"] = it.toFlutterJson(withStackTrace = false, addFlutterFlag = false)
                             methodChannel.invokeMethod("layer#loaded", args)
                         }
                 }
             }
             when (layerType) {
                 LayerType.OPERATIONAL -> map.operationalLayers.add(nativeLayer)
-                LayerType.BASE -> map.basemap?.value?.baseLayers?.add(nativeLayer)
-                LayerType.REFERENCE -> map.basemap?.value?.referenceLayers?.add(nativeLayer)
+                LayerType.BASE -> map.basemap.value?.baseLayers?.add(nativeLayer)
+                LayerType.REFERENCE -> map.basemap.value?.referenceLayers?.add(nativeLayer)
             }
         }
     }
@@ -200,9 +200,6 @@ class LayersController(
         val operationalLayersNative = flutterOperationalLayersMap.values
         val baseLayersNative = flutterBaseLayersMap.values
         val referenceLayersNative = flutterReferenceLayersMap.values
-        flutterOperationalLayersMap.clear()
-        flutterBaseLayersMap.clear()
-        flutterReferenceLayersMap.clear()
         var map = this.map ?: return
         map.operationalLayers.removeAll(operationalLayersNative)
         map.basemap.value?.baseLayers?.removeAll(baseLayersNative)

@@ -30,7 +30,6 @@ class ArcGISCredentialStoreController {
 
     private func handle(call: FlutterMethodCall,
                         result: @escaping FlutterResult) -> Void {
-        ArcGISEnvironment.authenticationManager.networkCredentialStore
         switch (call.method) {
         case "arcGISCredentialStore#makePersistent":
             taskManager.createTask {

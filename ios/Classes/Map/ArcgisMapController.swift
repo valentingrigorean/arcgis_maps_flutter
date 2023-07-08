@@ -92,10 +92,11 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             self?.channel.invokeMethod("map#onUserLocationTap", arguments: nil)
         }
 
-        viewModel.$viewpoint.sink { _ in
+        viewModel.$viewpointCenterAndScale.sink { _ in
                     self.viewpointChangedHandler()
                 }
                 .store(in: &cancellables)
+
         initWithArgs(args: args)
     }
 
@@ -189,15 +190,11 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             result(nil)
             break
         case "map#setViewpointChangedListenerEvents":
-            if let val = call.arguments as? Bool {
-                trackViewpointChangedListenerEvent = val
-            }
+            trackViewpointChangedListenerEvent = call.arguments as! Bool
             result(nil)
             break
         case "map#setTimeExtentChangedListener":
-            if let val = call.arguments as? Bool {
-                trackTimeExtent = val
-            }
+            trackTimeExtent = call.arguments as! Bool
             result(nil)
             break
         case "map#setTimeExtent":
@@ -549,7 +546,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             return
         }
 
-        if let offlineInfo = dict["offlineInfo"] as? [String:Any] {
+        if let offlineInfo = dict["offlineInfo"] as? [String: Any] {
             loadOfflineMap(args: offlineInfo)
             return
         }

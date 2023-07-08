@@ -73,12 +73,9 @@ class LayersController {
     public func setMap(_ map: Map) {
         clearMap(map: self.map)
         self.map = map
-        taskManager.cancelTask(withKey: "load_map")
-        taskManager.createTask(key: "load_map"){ [self] in
-            addLayersToMap(layers: Array(operationalLayers.set), layerType: .operational)
-            addLayersToMap(layers: Array(baseLayers.set), layerType: .base)
-            addLayersToMap(layers: Array(referenceLayers.set), layerType: .reference)
-        }
+        addLayersToMap(layers: Array(operationalLayers.set), layerType: .operational)
+        addLayersToMap(layers: Array(baseLayers.set), layerType: .base)
+        addLayersToMap(layers: Array(referenceLayers.set), layerType: .reference)
     }
 
     public func getLayerByLayerId(_ layerId: String) -> Layer? {
@@ -198,9 +195,9 @@ class LayersController {
         guard let map = map else {
             return
         }
-        map.removeOperationalLayers(flutterOperationalLayersMap.values)
-        map.basemap?.removeBaseLayers(flutterBaseLayersMap.values)
-        map.basemap?.removeReferenceLayers(flutterReferenceLayersMap.values)
+        map.removeAllOperationalLayers()
+        map.basemap?.removeAllBaseLayers()
+        map.basemap?.removeAllReferenceLayers()
     }
 
     private func addLayersToMap(layers: [FlutterLayer],
@@ -213,7 +210,7 @@ class LayersController {
 
 
         for layer in layers {
-            let nativeLayer = layer.createNativeLayer()
+            let nativeLayer = flutterMap[layer.layerId] ?? layer.createNativeLayer()
 
             if flutterMap[layer.layerId] == nil {
                 flutterMap[layer.layerId] = nativeLayer
@@ -225,7 +222,7 @@ class LayersController {
                 do {
                     try await nativeLayer.load()
                 } catch (let error) {
-                    args["error"] = error.toJSONFlutter(withStackTrace: false,addFlutterFlag: false)
+                    args["error"] = error.toJSONFlutter(withStackTrace: false, addFlutterFlag: false)
                 }
                 self.methodChannel.invokeMethod("layer#loaded", arguments: args)
             }
@@ -267,15 +264,21 @@ class LayersController {
             return
         }
 
+        //TODO(vali): remove only layers that need to be removed
+        // https://community.esri.com/t5/swift-maps-sdk-questions/error-removing-single-sequence-operational-layer-s/m-p/1298649#M80
         switch layerType {
         case .operational:
-            map.removeOperationalLayers(nativeLayersToRemove)
+            let operationalLayers = map.operationalLayers.filter { layer in
+                !nativeLayersToRemove.contains(where: { $0 === layer })
+            }
+            map.removeAllOperationalLayers()
+            map.addOperationalLayers(operationalLayers)
             break
         case .base:
-            map.basemap?.removeBaseLayers(nativeLayersToRemove)
+            removeBasemapLayers(baseLayers: nativeLayersToRemove, referenceLayers: [])
             break
         case .reference:
-            map.basemap?.removeReferenceLayers(nativeLayersToRemove)
+            removeBasemapLayers(baseLayers: [], referenceLayers: nativeLayersToRemove)
             break
         }
     }
@@ -318,7 +321,6 @@ class LayersController {
 
     private func getObjectName(layerType: LayerType) -> String {
         switch layerType {
-
         case .operational:
             return "operationalLayer"
         case .base:
