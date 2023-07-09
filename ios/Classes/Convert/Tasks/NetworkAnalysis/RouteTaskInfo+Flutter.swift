@@ -15,7 +15,7 @@ extension RouteTaskInfo {
         json["directionsLanguage"] = directionsLanguage
         json["directionsStyle"] = directionsStyle.toFlutterValue()
         json["findBestSequence"] = findsBestSequence
-        json["maxLocatingDistance"] = maxLocatingDistance
+        json["maxLocatingDistance"] = maxLocatingDistance.converted(to: .meters).value
         if let startTime = startDate {
             json["startTime"] = startTime.toIso8601String()
         }
