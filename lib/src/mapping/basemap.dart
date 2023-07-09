@@ -85,6 +85,7 @@ class Basemap extends Equatable {
   List<Object?> get props => [
         basemapStyle,
         item,
+        baseLayer,
         baseLayers,
         referenceLayers,
         uri,
