@@ -13,8 +13,6 @@ import Combine
 
 struct MapContentView: View {
 
-    @State private var isLongPress = false
-
     @State private var lastLongPressEvent: (CGPoint, ArcGIS.Point, MapViewProxy)?
 
     @ObservedObject var viewModel: MapViewModel
@@ -27,6 +25,14 @@ struct MapContentView: View {
         if viewModel.map == nil {
             EmptyView()
         } else {
+            let longPressGesture = LongPressGesture(minimumDuration: 0.5, maximumDistance: .infinity)
+                    .onEnded { _ in
+                        if let lastLongPressEvent = lastLongPressEvent {
+                            viewModel.handleLongTapEnded(screenPoint: lastLongPressEvent.0, mapPoint: lastLongPressEvent.1, mapViewProxy: lastLongPressEvent.2)
+                        }
+                        lastLongPressEvent = nil
+                    }
+
             MapViewReader { proxy in
                 MapView(map: viewModel.map!, viewpoint: viewModel.viewpoint, timeExtent: $viewModel.timeExtent, graphicsOverlays: viewModel.graphicsOverlays)
                         .onScaleChanged { newScale in
@@ -52,30 +58,19 @@ struct MapContentView: View {
                         }
                         .onLongPressGesture { screenPoint, mapPoint in
                             lastLongPressEvent = (screenPoint, mapPoint, proxy)
-                            viewModel.handleSingleTap(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: proxy)
+                            viewModel.handleLongTap(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: proxy)
                         }
                         .attributionBarHidden(viewModel.isAttributionTextVisible)
                         .locationDisplay(viewModel.locationDisplay)
                         .selectionColor(viewModel.selectedColor)
                         .interactionModes(viewModel.interactionModes)
                         .contentInsets(viewModel.contentInsets)
+                        .gesture(longPressGesture)
                         .edgesIgnoringSafeArea(viewModel.ignoresSafeAreaEdges ? .all : [])
                         .disabled(!viewModel.interactionsEnabled)
                         .onAppear {
                             viewModel.mapViewProxy = proxy
                         }
-                        .onLongPressGesture(minimumDuration: .infinity, maximumDistance: .infinity, pressing: { pressing in
-                            if pressing {
-                                isLongPress = true
-                            } else {
-                                if isLongPress {
-                                    isLongPress = false
-                                    if let lastLongPressEvent = lastLongPressEvent {
-                                        viewModel.handleLongTapEnded(screenPoint: lastLongPressEvent.0, mapPoint: lastLongPressEvent.1, mapViewProxy: lastLongPressEvent.2)
-                                    }
-                                }
-                            }
-                        }, perform: {})
             }.overlay(alignment: viewModel.scalebarConfig.alignment ?? .topLeading) {
                         if viewModel.haveScaleBar {
                             Scalebar(
