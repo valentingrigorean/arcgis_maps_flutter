@@ -232,7 +232,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             result(viewModel.map?.initialViewpoint?.toJSONFlutter())
             break
         case "map#setViewpoint":
-            setViewpoint(args: call.arguments, animated: true, result: result)
+            let data = call.arguments as! [String: Any]
+            let viewpoint = Viewpoint(data: data)
+            setViewpoint(viewpoint: viewpoint, animated: true, result: result)
             break
         case "map#setViewpointGeometry":
             guard let proxyView = viewModel.mapViewProxy else {
@@ -608,7 +610,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             }
 
             if let viewPoint = viewPoint {
-                self.setViewpoint(args: viewPoint, animated: false, result: nil)
+                self.setViewpoint(viewpoint: viewPoint, animated: false, result: nil)
             }
         }
     }
@@ -626,10 +628,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     }
 
 
-    private func setViewpoint(args: Any?,
+    private func setViewpoint(viewpoint: Viewpoint,
                               animated: Bool, result: FlutterResult?) {
-        let data = args as! [String: Any]
-        let viewpoint = Viewpoint(data: data)
+
         viewModel.viewpoint = viewpoint
         guard let proxyView = viewModel.mapViewProxy else {
             result?(nil)
@@ -646,11 +647,13 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         guard let dict = args as? [String: Any] else {
             return
         }
+
+        if let viewPoint = dict["viewpoint"] as? [String: Any] {
+            setViewpoint(viewpoint: Viewpoint(data: viewPoint), animated: false, result: nil)
+        }
+
         if let mapType = dict["map"] {
             changeMapType(args: mapType)
-        }
-        if let viewPoint = dict["viewpoint"] {
-            setViewpoint(args: viewPoint, animated: false, result: nil)
         }
 
         layersController.updateFromArgs(args: dict)
