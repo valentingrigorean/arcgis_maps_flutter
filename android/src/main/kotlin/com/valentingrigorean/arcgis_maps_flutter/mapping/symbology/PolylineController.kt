@@ -52,7 +52,7 @@ class PolylineController(polylineId: String) : BaseGraphicController(), Polyline
         if (color != null) {
             this.color = color
         }
-        val width = data["width"] as Double?
+        val width = data["width"] as Int?
         if (width != null) {
             this.width = width.toFloat()
         }
