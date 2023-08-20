@@ -15,7 +15,7 @@ class ArcGISCredentialStoreController {
     private var tokenCredentials = [String: TokenCredential]()
 
     init(messenger: FlutterBinaryMessenger) {
-        channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel/credential_store", binaryMessenger: messenger)
+        channel = UIFlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel/credential_store", binaryMessenger: messenger)
         channel.setMethodCallHandler({ [weak self](call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
             guard let self else {
                 return

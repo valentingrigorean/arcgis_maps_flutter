@@ -50,7 +50,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             viewIdentifier viewId: Int64,
             arguments args: Any?) {
 
-        channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)", binaryMessenger: registrar.messenger())
+        channel = UIFlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)", binaryMessenger: registrar.messenger())
 
         hostingView.frame = frame
         hostingView.setView(AnyView(MapContentView(viewModel: viewModel)))
@@ -72,7 +72,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         layersController = LayersController(methodChannel: channel)
 
-        let locationDisplayChannel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)_location_display", binaryMessenger: registrar.messenger())
+        let locationDisplayChannel = UIFlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)_location_display", binaryMessenger: registrar.messenger())
         locationDisplayController = LocationDisplayController(methodChannel: locationDisplayChannel, mapViewModel: viewModel)
 
 

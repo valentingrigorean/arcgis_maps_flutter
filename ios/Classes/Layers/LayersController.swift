@@ -264,21 +264,15 @@ class LayersController {
             return
         }
 
-        //TODO(vali): remove only layers that need to be removed
-        // https://community.esri.com/t5/swift-maps-sdk-questions/error-removing-single-sequence-operational-layer-s/m-p/1298649#M80
         switch layerType {
         case .operational:
-            let operationalLayers = map.operationalLayers.filter { layer in
-                !nativeLayersToRemove.contains(where: { $0 === layer })
-            }
-            map.removeAllOperationalLayers()
-            map.addOperationalLayers(operationalLayers)
+            map.removeOperationalLayers(nativeLayersToRemove)
             break
         case .base:
-            removeBasemapLayers(baseLayers: nativeLayersToRemove, referenceLayers: [])
+            map.basemap?.removeBaseLayers(nativeLayersToRemove)
             break
         case .reference:
-            removeBasemapLayers(baseLayers: [], referenceLayers: nativeLayersToRemove)
+            map.basemap?.removeReferenceLayers(nativeLayersToRemove)
             break
         }
     }
@@ -352,23 +346,6 @@ class LayersController {
         }
     }
 
-    private func removeBasemapLayers(baseLayers: [Layer], referenceLayers: [Layer]) {
-        guard let basemap = map?.basemap else {
-            return
-        }
-
-        let baseLayers = basemap.baseLayers.filter { layer in
-            !baseLayers.contains(where: { $0 === layer })
-        }
-        basemap.removeAllBaseLayers()
-        basemap.addBaseLayers(baseLayers)
-
-        let referenceLayers = basemap.referenceLayers.filter { layer in
-            !referenceLayers.contains(where: { $0 === layer })
-        }
-        basemap.removeAllReferenceLayers()
-        basemap.addReferenceLayers(referenceLayers)
-    }
 
     private static func findLayerIdByLayer(layer: Layer,
                                            data: SharedDictionary<String, Layer>) -> String? {

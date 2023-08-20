@@ -11,7 +11,7 @@ public class SwiftArcgisMapsFlutterPlugin: NSObject, FlutterPlugin {
     private let arcGISCredentialStoreController: ArcGISCredentialStoreController
 
     init(with registrar: FlutterPluginRegistrar) {
-        channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel", binaryMessenger: registrar.messenger())
+        channel = UIFlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel", binaryMessenger: registrar.messenger())
         geometryController = GeometryEngineController(messenger: registrar.messenger())
         coordinateFormatterController = CoordinateFormatterController(messenger: registrar.messenger())
         arcgisNativeObjectsController = ArcgisNativeObjectsController(messenger: registrar.messenger(), factory: ArcgisNativeObjectFactoryImpl())

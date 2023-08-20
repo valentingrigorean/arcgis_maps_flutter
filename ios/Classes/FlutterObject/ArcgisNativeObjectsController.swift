@@ -19,7 +19,7 @@ class ArcgisNativeObjectsController: NativeMessageSink {
     private let factory: ArcgisNativeObjectFactory
 
     init(messenger: FlutterBinaryMessenger, factory: ArcgisNativeObjectFactory) {
-        channel = FlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel/native_objects", binaryMessenger: messenger)
+        channel = UIFlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel/native_objects", binaryMessenger: messenger)
         self.factory = factory
         setMethodCallHandlers()
     }

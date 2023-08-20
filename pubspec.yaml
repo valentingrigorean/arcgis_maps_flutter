@@ -11,13 +11,13 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_plugin_android_lifecycle: ^2.0.15
-  plugin_platform_interface: ^2.1.4
+  plugin_platform_interface: ^2.1.5
   stream_transform: ^2.1.0
   collection:
   fluster: ^1.2.0
   equatable: ^2.0.5
   http: ^1.1.0
-  xml2json: ^6.1.0
+  xml2json: ^6.2.0
   jiffy: ^6.2.1
 
 dev_dependencies:
