@@ -20,9 +20,9 @@ extension Stop {
 
     func toJSONFlutter() -> Any {
         var json = [String: Any]()
-        json["arrivalCurbApproach"] = arrivalCurbApproach?.toFlutterValue()
-        json["departureCurbApproach"] = departureCurbApproach?.toFlutterValue()
-        json["curbApproach"] = curbApproach?.toFlutterValue()
+        json["arrivalCurbApproach"] = arrivalCurbApproach.toFlutterValue()
+        json["departureCurbApproach"] = departureCurbApproach.toFlutterValue()
+        json["curbApproach"] = curbApproach.toFlutterValue()
         json["currentBearing"] = currentBearing
         json["currentBearingTolerance"] = currentBearingTolerance
         json["distanceToNetworkLocation"] = distanceToNetworkLocation

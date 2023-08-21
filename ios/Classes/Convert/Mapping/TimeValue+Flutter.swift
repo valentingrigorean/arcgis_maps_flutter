@@ -16,7 +16,7 @@ extension TimeValue {
     func toJSONFlutter() -> Any {
         [
             "duration": duration,
-            "unit": unit?.toFlutterValue() ?? 0
+            "unit": unit.toFlutterValue()
         ] as [String: Any]
     }
 }

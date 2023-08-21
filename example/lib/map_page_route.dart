@@ -6,40 +6,51 @@ class MapPageRoute extends StatefulWidget {
   const MapPageRoute({Key? key}) : super(key: key);
 
   @override
-  State<MapPageRoute>  createState() => _MapPageRouteState();
+  State<MapPageRoute> createState() => _MapPageRouteState();
 }
 
 class _MapPageRouteState extends State<MapPageRoute> {
   final RouteTask _routeTask = RouteTask(
     url:
-        'https://sampleserver6.arcgisonline.com/arcgis/rest/services/NetworkAnalysis/SanDiego/NAServer/Route',
+        'https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World',
   );
-  final Set<Marker> _markers = {
-    Marker(
-      markerId: const MarkerId('start'),
-      position: Point(
-        x: -117.15083257944445,
-        y: 32.741123367963446,
-        spatialReference: SpatialReference.wgs84(),
-      ),
-      icon: BitmapDescriptor.fromStyleMarker(
-          style: SimpleMarkerSymbolStyle.circle, color: Colors.red, size: 30),
-    ),
-    Marker(
-      markerId: const MarkerId('end'),
-      position: Point(
-        x: -117.15557279683529,
-        y: 32.703360305883045,
-        spatialReference: SpatialReference.wgs84(),
-      ),
-      icon: BitmapDescriptor.fromStyleMarker(
-          style: SimpleMarkerSymbolStyle.square, color: Colors.green, size: 30),
-    ),
-  };
 
-  late final ArcgisMapController _mapController;
+  final List<Stop> _demoStops = [
+    Stop(
+      point: Point(
+        x: -122.690176,
+        y: 45.522054,
+        spatialReference: SpatialReference.wgs84(),
+      ),
+    ),
+    Stop(
+      point: Point(
+        x: -122.614995,
+        y: 45.526201,
+        spatialReference: SpatialReference.wgs84(),
+      ),
+    ),
+    Stop(
+      point: Point(
+        x: -122.68782,
+        y: 45.51238,
+        spatialReference: SpatialReference.wgs84(),
+      ),
+    )
+  ];
+
+  final Set<Marker> _markers = {};
+
   final Set<PolylineMarker> _routeLines = {};
   final List<DirectionManeuver> _directions = [];
+
+  late final ArcgisMapController _mapController;
+
+  @override
+  void initState() {
+    super.initState();
+    _makeMarkers();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,13 +63,13 @@ class _MapPageRouteState extends State<MapPageRoute> {
           ArcgisMapView(
             map: const ArcGISMap.fromBasemap(
               Basemap.fromStyle(
-                basemapStyle: BasemapStyle.arcGISCommunity,
+                basemapStyle: BasemapStyle.arcGISNavigation,
               ),
             ),
             viewpoint: Viewpoint.fromLatLng(
-              latitude: 32.741123367963446,
-              longitude: -117.15083257944445,
-              scale: 200000,
+              latitude: 45.526201,
+              longitude: -122.65,
+              scale: 144447.638572,
             ),
             onMapCreated: (controller) {
               _mapController = controller;
@@ -98,54 +109,81 @@ class _MapPageRouteState extends State<MapPageRoute> {
     );
   }
 
-  void _testRoute() async {
-    // ignore: unused_local_variable
-    final routeTaskInfo = await _routeTask.getRouteTaskInfo();
-    final defaultParam = (await _routeTask.createDefaultParameters())
-        .copyWith(returnDirections: true, stops: [
-      Stop(
-        point: Point(
-          x: -117.15083257944445,
-          y: 32.741123367963446,
-          spatialReference: SpatialReference.wgs84(),
+  void _makeMarkers() {
+    _markers.add(
+      Marker(
+        markerId: const MarkerId('origin'),
+        position: _demoStops[0].geometry!,
+        icon: BitmapDescriptor.fromStyleMarker(
+          style: SimpleMarkerSymbolStyle.circle,
+          color: Colors.green,
+          size: 24,
         ),
       ),
-      Stop(
-        point: Point(
-          x: -117.15557279683529,
-          y: 32.703360305883045,
-          spatialReference: SpatialReference.wgs84(),
+    );
+    _markers.add(
+      Marker(
+        markerId: const MarkerId('stop'),
+        position: _demoStops[1].geometry!,
+        icon: BitmapDescriptor.fromStyleMarker(
+          style: SimpleMarkerSymbolStyle.diamond,
+          color: Colors.red,
+          size: 12,
         ),
-      )
-    ]);
-    final routeResults = await _routeTask.solveRoute(defaultParam);
-    if (routeResults.routes.isNotEmpty) {
-      final route = routeResults.routes.first;
-      if (route.routeGeometry != null) {
-        final didSetViewPoint = await _mapController.setViewpointGeometry(route.routeGeometry!,
-            padding: 50);
-        if (kDebugMode) {
-          print('didSetViewPoint: $didSetViewPoint');
+      ),
+    );
+    _markers.add(
+      Marker(
+        markerId: const MarkerId('destination'),
+        position: _demoStops[2].geometry!,
+        icon: BitmapDescriptor.fromStyleMarker(
+          style: SimpleMarkerSymbolStyle.circle,
+          color: Colors.black,
+          size: 24,
+        ),
+      ),
+    );
+  }
+
+  void _testRoute() async {
+    try {
+      final parameters = await _routeTask.createDefaultParameters();
+
+      final routeResults = await _routeTask.solveRoute(parameters.copyWith(
+        stops: _demoStops,
+        returnDirections: true,
+        directionsLanguage: 'es',
+      ));
+      if (routeResults.routes.isNotEmpty) {
+        final route = routeResults.routes.first;
+        if (route.routeGeometry != null) {
+          final didSetViewPoint = await _mapController
+              .setViewpointGeometry(route.routeGeometry!, padding: 50);
+          if (kDebugMode) {
+            print('didSetViewPoint: $didSetViewPoint');
+          }
+        }
+        _routeLines.clear();
+        _routeLines.add(
+          PolylineMarker(
+            polylineId: const PolylineId('route'),
+            points: route.routeGeometry!.points.first
+                .map((e) => e.copyWithSpatialReference(
+                      route.routeGeometry!.spatialReference,
+                    ))
+                .toList(),
+            color: Colors.green,
+            width: 5,
+          ),
+        );
+        _directions.clear();
+        _directions.addAll(route.directionManeuvers);
+        if (mounted) {
+          setState(() {});
         }
       }
-      _routeLines.clear();
-      _routeLines.add(
-        PolylineMarker(
-          polylineId: const PolylineId('route'),
-          points: route.routeGeometry!.points.first
-              .map((e) => e.copyWithSpatialReference(
-                    route.routeGeometry!.spatialReference,
-                  ))
-              .toList(),
-          color: Colors.green,
-          width: 5,
-        ),
-      );
-      _directions.clear();
-      _directions.addAll(route.directionManeuvers);
-      if (mounted) {
-        setState(() {});
-      }
+    } catch (ex, stackTrace) {
+      debugPrint('ex: $ex\nstackTrace:\n$stackTrace');
     }
   }
 }

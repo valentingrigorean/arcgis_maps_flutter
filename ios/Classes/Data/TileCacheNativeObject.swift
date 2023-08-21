@@ -19,7 +19,7 @@ class TileCacheNativeObject: BaseNativeObject<TileCache> {
             result(nativeObject.isAntialiasing)
             break
         case "tileCache#getCacheStorageFormat":
-            result(nativeObject.storageFormat?.toFlutterValue())
+            result(nativeObject.storageFormat.toFlutterValue())
             break
         case "tileCache#getTileInfo":
             result(nativeObject.tileInfo?.toJSONFlutter())

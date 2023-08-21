@@ -12,7 +12,7 @@ class RouteTaskNativeObject: BaseNativeObject<RouteTask> {
             ApiKeyResourceNativeHandler(apiKeyResource: task)
         ], messageSink: messageSink)
     }
-    
+
     override func onMethodCall(method: String, arguments: Any?, result: @escaping FlutterResult) {
         switch (method) {
         case "routeTask#getRouteTaskInfo":
@@ -28,40 +28,38 @@ class RouteTaskNativeObject: BaseNativeObject<RouteTask> {
             super.onMethodCall(method: method, arguments: arguments, result: result)
         }
     }
-    
+
     private func getRouteTaskInfo(result: @escaping FlutterResult) {
         createTask {
             do {
                 try await self.nativeObject.load()
                 result(self.nativeObject.info.toJSONFlutter())
-            }catch{
+            } catch {
                 result(error.toJSONFlutter())
             }
         }
     }
-    
+
     private func createDefaultParameters(result: @escaping FlutterResult) {
         createTask {
-            do{
+            do {
                 let params = try await self.nativeObject.makeDefaultParameters()
                 result(params.toJSONFlutter())
-            }catch{
+            } catch {
                 result(error.toJSONFlutter())
             }
         }
-        
     }
-    
+
     private func solveRoute(arguments: Any?, result: @escaping FlutterResult) {
         createTask {
-            let parameters = RouteParameters(data: arguments as! [String: Any])
-            do{
+            do {
+                let parameters = RouteParameters(data: arguments as! [String: Any])
                 let route = try await self.nativeObject.solveRoute(using: parameters)
                 result(route.toJSONFlutter())
-            }catch{
+            } catch {
                 result(error.toJSONFlutter())
             }
         }
     }
-    
 }

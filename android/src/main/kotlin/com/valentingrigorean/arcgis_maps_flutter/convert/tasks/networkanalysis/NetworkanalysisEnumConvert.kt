@@ -7,7 +7,6 @@ import com.arcgismaps.tasks.networkanalysis.DirectionMessageType
 import com.arcgismaps.tasks.networkanalysis.DirectionsStyle
 import com.arcgismaps.tasks.networkanalysis.LocationStatus
 import com.arcgismaps.tasks.networkanalysis.NetworkDirectionsSupport
-import com.arcgismaps.tasks.networkanalysis.RestrictionAttribute
 import com.arcgismaps.tasks.networkanalysis.RouteShapeType
 import com.arcgismaps.tasks.networkanalysis.StopType
 import com.arcgismaps.tasks.networkanalysis.UTurnPolicy

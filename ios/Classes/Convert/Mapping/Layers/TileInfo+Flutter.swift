@@ -23,8 +23,6 @@ extension TileImageFormat {
             self = .mixed
         case 6:
             self = .lerc
-        case 7:
-            self = .png
         default:
             fatalError("Invalid TileImageFormat value \(flutterValue)")
         }
@@ -50,8 +48,17 @@ extension TileImageFormat {
             fatalError("Invalid TileImageFormat value \(self)")
         }
     }
+}
 
-
+extension Optional where Wrapped == TileImageFormat {
+    func toFlutterValue() -> Int {
+        switch self {
+        case .none:
+            return 7
+        case .some(let value):
+            return value.toFlutterValue()
+        }
+    }
 }
 
 extension TileInfo {
@@ -73,7 +80,7 @@ extension TileInfo {
     func toJSONFlutter() -> [String: Any] {
         [
             "dpi": dpi,
-            "imageFormat": format?.toFlutterValue(),
+            "imageFormat": self.format.toFlutterValue(),
             "levelOfDetails": levelsOfDetail.map {
                 $0.toJSONFlutter()
             },

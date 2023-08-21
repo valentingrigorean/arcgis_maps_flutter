@@ -84,6 +84,21 @@ func toFlutterFieldType(obj: Any?) -> Any {
     case .unknown:
         value = nil
         break
+    case .integer:
+        if let number = obj as? NSNumber {
+            value = number.intValue
+        } else {
+            value = obj
+        }
+        break
+    case .double:
+        if let number = obj as? NSNumber {
+            value = number.doubleValue
+        } else {
+            value = obj
+        }
+        break
+
     default:
         if let obj = obj as? UUID {
             value = obj.uuidString
@@ -115,6 +130,16 @@ func fromFlutterField(data: [String: Any]) -> Any? {
     case .blob:
         if let bytes = value as? FlutterStandardTypedData {
             value = bytes.data
+        }
+        break
+    case .integer:
+        if let number = value as? NSNumber {
+            value = number.intValue
+        }
+        break
+    case .double:
+        if let number = value as? NSNumber {
+            value = number.doubleValue
         }
         break
     default:

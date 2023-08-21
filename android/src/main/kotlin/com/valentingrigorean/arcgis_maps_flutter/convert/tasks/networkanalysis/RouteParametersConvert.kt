@@ -8,7 +8,7 @@ import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterValue
 import com.valentingrigorean.arcgis_maps_flutter.convert.toUnitSystem
 
 fun RouteParameters.toFlutterJson(): Any {
-    val data: MutableMap<String, Any?> = HashMap(17)
+    val data: MutableMap<String, Any?> = HashMap(18)
     data["accumulateAttributeNames"] = accumulateAttributeNames
     data["directionsDistanceUnits"] = directionsDistanceUnits.toFlutterValue()
     data["directionsLanguage"] = directionsLanguage
