@@ -49,8 +49,6 @@ extension LinearUnit {
         }
     }
 
-    static let defaultFlutterValue = 8
-
     func toFlutterValue() -> Int {
         switch linearID {
         case .centimeters:
@@ -65,12 +63,55 @@ extension LinearUnit {
             return 4
         case .miles:
             return 5
-        case .nauticalMiles:
+        case .millimeters:
             return 6
-        case .yards:
+        case .nauticalMiles:
             return 7
+        case .yards:
+            return 8
         default:
-            return LinearUnit.defaultFlutterValue
+            fatalError("Unexpected linear unit: \(linearID)")
+        }
+    }
+}
+
+extension Optional where Wrapped == LinearUnit {
+    func toFlutterValue() -> Int {
+        switch self {
+        case .some(let unit):
+            return unit.toFlutterValue()
+        case .none:
+            return 9
+        }
+    }
+}
+
+extension Measurement where UnitType == UnitLength {
+    func toFlutterValue() -> LinearUnit{
+        if let linearUnit = unit.linearUnit{
+            return linearUnit
+        }
+        switch unit {
+        case .centimeters:
+            return LinearUnit(linearID: .centimeters)
+        case .feet:
+            return LinearUnit(linearID: .feet)
+        case .inches:
+            return LinearUnit(linearID: .inches)
+        case .kilometers:
+            return LinearUnit(linearID: .kilometers)
+        case .meters:
+            return LinearUnit(linearID: .meters)
+        case .miles:
+            return LinearUnit(linearID: .miles)
+        case .millimeters:
+            return LinearUnit(linearID: .millimeters)
+        case .nauticalMiles:
+            return LinearUnit(linearID: .nauticalMiles)
+        case .yards:
+            return LinearUnit(linearID: .yards)
+        default:
+            fatalError("Unexpected linear unit: \(unit)")
         }
     }
 }
@@ -99,21 +140,51 @@ extension AngularUnit {
     }
 }
 
-extension GeometryEngine.GeodeticCurveType {
-    init(_ flutterValue: Int) {
-        switch flutterValue {
-        case 0:
-            self = .geodesic
-        case 1:
-            self = .loxodrome
-        case 2:
-            self = .greatElliptic
-        case 3:
-            self = .normalSection
-        case 4:
-            self = .shapePreserving
+extension  AngularUnit.ID{
+    func toFlutterValue() -> Int {
+        switch self {
+        case .degrees:
+            return 0
+        case .minutes:
+            return 1
+        case .seconds:
+            return 2
+        case .grads:
+            return 3
+        case .radians:
+            return 4
         default:
-            fatalError("Unexpected flutter value: \(flutterValue)")
+            fatalError("Unexpected angular unit: \(self)")
+        }
+    }
+}
+
+extension Optional where Wrapped == AngularUnit.ID {
+    func toFlutterValue() -> Int {
+        switch self {
+        case .some(let unit):
+            return unit.toFlutterValue()
+        case .none:
+            return 5
+        }
+    }
+}
+
+extension Measurement where UnitType == UnitAngle {
+    func toFlutterValue() -> Int {
+        switch unit {
+        case .degrees:
+            return AngularUnit.ID.degrees.toFlutterValue()
+        case .arcMinutes:
+            return AngularUnit.ID.minutes.toFlutterValue()
+        case .arcSeconds:
+            return AngularUnit.ID.seconds.toFlutterValue()
+        case .radians:
+            return AngularUnit.ID.radians.toFlutterValue()
+        case .gradians:
+            return AngularUnit.ID.grads.toFlutterValue()
+        default:
+            return 5
         }
     }
 }
@@ -153,6 +224,26 @@ extension AreaUnit {
             break
         default:
             return nil
+        }
+    }
+}
+
+
+extension GeometryEngine.GeodeticCurveType {
+    init(_ flutterValue: Int) {
+        switch flutterValue {
+        case 0:
+            self = .geodesic
+        case 1:
+            self = .loxodrome
+        case 2:
+            self = .greatElliptic
+        case 3:
+            self = .normalSection
+        case 4:
+            self = .shapePreserving
+        default:
+            fatalError("Unexpected flutter value: \(flutterValue)")
         }
     }
 }

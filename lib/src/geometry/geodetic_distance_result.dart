@@ -17,7 +17,7 @@ enum LinearUnitId {
 
   factory LinearUnitId.fromValue(int value) {
     return LinearUnitId.values.firstWhere(
-      (e) => e.value == value,
+          (e) => e.value == value,
       orElse: () => LinearUnitId.other,
     );
   }
@@ -38,7 +38,7 @@ enum AngularUnitId {
 
   factory AngularUnitId.fromValue(int value) {
     return AngularUnitId.values.firstWhere(
-      (e) => e.value == value,
+          (e) => e.value == value,
       orElse: () => AngularUnitId.other,
     );
   }
@@ -71,7 +71,7 @@ enum GeodeticCurveType {
 
   factory GeodeticCurveType.fromValue(int value) {
     return GeodeticCurveType.values.firstWhere(
-      (e) => e.value == value,
+          (e) => e.value == value,
     );
   }
 
@@ -96,7 +96,7 @@ class GeodeticDistanceResult extends Equatable {
 
   final double azimuth2;
 
-  final AngularUnitId? angularUnitId;
+  final AngularUnitId angularUnitId;
 
   factory GeodeticDistanceResult.fromJson(Map<dynamic, dynamic> json) {
     return GeodeticDistanceResult(
@@ -104,9 +104,7 @@ class GeodeticDistanceResult extends Equatable {
       distanceUnitId: LinearUnitId.fromValue(json['distanceUnitId']),
       azimuth1: json['azimuth1'],
       azimuth2: json['azimuth2'],
-      angularUnitId: json.containsKey('angularUnitId')
-          ? AngularUnitId.fromValue(json['angularUnitId'])
-          : null,
+      angularUnitId: AngularUnitId.fromValue(json['angularUnitId']),
     );
   }
 

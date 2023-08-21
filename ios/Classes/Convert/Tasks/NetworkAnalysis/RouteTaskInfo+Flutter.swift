@@ -26,10 +26,10 @@ extension RouteTaskInfo {
         json["preserveFirstStop"] = preservesFirstStop
         json["preserveLastStop"] = preservesLastStop
         json["restrictionAttributes"] = restrictionAttributes.mapValues({ $0.toJSONFlutter() })
-        json["routeShapeType"] = routeShapeType?.toFlutterValue()
+        json["routeShapeType"] = routeShapeType.toFlutterValue()
         json["supportedLanguages"] = supportedLanguages
         json["supportedRestrictionUsageParameterValues"] = supportedRestrictionUsageParameterValues
-        json["directionsSupport"] = directionsSupport?.toFlutterValue()
+        json["directionsSupport"] = directionsSupport.toFlutterValue()
         json["travelModes"] = travelModes.map({ $0.toJSONFlutter() })
         json["supportsRerouting"] = supportsRerouting
         return json

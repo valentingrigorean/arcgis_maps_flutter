@@ -19,7 +19,7 @@ extension Route {
             json["endTime"] = endDate.toIso8601String()
         }
         json["endTimeShift"] = endDateShift
-        json["totalLength"] = totalLength
+        json["totalLength"] = totalLength.value
         if let routeGeometry = geometry {
             json["routeGeometry"] = routeGeometry.toJSONFlutter()
         }

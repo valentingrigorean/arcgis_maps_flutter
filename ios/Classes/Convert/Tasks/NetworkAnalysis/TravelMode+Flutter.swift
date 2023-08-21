@@ -19,7 +19,7 @@ extension TravelMode{
         let restrictionAttributeNames = data["restrictionAttributeNames"] as! [String]
         addRestrictionAttributeNames(restrictionAttributeNames)
         timeAttributeName = data["timeAttributeName"] as! String
-        type = data["type"] as! String
+        self.type = data["type"] as! String
         usesHierarchy = data["useHierarchy"] as! Bool
         uTurnPolicy = TravelMode.UTurnPolicy(data["uTurnPolicy"] as! Int)
     }
@@ -34,7 +34,7 @@ extension TravelMode{
         json["outputGeometryPrecision"] = outputGeometryPrecision
         json["restrictionAttributeNames"] = restrictionAttributeNames
         json["timeAttributeName"] = timeAttributeName
-        json["type"] = type
+        json["type"] = self.type
         json["useHierarchy"] = usesHierarchy
         json["uTurnPolicy"] = uTurnPolicy.toFlutterValue()
         return json

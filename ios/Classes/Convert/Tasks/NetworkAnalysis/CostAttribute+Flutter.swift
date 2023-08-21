@@ -9,7 +9,7 @@ extension CostAttribute {
     func toJSONFlutter() -> Any {
         var json = [String: Any]()
         json["parameterValues"] = parameterValues.toFlutterTypes()
-        json["unit"] = unit?.toFlutterValue()
+        json["unit"] = unit.toFlutterValue()
         return json
     }
 }

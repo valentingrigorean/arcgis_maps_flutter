@@ -9,9 +9,10 @@ extension GeodeticDistanceResult {
     func toJSONFlutter() -> Any {
         [
             "distance": distance.value,
-            "distanceUnitId": distance.unit.linearUnit?.toFlutterValue() ?? LinearUnit.defaultFlutterValue,
+            "distanceUnitId": distance.toFlutterValue(),
             "azimuth1": azimuth1.value,
             "azimuth2": azimuth2.value,
+            "azimuthUnitId": azimuth1.toFlutterValue()
         ] as [String: Any]
     }
 }

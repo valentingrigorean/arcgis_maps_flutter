@@ -51,9 +51,10 @@ dynamic fromNativeField(Map<dynamic, dynamic>? map) {
   final FieldType fieldType = FieldType.values[map['type']!];
   final value = map['value'];
   switch (fieldType) {
+    case FieldType.double:
+      return (value as num).toDouble();
     case FieldType.unknown:
     case FieldType.integer:
-    case FieldType.double:
     case FieldType.text:
     case FieldType.blob:
       return value;

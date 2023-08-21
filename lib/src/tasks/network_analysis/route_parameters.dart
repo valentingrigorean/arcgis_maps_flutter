@@ -146,11 +146,6 @@ class RouteParameters {
       assert(stops!.length > 1,
           'At least two stops are required to return routes');
     }
-    if (stops != null) {
-      if (stops.length > 1 && returnRoutes == null) {
-        returnRoutes = true;
-      }
-    }
     return RouteParameters(
       accumulateAttributeNames:
           accumulateAttributeNames ?? this.accumulateAttributeNames,

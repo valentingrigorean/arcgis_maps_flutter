@@ -32,9 +32,8 @@ extension RouteParameters {
             self.travelMode = TravelMode(data: travelMode)
         }
         if let stops = data["stops"] as? [[String: Any]] {
-            setStops(stops.map {
-                Stop(data: $0)
-            })
+            let stops = stops.map { Stop(data: $0) }
+            setStops(stops)
         }
     }
 
@@ -59,7 +58,7 @@ extension RouteParameters {
         json["returnPolylineBarriers"] = returnsPolylineBarriers
         json["returnRoutes"] = returnsRoutes
         json["returnStops"] = returnsStops
-        json["routeShapeType"] = routeShapeType?.toFlutterValue()
+        json["routeShapeType"] = routeShapeType.toFlutterValue()
         if let travelMode = travelMode {
             json["travelMode"] = travelMode.toJSONFlutter()
         }

@@ -39,8 +39,10 @@ extension DirectionsStyle {
 
 
 extension RouteShapeType {
-    init(_ flutterValue: Int) {
+    init?(_ flutterValue: Int) {
         switch flutterValue {
+        case 0:
+            return nil
         case 1:
             self = .straightLine
         case 2:
@@ -58,6 +60,17 @@ extension RouteShapeType {
             return 2
         default:
             fatalError("Unexpected value: $this")
+        }
+    }
+}
+
+extension Optional where Wrapped == RouteShapeType {
+    func toFlutterValue() -> Int {
+        switch self {
+        case .some(let routeShapeType):
+            return routeShapeType.toFlutterValue()
+        case .none:
+            return 0
         }
     }
 }
@@ -95,8 +108,10 @@ extension TravelMode.UTurnPolicy {
 }
 
 extension CostAttribute.Unit {
-    init(_ flutterValue: Int) {
+    init?(_ flutterValue: Int) {
         switch flutterValue {
+        case 0:
+            return nil
         case 1:
             self = .inches
         case 2:
@@ -170,6 +185,17 @@ extension CostAttribute.Unit {
     }
 }
 
+extension Optional where Wrapped == CostAttribute.Unit {
+    func toFlutterValue() -> Int {
+        switch self {
+        case .some(let unit):
+            return unit.toFlutterValue()
+        case .none:
+            return 0
+        }
+    }
+}
+
 extension NetworkDirectionsSupport {
     func toFlutterValue() -> Int {
         switch self {
@@ -177,8 +203,19 @@ extension NetworkDirectionsSupport {
             return 1
         case .supported:
             return 2
-        @unknown default:
+        default:
             fatalError("Unexpected value: \(self)")
+        }
+    }
+}
+
+extension Optional where Wrapped == NetworkDirectionsSupport {
+    func toFlutterValue() -> Int {
+        switch self {
+        case .some(let unit):
+            return unit.toFlutterValue()
+        case .none:
+            return 0
         }
     }
 }
@@ -189,9 +226,9 @@ extension Stop.Kind {
         case 0:
             self = .stop
         case 1:
-            self =  .waypoint
+            self = .waypoint
         case 2:
-            self =  .restBreak
+            self = .restBreak
         default:
             fatalError("Unexpected value: (flutterValue)")
         }
@@ -212,16 +249,18 @@ extension Stop.Kind {
 }
 
 extension CurbApproach {
-    init(_ flutterValue: Int) {
+    init?(_ flutterValue: Int) {
         switch flutterValue {
+        case -1:
+            return nil
         case 0:
-            self =  .eitherSide
+            self = .eitherSide
         case 1:
-            self =  .leftSide
+            self = .leftSide
         case 2:
-            self =  .rightSide
+            self = .rightSide
         case 3:
-            self =  .noUTurn
+            self = .noUTurn
         default:
             fatalError("Unexpected value: \(flutterValue)")
         }
@@ -237,7 +276,18 @@ extension CurbApproach {
             return 2
         case .noUTurn:
             return 3
-        @unknown default:
+        default:
+            fatalError("Unexpected value: \(self)")
+        }
+    }
+}
+
+extension Optional where Wrapped == CurbApproach {
+    func toFlutterValue() -> Int {
+        switch self {
+        case .some(let unit):
+            return unit.toFlutterValue()
+        case .none:
             return -1
         }
     }
@@ -330,6 +380,17 @@ extension DirectionManeuver.Kind {
         case .doorPassage:
             return 30
         default:
+            fatalError("Unexpected value: \(self)")
+        }
+    }
+}
+
+extension Optional where Wrapped == DirectionManeuver.Kind {
+    func toFlutterValue() -> Int {
+        switch self {
+        case .some(let unit):
+            return unit.toFlutterValue()
+        case .none:
             return -1
         }
     }
