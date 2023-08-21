@@ -5,7 +5,10 @@
 import Foundation
 import Flutter
 
-class UIFlutterMethodChannel: FlutterMethodChannel{
+class UIFlutterMethodChannel: FlutterMethodChannel {
+    init(name: String, binaryMessenger messenger: FlutterBinaryMessenger) {
+        super.init(name: name, binaryMessenger: messenger, codec: FlutterStandardMethodCodec.sharedInstance())
+    }
 
     override func invokeMethod(_ method: String, arguments: Any?) {
         if Thread.isMainThread {

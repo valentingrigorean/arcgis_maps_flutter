@@ -69,9 +69,8 @@ public class NativeObjectMessageSink: NativeMessageSink {
 
 
 class BaseNativeObject<T>: NativeMessageSink, NativeObject {
+    private let taskManager: TaskManager = TaskManager()
     private var nativeObjectMessageSink: NativeObjectMessageSink
-    private var tasks: [Int: Task<Void, Error>] = [:]
-    private var taskIdCounter = 0
     
     private var isDisposed: Bool = false
     private let nativeHandlers: [NativeHandler]
@@ -123,24 +122,11 @@ class BaseNativeObject<T>: NativeMessageSink, NativeObject {
 
     @discardableResult
     func createTask(operation: @escaping @Sendable () async throws -> Void) -> Task<Void, Error> {
-        let taskId = taskIdCounter
-        let task = Task<Void, Error> {
-            do {
-                try await operation()
-            } catch {
-                throw error
-            }
-        }
-        tasks[taskId] = task
-        taskIdCounter += 1
-        return task
+        taskManager.createTask(operation: operation)
     }
 
     
     private func cancelAllTasks() {
-        for (_, task) in tasks {
-            task.cancel()
-        }
-        tasks.removeAll()
+        taskManager.cancelAllTasks()
     }
 }
