@@ -87,29 +87,29 @@ extension Optional where Wrapped == LinearUnit {
 }
 
 extension Measurement where UnitType == UnitLength {
-    func toFlutterValue() -> LinearUnit{
+    func toFlutterValue() -> Int{
         if let linearUnit = unit.linearUnit{
-            return linearUnit
+            return linearUnit.toFlutterValue()
         }
         switch unit {
         case .centimeters:
-            return LinearUnit(linearID: .centimeters)
+            return LinearUnit(linearID: .centimeters).toFlutterValue()
         case .feet:
-            return LinearUnit(linearID: .feet)
+            return LinearUnit(linearID: .feet).toFlutterValue()
         case .inches:
-            return LinearUnit(linearID: .inches)
+            return LinearUnit(linearID: .inches).toFlutterValue()
         case .kilometers:
-            return LinearUnit(linearID: .kilometers)
+            return LinearUnit(linearID: .kilometers).toFlutterValue()
         case .meters:
-            return LinearUnit(linearID: .meters)
+            return LinearUnit(linearID: .meters).toFlutterValue()
         case .miles:
-            return LinearUnit(linearID: .miles)
+            return LinearUnit(linearID: .miles).toFlutterValue()
         case .millimeters:
-            return LinearUnit(linearID: .millimeters)
+            return LinearUnit(linearID: .millimeters).toFlutterValue()
         case .nauticalMiles:
-            return LinearUnit(linearID: .nauticalMiles)
+            return LinearUnit(linearID: .nauticalMiles).toFlutterValue()
         case .yards:
-            return LinearUnit(linearID: .yards)
+            return LinearUnit(linearID: .yards).toFlutterValue()
         default:
             fatalError("Unexpected linear unit: \(unit)")
         }
