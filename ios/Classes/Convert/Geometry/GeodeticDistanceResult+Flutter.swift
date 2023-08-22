@@ -12,7 +12,7 @@ extension GeodeticDistanceResult {
             "distanceUnitId": distance.toFlutterValue(),
             "azimuth1": azimuth1.value,
             "azimuth2": azimuth2.value,
-            "azimuthUnitId": azimuth1.toFlutterValue()
+            "angularUnitId": azimuth1.toFlutterValue()
         ] as [String: Any]
     }
 }
