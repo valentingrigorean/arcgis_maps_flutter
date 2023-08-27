@@ -15,9 +15,8 @@ struct MapContentView: View {
 
     @State private var lastLongPressEvent: (CGPoint, ArcGIS.Point, MapViewProxy)?
 
-    @State private var didSendLongTap = false
-
-    @GestureState private var isLongPressed = false
+    @GestureState private var longPressState = false
+    @State private var longPressActive = false
 
     @ObservedObject var viewModel: MapViewModel
 
@@ -29,27 +28,6 @@ struct MapContentView: View {
         if viewModel.map == nil {
             EmptyView()
         } else {
-            let longPressGesture = LongPressGesture(minimumDuration: 0.5, maximumDistance: 10)
-                    .updating($isLongPressed) { currentState, gestureState, transaction in
-                        if currentState {
-                            if let lastLongPressEvent = lastLongPressEvent {
-                                didSendLongTap = true
-                                viewModel.handleLongTap(screenPoint: lastLongPressEvent.0, mapPoint: lastLongPressEvent.1, mapViewProxy: lastLongPressEvent.2)
-                            }
-                        }
-                        gestureState = currentState
-                    }
-                    .onEnded { _ in
-                        if let lastLongPressEvent = lastLongPressEvent {
-                            if !didSendLongTap {
-                                viewModel.handleLongTap(screenPoint: lastLongPressEvent.0, mapPoint: lastLongPressEvent.1, mapViewProxy: lastLongPressEvent.2)
-                            }
-                            viewModel.handleLongTapEnded(screenPoint: lastLongPressEvent.0, mapPoint: lastLongPressEvent.1, mapViewProxy: lastLongPressEvent.2)
-                        }
-                        didSendLongTap = false
-                        lastLongPressEvent = nil
-                    }
-
             MapViewReader { proxy in
                 MapView(map: viewModel.map!, viewpoint: viewModel.viewpoint, timeExtent: $viewModel.timeExtent, graphicsOverlays: viewModel.graphicsOverlays)
                         .onScaleChanged { newScale in
@@ -76,17 +54,36 @@ struct MapContentView: View {
                             viewModel.handleSingleTap(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: proxy)
                         }
                         .onLongPressGesture { screenPoint, mapPoint in
-                            if lastLongPressEvent != nil {
+                            if longPressActive {
                                 return
                             }
+                            longPressActive = true
                             lastLongPressEvent = (screenPoint, mapPoint, proxy)
+                            viewModel.handleLongTap(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: proxy)
                         }
                         .attributionBarHidden(viewModel.isAttributionTextVisible)
                         .locationDisplay(viewModel.locationDisplay)
                         .selectionColor(viewModel.selectedColor)
                         .interactionModes(viewModel.interactionModes)
                         .contentInsets(viewModel.contentInsets)
-                        .gesture(longPressGesture)
+                        .gesture(LongPressGesture(minimumDuration: 0.5)
+                                .updating($longPressState){ currentState, gestureState, transaction in
+                                    gestureState = currentState
+                                }
+                                .simultaneously(with: DragGesture(minimumDistance: 0).onChanged { _ in
+                                    if let lastLongPressEvent = lastLongPressEvent {
+                                        viewModel.handleLongTapEnded(screenPoint: lastLongPressEvent.0, mapPoint: lastLongPressEvent.1, mapViewProxy: lastLongPressEvent.2)
+                                        self.lastLongPressEvent = nil
+                                    }
+                                })
+                                .onEnded({ _ in
+                                    longPressActive = false
+                                    if let lastLongPressEvent = lastLongPressEvent {
+                                        viewModel.handleLongTapEnded(screenPoint: lastLongPressEvent.0, mapPoint: lastLongPressEvent.1, mapViewProxy: lastLongPressEvent.2)
+                                        self.lastLongPressEvent = nil
+                                    }
+                                })
+                        )
                         .edgesIgnoringSafeArea(viewModel.ignoresSafeAreaEdges ? .all : [])
                         .disabled(!viewModel.interactionsEnabled)
                         .onAppear {

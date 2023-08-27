@@ -22,20 +22,28 @@ class _MapPageGestureState extends State<MapPageGesture> {
                 basemapStyle: BasemapStyle.arcGISCommunity,
               ),
             ),
-            onTap: (_,point) {
-              setState(() {
-                text = 'OnTap: $point';
-              });
-            },
-            onLongPress: (_,point) {
-              setState(() {
-                text = 'OnLongPress: $point';
-              });
-            },
             interactionOptions: const InteractionOptions(
               isMagnifierEnabled: false,
               allowMagnifierToPan: false,
             ),
+            onTap: (_, point) {
+              debugPrint('Tap: $point');
+              setState(() {
+                text = 'OnTap: $point';
+              });
+            },
+            onLongPress: (_, point) {
+              debugPrint('LongPress: $point');
+              setState(() {
+                text = 'OnLongPress: $point';
+              });
+            },
+            onLongPressEnd: (_, point) {
+              debugPrint('LongPressEnd: $point');
+              setState(() {
+                text = null;
+              });
+            },
           ),
           if (text != null)
             Positioned(
