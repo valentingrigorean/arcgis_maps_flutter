@@ -23,8 +23,6 @@ class GeoViewTouchDelegate {
     private var graphicsTouchDelegates = [MapGraphicTouchDelegate]()
     private var cancellables = Set<AnyCancellable>()
 
-    private var isLongPress = false
-
 
     init(methodChannel: FlutterMethodChannel, viewModel: MapViewModel) {
         self.methodChannel = methodChannel
@@ -39,7 +37,6 @@ class GeoViewTouchDelegate {
                 .store(in: &cancellables)
 
         viewModel.longTapEvent.sink(receiveValue: { screenPoint, mapPoint, mapViewProxy in
-                    self.isLongPress = true
                     self.taskManager.cancelTask(withKey: "longTapTask")
                     self.taskManager.createTask(key: "longTapTask") {
                         await self.handleLongTap(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: mapViewProxy)
@@ -49,13 +46,9 @@ class GeoViewTouchDelegate {
 
 
         viewModel.longTapEndedEvent.sink(receiveValue: { screenPoint, mapPoint, mapViewProxy in
-                    if !self.isLongPress {
-                        return
-                    }
-                    self.isLongPress = false
-                    self.taskManager.cancelTask(withKey: "longTapTask")
-                    self.taskManager.createTask(key: "longTapTask") {
-                        await self.handleLongTap(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: mapViewProxy)
+                    self.taskManager.cancelTask(withKey: "longTapEndedTask")
+                    self.taskManager.createTask(key: "longTapEndedTask") {
+                        await self.handleLongTapEnded(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: mapViewProxy)
                     }
                 })
                 .store(in: &cancellables)

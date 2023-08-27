@@ -68,6 +68,9 @@ class _MapPageLocatorState extends State<MapPageLocator> {
                   basemapStyle: BasemapStyle.arcGISCommunity,
                 ),
               ),
+              interactionOptions: const InteractionOptions(
+                isMagnifierEnabled: false,
+              ),
               onTap: (_, point) async {
                 setState(() {
                   _isLoading = true;

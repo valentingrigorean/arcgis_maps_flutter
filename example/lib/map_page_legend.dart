@@ -76,6 +76,9 @@ class _MapPageLegendState extends State<MapPageLegend> {
                 final result = await _controller!.getLegendInfosForLayers(getLakeLayers());
                 print('LegendInfo:${result.length}');
 
+                if(!context.mounted) {
+                  return;
+                }
                 showDialog(
                   context: context,
                   builder: (context) {

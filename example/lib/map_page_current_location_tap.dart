@@ -85,9 +85,7 @@ class _MapPageCurrentLocationTapState extends State<MapPageCurrentLocationTap> {
     }
     if (mounted) {
       setState(() {
-        print(newStatus);
         _permissionStatus = newStatus;
-        print(_permissionStatus);
       });
     }
   }

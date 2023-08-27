@@ -42,7 +42,7 @@ class GeodatabaseSyncTask extends ArcgisNativeObject
       return (result as List<dynamic>)
           .map((e) => SyncLayerResult._fromJson(e))
           .toList();
-    } on PlatformException catch (e) {
+    } on PlatformException catch (_) {
       return null;
     }
 

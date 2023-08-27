@@ -32,8 +32,6 @@ class Polygon extends Geometry {
       return null;
     }
 
-    PolygonMarker q;
-
     final bool hasZ = json['hasZ'] ?? false;
     final bool hasM = json['hasM'] ?? false;
 

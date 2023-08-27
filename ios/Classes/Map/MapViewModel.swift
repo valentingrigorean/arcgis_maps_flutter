@@ -15,6 +15,10 @@ struct MapContentView: View {
 
     @State private var lastLongPressEvent: (CGPoint, ArcGIS.Point, MapViewProxy)?
 
+    @State private var didSendLongTap = false
+
+    @GestureState private var isLongPressed = false
+
     @ObservedObject var viewModel: MapViewModel
 
     init(viewModel: MapViewModel) {
@@ -25,11 +29,24 @@ struct MapContentView: View {
         if viewModel.map == nil {
             EmptyView()
         } else {
-            let longPressGesture = LongPressGesture(minimumDuration: 0.5, maximumDistance: .infinity)
+            let longPressGesture = LongPressGesture(minimumDuration: 0.5, maximumDistance: 10)
+                    .updating($isLongPressed) { currentState, gestureState, transaction in
+                        if currentState {
+                            if let lastLongPressEvent = lastLongPressEvent {
+                                didSendLongTap = true
+                                viewModel.handleLongTap(screenPoint: lastLongPressEvent.0, mapPoint: lastLongPressEvent.1, mapViewProxy: lastLongPressEvent.2)
+                            }
+                        }
+                        gestureState = currentState
+                    }
                     .onEnded { _ in
                         if let lastLongPressEvent = lastLongPressEvent {
+                            if !didSendLongTap {
+                                viewModel.handleLongTap(screenPoint: lastLongPressEvent.0, mapPoint: lastLongPressEvent.1, mapViewProxy: lastLongPressEvent.2)
+                            }
                             viewModel.handleLongTapEnded(screenPoint: lastLongPressEvent.0, mapPoint: lastLongPressEvent.1, mapViewProxy: lastLongPressEvent.2)
                         }
+                        didSendLongTap = false
                         lastLongPressEvent = nil
                     }
 
@@ -50,6 +67,8 @@ struct MapContentView: View {
                         .onUnitsPerPointChanged {
                             viewModel.unitsPerPoint = $0
                         }
+                        .magnifierDisabled(viewModel.magnifierDisabled)
+                        .magnifierEdgePanningDisabled(viewModel.magnifierEdgePanningDisabled)
                         .onSpatialReferenceChanged {
                             viewModel.spatialReference = $0
                         }
@@ -57,8 +76,10 @@ struct MapContentView: View {
                             viewModel.handleSingleTap(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: proxy)
                         }
                         .onLongPressGesture { screenPoint, mapPoint in
+                            if lastLongPressEvent != nil {
+                                return
+                            }
                             lastLongPressEvent = (screenPoint, mapPoint, proxy)
-                            viewModel.handleLongTap(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: proxy)
                         }
                         .attributionBarHidden(viewModel.isAttributionTextVisible)
                         .locationDisplay(viewModel.locationDisplay)
@@ -71,7 +92,8 @@ struct MapContentView: View {
                         .onAppear {
                             viewModel.mapViewProxy = proxy
                         }
-            }.overlay(alignment: viewModel.scalebarConfig.alignment ?? .topLeading) {
+            }
+                    .overlay(alignment: viewModel.scalebarConfig.alignment ?? .topLeading) {
                         if viewModel.haveScaleBar {
                             Scalebar(
                                     maxWidth: viewModel.scalebarConfig.maxWidth,
@@ -83,7 +105,7 @@ struct MapContentView: View {
                                     viewpoint: $viewModel.viewpointCenterAndScale
                             ).ignoresSafeArea()
                                     .offset(viewModel.scalebarConfig.offset ?? .zero)
-                        }else{
+                        } else {
                             EmptyView()
                         }
                     }
@@ -134,6 +156,10 @@ class MapViewModel: ObservableObject {
     @Published var isAttributionTextVisible: Bool = true
 
     @Published var haveScaleBar: Bool = true
+
+    @Published var magnifierDisabled: Bool = false
+
+    @Published var magnifierEdgePanningDisabled: Bool = false
 
     @Published var scalebarConfig: FlutterScalebarConfig = FlutterScalebarConfig(settings: ScalebarSettings(), units: NSLocale.current.usesMetricSystem ? .metric : .imperial, style: .alternatingBar)
 
@@ -245,6 +271,14 @@ extension MapViewModel {
 
         if let isZoomEnabled = options["isZoomEnabled"] as? Bool, isZoomEnabled {
             newInteractionModes.insert(.zoom)
+        }
+
+        if let isMagnifierEnabled = options["isMagnifierEnabled"] as? Bool {
+            magnifierDisabled = !isMagnifierEnabled
+        }
+
+        if let allowMagnifierToPan = options["allowMagnifierToPan"] as? Bool {
+            magnifierEdgePanningDisabled = !allowMagnifierToPan
         }
 
         interactionModes = newInteractionModes

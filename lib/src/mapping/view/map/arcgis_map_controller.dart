@@ -335,12 +335,6 @@ class ArcgisMapController {
           (UserLocationTapEvent e) => _arcgisMapState.onUserLocationTap(),
         );
   }
-
-  void _checkIfDisposed() {
-    if (_isDisposed) {
-      throw StateError('Cannot access a disposed ArcGISMapController.');
-    }
-  }
 }
 
 typedef _RegisterHandlerCallback = void Function(bool register);
