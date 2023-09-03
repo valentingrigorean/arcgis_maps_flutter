@@ -113,13 +113,14 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
     );
   }
 
-  void onMapCreated(ArcgisMapController mapController) {
+  void onMapCreated(ArcgisMapController mapController) async {
     _mapController = mapController;
     mapController.locationDisplay.autoPanMode = AutoPanMode.navigation;
-    final spatialReference = mapController.getMapSpatialReference();
-    debugPrint('spatialReference: $spatialReference');
+
     _compassController = CompassController.fromMapController(mapController);
     setState(() {});
+    final spatialReference = await mapController.getMapSpatialReference();
+    debugPrint('spatialReference: $spatialReference');
   }
 
   @override
