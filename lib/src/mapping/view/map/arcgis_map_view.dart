@@ -10,7 +10,7 @@ typedef MapErrorCallback = void Function(Object? error, StackTrace? stackTrace);
 
 typedef MapLoadedCallback = void Function(ArcgisError? error);
 
-typedef LayerLoadedCallback = void Function(Layer layer, ArcgisError? error);
+typedef LayerLoadedCallback = void Function(LayerId layerId, ArcgisError? error, Layer? layer);
 
 typedef GestureCallback = void Function(Offset screenPoint, Point? position);
 
@@ -91,10 +91,11 @@ class ArcgisMapView extends StatefulWidget {
     this.minScale = 0,
     this.maxScale = 0,
     this.onUnknownMapObjectIdError,
-  })  : assert(onIdentifyLayer.isNotEmpty ? onIdentifyLayers == null : true,
-            'You can use only onIdentifyLayer or onIdentifyLayers'),
+  })
+      : assert(onIdentifyLayer.isNotEmpty ? onIdentifyLayers == null : true,
+  'You can use only onIdentifyLayer or onIdentifyLayers'),
         assert(onIdentifyLayers != null ? onIdentifyLayer.isEmpty : true,
-            'You can use only onIdentifyLayer or onIdentifyLayers'),
+        'You can use only onIdentifyLayer or onIdentifyLayers'),
         super(key: key);
 
   /// Callback method for when the map is ready to be used.
@@ -238,7 +239,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   final _mapId = _nextMapCreationId++;
 
   final Completer<ArcgisMapController> _controller =
-      Completer<ArcgisMapController>();
+  Completer<ArcgisMapController>();
 
   late ArcGISMap _map = widget.map;
 
@@ -310,7 +311,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
 
   Future<void> onPlatformViewCreated(int id) async {
     final ArcgisMapController controller =
-        await ArcgisMapController.init(id, this);
+    await ArcgisMapController.init(id, this);
 
     if (!mounted) {
       return;
@@ -360,18 +361,9 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
       if (layer != null) break;
     }
 
-    if (layer == null) {
-      final error = UnknownMapObjectIdError('layer', layerId, 'onLayerLoaded');
-      final callback = widget.onUnknownMapObjectIdError;
-      if (callback == null) {
-        throw error;
-      }
-      callback(error);
-      return;
-    }
     final completion = widget.onLayerLoaded;
     if (completion != null) {
-      completion(layer, error);
+      completion(layerId, error, layer);
     }
   }
 
@@ -455,8 +447,8 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     }
   }
 
-  void onIdentifyLayers(
-      Offset screenMap, Point? position, List<IdentifyLayerResult> results) {
+  void onIdentifyLayers(Offset screenMap, Point? position,
+      List<IdentifyLayerResult> results) {
     final callback = widget.onIdentifyLayers;
     if (callback != null) {
       callback(screenMap, position, results);
@@ -473,7 +465,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   void _updateOptions() async {
     final _ArcgisMapOptions newOptions = _ArcgisMapOptions.fromWidget(widget);
     final Map<String, dynamic> updates =
-        _arcgisMapOptions.updatesMap(newOptions);
+    _arcgisMapOptions.updatesMap(newOptions);
     if (updates.isEmpty) {
       return;
     }
@@ -528,7 +520,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   void _updateMarkers() async {
     final ArcgisMapController controller = await _controller.future;
     final markerUpdate =
-        MarkerUpdates.from(_markers.values.toSet(), widget.markers);
+    MarkerUpdates.from(_markers.values.toSet(), widget.markers);
     if (markerUpdate.isEmpty) return;
     controller._updateMarkers(markerUpdate);
     _markers = keyByMarkerId(widget.markers);
@@ -537,7 +529,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   void _updatePolygons() async {
     final ArcgisMapController controller = await _controller.future;
     final polygonUpdates =
-        PolygonUpdates.from(_polygons.values.toSet(), widget.polygons);
+    PolygonUpdates.from(_polygons.values.toSet(), widget.polygons);
     if (polygonUpdates.isEmpty) return;
     controller._updatePolygons(polygonUpdates);
     _polygons = keyByPolygonId(widget.polygons);
@@ -546,7 +538,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   void _updatePolylines() async {
     final ArcgisMapController controller = await _controller.future;
     final polylinesUpdate =
-        PolylineUpdates.from(_polylines.values.toSet(), widget.polylines);
+    PolylineUpdates.from(_polylines.values.toSet(), widget.polylines);
     if (polylinesUpdate.isEmpty) return;
     controller._updatePolylines(polylinesUpdate);
     _polylines = keyByPolylineId(widget.polylines);

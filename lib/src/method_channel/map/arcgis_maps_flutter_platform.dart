@@ -183,6 +183,11 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('getMapScale() has not been implemented.');
   }
 
+  Future<SpatialReference?> getMapSpatialReference(int mapId) {
+    throw UnimplementedError(
+        'getMapSpatialReference() has not been implemented.');
+  }
+
   Future<void> updateLayers(int mapId, LayerUpdates layerUpdates) {
     throw UnimplementedError('updateLayers() has not been implemented.');
   }
@@ -275,5 +280,7 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
   void dispose(int mapId) {
     throw UnimplementedError('dispose() has not been implemented.');
   }
+
+
 
 }

@@ -389,6 +389,15 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
+  Future<SpatialReference?> getMapSpatialReference(int mapId) async{
+    final result = await channel(mapId).invokeMapMethod<String, dynamic>('map#getMapSpatialReference');
+    if (result == null) {
+      return null;
+    }
+    return SpatialReference.fromJson(result);
+  }
+
+  @override
   Future<Point?> screenToLocation(
       int mapId, Offset screenPoint, SpatialReference spatialReference) async {
     final result = await channel(mapId).invokeMethod('map#screenToLocation', {

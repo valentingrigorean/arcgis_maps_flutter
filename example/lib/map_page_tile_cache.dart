@@ -60,8 +60,8 @@ class _MapPageTileCacheState extends State<MapPageTileCache> {
         onMapCreated: (controller) {
           _mapController = controller;
         },
-        onLayerLoaded: (layer, error) {
-          debugPrint('layer: $layer');
+        onLayerLoaded: (layerId, error,layer) {
+          debugPrint('layer: $layerId');
           if (error != null) debugPrint('error: $error');
         },
       ),

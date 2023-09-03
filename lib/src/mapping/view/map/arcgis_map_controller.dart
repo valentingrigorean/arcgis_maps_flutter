@@ -204,6 +204,9 @@ class ArcgisMapController {
   Future<double> getMapRotation() =>
       ArcgisMapsFlutterPlatform.instance.getMapRotation(mapId);
 
+  Future<SpatialReference?> getMapSpatialReference() =>
+      ArcgisMapsFlutterPlatform.instance.getMapSpatialReference(mapId);
+
   /// Gets the factor of map extent within which the location symbol may move
   /// before causing auto-panning to re-center the map on the current location.
   /// Applies only to [AutoPanMode.recenter] mode.

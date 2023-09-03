@@ -304,6 +304,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             }
             result(mapPoint?.toJSONFlutter())
             break
+        case "map#getMapSpatialReference":
+            result(viewModel.map?.spatialReference?.toJSONFlutter())
+            break
         case "map#getMapScale":
             result(viewModel.currentScale)
             break

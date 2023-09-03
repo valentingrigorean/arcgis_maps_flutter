@@ -325,6 +325,14 @@ class ArcgisMapController(
                 }
                 result.success(mapPoint?.toFlutterJson())
             }
+            "map#getMapSpatialReference" -> {
+                val map = mapView.map
+                if (map == null) {
+                    result.success(null)
+                    return
+                }
+                result.success(map.spatialReference?.toFlutterJson())
+            }
 
             "map#getMapScale" -> {
                 result.success(mapView.mapScale.value)
