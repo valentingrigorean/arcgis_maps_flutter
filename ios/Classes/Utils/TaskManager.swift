@@ -18,6 +18,9 @@ class TaskManager {
     func createTask(key: String? = nil, operation: @escaping @Sendable () async throws -> Void) -> Task<Void, Error> {
         let taskKey = key ?? UUID().uuidString
         let task = Task(priority: .userInitiated) {
+            defer {
+                tasks.removeValue(forKey: taskKey)
+            }
             do {
                 try await operation()
             } catch {
@@ -27,7 +30,6 @@ class TaskManager {
                     throw error
                 }
             }
-            tasks.removeValue(forKey: taskKey)
         }
 
         tasks[taskKey] = task
