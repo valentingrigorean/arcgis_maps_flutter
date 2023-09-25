@@ -60,6 +60,19 @@ class ArcGISCredentialStore {
     });
   }
 
+  Future<String> addPregeneratedTokenCredential({
+    required String url,
+    required TokenInfo tokenInfo,
+    String referer = '',
+  }) async {
+    return await _channel
+        .invokeMethod('arcGISCredentialStore#addPregeneratedTokenCredential', {
+      "url": url,
+      "tokenInfo": tokenInfo.toJson(),
+      "referer": referer,
+    });
+  }
+
   Future<void> removeCredential(String handlerId) {
     return _channel.invokeMethod(
         'arcGISCredentialStore#removeCredential', handlerId);

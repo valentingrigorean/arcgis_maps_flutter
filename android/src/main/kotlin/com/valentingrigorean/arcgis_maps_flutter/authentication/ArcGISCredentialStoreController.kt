@@ -1,14 +1,20 @@
 package com.valentingrigorean.arcgis_maps_flutter.authentication
 
 import com.arcgismaps.ArcGISEnvironment
+import com.arcgismaps.httpcore.authentication.ArcGISCredential
 import com.arcgismaps.httpcore.authentication.ArcGISCredentialStore
+import com.arcgismaps.httpcore.authentication.PregeneratedTokenCredential
 import com.arcgismaps.httpcore.authentication.TokenCredential
+import com.arcgismaps.httpcore.authentication.TokenInfo
+import com.valentingrigorean.arcgis_maps_flutter.convert.authentication.toTokenInfoOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 class ArcGISCredentialStoreController(
@@ -19,7 +25,7 @@ class ArcGISCredentialStoreController(
 
     private val channel: MethodChannel =
         MethodChannel(messenger, "plugins.flutter.io/arcgis_channel/credential_store")
-    private val tokenCredentials = mutableMapOf<String, TokenCredential>()
+    private val credentials = mutableMapOf<String, ArcGISCredential>()
 
     private var store = ArcGISEnvironment.authenticationManager.arcGISCredentialStore
 
@@ -32,8 +38,12 @@ class ArcGISCredentialStoreController(
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        var accessToken = "xxxxxxx"
+        val tokenInfo = TokenInfo(accessToken, Instant.now().plus(2, ChronoUnit.HOURS), true)
+        var pregeneratedTokenCredential = PregeneratedTokenCredential("", tokenInfo)
+        store.add(pregeneratedTokenCredential)
         when (call.method) {
-            "arcGISCredentialStore#makePersistent" ->{
+            "arcGISCredentialStore#makePersistent" -> {
                 scope.launch {
                     ArcGISCredentialStore.createWithPersistence().onSuccess {
                         ArcGISEnvironment.authenticationManager.arcGISCredentialStore = it
@@ -44,6 +54,7 @@ class ArcGISCredentialStoreController(
                     }
                 }
             }
+
             "arcGISCredentialStore#addCredential" -> {
                 scope.launch {
                     val arguments = call.arguments as Map<*, *>
@@ -54,7 +65,7 @@ class ArcGISCredentialStoreController(
                         arguments["tokenExpirationMinutes"] as Int?
                     ).onSuccess {
                         val uuid = UUID.randomUUID().toString()
-                        tokenCredentials[uuid] = it
+                        credentials[uuid] = it
                         store.add(it)
                         result.success(uuid)
                     }.onFailure {
@@ -63,12 +74,26 @@ class ArcGISCredentialStoreController(
                 }
             }
 
+            "arcGISCredentialStore#addPregeneratedTokenCredential" -> {
+                val arguments = call.arguments as Map<*, *>
+                val tokenInfo = arguments["tokenInfo"]!!.toTokenInfoOrNull()!!
+                val token = PregeneratedTokenCredential(
+                    arguments["url"] as String,
+                    tokenInfo,
+                    arguments["referer"] as String
+                )
+                store.add(token)
+                val uuid = UUID.randomUUID().toString()
+                credentials[uuid] = token
+                result.success(uuid)
+            }
+
             "arcGISCredentialStore.removeCredential" -> {
                 val arguments = call.arguments as String
-                val tokenCredential = tokenCredentials[arguments]
+                val tokenCredential = credentials[arguments]
                 if (tokenCredential != null) {
                     store.remove(tokenCredential)
-                    tokenCredentials.remove(arguments)
+                    credentials.remove(arguments)
                 }
                 result.success(null)
             }

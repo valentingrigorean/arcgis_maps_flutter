@@ -8,11 +8,20 @@
 import Foundation
 import ArcGIS
 
+extension TokenInfo{
+    convenience init?(data:Dictionary<String,Any>){
+        let accessToken = data["accessToken"] as! String
+        let expirationDate = data["expirationDate"] as! String
+        let isSSLRequired = data["isSSLRequired"] as! Bool
+        self.init(accessToken:accessToken, expirationDate: expirationDate.toDateFromIso8601()!, isSSLRequired: isSSLRequired)
+    }
+}
+
 class ArcGISCredentialStoreController {
     private let taskManager = TaskManager()
     private let channel: FlutterMethodChannel
     private var credentialStore = ArcGISEnvironment.authenticationManager.arcGISCredentialStore
-    private var tokenCredentials = [String: TokenCredential]()
+    private var tokenCredentials = [String: ArcGISCredential]()
 
     init(messenger: FlutterBinaryMessenger) {
         channel = UIFlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel/credential_store", binaryMessenger: messenger)
@@ -22,6 +31,7 @@ class ArcGISCredentialStoreController {
             }
             self.handle(call: call, result: result)
         })
+
     }
 
     deinit {
@@ -67,6 +77,21 @@ class ArcGISCredentialStoreController {
                     result(error.toJSONFlutter())
                 }
             }
+            break
+        case "arcGISCredentialStore#addPregeneratedTokenCredential":
+            let data = call.arguments as! [String: Any]
+            let url = data["url"] as! String
+            let tokenInfo = TokenInfo(data: data["tokenInfo"] as! Dictionary<String, Any>)!
+            let referer = data["referer"] as! String
+            let token = PregeneratedTokenCredential(
+                    url: URL(string: url)!,
+                    tokenInfo: tokenInfo,
+                    referer: referer
+            )
+            credentialStore.add(token)
+            let uuid = UUID().uuidString
+            tokenCredentials[uuid] = token
+            result(uuid)
             break
         case "arcGISCredentialStore#removeCredential":
             let uuid = call.arguments as! String
