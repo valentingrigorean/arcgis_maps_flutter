@@ -290,10 +290,11 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                             queryParams.spatialRelationship = AGSSpatialRelationship.fromFlutter(value as! Int)
                             break
                         default:
+                            let queryString = "upper(\(key)) LIKE '%\((value as! String).uppercased())%'"
                             if (queryParams.whereClause.isEmpty) {
-                                queryParams.whereClause = "upper(\(key)) LIKE '%\(value as! String).uppercased())%'"
+                                queryParams.whereClause = queryString
                             } else {
-                                queryParams.whereClause.append(" AND upper(\(key)) LIKE '%\((value as! String).uppercased())%'")
+                                queryParams.whereClause.append(" AND \(queryString)")
                             }
                             break
                     }
