@@ -27,10 +27,10 @@ extension Route {
             $0.toJSONFlutter()
         }
         json["routeName"] = name
-        json["totalTime"] = totalTime
-        json["travelTime"] = travelTime
-        json["violationTime"] = violationTime
-        json["waitTime"] = waitTime
+        json["totalTime"] = totalTime / 60
+        json["travelTime"] = travelTime / 60
+        json["violationTime"] = violationTime / 60
+        json["waitTime"] = waitTime / 60
         return json
     }
 }
