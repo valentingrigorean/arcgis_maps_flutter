@@ -9,8 +9,12 @@ import Foundation
 
 class TaskManager {
     private var tasks: [String: Task<Void, Error>] = [:]
+    private let lock = DispatchQueue(label: "TaskManager")
+
+    private var isDisposed = false
 
     deinit {
+        isDisposed = true
         cancelAllTasks()
     }
 
@@ -19,7 +23,11 @@ class TaskManager {
         let taskKey = key ?? UUID().uuidString
         let task = Task(priority: .userInitiated) {
             defer {
-                tasks.removeValue(forKey: taskKey)
+                lock.async {
+                    if !self.isDisposed {
+                        self.tasks.removeValue(forKey: taskKey)
+                    }
+                }
             }
             do {
                 try await operation()
@@ -27,25 +35,35 @@ class TaskManager {
                 if error is CancellationError {
                     print("Task \(taskKey) was cancelled")
                 } else {
-                    throw error
+                    if !self.isDisposed {
+                        print("Task \(taskKey) failed with error: \(error)")
+                    } else {
+                        throw error
+                    }
                 }
             }
         }
 
-        tasks[taskKey] = task
+        lock.async {
+            self.tasks[taskKey] = task
+        }
         return task
     }
 
     func cancelTask(withKey key: String) {
-        tasks[key]?.cancel()
-        tasks.removeValue(forKey: key)
+        lock.async {
+            self.tasks[key]?.cancel()
+            self.tasks.removeValue(forKey: key)
+        }
     }
 
     func cancelAllTasks() {
-        for (_, task) in tasks {
-            task.cancel()
+        lock.async {
+            for (_, task) in self.tasks {
+                task.cancel()
+            }
+            self.tasks.removeAll()
         }
-        tasks.removeAll()
     }
 }
 
