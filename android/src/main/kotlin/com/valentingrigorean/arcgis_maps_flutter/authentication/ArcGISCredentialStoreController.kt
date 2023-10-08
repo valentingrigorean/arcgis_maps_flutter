@@ -1,11 +1,19 @@
 package com.valentingrigorean.arcgis_maps_flutter.authentication
 
+import android.content.Context
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import com.arcgismaps.ArcGISEnvironment
+import com.arcgismaps.httpcore.authentication.ArcGISAuthenticationChallengeHandler
+import com.arcgismaps.httpcore.authentication.ArcGISAuthenticationChallengeResponse
 import com.arcgismaps.httpcore.authentication.ArcGISCredential
 import com.arcgismaps.httpcore.authentication.ArcGISCredentialStore
+import com.arcgismaps.httpcore.authentication.OAuthUserConfiguration
+import com.arcgismaps.httpcore.authentication.OAuthUserCredential
 import com.arcgismaps.httpcore.authentication.PregeneratedTokenCredential
 import com.arcgismaps.httpcore.authentication.TokenCredential
 import com.arcgismaps.httpcore.authentication.TokenInfo
+import com.arcgismaps.mapping.PortalItem
 import com.valentingrigorean.arcgis_maps_flutter.convert.authentication.toTokenInfoOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
 import io.flutter.plugin.common.BinaryMessenger
@@ -20,12 +28,15 @@ import java.util.UUID
 class ArcGISCredentialStoreController(
     messenger: BinaryMessenger,
     private val scope: CoroutineScope,
+    private val context: Context,
 ) :
     MethodChannel.MethodCallHandler {
 
     private val channel: MethodChannel =
         MethodChannel(messenger, "plugins.flutter.io/arcgis_channel/credential_store")
     private val credentials = mutableMapOf<String, ArcGISCredential>()
+
+    private val oAuthConfigurations = mutableListOf<OAuthUserConfiguration>()
 
     private var store = ArcGISEnvironment.authenticationManager.arcGISCredentialStore
 
@@ -35,13 +46,10 @@ class ArcGISCredentialStoreController(
 
     fun dispose() {
         channel.setMethodCallHandler(null)
+        setUpArcGISAuthenticationChallengeHandler()
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        var accessToken = "xxxxxxx"
-        val tokenInfo = TokenInfo(accessToken, Instant.now().plus(2, ChronoUnit.HOURS), true)
-        var pregeneratedTokenCredential = PregeneratedTokenCredential("", tokenInfo)
-        store.add(pregeneratedTokenCredential)
         when (call.method) {
             "arcGISCredentialStore#makePersistent" -> {
                 scope.launch {
@@ -88,6 +96,28 @@ class ArcGISCredentialStoreController(
                 result.success(uuid)
             }
 
+            "arcGISCredentialStore#addOAuthCredential" -> {
+                val arguments = call.arguments as Map<*, *>
+                val oAuthConfiguration = OAuthUserConfiguration(
+                    arguments["portalUrl"] as String,
+                    arguments["clientId"] as String,
+                    arguments["redirectUri"] as String,
+                )
+                oAuthConfigurations.add(oAuthConfiguration)
+                scope.launch {
+                    OAuthUserCredential.create(oAuthConfiguration) { oAuthUserSignIn ->
+                        OAuthUserSignInActivity.promptForOAuthUserSignIn(context, oAuthUserSignIn)
+                    }.onSuccess {
+                        val uuid = UUID.randomUUID().toString()
+                        credentials[uuid] = it
+                        store.add(it)
+                        result.success(uuid)
+                    }.onFailure {
+                        result.success(it.toFlutterJson())
+                    }
+                }
+            }
+
             "arcGISCredentialStore.removeCredential" -> {
                 val arguments = call.arguments as String
                 val tokenCredential = credentials[arguments]
@@ -100,6 +130,33 @@ class ArcGISCredentialStoreController(
 
             else -> result.notImplemented()
         }
+    }
+
+
+    private fun setUpArcGISAuthenticationChallengeHandler() {
+        ArcGISEnvironment.authenticationManager.arcGISAuthenticationChallengeHandler =
+            ArcGISAuthenticationChallengeHandler { challenge ->
+
+                for (oAuthConfiguration in oAuthConfigurations) {
+                    if (oAuthConfiguration.canBeUsedForUrl(challenge.requestUrl)) {
+                        val oAuthUserCredential =
+                            OAuthUserCredential.create(oAuthConfiguration) { oAuthUserSignIn ->
+                                OAuthUserSignInActivity.promptForOAuthUserSignIn(
+                                    context,
+                                    oAuthUserSignIn
+                                )
+                            }.getOrThrow()
+
+                        return@ArcGISAuthenticationChallengeHandler ArcGISAuthenticationChallengeResponse.ContinueWithCredential(
+                            oAuthUserCredential
+                        )
+                    }
+                }
+
+                ArcGISAuthenticationChallengeResponse.ContinueAndFailWithError(
+                    UnsupportedOperationException()
+                )
+            }
     }
 
 }

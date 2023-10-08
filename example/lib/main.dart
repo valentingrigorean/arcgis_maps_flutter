@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
+import 'package:arcgis_maps_flutter_example/authenticate_with_oauth_screen.dart';
 import 'package:arcgis_maps_flutter_example/credential_page.dart';
 import 'package:arcgis_maps_flutter_example/map_page.dart';
 import 'package:arcgis_maps_flutter_example/map_page_assets_marker.dart';
@@ -99,8 +100,10 @@ class MainPage extends StatelessWidget {
               ElevatedButton(
                 child: const Text('Map 2d Screenshot'),
                 onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const MapPageExportImage()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const MapPageExportImage()));
                 },
               ),
               ElevatedButton(
@@ -258,7 +261,6 @@ class MainPage extends StatelessWidget {
                   );
                 },
               ),
-
               ElevatedButton(
                 child: const Text('Map View insets'),
                 onPressed: () {
@@ -421,6 +423,17 @@ class MainPage extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (context) => const ScenePage()));
+                },
+              ),
+              ElevatedButton(
+                child: const Text('Authentication with OAuth'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AuthenticateWithOAuthScreen(),
+                    ),
+                  );
                 },
               ),
             ],

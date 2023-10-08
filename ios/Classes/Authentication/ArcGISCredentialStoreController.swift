@@ -8,12 +8,12 @@
 import Foundation
 import ArcGIS
 
-extension TokenInfo{
-    convenience init?(data:Dictionary<String,Any>){
+extension TokenInfo {
+    convenience init?(data: Dictionary<String, Any>) {
         let accessToken = data["accessToken"] as! String
         let expirationDate = data["expirationDate"] as! String
         let isSSLRequired = data["isSSLRequired"] as! Bool
-        self.init(accessToken:accessToken, expirationDate: expirationDate.toDateFromIso8601()!, isSSLRequired: isSSLRequired)
+        self.init(accessToken: accessToken, expirationDate: expirationDate.toDateFromIso8601()!, isSSLRequired: isSSLRequired)
     }
 }
 
@@ -46,7 +46,7 @@ class ArcGISCredentialStoreController {
                 let options = call.arguments as! [String: Any]
                 let access = options["access"] as! Int
                 let synchronizesWithiCloud = options["synchronizesWithiCloud"] as! Bool
-                ArcGISEnvironment.authenticationManager.arcGISCredentialStore =  try await .makePersistent(
+                ArcGISEnvironment.authenticationManager.arcGISCredentialStore = try await .makePersistent(
                         access: self.getKeyAccess(value: access),
                         synchronizesWithiCloud: synchronizesWithiCloud
                 )
@@ -92,6 +92,24 @@ class ArcGISCredentialStoreController {
             let uuid = UUID().uuidString
             tokenCredentials[uuid] = token
             result(uuid)
+            break
+        case "arcGISCredentialStore#addOAuthCredential":
+            let data = call.arguments as! [String: Any]
+            let portalUrl = data["portalUrl"] as! String
+            let clientID = data["clientId"] as! String
+            let redirectURL = data["redirectUri"] as! String
+            let configuration = OAuthUserConfiguration(portalURL: URL(string: portalUrl)!, clientID: clientID, redirectURL: URL(string: redirectURL)!)
+            taskManager.createTask{
+                do {
+                    let oAuthCredential = try await OAuthUserCredential.credential(for: configuration)
+                    let uuid = UUID().uuidString
+                    self.tokenCredentials[uuid] = oAuthCredential
+                    self.credentialStore.add(oAuthCredential)
+                    result(uuid)
+                } catch {
+                    result(error.toJSONFlutter())
+                }
+            }
             break
         case "arcGISCredentialStore#removeCredential":
             let uuid = call.arguments as! String

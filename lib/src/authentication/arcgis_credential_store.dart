@@ -73,6 +73,18 @@ class ArcGISCredentialStore {
     });
   }
 
+  Future<String> addOAuthCredential({
+    required String portalUrl,
+    required String clientId,
+    required String redirectUri,
+}) async{
+    return await _channel.invokeMethod('arcGISCredentialStore#addOAuthCredential', {
+      "portalUrl": portalUrl,
+      "clientId": clientId,
+      "redirectUri": redirectUri,
+    });
+  }
+
   Future<void> removeCredential(String handlerId) {
     return _channel.invokeMethod(
         'arcGISCredentialStore#removeCredential', handlerId);

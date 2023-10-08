@@ -1,5 +1,6 @@
 package com.valentingrigorean.arcgis_maps_flutter
 
+import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.Lifecycle
 import com.arcgismaps.ApiKey
@@ -22,6 +23,7 @@ import io.flutter.embedding.engine.plugins.lifecycle.FlutterLifecycleAdapter
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
+import io.flutter.plugin.common.PluginRegistry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -29,12 +31,14 @@ import kotlinx.coroutines.cancel
 /**
  * ArcgisMapsFlutterPlugin
  */
-class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
+class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler,
+    PluginRegistry.ActivityResultListener {
     private var geometryEngineController: GeometryEngineController? = null
     private var coordinateFormatterController: CoordinateFormatterController? = null
     private var nativeObjectsController: ArcgisNativeObjectsController? = null
     private var arcGISCredentialStoreController: ArcGISCredentialStoreController? = null
     private var scope: CoroutineScope? = null
+
 
     private lateinit var channel: MethodChannel
     private var lifecycle: Lifecycle? = null
@@ -57,8 +61,12 @@ class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
             binding.binaryMessenger,
             ArcgisNativeObjectFactoryImpl(scope!!),
         )
-        arcGISCredentialStoreController =
-            ArcGISCredentialStoreController(binding.binaryMessenger, scope!!)
+
+        arcGISCredentialStoreController = ArcGISCredentialStoreController(
+            binding.binaryMessenger,
+            scope!!,
+            binding.applicationContext,
+        )
     }
 
     override fun onDetachedFromEngine(binding: FlutterPluginBinding) {
@@ -78,6 +86,7 @@ class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         lifecycle = FlutterLifecycleAdapter.getActivityLifecycle(binding)
+        binding.addActivityResultListener(this)
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
@@ -120,9 +129,15 @@ class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+        return false
+    }
+
     companion object {
         const val TAG = "ArcgisMapsFlutterPlugin"
         private const val VIEW_TYPE_MAP = "plugins.flutter.io/arcgis_maps"
         private const val VIEW_TYPE_SCENE = "plugins.flutter.io/arcgis_scene"
     }
+
+
 }
