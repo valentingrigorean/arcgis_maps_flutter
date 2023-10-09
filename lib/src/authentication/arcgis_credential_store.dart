@@ -77,11 +77,27 @@ class ArcGISCredentialStore {
     required String portalUrl,
     required String clientId,
     required String redirectUri,
-}) async{
-    return await _channel.invokeMethod('arcGISCredentialStore#addOAuthCredential', {
+  }) async {
+    return await _channel
+        .invokeMethod('arcGISCredentialStore#addOAuthCredential', {
       "portalUrl": portalUrl,
       "clientId": clientId,
       "redirectUri": redirectUri,
+    });
+  }
+
+  Future<String> addOAuthApplicationCredential({
+    required String portalUrl,
+    required String clientId,
+    required String clientSecret,
+    int? expirationMinutes,
+  }) async {
+    return await _channel
+        .invokeMethod('arcGISCredentialStore#addOAuthApplicationCredential', {
+      "portalUrl": portalUrl,
+      "clientId": clientId,
+      "clientSecret": clientSecret,
+      "expirationMinutes": expirationMinutes,
     });
   }
 

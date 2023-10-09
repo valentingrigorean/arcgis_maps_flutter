@@ -1,19 +1,8 @@
 package com.valentingrigorean.arcgis_maps_flutter.authentication
 
 import android.content.Context
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import com.arcgismaps.ArcGISEnvironment
-import com.arcgismaps.httpcore.authentication.ArcGISAuthenticationChallengeHandler
-import com.arcgismaps.httpcore.authentication.ArcGISAuthenticationChallengeResponse
-import com.arcgismaps.httpcore.authentication.ArcGISCredential
-import com.arcgismaps.httpcore.authentication.ArcGISCredentialStore
-import com.arcgismaps.httpcore.authentication.OAuthUserConfiguration
-import com.arcgismaps.httpcore.authentication.OAuthUserCredential
-import com.arcgismaps.httpcore.authentication.PregeneratedTokenCredential
-import com.arcgismaps.httpcore.authentication.TokenCredential
-import com.arcgismaps.httpcore.authentication.TokenInfo
-import com.arcgismaps.mapping.PortalItem
+import com.arcgismaps.httpcore.authentication.*
 import com.valentingrigorean.arcgis_maps_flutter.convert.authentication.toTokenInfoOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
 import io.flutter.plugin.common.BinaryMessenger
@@ -21,8 +10,6 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 class ArcGISCredentialStoreController(
@@ -108,6 +95,26 @@ class ArcGISCredentialStoreController(
                     OAuthUserCredential.create(oAuthConfiguration) { oAuthUserSignIn ->
                         OAuthUserSignInActivity.promptForOAuthUserSignIn(context, oAuthUserSignIn)
                     }.onSuccess {
+                        val uuid = UUID.randomUUID().toString()
+                        credentials[uuid] = it
+                        store.add(it)
+                        result.success(uuid)
+                    }.onFailure {
+                        result.success(it.toFlutterJson())
+                    }
+                }
+            }
+
+            "arcGISCredentialStore#addOAuthApplicationCredential" -> {
+                scope.launch {
+                    val arguments = call.arguments as Map<*, *>
+                    val oAuthApplicationCredential = OAuthApplicationCredential.create(
+                        arguments["portalUrl"] as String,
+                        arguments["clientId"] as String,
+                        arguments["clientSecret"] as String,
+                        arguments["tokenExpirationMinutes"] as Int?
+                    )
+                    oAuthApplicationCredential.onSuccess {
                         val uuid = UUID.randomUUID().toString()
                         credentials[uuid] = it
                         store.add(it)

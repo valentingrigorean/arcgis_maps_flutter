@@ -40,6 +40,7 @@ class ArcGISCredentialStoreController {
 
     private func handle(call: FlutterMethodCall,
                         result: @escaping FlutterResult) -> Void {
+
         switch (call.method) {
         case "arcGISCredentialStore#makePersistent":
             taskManager.createTask {
@@ -102,6 +103,24 @@ class ArcGISCredentialStoreController {
             taskManager.createTask{
                 do {
                     let oAuthCredential = try await OAuthUserCredential.credential(for: configuration)
+                    let uuid = UUID().uuidString
+                    self.tokenCredentials[uuid] = oAuthCredential
+                    self.credentialStore.add(oAuthCredential)
+                    result(uuid)
+                } catch {
+                    result(error.toJSONFlutter())
+                }
+            }
+            break
+        case "arcGISCredentialStore#addOAuthApplicationCredential":
+            let data = call.arguments as! [String: Any]
+            let portalUrl = data["portalUrl"] as! String
+            let clientID = data["clientId"] as! String
+            let clientSecret = data["clientSecret"] as! String
+            let tokenExpirationMinutes = data["tokenExpirationMinutes"] as? Int
+            taskManager.createTask{
+                do {
+                    let oAuthCredential = try await OAuthApplicationCredential.credential(for: URL(string: portalUrl)!, clientID: clientID, clientSecret: clientSecret, tokenExpirationMinutes: tokenExpirationMinutes)
                     let uuid = UUID().uuidString
                     self.tokenCredentials[uuid] = oAuthCredential
                     self.credentialStore.add(oAuthCredential)
