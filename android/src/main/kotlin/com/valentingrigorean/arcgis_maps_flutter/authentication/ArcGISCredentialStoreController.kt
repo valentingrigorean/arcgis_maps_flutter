@@ -19,9 +19,12 @@ class ArcGISCredentialStoreController(
 ) :
     MethodChannel.MethodCallHandler {
 
+    companion object {
+        private val credentials = mutableMapOf<String, TokenCredential>()
+    }
+
     private val channel: MethodChannel =
         MethodChannel(messenger, "plugins.flutter.io/arcgis_channel/credential_store")
-    private val credentials = mutableMapOf<String, ArcGISCredential>()
 
     private val oAuthConfigurations = mutableListOf<OAuthUserConfiguration>()
 
