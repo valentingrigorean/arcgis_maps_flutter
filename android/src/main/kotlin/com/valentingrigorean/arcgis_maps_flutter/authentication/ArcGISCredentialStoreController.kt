@@ -20,7 +20,7 @@ class ArcGISCredentialStoreController(
     MethodChannel.MethodCallHandler {
 
     companion object {
-        private val credentials = mutableMapOf<String, TokenCredential>()
+        private val credentials = mutableMapOf<String, ArcGISCredential>()
     }
 
     private val channel: MethodChannel =
