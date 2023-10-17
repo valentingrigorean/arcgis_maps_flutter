@@ -34,8 +34,8 @@ fun Any.toGeocodeParametersOrNull(): GeocodeParameters? {
     if (outputLanguageCode != null) {
         geocodeParameters.outputLanguageCode = outputLanguageCode
     }
-    val outputSpatialReference = data["outputSpatialReference"] as Map<*, *>
-    geocodeParameters.outputSpatialReference = outputSpatialReference.toSpatialReferenceOrNull()
+    val outputSpatialReference = data["outputSpatialReference"] as Map<*, *>?
+    geocodeParameters.outputSpatialReference = outputSpatialReference?.toSpatialReferenceOrNull()
     val preferredSearchLocation = data["preferredSearchLocation"]
     if (preferredSearchLocation != null) {
         geocodeParameters.preferredSearchLocation = preferredSearchLocation.toPointOrNull()
