@@ -14,46 +14,49 @@ class TaskManager {
     private var isDisposed = false
 
     deinit {
-        isDisposed = true
+        lock.sync {
+            isDisposed = true
+        }
         cancelAllTasks()
     }
 
     @discardableResult
     func createTask(key: String? = nil, operation: @escaping @Sendable () async throws -> Void) -> Task<Void, Error> {
-        let taskKey = key ?? UUID().uuidString
-        let task = Task(priority: .userInitiated) {
-            defer {
-                lock.async {
-                    if !self.isDisposed {
-                        self.tasks.removeValue(forKey: taskKey)
-                    }
+        lock.sync {
+            // Check disposed status
+            guard !isDisposed else {
+                // Handle or throw an error, e.g.:
+                // throw CustomError("TaskManager is disposed")
+                return Task<Void, Error> {
+                    throw NSError(domain: "TaskManager", code: 1, userInfo: nil)
                 }
             }
-            do {
-                try await operation()
-            } catch {
-                if error is CancellationError {
-                    print("Task \(taskKey) was cancelled")
-                } else {
-                    if !self.isDisposed {
-                        print("Task \(taskKey) failed with error: \(error)")
-                    } else {
-                        throw error
-                    }
-                }
-            }
-        }
 
-        lock.async {
-            self.tasks[taskKey] = task
+            let taskKey = key ?? UUID().uuidString
+            let task = Task<Void, Error>(priority: .userInitiated) {
+                do {
+                    try await operation()
+                } catch {
+                    if !isDisposed {
+                        if error is CancellationError {
+                            print("Task \(taskKey) was cancelled")
+                        } else {
+                            print("Task \(taskKey) failed with error: \(error)")
+                        }
+                    }
+                }
+            }
+
+            tasks[taskKey] = task
+
+            return task
         }
-        return task
     }
 
     func cancelTask(withKey key: String) {
-        lock.async {
-            self.tasks[key]?.cancel()
-            self.tasks.removeValue(forKey: key)
+        lock.sync {
+            tasks[key]?.cancel()
+            tasks.removeValue(forKey: key)
         }
     }
 
