@@ -21,7 +21,7 @@ class ArcGISCredentialStoreController {
     private let taskManager = TaskManager()
     private let channel: FlutterMethodChannel
     private var credentialStore = ArcGISEnvironment.authenticationManager.arcGISCredentialStore
-    private var tokenCredentials = [String: ArcGISCredential]()
+    private static var tokenCredentials = [String: ArcGISCredential]()
 
     init(messenger: FlutterBinaryMessenger) {
         channel = UIFlutterMethodChannel(name: "plugins.flutter.io/arcgis_channel/credential_store", binaryMessenger: messenger)
@@ -32,10 +32,6 @@ class ArcGISCredentialStoreController {
             self.handle(call: call, result: result)
         })
 
-    }
-
-    deinit {
-        channel.setMethodCallHandler(nil)
     }
 
     private func handle(call: FlutterMethodCall,
@@ -71,7 +67,7 @@ class ArcGISCredentialStoreController {
                             tokenExpirationMinutes: tokenExpirationMinutes
                     )
                     let uuid = UUID().uuidString
-                    self.tokenCredentials[uuid] = tokenCredentials
+                    ArcGISCredentialStoreController.tokenCredentials[uuid] = tokenCredentials
                     self.credentialStore.add(tokenCredentials)
                     result(uuid)
                 } catch {
@@ -91,7 +87,7 @@ class ArcGISCredentialStoreController {
             )
             credentialStore.add(token)
             let uuid = UUID().uuidString
-            tokenCredentials[uuid] = token
+            ArcGISCredentialStoreController.tokenCredentials[uuid] = token
             result(uuid)
             break
         case "arcGISCredentialStore#addOAuthCredential":
@@ -104,7 +100,7 @@ class ArcGISCredentialStoreController {
                 do {
                     let oAuthCredential = try await OAuthUserCredential.credential(for: configuration)
                     let uuid = UUID().uuidString
-                    self.tokenCredentials[uuid] = oAuthCredential
+                    ArcGISCredentialStoreController.tokenCredentials[uuid] = oAuthCredential
                     self.credentialStore.add(oAuthCredential)
                     result(uuid)
                 } catch {
@@ -122,7 +118,7 @@ class ArcGISCredentialStoreController {
                 do {
                     let oAuthCredential = try await OAuthApplicationCredential.credential(for: URL(string: portalUrl)!, clientID: clientID, clientSecret: clientSecret, tokenExpirationMinutes: tokenExpirationMinutes)
                     let uuid = UUID().uuidString
-                    self.tokenCredentials[uuid] = oAuthCredential
+                    ArcGISCredentialStoreController.tokenCredentials[uuid] = oAuthCredential
                     self.credentialStore.add(oAuthCredential)
                     result(uuid)
                 } catch {
@@ -132,10 +128,10 @@ class ArcGISCredentialStoreController {
             break
         case "arcGISCredentialStore#removeCredential":
             let uuid = call.arguments as! String
-            let tokenCredential = tokenCredentials[uuid]
+            let tokenCredential = ArcGISCredentialStoreController.tokenCredentials[uuid]
             if let tokenCredential = tokenCredential {
                 credentialStore.remove(tokenCredential)
-                tokenCredentials.removeValue(forKey: uuid)
+                ArcGISCredentialStoreController.tokenCredentials.removeValue(forKey: uuid)
             }
             result(nil)
             break
