@@ -150,13 +150,13 @@ class MarkerController(val context: Context, markerId: String) : BaseGraphicCont
     }
 
     private fun handleScaleChange() {
-        val scale = if (isSelected) selectedScale else 1f
-        if (backgroundScaleSymbolController != null) {
-            backgroundScaleSymbolController!!.scale = scale
-        }
-        if (iconScaleSymbolController != null) {
-            iconScaleSymbolController!!.scale = scale
-        }
+//        val scale = if (isSelected) selectedScale else 1f
+//        if (backgroundScaleSymbolController != null) {
+//            backgroundScaleSymbolController!!.scale = scale
+//        }
+//        if (iconScaleSymbolController != null) {
+//            iconScaleSymbolController!!.scale = scale
+//        }
     }
 
     private fun offsetSymbol(symbol: Symbol?, offsetX: Float, offsetY: Float) {

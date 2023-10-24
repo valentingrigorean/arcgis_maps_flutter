@@ -2,47 +2,32 @@ import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 
 abstract class BaseTileLayer extends Layer {
   const BaseTileLayer({
-    required LayerId layerId,
+    required super.layerId,
     required this.type,
-    bool isVisible = true,
-    double opacity = 1,
+    super.isVisible = true,
+    super.opacity = 1,
   })  : url = null,
-        portalItem = null,
-        super(
-          layerId: layerId,
-          opacity: opacity,
-          isVisible: isVisible,
-        );
+        portalItem = null;
 
   const BaseTileLayer.fromUrl({
-    required LayerId layerId,
+    required super.layerId,
     required String url,
     required this.type,
-    bool isVisible = true,
-    double opacity = 1,
+    super.isVisible = true,
+    super.opacity = 1,
   })  : portalItem = null,
         // ignore: prefer_initializing_formals
-        url = url,
-        super(
-          layerId: layerId,
-          isVisible: isVisible,
-          opacity: opacity,
-        );
+        url = url;
 
   const BaseTileLayer.fromPortalItem({
-    required LayerId layerId,
+    required super.layerId,
     required PortalItem portalItem,
     required this.type,
-    bool isVisible = true,
-    double opacity = 1,
+    super.isVisible = true,
+    super.opacity = 1,
   })  : url = null,
         // ignore: prefer_initializing_formals
-        portalItem = portalItem,
-        super(
-          layerId: layerId,
-          isVisible: isVisible,
-          opacity: opacity,
-        );
+        portalItem = portalItem;
 
   final String? url;
 

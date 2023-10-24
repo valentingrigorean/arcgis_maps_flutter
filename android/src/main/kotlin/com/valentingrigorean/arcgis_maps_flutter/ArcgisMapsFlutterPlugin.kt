@@ -138,6 +138,4 @@ class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler,
         private const val VIEW_TYPE_MAP = "plugins.flutter.io/arcgis_maps"
         private const val VIEW_TYPE_SCENE = "plugins.flutter.io/arcgis_scene"
     }
-
-
 }

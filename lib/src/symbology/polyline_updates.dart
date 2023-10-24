@@ -8,6 +8,6 @@ import 'package:arcgis_maps_flutter/src/maps_object_updates.dart';
 // (Do not re-export)
 class PolylineUpdates extends MapsObjectUpdates<PolylineMarker> {
   /// Computes [PolylineUpdates] given previous and current [PolylineMarker]s.
-  PolylineUpdates.from(Set<PolylineMarker> previous, Set<PolylineMarker> current)
-      : super.from(previous, current, objectName: 'polyline');
+  PolylineUpdates.from(super.previous, super.current)
+      : super.from(objectName: 'polyline');
 }

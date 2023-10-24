@@ -22,9 +22,9 @@ class MarkerTapEvent extends MapEvent<MarkerId> {
   ///
   /// The `value` of this event is a [MarkerId] object that represents the tapped Marker.
   const MarkerTapEvent(
-    int mapId,
-    MarkerId markerId,
-  ) : super(mapId, markerId);
+    super.mapId,
+    super.markerId,
+  );
 }
 
 /// An event fired when a [PolygonMarker] is tapped.
@@ -33,9 +33,9 @@ class PolygonTapEvent extends MapEvent<PolygonId> {
   ///
   /// The `value` of this event is a [PolygonId] object that represents the tapped Polygon.
   const PolygonTapEvent(
-    int mapId,
-    PolygonId polygonId,
-  ) : super(mapId, polygonId);
+    super.mapId,
+    super.polygonId,
+  );
 }
 
 class PolylineTapEvent extends MapEvent<PolylineId> {
@@ -43,9 +43,9 @@ class PolylineTapEvent extends MapEvent<PolylineId> {
   ///
   /// The `value` of this event is a [PolylineId] object that represents the tapped Polygon.
   const PolylineTapEvent(
-    int mapId,
-    PolylineId polylineId,
-  ) : super(mapId, polylineId);
+    super.mapId,
+    super.polylineId,
+  );
 }
 
 class UserLocationTapEvent extends MapEvent<void> {
@@ -54,12 +54,12 @@ class UserLocationTapEvent extends MapEvent<void> {
 
 class IdentifyLayerEvent extends MapEvent<LayerId> {
   const IdentifyLayerEvent(
-    int mapId,
-    LayerId layerId, {
+    super.mapId,
+    super.layerId, {
     required this.result,
     required this.screenPoint,
     required this.position,
-  }) : super(mapId, layerId);
+  });
 
   final Offset screenPoint;
   final Point position;
@@ -83,9 +83,9 @@ class IdentifyLayersEvent extends MapEvent<void> {
 
 class MapLoadedEvent extends MapEvent<ArcgisError?> {
   const MapLoadedEvent(
-    int mapId,
-    ArcgisError? value,
-  ) : super(mapId, value);
+    super.mapId,
+    super.value,
+  );
 }
 
 class LayerLoadedEvent extends MapEvent<LayerId> {
@@ -132,8 +132,7 @@ class ViewpointChangedEvent extends MapEvent<void> {
 
 
 class TimeExtentChangedEvent extends MapEvent<TimeExtent?> {
-  const TimeExtentChangedEvent(int mapId, TimeExtent? value)
-      : super(mapId, value);
+  const TimeExtentChangedEvent(super.mapId, super.value);
 }
 
 /// A `MapEvent` associated to a `position`.

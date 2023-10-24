@@ -6,6 +6,6 @@ import 'package:arcgis_maps_flutter/src/maps_object_updates.dart';
 // (Do not re-export)
 class PolygonUpdates extends MapsObjectUpdates<PolygonMarker> {
   /// Computes [PolygonUpdates] given previous and current [PolygonMarker]s.
-  PolygonUpdates.from(Set<PolygonMarker> previous, Set<PolygonMarker> current)
-      : super.from(previous, current, objectName: 'polygon');
+  PolygonUpdates.from(super.previous, super.current)
+      : super.from(objectName: 'polygon');
 }
