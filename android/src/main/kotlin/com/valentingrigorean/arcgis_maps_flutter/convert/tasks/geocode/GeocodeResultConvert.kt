@@ -6,7 +6,7 @@ import com.valentingrigorean.arcgis_maps_flutter.data.toFlutterFieldType
 
 fun GeocodeResult.toFlutterJson(): Any {
     val data: MutableMap<String, Any?> = HashMap(6)
-    val flutterAttributes: MutableMap<String, Any> = HashMap(attributes.size)
+    val flutterAttributes: MutableMap<String, Any?> = HashMap(attributes.size)
     attributes.forEach { (k: String, v: Any?) ->
         flutterAttributes[k] = v.toFlutterFieldType()
     }

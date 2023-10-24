@@ -24,8 +24,8 @@ enum class FieldTypeFlutter(val value: Int) {
 
 
 
-private val ISO8601Format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US)
-fun Any.toFlutterFieldType(): Any {
+private val _iso8601Format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US)
+fun Any?.toFlutterFieldType(): Any {
     val data: MutableMap<String, Any?> = HashMap(2)
     val fieldTypeFlutter: FieldTypeFlutter
     var obj = this
@@ -37,7 +37,7 @@ fun Any.toFlutterFieldType(): Any {
         fieldTypeFlutter = FieldTypeFlutter.DOUBLE
     } else if (obj is GregorianCalendar) {
         fieldTypeFlutter = FieldTypeFlutter.DATE
-        obj = ISO8601Format.format(
+        obj = _iso8601Format.format(
             obj.time
         )
     } else if (obj is Instant) {
