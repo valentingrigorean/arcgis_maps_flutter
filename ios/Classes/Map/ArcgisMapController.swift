@@ -594,7 +594,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 let map = mobileMapPackage.maps[mapIndex]
                 self.changeMap(map: map)
             } catch {
-                self.channel.invokeMethod("map#loaded", arguments: error.localizedDescription)
+                self.channel.invokeMethod("map#loaded", arguments: error.toJSONFlutter(withStackTrace: false))
             }
         }
     }
