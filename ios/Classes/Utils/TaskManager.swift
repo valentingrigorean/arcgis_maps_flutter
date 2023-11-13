@@ -15,9 +15,9 @@ class TaskManager {
 
     deinit {
         lock.sync {
+            cancelAllTaskInternal()
             isDisposed = true
         }
-        cancelAllTasks()
     }
 
     @discardableResult
@@ -61,12 +61,19 @@ class TaskManager {
     }
 
     func cancelAllTasks() {
-        lock.async {
-            for (_, task) in self.tasks {
-                task.cancel()
-            }
-            self.tasks.removeAll()
+        if isDisposed {
+            return
         }
+        lock.async {
+            self.cancelAllTaskInternal()
+        }
+    }
+
+    private func cancelAllTaskInternal() {
+        for (_, task) in tasks {
+            task.cancel()
+        }
+        tasks.removeAll()
     }
 }
 
