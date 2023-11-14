@@ -161,7 +161,7 @@ object BitmapDescriptorFactory {
 
         init {
             resourceName = data["fromNativeAsset"] as String?
-            tintColor = data["tintColor"]!!.fromFlutterColor()
+            tintColor = data["tintColor"]?.fromFlutterColor()
             width = (data["width"] as Double?)?.toFloat()
             height = (data["height"] as Double?)?.toFloat()
         }
