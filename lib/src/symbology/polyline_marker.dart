@@ -35,7 +35,7 @@ class PolylineId extends SymbolId<PolylineMarker> {
   /// Creates an immutable object representing a [PolylineId] among [ArcgisMapView] polylines.
   ///
   /// An [AssertionError] will be thrown if [value] is null.
-  const PolylineId(String value) : super(value);
+  const PolylineId(super.value);
 }
 
 @immutable

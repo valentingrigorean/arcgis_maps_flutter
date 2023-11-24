@@ -6,7 +6,7 @@ part of arcgis_maps_flutter;
 @immutable
 class PolygonId extends SymbolId<PolygonMarker> {
   /// Creates an immutable identifier for a [PolygonMarker].
-  const PolygonId(String value) : super(value);
+  const PolygonId(super.value);
 }
 
 /// Draws a polygon through geographical locations on the map.

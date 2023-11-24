@@ -6,7 +6,7 @@ part of arcgis_maps_flutter;
 @immutable
 class SymbolId<T extends Symbol> extends MapsObjectId<T> {
   /// Creates an immutable identifier for a [Marker].
-  const SymbolId(String value) : super(value);
+  const SymbolId(super.value);
 }
 
 /// Marks a geographical location on the map.

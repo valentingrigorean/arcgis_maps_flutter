@@ -130,6 +130,7 @@ part 'src/loadable/loadable.dart';
 
 part 'src/mapping/view/map/arcgis_map_view.dart';
 part 'src/mapping/view/map/arcgis_map_controller.dart';
+part 'src/mapping/view/identify_graphics_overlay_result.dart';
 part 'src/mapping/view/interaction_options.dart';
 part 'src/mapping/view/scalebar_configuration.dart';
 part 'src/mapping/view/zoom_level.dart';

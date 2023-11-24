@@ -1,7 +1,7 @@
 part of arcgis_maps_flutter;
 
 class MarkerId extends SymbolId<Marker> {
-  const MarkerId(String value) : super(value);
+  const MarkerId(super.value);
 }
 
 class Marker extends Symbol {

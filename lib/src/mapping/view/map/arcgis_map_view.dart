@@ -10,7 +10,8 @@ typedef MapErrorCallback = void Function(Object? error, StackTrace? stackTrace);
 
 typedef MapLoadedCallback = void Function(ArcgisError? error);
 
-typedef LayerLoadedCallback = void Function(LayerId layerId, ArcgisError? error, Layer? layer);
+typedef LayerLoadedCallback = void Function(
+    LayerId layerId, ArcgisError? error, Layer? layer);
 
 typedef GestureCallback = void Function(Offset screenPoint, Point? position);
 
@@ -19,6 +20,9 @@ typedef IdentifyLayerCallback = void Function(
 
 typedef IdentifyLayersCallback = void Function(
     Offset screenPoint, Point? position, List<IdentifyLayerResult> results);
+
+typedef IdentityGraphicsCallback = void Function(Offset screenPoint,
+    Point? position, List<IdentifyGraphicsOverlayResult> results);
 
 /// Callback function taking a single argument.
 typedef ArgumentCallback<T> = void Function(T argument);
@@ -62,7 +66,7 @@ class UnknownMapObjectIdError extends Error {
 
 class ArcgisMapView extends StatefulWidget {
   ArcgisMapView({
-    Key? key,
+    super.key,
     required this.map,
     this.gestureRecognizers = const <Factory<OneSequenceGestureRecognizer>>{},
     this.onMapCreated,
@@ -91,12 +95,11 @@ class ArcgisMapView extends StatefulWidget {
     this.minScale = 0,
     this.maxScale = 0,
     this.onUnknownMapObjectIdError,
-  })
-      : assert(onIdentifyLayer.isNotEmpty ? onIdentifyLayers == null : true,
-  'You can use only onIdentifyLayer or onIdentifyLayers'),
+    this.onIdentifyGraphics,
+  })  : assert(onIdentifyLayer.isNotEmpty ? onIdentifyLayers == null : true,
+            'You can use only onIdentifyLayer or onIdentifyLayers'),
         assert(onIdentifyLayers != null ? onIdentifyLayer.isEmpty : true,
-        'You can use only onIdentifyLayer or onIdentifyLayers'),
-        super(key: key);
+            'You can use only onIdentifyLayer or onIdentifyLayers');
 
   /// Callback method for when the map is ready to be used.
   ///
@@ -217,6 +220,8 @@ class ArcgisMapView extends StatefulWidget {
 
   final IdentifyLayersCallback? onIdentifyLayers;
 
+  final IdentityGraphicsCallback? onIdentifyGraphics;
+
   final VoidCallback? onUserLocationTap;
 
   final ValueChanged<UnknownMapObjectIdError>? onUnknownMapObjectIdError;
@@ -239,7 +244,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   final _mapId = _nextMapCreationId++;
 
   final Completer<ArcgisMapController> _controller =
-  Completer<ArcgisMapController>();
+      Completer<ArcgisMapController>();
 
   late ArcGISMap _map = widget.map;
 
@@ -311,7 +316,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
 
   Future<void> onPlatformViewCreated(int id) async {
     final ArcgisMapController controller =
-    await ArcgisMapController.init(id, this);
+        await ArcgisMapController.init(id, this);
 
     if (!mounted) {
       return;
@@ -447,12 +452,20 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     }
   }
 
-  void onIdentifyLayers(Offset screenMap, Point? position,
-      List<IdentifyLayerResult> results) {
+  void onIdentifyLayers(
+      Offset screenMap, Point? position, List<IdentifyLayerResult> results) {
     final callback = widget.onIdentifyLayers;
     if (callback != null) {
       callback(screenMap, position, results);
     }
+  }
+
+  void onIdentityGraphics(Offset screenMap,Point? position,List<List<String>> results){
+    final callback = widget.onIdentifyGraphics;
+    if (callback == null) {
+     return;
+    }
+    throw UnimplementedError();
   }
 
   void _updateMap() async {
@@ -465,7 +478,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   void _updateOptions() async {
     final _ArcgisMapOptions newOptions = _ArcgisMapOptions.fromWidget(widget);
     final Map<String, dynamic> updates =
-    _arcgisMapOptions.updatesMap(newOptions);
+        _arcgisMapOptions.updatesMap(newOptions);
     if (updates.isEmpty) {
       return;
     }
@@ -520,7 +533,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   void _updateMarkers() async {
     final ArcgisMapController controller = await _controller.future;
     final markerUpdate =
-    MarkerUpdates.from(_markers.values.toSet(), widget.markers);
+        MarkerUpdates.from(_markers.values.toSet(), widget.markers);
     if (markerUpdate.isEmpty) return;
     controller._updateMarkers(markerUpdate);
     _markers = keyByMarkerId(widget.markers);
@@ -529,7 +542,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   void _updatePolygons() async {
     final ArcgisMapController controller = await _controller.future;
     final polygonUpdates =
-    PolygonUpdates.from(_polygons.values.toSet(), widget.polygons);
+        PolygonUpdates.from(_polygons.values.toSet(), widget.polygons);
     if (polygonUpdates.isEmpty) return;
     controller._updatePolygons(polygonUpdates);
     _polygons = keyByPolygonId(widget.polygons);
@@ -538,7 +551,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   void _updatePolylines() async {
     final ArcgisMapController controller = await _controller.future;
     final polylinesUpdate =
-    PolylineUpdates.from(_polylines.values.toSet(), widget.polylines);
+        PolylineUpdates.from(_polylines.values.toSet(), widget.polylines);
     if (polylinesUpdate.isEmpty) return;
     controller._updatePolylines(polylinesUpdate);
     _polylines = keyByPolylineId(widget.polylines);
@@ -562,6 +575,7 @@ class _ArcgisMapOptions {
         myLocationEnabled = map.myLocationEnabled,
         trackIdentifyLayers = map.onIdentifyLayers != null,
         trackUserLocationTap = map.onUserLocationTap != null,
+        trackIdentifyGraphics = map.onIdentifyGraphics != null,
         insetsContentInsetFromSafeArea = map.insetsContentInsetFromSafeArea,
         isAttributionTextVisible = map.isAttributionTextVisible,
         contentInsets = map.contentInsets,
@@ -573,6 +587,7 @@ class _ArcgisMapOptions {
   final bool myLocationEnabled;
   final bool trackIdentifyLayers;
   final bool trackUserLocationTap;
+  final bool trackIdentifyGraphics;
   final bool insetsContentInsetFromSafeArea;
   final bool isAttributionTextVisible;
   final double minScale;
@@ -586,6 +601,7 @@ class _ArcgisMapOptions {
       'myLocationEnabled': myLocationEnabled,
       'trackIdentifyLayers': trackIdentifyLayers,
       'trackUserLocationTap': myLocationEnabled,
+      'trackIdentifyGraphics': trackIdentifyGraphics,
       'haveScalebar': scalebarConfiguration != null,
       'insetsContentInsetFromSafeArea': insetsContentInsetFromSafeArea,
       'isAttributionTextVisible': isAttributionTextVisible,

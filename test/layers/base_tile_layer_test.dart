@@ -5,28 +5,21 @@ import 'package:flutter_test/flutter_test.dart';
 class BaseTileLayerMock extends BaseTileLayer {
   BaseTileLayerMock.fromUrl({
     LayerId? layerId,
-    required String url,
-    bool isVisible = true,
-    double opacity = 1,
+    required super.url,
+    super.isVisible,
+    super.opacity,
   }) : super.fromUrl(
           layerId: layerId ?? LayerId(url),
-          url: url,
           type: 'mock',
-          isVisible: isVisible,
-          opacity: opacity,
         );
 
   BaseTileLayerMock.fromPortalItem({
-    required LayerId layerId,
-    required PortalItem portalItem,
-    bool isVisible = true,
-    double opacity = 1,
+    required super.layerId,
+    required super.portalItem,
+    super.isVisible,
+    super.opacity,
   }) : super.fromPortalItem(
-          layerId: layerId,
           type: 'mock',
-          portalItem: portalItem,
-          isVisible: isVisible,
-          opacity: opacity,
         );
 
   @override

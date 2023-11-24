@@ -61,7 +61,7 @@ struct MapContentView: View {
                             lastLongPressEvent = (screenPoint, mapPoint, proxy)
                             viewModel.handleLongTap(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: proxy)
                         }
-                        .attributionBarHidden(viewModel.isAttributionTextVisible)
+                        .attributionBarHidden(!viewModel.isAttributionTextVisible)
                         .locationDisplay(viewModel.locationDisplay)
                         .selectionColor(viewModel.selectedColor)
                         .interactionModes(viewModel.interactionModes)

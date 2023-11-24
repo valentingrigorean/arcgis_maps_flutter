@@ -3,14 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 class LayerMock extends Layer {
   const LayerMock({
-    required bool isVisible,
-    required double opacity,
-    required LayerId layerId,
-  }) : super(
-          isVisible: isVisible,
-          opacity: opacity,
-          layerId: layerId,
-        );
+    required super.isVisible,
+    required super.opacity,
+    required super.layerId,
+  });
 
   @override
   Layer clone() {

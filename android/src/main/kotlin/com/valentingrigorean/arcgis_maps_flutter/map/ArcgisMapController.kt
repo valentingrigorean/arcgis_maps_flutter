@@ -68,7 +68,6 @@ class ArcgisMapController(
     private var mapView: MapView
     private var mapViewOnTouchListener: MapViewOnTouchListener
     private var scaleBarController: ScaleBarController
-    private val invalidateMapHelper: InvalidateMapHelper
     private var viewpoint: Viewpoint? = null
     private var haveScaleBar = false
     private var trackViewpointChangedListenerEvents = false
@@ -125,8 +124,6 @@ class ArcgisMapController(
                 methodChannel.invokeMethod("map#timeExtentChanged", it?.toFlutterJson())
             }
         }.launchIn(scope)
-
-        invalidateMapHelper = InvalidateMapHelper(mapView, scope)
 
         if (params != null) {
             initWithParams(params)
@@ -339,7 +336,6 @@ class ArcgisMapController(
             }
 
             "layers#update" -> {
-                invalidateMapHelper.invalidateMapIfNeeded()
                 layersController.updateFromArgs(call.arguments)
                 result.success(null)
             }
@@ -351,20 +347,17 @@ class ArcgisMapController(
                 markersController.changeMarkers(markersToChange)
                 val markerIdsToRemove = call.argument<List<Any?>>("markerIdsToRemove")!!
                 markersController.removeMarkers(markerIdsToRemove)
-                invalidateMapHelper.invalidateMapIfNeeded()
                 symbolVisibilityFilterController.invalidate()
                 result.success(null)
             }
 
             "map#clearMarkerSelection" -> {
-                invalidateMapHelper.invalidateMapIfNeeded()
                 selectionPropertiesHandler.reset()
                 markersController.clearSelectedMarker()
                 result.success(null)
             }
 
             "polygons#update" -> {
-                invalidateMapHelper.invalidateMapIfNeeded()
                 val polygonsToAdd = call.argument<List<Any?>>("polygonsToAdd")!!
                 polygonsController.addPolygons(polygonsToAdd)
                 val polygonsToChange = call.argument<List<Any?>>("polygonsToChange")!!
@@ -375,7 +368,6 @@ class ArcgisMapController(
             }
 
             "polylines#update" -> {
-                invalidateMapHelper.invalidateMapIfNeeded()
                 val polylinesToAdd = call.argument<List<Any>>("polylinesToAdd")!!
                 polylinesController.addPolylines(polylinesToAdd)
                 val polylinesToChange = call.argument<List<Any>>("polylinesToChange")!!
@@ -633,7 +625,6 @@ class ArcgisMapController(
             if (currentViewpoint != null) {
                 viewpoint = null
                 mapView.setViewpoint(currentViewpoint)
-                invalidateMapHelper.invalidateMapIfNeeded()
             }
         }
     }
