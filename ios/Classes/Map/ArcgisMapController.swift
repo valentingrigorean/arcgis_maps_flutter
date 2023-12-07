@@ -38,6 +38,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private var trackIdentityLayers = false
 
+    private var trackIdentifyGraphics = false
+
     private var trackTimeExtent = false
 
     private var trackViewpointChangedListenerEvent = false
@@ -623,6 +625,10 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         if let trackIdentityLayers = mapOptions["trackIdentifyLayers"] as? Bool {
             self.trackIdentityLayers = trackIdentityLayers
+        }
+
+        if let trackIdentifyGraphics = mapOptions["trackIdentifyGraphics"] as? Bool {
+            self.trackIdentifyGraphics = trackIdentifyGraphics
         }
 
         if let trackUserLocationTap = mapOptions["trackUserLocationTap"] as? Bool {

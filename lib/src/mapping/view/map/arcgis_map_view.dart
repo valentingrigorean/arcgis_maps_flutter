@@ -460,12 +460,29 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     }
   }
 
-  void onIdentityGraphics(Offset screenMap,Point? position,List<List<String>> results){
+  void onIdentityGraphics(Offset screenMap, Point? position, List<String> ids) {
     final callback = widget.onIdentifyGraphics;
     if (callback == null) {
-     return;
+      return;
     }
-    throw UnimplementedError();
+    final markers = _markers.values
+        .where((element) => ids.contains(element.markerId.value));
+    final polygons = _polygons.values
+        .where((element) => ids.contains(element.polygonId.value));
+    final polylines = _polylines.values
+        .where((element) => ids.contains(element.polylineId.value));
+
+    callback(
+      screenMap,
+      position,
+      [
+        IdentifyGraphicsOverlayResult(
+          markers: markers.toList(growable: false),
+          polygons: polygons.toList(growable: false),
+          polylines: polylines.toList(growable: false),
+        )
+      ],
+    );
   }
 
   void _updateMap() async {

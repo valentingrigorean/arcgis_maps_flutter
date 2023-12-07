@@ -81,6 +81,15 @@ class IdentifyLayersEvent extends MapEvent<void> {
   final List<IdentifyLayerResult> results;
 }
 
+class IdentifyGraphicsEvent extends _PositionedMapEvent<List<String>> {
+  const IdentifyGraphicsEvent(
+    super.mapId, {
+    required super.screenPoint,
+    required super.position,
+    required super.value,
+  });
+}
+
 class MapLoadedEvent extends MapEvent<ArcgisError?> {
   const MapLoadedEvent(
     super.mapId,
@@ -120,16 +129,15 @@ class MapLongPressEvent extends _PositionedMapEvent<void> {
 
 class MapLongPressEndEvent extends _PositionedMapEvent<void> {
   const MapLongPressEndEvent(
-      super.mapId, {
-        required super.screenPoint,
-        required super.position,
-      }) : super(value: null);
+    super.mapId, {
+    required super.screenPoint,
+    required super.position,
+  }) : super(value: null);
 }
 
 class ViewpointChangedEvent extends MapEvent<void> {
   const ViewpointChangedEvent(int mapId) : super(mapId, null);
 }
-
 
 class TimeExtentChangedEvent extends MapEvent<TimeExtent?> {
   const TimeExtentChangedEvent(super.mapId, super.value);

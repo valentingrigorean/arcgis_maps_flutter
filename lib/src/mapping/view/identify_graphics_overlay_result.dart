@@ -9,7 +9,7 @@ class IdentifyGraphicsOverlayResult {
 
   final List<Marker> markers;
 
-  final List<Polygon> polygons;
+  final List<PolygonMarker> polygons;
 
-  final List<Polyline> polylines;
+  final List<PolylineMarker> polylines;
 }

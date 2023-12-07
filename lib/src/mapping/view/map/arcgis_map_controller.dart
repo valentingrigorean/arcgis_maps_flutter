@@ -327,12 +327,29 @@ class ArcgisMapController {
     );
 
     ArcgisMapsFlutterPlatform.instance.onIdentifyLayer(mapId: mapId).listen(
-        (IdentifyLayerEvent e) => _arcgisMapState.onIdentifyLayer(
-            e.value, e.screenPoint, e.position, e.result));
+          (IdentifyLayerEvent e) => _arcgisMapState.onIdentifyLayer(
+            e.value,
+            e.screenPoint,
+            e.position,
+            e.result,
+          ),
+        );
+
+    ArcgisMapsFlutterPlatform.instance.onIdentifyGraphics(mapId: mapId).listen(
+          (IdentifyGraphicsEvent e) => _arcgisMapState.onIdentityGraphics(
+            e.screenPoint,
+            e.position,
+            e.value,
+          ),
+        );
 
     ArcgisMapsFlutterPlatform.instance.onIdentifyLayers(mapId: mapId).listen(
-        (IdentifyLayersEvent e) => _arcgisMapState.onIdentifyLayers(
-            e.screenPoint, e.position, e.results));
+          (IdentifyLayersEvent e) => _arcgisMapState.onIdentifyLayers(
+            e.screenPoint,
+            e.position,
+            e.results,
+          ),
+        );
 
     ArcgisMapsFlutterPlatform.instance.onUserLocationTap(mapId: mapId).listen(
           (UserLocationTapEvent e) => _arcgisMapState.onUserLocationTap(),

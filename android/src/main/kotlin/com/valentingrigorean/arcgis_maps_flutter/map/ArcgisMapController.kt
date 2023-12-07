@@ -652,6 +652,11 @@ class ArcgisMapController(
         if (trackIdentifyLayers != null) {
             mapViewOnTouchListener.trackIdentityLayers = trackIdentifyLayers
         }
+
+        val trackIdentifyGraphics = data["trackIdentifyGraphics"] as Boolean?
+        if (trackIdentifyGraphics != null) {
+            mapViewOnTouchListener.trackIdentifyGraphics = trackIdentifyGraphics
+        }
         val haveScaleBar = data["haveScalebar"] as Boolean?
         if (haveScaleBar != null) {
             this.haveScaleBar = haveScaleBar

@@ -30,6 +30,7 @@ class MapViewOnTouchListener(
     private var layerJob: Job? = null
     private var isLongPress = false
     var trackIdentityLayers = false
+    var trackIdentifyGraphics = false
 
 
     init {
@@ -39,7 +40,7 @@ class MapViewOnTouchListener(
                 return@onEach
             }
 
-            if (canConsumeGraphics()) {
+            if (canConsumeGraphics() || trackIdentifyGraphics) {
                 Log.d(TAG, "onSingleTapConfirmed: identifyGraphicsOverlays")
                 identifyGraphicsOverlays(it.screenCoordinate, it.mapPoint)
             } else if (trackIdentityLayers) {
@@ -77,7 +78,18 @@ class MapViewOnTouchListener(
     private fun identifyGraphicsOverlays(screenPoint: ScreenCoordinate, point: Point?) {
         graphicJob = scope.launch {
             mapView.identifyGraphicsOverlays(screenPoint, 10.0, false, 10).onSuccess {
-                if (onTapCompleted(it)) {
+                if (trackIdentifyGraphics) {
+                    val flutterIds = getFlutterIds(it)
+                    if (flutterIds.isNotEmpty()) {
+                        val data = mapOf(
+                            "screenPoint" to arrayListOf(screenPoint.x, screenPoint.y),
+                            "position" to point?.toFlutterJson(),
+                            "results" to getFlutterIds(it)
+                        )
+                        methodChannel.invokeMethod("map#onIdentifyGraphics", data);
+                    }
+                }
+                if (canConsumeGraphics() && onTapCompleted(it)) {
                     return@launch
                 }
                 if (trackIdentityLayers) {
@@ -135,6 +147,31 @@ class MapViewOnTouchListener(
             MessageType.OnLongPress -> methodChannel.invokeMethod("map#onLongPress", data)
             MessageType.OnLongPressEnd -> methodChannel.invokeMethod("map#onLongPressEnd", data)
         }
+    }
+
+
+    private fun getFlutterIds(graphics: List<IdentifyGraphicsOverlayResult>): List<String> {
+        val flutterIds = ArrayList<String>()
+
+        for (result in graphics) {
+            for (graphic in result.graphics) {
+                val markerId = graphic.attributes["markerId"] as String?
+                if (markerId != null) {
+                    flutterIds.add(markerId)
+                    continue
+                }
+                val polylineId = graphic.attributes["polylineId"] as String?
+                if (polylineId != null) {
+                    flutterIds.add(polylineId)
+                    continue
+                }
+                val polygonId = graphic.attributes["polygonId"] as String?
+                if (polygonId != null) {
+                    flutterIds.add(polygonId)
+                }
+            }
+        }
+        return flutterIds
     }
 
     private fun clearHandlers() {

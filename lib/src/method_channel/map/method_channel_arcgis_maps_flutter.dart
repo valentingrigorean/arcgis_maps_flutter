@@ -1,23 +1,23 @@
 import 'dart:async';
-import 'package:arcgis_maps_flutter/src/arcgis_method_channel.dart';
-import 'package:arcgis_maps_flutter/src/symbology/marker_updates.dart';
-import 'package:arcgis_maps_flutter/src/symbology/polygon_updates.dart';
-import 'package:arcgis_maps_flutter/src/symbology/polyline_updates.dart';
-import 'package:arcgis_maps_flutter/src/utils/markers.dart';
-import 'package:arcgis_maps_flutter/src/utils/polygons.dart';
-import 'package:arcgis_maps_flutter/src/utils/polyline.dart';
-import 'package:flutter/gestures.dart';
-import 'package:flutter/rendering.dart' as rendering;
-import 'package:stream_transform/stream_transform.dart';
 
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
+import 'package:arcgis_maps_flutter/src/arcgis_method_channel.dart';
 import 'package:arcgis_maps_flutter/src/layers/layer_updates.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/arcgis_maps_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/map_event.dart';
+import 'package:arcgis_maps_flutter/src/symbology/marker_updates.dart';
+import 'package:arcgis_maps_flutter/src/symbology/polygon_updates.dart';
+import 'package:arcgis_maps_flutter/src/symbology/polyline_updates.dart';
 import 'package:arcgis_maps_flutter/src/utils/layers.dart';
+import 'package:arcgis_maps_flutter/src/utils/markers.dart';
+import 'package:arcgis_maps_flutter/src/utils/polygons.dart';
+import 'package:arcgis_maps_flutter/src/utils/polyline.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' as rendering;
 import 'package:flutter/services.dart';
+import 'package:stream_transform/stream_transform.dart';
 
 /// Error thrown when an unknown map ID is provided to a method channel API.
 class UnknownMapIDError extends Error {
@@ -389,8 +389,9 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<SpatialReference?> getMapSpatialReference(int mapId) async{
-    final result = await channel(mapId).invokeMapMethod<String, dynamic>('map#getMapSpatialReference');
+  Future<SpatialReference?> getMapSpatialReference(int mapId) async {
+    final result = await channel(mapId)
+        .invokeMapMethod<String, dynamic>('map#getMapSpatialReference');
     if (result == null) {
       return null;
     }
@@ -501,6 +502,11 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   @override
   Stream<IdentifyLayersEvent> onIdentifyLayers({required int mapId}) {
     return _events(mapId).whereType<IdentifyLayersEvent>();
+  }
+
+  @override
+  Stream<IdentifyGraphicsEvent> onIdentifyGraphics({required int mapId}) {
+    return _events(mapId).whereType<IdentifyGraphicsEvent>();
   }
 
   @override
@@ -626,6 +632,20 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
             screenPoint: screenPoint,
             position: position,
             results: results,
+          ),
+        );
+        break;
+      case 'map#onIdentifyGraphics':
+        final Map<dynamic, dynamic> args = call.arguments;
+        final screenPoint = _fromJson(args['screenPoint']);
+        final position = Point.fromJson(args['position']);
+        final List<String> results = args['results'].cast<String>();
+        _mapEventStreamController.add(
+          IdentifyGraphicsEvent(
+            mapId,
+            screenPoint: screenPoint,
+            position: position,
+            value: results,
           ),
         );
         break;

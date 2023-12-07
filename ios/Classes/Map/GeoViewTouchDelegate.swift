@@ -24,6 +24,10 @@ class GeoViewTouchDelegate {
     private var cancellables = Set<AnyCancellable>()
 
 
+    var trackIdentifyLayers: Bool = false
+
+    var trackIdentifyGraphics: Bool = false
+
     init(methodChannel: FlutterMethodChannel, viewModel: MapViewModel) {
         self.methodChannel = methodChannel
         self.viewModel = viewModel
@@ -84,13 +88,16 @@ class GeoViewTouchDelegate {
 
         let result = await withTaskGroup(of: Bool.self) { group in
 
-            group.addTask {
-                await self.handleIdentifyGraphicsOverlays(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: mapViewProxy)
+            if (canConsumeGraphics() || trackIdentifyGraphics) {
+                group.addTask {
+                    await self.handleIdentifyGraphicsOverlays(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: mapViewProxy)
+                }
             }
-            group.addTask {
-                await self.handleIdentifyLayers(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: mapViewProxy)
+            if (trackIdentifyLayers) {
+                group.addTask {
+                    await self.handleIdentifyLayers(screenPoint: screenPoint, mapPoint: mapPoint, mapViewProxy: mapViewProxy)
+                }
             }
-
             for await result in group {
                 if result {
                     return true
@@ -124,11 +131,14 @@ class GeoViewTouchDelegate {
 
 
     private func handleIdentifyGraphicsOverlays(screenPoint: CGPoint, mapPoint: ArcGIS.Point, mapViewProxy: MapViewProxy) async -> Bool {
-        if !canConsumeGraphics() {
-            return false
-        }
         do {
             let results = try await mapViewProxy.identifyGraphicsOverlays(screenPoint: screenPoint, tolerance: 12)
+            if trackIdentifyGraphics {
+                let flutterIds = getFlutterIds(results: results)
+                if !flutterIds.isEmpty {
+                    methodChannel.invokeMethod("map#onIdentifyGraphicsOverlays", arguments: ["results": flutterIds, "screenPoint": screenPoint.toJSONFlutter(), "position": mapPoint.toJSONFlutter(), "flutterIds": flutterIds])
+                }
+            }
             return onTapGraphicsCompleted(results: results, screenPoint: screenPoint)
         } catch {
             return false
@@ -181,6 +191,27 @@ class GeoViewTouchDelegate {
             }
         }
         return false
+    }
+
+    private func getFlutterIds(results: [ArcGIS.IdentifyGraphicsOverlayResult]) -> [String] {
+        var flutterIds = [String]()
+        for result in results {
+            for graphic in result.graphics {
+                if let markerId = graphic.attributes["markerId"] as? String {
+                    flutterIds.append(markerId)
+                    continue
+                }
+                if let polylineId = graphic.attributes["polylineId"] as? String {
+                    flutterIds.append(polylineId)
+                    continue
+                }
+                if let polygonId = graphic.attributes["polygonId"] as? String {
+                    flutterIds.append(polygonId)
+                    continue
+                }
+            }
+        }
+        return flutterIds
     }
 
     private func sendOnMapTap(screenPoint: CGPoint, mapViewProxy: MapViewProxy) {

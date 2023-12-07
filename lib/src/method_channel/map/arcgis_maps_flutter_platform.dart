@@ -268,6 +268,10 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('onIdentifyLayers() has not been implemented.');
   }
 
+  Stream<IdentifyGraphicsEvent> onIdentifyGraphics({required int mapId}) {
+    throw UnimplementedError('onIdentifyGraphics() has not been implemented.');
+  }
+
   Stream<ViewpointChangedEvent> onViewpointChanged({required int mapId}) {
     throw UnimplementedError(
         'onViewpointChangedListener() has not been implemented.');
