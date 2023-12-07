@@ -36,10 +36,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
     private var cancellables = Set<AnyCancellable>()
 
-    private var trackIdentityLayers = false
-
-    private var trackIdentifyGraphics = false
-
     private var trackTimeExtent = false
 
     private var trackViewpointChangedListenerEvent = false
@@ -624,11 +620,11 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         viewModel.updateMapOptions(with: mapOptions)
 
         if let trackIdentityLayers = mapOptions["trackIdentifyLayers"] as? Bool {
-            self.trackIdentityLayers = trackIdentityLayers
+            geoViewTouchDelegate.trackIdentifyLayers = trackIdentityLayers
         }
 
         if let trackIdentifyGraphics = mapOptions["trackIdentifyGraphics"] as? Bool {
-            self.trackIdentifyGraphics = trackIdentifyGraphics
+            geoViewTouchDelegate.trackIdentifyGraphics = trackIdentifyGraphics
         }
 
         if let trackUserLocationTap = mapOptions["trackUserLocationTap"] as? Bool {
