@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/esri/arcgis-maps-sdk-swift",
       "state" : {
-        "revision" : "893ca8532df47371ffb1252e41e65f1c0eb9cbbf",
-        "version" : "200.2.0"
+        "revision" : "6fe1517b11451bbbed6266e9e63f4a7a6d48a81b",
+        "version" : "200.3.0"
       }
     }
   ],

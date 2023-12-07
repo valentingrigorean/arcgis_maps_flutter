@@ -45,7 +45,7 @@ android {
     }
 
     dependencies {
-        implementation 'com.esri:arcgis-maps-kotlin:200.2.0'
+        implementation 'com.esri:arcgis-maps-kotlin:200.3.0'
     }
 
     packagingOptions {
