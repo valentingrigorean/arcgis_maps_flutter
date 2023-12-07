@@ -21,8 +21,8 @@ typedef IdentifyLayerCallback = void Function(
 typedef IdentifyLayersCallback = void Function(
     Offset screenPoint, Point? position, List<IdentifyLayerResult> results);
 
-typedef IdentityGraphicsCallback = void Function(Offset screenPoint,
-    Point? position, List<IdentifyGraphicsOverlayResult> results);
+typedef IdentityGraphicsCallback = void Function(
+    Offset screenPoint, Point? position, IdentifyGraphicsOverlayResult result);
 
 /// Callback function taking a single argument.
 typedef ArgumentCallback<T> = void Function(T argument);
@@ -475,13 +475,11 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     callback(
       screenMap,
       position,
-      [
-        IdentifyGraphicsOverlayResult(
-          markers: markers.toList(growable: false),
-          polygons: polygons.toList(growable: false),
-          polylines: polylines.toList(growable: false),
-        )
-      ],
+      IdentifyGraphicsOverlayResult(
+        markers: markers.toList(growable: false),
+        polygons: polygons.toList(growable: false),
+        polylines: polylines.toList(growable: false),
+      ),
     );
   }
 
