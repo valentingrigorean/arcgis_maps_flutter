@@ -132,11 +132,11 @@ class GeoViewTouchDelegate {
 
     private func handleIdentifyGraphicsOverlays(screenPoint: CGPoint, mapPoint: ArcGIS.Point, mapViewProxy: MapViewProxy) async -> Bool {
         do {
-            let results = try await mapViewProxy.identifyGraphicsOverlays(screenPoint: screenPoint, tolerance: 12)
+            let results = try await mapViewProxy.identifyGraphicsOverlays(screenPoint: screenPoint, tolerance: 12,maximumResultsPerOverlay: trackIdentifyLayers ? nil : 1)
             if trackIdentifyGraphics {
                 let flutterIds = getFlutterIds(results: results)
                 if !flutterIds.isEmpty {
-                    methodChannel.invokeMethod("map#onIdentifyGraphicsOverlays", arguments: ["results": flutterIds, "screenPoint": screenPoint.toJSONFlutter(), "position": mapPoint.toJSONFlutter(), "flutterIds": flutterIds])
+                    methodChannel.invokeMethod("map#map#onIdentifyGraphics", arguments: ["results": flutterIds, "screenPoint": screenPoint.toJSONFlutter(), "position": mapPoint.toJSONFlutter(), "flutterIds": flutterIds])
                 }
             }
             return onTapGraphicsCompleted(results: results, screenPoint: screenPoint)
