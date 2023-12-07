@@ -136,7 +136,7 @@ class GeoViewTouchDelegate {
             if trackIdentifyGraphics {
                 let flutterIds = getFlutterIds(results: results)
                 if !flutterIds.isEmpty {
-                    methodChannel.invokeMethod("map#map#onIdentifyGraphics", arguments: ["results": flutterIds, "screenPoint": screenPoint.toJSONFlutter(), "position": mapPoint.toJSONFlutter(), "flutterIds": flutterIds])
+                    methodChannel.invokeMethod("map#onIdentifyGraphics", arguments: ["results": flutterIds, "screenPoint": screenPoint.toJSONFlutter(), "position": mapPoint.toJSONFlutter(), "flutterIds": flutterIds])
                 }
             }
             return onTapGraphicsCompleted(results: results, screenPoint: screenPoint)
