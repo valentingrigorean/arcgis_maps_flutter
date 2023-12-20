@@ -15,7 +15,7 @@ import java.util.UUID
 enum class FieldTypeFlutter(val value: Int) {
     UNKNOWN(0), INTEGER(1), DOUBLE(2), DATE(3), TEXT(4), NULLABLE(5), BLOB(6), GEOMETRY(7);
 
-    companion object{
+    companion object {
         fun fromInt(value: Int): FieldTypeFlutter {
             return values()[value]
         }
@@ -23,13 +23,14 @@ enum class FieldTypeFlutter(val value: Int) {
 }
 
 
-
 private val _iso8601Format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US)
 fun Any?.toFlutterFieldType(): Any {
     val data: MutableMap<String, Any?> = HashMap(2)
     val fieldTypeFlutter: FieldTypeFlutter
     var obj = this
-    if (this is String) {
+    if (obj == null) {
+        fieldTypeFlutter = FieldTypeFlutter.NULLABLE
+    } else if (this is String) {
         fieldTypeFlutter = FieldTypeFlutter.TEXT
     } else if (obj is Short || obj is Int) {
         fieldTypeFlutter = FieldTypeFlutter.INTEGER
@@ -53,15 +54,15 @@ fun Any?.toFlutterFieldType(): Any {
         }
     } else if (obj is Geometry) {
         fieldTypeFlutter = FieldTypeFlutter.GEOMETRY
-        obj = obj.toFlutterJson()!!
-    } else if (obj == null) {
-        fieldTypeFlutter = FieldTypeFlutter.NULLABLE
+        obj = obj.toFlutterJson()
     } else {
         fieldTypeFlutter = FieldTypeFlutter.UNKNOWN
         obj = obj.toString()
     }
     data["type"] = fieldTypeFlutter.value
-    data["value"] = obj
+    if (obj != null) {
+        data["value"] = obj
+    }
     return data
 }
 
