@@ -25,8 +25,8 @@ class BitmapDescriptor {
 
   static BitmapDescriptor fromNativeAsset(
     String name, {
-    double width = -1,
-    double height = -1,
+    double? width,
+    double? height,
     Color? tintColor,
   }) {
     return BitmapDescriptor._(
@@ -131,23 +131,23 @@ class _BitmapDescriptorRaw implements _BitmapDescriptorBase {
 class _BitmapDescriptorNative implements _BitmapDescriptorBase {
   const _BitmapDescriptorNative({
     required this.fileName,
-    this.width = -1,
-    this.height = 1,
+    this.width,
+    this.height,
     this.tintColor,
   });
 
   final String fileName;
 
-  final double width;
-  final double height;
+  final double? width;
+  final double? height;
   final Color? tintColor;
 
   @override
   Object toJson() {
     final json = <String, Object>{};
     json['fromNativeAsset'] = fileName;
-    json['width'] = width;
-    json['height'] = height;
+    if (width != null) json['width'] = width!;
+    if (height != null) json['height'] = height!;
     if (tintColor != null) {
       json['tintColor'] = tintColor!.value;
     }
@@ -225,10 +225,9 @@ class _SimpleStyleMarkerBitmapDescriptor implements _BitmapDescriptorBase {
 
 class _MarkerInfo extends StatefulWidget {
   const _MarkerInfo({
-    Key? key,
     required this.child,
     required this.onBitmapCreated,
-  }) : super(key: key);
+  });
 
   final Widget child;
 
