@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import Combine
+
 
 class TaskManager {
     private var tasks: [String: Task<Void, Error>] = [:]
@@ -76,4 +78,3 @@ class TaskManager {
         tasks.removeAll()
     }
 }
-

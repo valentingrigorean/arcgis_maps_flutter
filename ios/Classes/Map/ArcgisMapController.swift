@@ -22,6 +22,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     private let polygonsController: PolygonsController
     private let polylinesController: PolylinesController
 
+    private let mapManager: MapManager
+
     private let legendInfoController: LegendInfoController
 
     private let locationDisplayController: LocationDisplayController
@@ -79,6 +81,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
 
         legendInfoController = LegendInfoController(layersController: layersController)
+
+        mapManager = MapManager(viewModel: viewModel, channel: channel, layersController: layersController)
 
         super.init()
 
@@ -548,73 +552,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         guard let dict = args as? [String: Any] else {
             return
         }
-
-        if let offlineInfo = dict["offlineInfo"] as? [String: Any] {
-            loadOfflineMap(args: offlineInfo)
-            return
-        }
-
-        let map = Map(data: dict)
-        changeMap(map: map)
+        mapManager.changeMap(data: dict)
     }
 
-    private func loadOfflineMap(args: [String: Any]) {
-        let offlinePath = args["path"] as! String
-        let mapIndex = args["index"] as! Int
-
-        let ext = offlinePath.components(separatedBy: ".").last
-
-        switch ext {
-        case "vtpk":
-            // .vtpk extension is automatically added by the ArcGIS Runtime
-            let url = URL(fileURLWithPath: offlinePath.replacingOccurrences(of: ".vtpk", with: ""))
-            let vectorTileLayer = ArcGISVectorTiledLayer(url: url)
-            let basemap = Basemap(baseLayer: vectorTileLayer)
-            let map = Map(basemap: basemap)
-            changeMap(map: map)
-            return
-        default:
-            loadMobileMapPackage(offlinePath: offlinePath, mapIndex: mapIndex)
-            return
-        }
-    }
-
-    private func loadMobileMapPackage(offlinePath: String, mapIndex: Int) {
-        let mobileMapPackage = MobileMapPackage(fileURL: URL(fileURLWithPath: offlinePath))
-
-        taskManager.createTask {
-            do {
-                try await mobileMapPackage.load()
-                if mobileMapPackage.maps.isEmpty {
-                    self.channel.invokeMethod("map#loaded", arguments: "No maps in the package")
-                    return
-                }
-                let map = mobileMapPackage.maps[mapIndex]
-                self.changeMap(map: map)
-            } catch {
-                self.channel.invokeMethod("map#loaded", arguments: error.toJSONFlutter(withStackTrace: false))
-            }
-        }
-    }
-
-    private func changeMap(map: Map) {
-        let viewPoint = viewModel.viewpointCenterAndScale
-        viewModel.map = map
-        layersController.setMap(map)
-
-        taskManager.createTask {
-            do {
-                try await map.load()
-                self.channel.invokeMethod("map#loaded", arguments: nil)
-            } catch {
-                self.channel.invokeMethod("map#loaded", arguments: error.toJSONFlutter(withStackTrace: false))
-            }
-
-            if let viewPoint = viewPoint {
-                self.setViewpoint(viewpoint: viewPoint, animated: false, result: nil)
-            }
-        }
-    }
 
     private func updateMapOptions(mapOptions: [String: Any]) {
         viewModel.updateMapOptions(with: mapOptions)
@@ -676,6 +616,106 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         if let options = dict["options"] as? [String: Any] {
             updateMapOptions(mapOptions: options)
+        }
+    }
+}
+
+
+private class MapManager {
+    private let viewModel: MapViewModel
+    private let channel: FlutterMethodChannel
+    private let taskManager = TaskManager()
+    private let layersController: LayersController
+
+
+    init(viewModel: MapViewModel, channel: FlutterMethodChannel, layersController: LayersController) {
+        self.viewModel = viewModel
+        self.channel = channel
+        self.layersController = layersController
+    }
+
+    func changeMap(data: [String: Any]) {
+        taskManager.cancelTask(withKey: "changeMap")
+        taskManager.createTask(key: "changeMap") {
+            if let offlineInfo = data["offlineInfo"] as? [String: Any] {
+                await self.loadOfflineMap(args: offlineInfo)
+                return
+            }
+
+            let map = Map(data: data)
+            await self.changeMapInternal(map: map)
+        }
+    }
+
+    private func loadOfflineMap(args: [String: Any]) async {
+        let offlinePath = args["path"] as! String
+        let mapIndex = args["index"] as! Int
+
+        let ext = offlinePath.components(separatedBy: ".").last
+
+        switch ext {
+        case "vtpk":
+            // .vtpk extension is automatically added by the ArcGIS Runtime
+            let url = URL(fileURLWithPath: offlinePath.replacingOccurrences(of: ".vtpk", with: ""))
+            let vectorTileLayer = ArcGISVectorTiledLayer(url: url)
+            let basemap = Basemap(baseLayer: vectorTileLayer)
+            let map = Map(basemap: basemap)
+            await changeMapInternal(map: map)
+            return
+        default:
+            await loadMobileMapPackage(offlinePath: offlinePath, mapIndex: mapIndex)
+            return
+        }
+    }
+
+
+    private func loadMobileMapPackage(offlinePath: String, mapIndex: Int) async {
+        let mobileMapPackage = MobileMapPackage(fileURL: URL(fileURLWithPath: offlinePath))
+        do {
+            try await mobileMapPackage.load()
+            if Task.isCancelled {
+                return
+            }
+            if mobileMapPackage.maps.isEmpty {
+                channel.invokeMethod("map#loaded", arguments: "No maps in the package")
+                return
+            }
+            let map = mobileMapPackage.maps[mapIndex]
+            await changeMapInternal(map: map)
+        } catch {
+            if Task.isCancelled {
+                return
+            }
+            channel.invokeMethod("map#loaded", arguments: error.toJSONFlutter(withStackTrace: false))
+        }
+
+    }
+
+    private func changeMapInternal(map: Map) async {
+        if Task.isCancelled {
+            return
+        }
+        let viewPoint = viewModel.viewpointCenterAndScale
+        viewModel.map = map
+        layersController.setMap(map)
+
+        do {
+            try await map.load()
+            if Task.isCancelled {
+                return
+            }
+            channel.invokeMethod("map#loaded", arguments: nil)
+        } catch {
+            if Task.isCancelled {
+                return
+            }
+            channel.invokeMethod("map#loaded", arguments: error.toJSONFlutter(withStackTrace: false))
+        }
+        if Task.isCancelled {
+            return
+        }
+        if let viewPoint = viewPoint {
+            await viewModel.mapViewProxy?.setViewpoint(viewPoint)
         }
     }
 }

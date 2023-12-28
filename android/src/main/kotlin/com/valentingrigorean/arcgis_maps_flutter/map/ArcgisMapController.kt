@@ -41,6 +41,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.platform.PlatformView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.launchIn
@@ -76,6 +77,8 @@ class ArcgisMapController(
     private var minScale = 0.0
     private var maxScale = 0.0
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main)
+
+    private var mapJob: Job? = null
 
     init {
         methodChannel = MethodChannel(binaryMessenger, "plugins.flutter.io/arcgis_maps_$id")
@@ -188,7 +191,7 @@ class ArcgisMapController(
 
             "map#getLegendInfos" -> {
                 scope.launch {
-                    val legendInfoController = LegendInfoController(context,layersController)
+                    val legendInfoController = LegendInfoController(context, layersController)
                     legendInfoController.load(call.arguments as Map<*, *>).onSuccess {
                         result.success(it)
                     }.onFailure {
@@ -322,6 +325,7 @@ class ArcgisMapController(
                 }
                 result.success(mapPoint?.toFlutterJson())
             }
+
             "map#getMapSpatialReference" -> {
                 val map = mapView.map
                 if (map == null) {
@@ -567,6 +571,7 @@ class ArcgisMapController(
 
     private fun changeMapType(args: Any?) {
         val data = args as Map<*, *>? ?: return
+        mapJob?.cancel()
         if (data.containsKey("offlineInfo")) {
             loadOfflineMap(data["offlineInfo"] as Map<*, *>)
             return
@@ -588,12 +593,14 @@ class ArcgisMapController(
             }
 
             else -> {
-                scope.launch {
+                mapJob = scope.launch {
                     val mobileMapPackage = MobileMapPackage(offlinePath!!)
                     mobileMapPackage.load().onSuccess {
                         val map = mobileMapPackage.maps[mapIndex]
+                        ensureActive()
                         changeMap(map)
                     }.onFailure {
+                        ensureActive()
                         methodChannel.invokeMethod(
                             "map#loaded", it.toFlutterJson(withStackTrace = false)
                         )
@@ -604,14 +611,16 @@ class ArcgisMapController(
     }
 
     private fun changeMap(map: ArcGISMap) {
-        scope.launch {
+        mapJob = scope.launch {
             var currentViewpoint = viewpoint
             if (currentViewpoint == null) {
                 currentViewpoint = mapView.getCurrentViewpoint(ViewpointType.CenterAndScale)
             }
             map.load().onSuccess {
+                ensureActive()
                 methodChannel.invokeMethod("map#loaded", null)
             }.onFailure {
+                ensureActive()
                 methodChannel.invokeMethod(
                     "map#loaded", it.toFlutterJson(withStackTrace = false)
                 )
