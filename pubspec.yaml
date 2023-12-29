@@ -1,6 +1,6 @@
 name: arcgis_maps_flutter
 description: A new flutter plugin project.
-version: 1.0.0+67
+version: 1.0.0+68
 homepage: https://github.com/valentingrigorean/arcgis_maps_flutter
 
 environment:

@@ -696,8 +696,8 @@ private class MapManager {
             return
         }
         let viewPoint = viewModel.viewpointCenterAndScale
-        viewModel.map = map
         layersController.setMap(map)
+        viewModel.map = map
 
         do {
             try await map.load()

@@ -71,7 +71,7 @@ class LayersController {
     }
 
     public func setMap(_ map: Map) {
-        clearMap(map: self.map)
+        clearMap()
         self.map = map
         addLayersToMap(layers: Array(operationalLayers.set), layerType: .operational)
         addLayersToMap(layers: Array(baseLayers.set), layerType: .base)
@@ -191,7 +191,7 @@ class LayersController {
         removeLayersFromMap(layers: layersToRemove, layerType: layerType)
     }
 
-    private func clearMap(map: Map?) {
+    private func clearMap() {
         guard let map = map else {
             return
         }
@@ -207,7 +207,9 @@ class LayersController {
         }
 
         let flutterMap = getFlutterMap(layerType: layerType)
-
+        var operationLayers = [Layer]()
+        var baseLayers = [Layer]()
+        var referenceLayers = [Layer]()
 
         for layer in layers {
             let nativeLayer = flutterMap[layer.layerId] ?? layer.createNativeLayer()
@@ -230,16 +232,20 @@ class LayersController {
             switch layerType {
 
             case .operational:
-                map.addOperationalLayer(nativeLayer)
+                operationLayers.append(nativeLayer)
                 break
             case .base:
-                map.basemap?.addBaseLayer(nativeLayer)
+                baseLayers.append(nativeLayer)
                 break
             case .reference:
-                map.basemap?.addReferenceLayer(nativeLayer)
+                referenceLayers.append(nativeLayer)
                 break
             }
         }
+
+        map.addOperationalLayers(operationLayers)
+        map.basemap?.addBaseLayers(baseLayers)
+        map.basemap?.addReferenceLayers(referenceLayers)
     }
 
     private func removeLayersFromMap(layers: [FlutterLayer],
