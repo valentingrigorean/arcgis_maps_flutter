@@ -710,15 +710,15 @@ class ArcgisMapController(
         layersController.updateFromArgs(params)
         val markersToAdd = params["markersToAdd"]
         if (markersToAdd != null) {
-            markersController.addMarkers(markersToAdd as List<Any?>?)
+            markersController.addMarkers(markersToAdd as List<Any>?)
         }
         val polygonsToAdd = params["polygonsToAdd"]
         if (polygonsToAdd != null) {
-            polygonsController.addPolygons(polygonsToAdd as List<Any?>?)
+            polygonsController.addPolygons(polygonsToAdd as List<Any>?)
         }
         val polylinesToAdd = params["polylinesToAdd"]
         if (polylinesToAdd != null) {
-            polylinesController.addPolylines(polylinesToAdd as List<Any>?)
+            polylinesController.addPolylines(polylinesToAdd as List<Any>)
         }
     }
 
