@@ -35,6 +35,7 @@ class PolygonsController(
         if (polygonsToAdd == null) {
             return
         }
+        val graphicsAdded = ArrayList<Graphic>(polygonsToAdd.size)
         for (polygon in polygonsToAdd) {
             val data = polygon as Map<*, *>? ?: continue
             val polygonId = data["polygonId"] as String
@@ -42,8 +43,9 @@ class PolygonsController(
             controller.setSelectionPropertiesHandler(selectionPropertiesHandler)
             controller.interpretGraphicController(data, symbolVisibilityFilterController)
             polygonIdToController[polygonId] = controller
-            controller.add(graphicsOverlay)
+            graphicsAdded.add(controller.graphic)
         }
+        graphicsOverlay.graphics.addAll(graphicsAdded)
     }
 
     fun changePolygons(polygonsToChange: List<Any?>?) {
@@ -58,20 +60,19 @@ class PolygonsController(
         }
     }
 
-    fun removePolygons(polygonIdsToRemove: List<Any?>?) {
+    fun removePolygons(polygonIdsToRemove: List<Any>?) {
         if (polygonIdsToRemove == null) {
             return
         }
+        val graphicsToRemove = ArrayList<Graphic>(polygonIdsToRemove.size)
         for (rawPolygonId in polygonIdsToRemove) {
-            if (rawPolygonId == null) {
-                continue
-            }
             val polygonId = rawPolygonId as String
             val controller = polygonIdToController.remove(polygonId)
             if (controller != null) {
                 onSymbolRemoval(controller)
-                controller.remove(graphicsOverlay)
+                graphicsToRemove.add(controller.graphic)
             }
         }
+        graphicsOverlay.graphics.removeAll(graphicsToRemove)
     }
 }

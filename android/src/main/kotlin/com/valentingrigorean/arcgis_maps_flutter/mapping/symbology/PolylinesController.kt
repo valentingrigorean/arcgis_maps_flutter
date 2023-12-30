@@ -35,6 +35,7 @@ class PolylinesController(
         if (polylinesToAdd == null) {
             return
         }
+        val graphicsAdded = ArrayList<Graphic>(polylinesToAdd.size)
         for (polyline in polylinesToAdd) {
             val data = polyline as Map<*, *>? ?: continue
             val polylineId = data["polylineId"] as String
@@ -42,8 +43,9 @@ class PolylinesController(
             controller.setSelectionPropertiesHandler(selectionPropertiesHandler)
             controller.interpretGraphicController(data, symbolVisibilityFilterController)
             polylineIdToController[polylineId] = controller
-            controller.add(graphicsOverlay)
+            graphicsAdded.add(controller.graphic)
         }
+        graphicsOverlay.graphics.addAll(graphicsAdded)
     }
 
     fun changePolylines(polylinesToChange: List<Any>?) {
@@ -64,16 +66,15 @@ class PolylinesController(
         if (polylineIdsToRemove == null) {
             return
         }
+        val graphicsToRemove = ArrayList<Graphic>(polylineIdsToRemove.size)
         for (rawPolylineId in polylineIdsToRemove) {
-            if (rawPolylineId == null) {
-                continue
-            }
             val polylineId = rawPolylineId as String
             val controller = polylineIdToController.remove(polylineId)
             if (controller != null) {
                 onSymbolRemoval(controller)
-                controller.remove(graphicsOverlay)
+                graphicsToRemove.add(controller.graphic)
             }
         }
+        graphicsOverlay.graphics.removeAll(graphicsToRemove)
     }
 }

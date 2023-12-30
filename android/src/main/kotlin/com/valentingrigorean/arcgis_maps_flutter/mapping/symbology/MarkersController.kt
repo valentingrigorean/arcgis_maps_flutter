@@ -42,6 +42,7 @@ class MarkersController(
         if (markersToAdd == null) {
             return
         }
+        val graphicsAdded = ArrayList<Graphic>(markersToAdd.size)
         for (marker in markersToAdd) {
             val data = marker as Map<*, *>? ?: continue
             val markerId = data["markerId"] as String
@@ -49,8 +50,10 @@ class MarkersController(
             markerController.setSelectionPropertiesHandler(selectionPropertiesHandler)
             markerController.interpretGraphicController(data, symbolVisibilityFilterController)
             markerIdToController[markerId] = markerController
-            markerController.add(graphicsOverlay)
+            graphicsAdded.add(markerController.graphic)
         }
+
+        graphicsOverlay.graphics.addAll(graphicsAdded)
     }
 
     fun changeMarkers(markersToChange: List<Any?>?) {
@@ -67,21 +70,20 @@ class MarkersController(
         }
     }
 
-    fun removeMarkers(markerIdsToRemove: List<Any?>?) {
+    fun removeMarkers(markerIdsToRemove: List<Any>?) {
         if (markerIdsToRemove == null) {
             return
         }
+        val graphicsToRemove = ArrayList<Graphic>(markerIdsToRemove.size)
         for (rawMarkerId in markerIdsToRemove) {
-            if (rawMarkerId == null) {
-                continue
-            }
             val markerId = rawMarkerId as String
             val markerController = markerIdToController.remove(markerId)
             if (markerController != null) {
                 onSymbolRemoval(markerController)
-                markerController.remove(graphicsOverlay)
+                graphicsToRemove.add(markerController.graphic)
             }
         }
+        graphicsOverlay.graphics.removeAll(graphicsToRemove)
     }
 
     fun clearSelectedMarker() {

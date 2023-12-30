@@ -14,7 +14,7 @@ abstract class BaseGraphicController(
     override var selectedColor: Color? = null,
 ) : GraphicControllerSink {
     private var selectionPropertiesHandler: SelectionPropertiesHandler? = null
-    protected val graphic = Graphic()
+    val graphic = Graphic()
 
     override var geometry: Geometry?
         get() = graphic.geometry
@@ -49,14 +49,6 @@ abstract class BaseGraphicController(
 
     fun setSelectionPropertiesHandler(selectionPropertiesHandler: SelectionPropertiesHandler?) {
         this.selectionPropertiesHandler = selectionPropertiesHandler
-    }
-
-    override fun add(graphicsOverlay: GraphicsOverlay) {
-        graphicsOverlay.graphics.add(graphic)
-    }
-
-    override fun remove(graphicsOverlay: GraphicsOverlay) {
-        graphicsOverlay.graphics.remove(graphic)
     }
 
     override fun interpretGraphicController(

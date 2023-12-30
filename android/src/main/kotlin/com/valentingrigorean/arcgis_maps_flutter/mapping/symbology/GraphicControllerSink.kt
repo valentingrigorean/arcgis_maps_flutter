@@ -3,12 +3,12 @@ package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 
 import com.arcgismaps.Color
 import com.arcgismaps.geometry.Geometry
-import com.arcgismaps.mapping.view.GraphicsOverlay
+import com.arcgismaps.mapping.view.Graphic
 import com.valentingrigorean.arcgis_maps_flutter.map.SymbolVisibilityFilterController
 
 interface GraphicControllerSink {
-    fun add(graphicsOverlay: GraphicsOverlay)
-    fun remove(graphicsOverlay: GraphicsOverlay)
+
+    val graphic: Graphic
 
     var visible: Boolean
 
