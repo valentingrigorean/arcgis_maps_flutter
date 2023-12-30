@@ -345,11 +345,11 @@ class ArcgisMapController(
             }
 
             "markers#update" -> {
-                val markersToAdd = call.argument<List<Any?>>("markersToAdd")!!
+                val markersToAdd = call.argument<List<Any>>("markersToAdd")!!
                 markersController.addMarkers(markersToAdd)
-                val markersToChange = call.argument<List<Any?>>("markersToChange")!!
+                val markersToChange = call.argument<List<Any>>("markersToChange")!!
                 markersController.changeMarkers(markersToChange)
-                val markerIdsToRemove = call.argument<List<Any?>>("markerIdsToRemove")!!
+                val markerIdsToRemove = call.argument<List<Any>>("markerIdsToRemove")!!
                 markersController.removeMarkers(markerIdsToRemove)
                 symbolVisibilityFilterController.invalidate()
                 result.success(null)
@@ -362,11 +362,11 @@ class ArcgisMapController(
             }
 
             "polygons#update" -> {
-                val polygonsToAdd = call.argument<List<Any?>>("polygonsToAdd")!!
+                val polygonsToAdd = call.argument<List<Any>>("polygonsToAdd")!!
                 polygonsController.addPolygons(polygonsToAdd)
-                val polygonsToChange = call.argument<List<Any?>>("polygonsToChange")!!
+                val polygonsToChange = call.argument<List<Any>>("polygonsToChange")!!
                 polygonsController.changePolygons(polygonsToChange)
-                val polygonIdsToRemove = call.argument<List<Any?>>("polygonIdsToRemove")!!
+                val polygonIdsToRemove = call.argument<List<Any>>("polygonIdsToRemove")!!
                 polygonsController.removePolygons(polygonIdsToRemove)
                 result.success(null)
             }

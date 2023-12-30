@@ -38,7 +38,7 @@ class MarkersController(
         return true
     }
 
-    fun addMarkers(markersToAdd: List<Any?>?) {
+    fun addMarkers(markersToAdd: List<Any>?) {
         if (markersToAdd == null) {
             return
         }
