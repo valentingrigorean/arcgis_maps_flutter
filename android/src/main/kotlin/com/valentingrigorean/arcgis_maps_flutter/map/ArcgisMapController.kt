@@ -53,7 +53,7 @@ class ArcgisMapController(
     private val context: Context,
     params: Map<String, Any>?,
     binaryMessenger: BinaryMessenger,
-    private val lifecycleProvider: () -> Lifecycle
+    lifecycleProvider: () -> Lifecycle
 ) : PlatformView, MethodCallHandler, LocationDisplayControllerDelegate {
     private val methodChannel: MethodChannel
     private val selectionPropertiesHandler: SelectionPropertiesHandler
@@ -78,6 +78,9 @@ class ArcgisMapController(
     private var maxScale = 0.0
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main)
 
+    private val lifecycle = lifecycleProvider()
+
+
     private var mapJob: Job? = null
 
     init {
@@ -89,7 +92,7 @@ class ArcgisMapController(
             FrameLayout.LayoutParams.MATCH_PARENT,
             FrameLayout.LayoutParams.MATCH_PARENT
         )
-        lifecycleProvider().addObserver(mapView)
+        lifecycle.addObserver(mapView)
         scaleBarController = ScaleBarController(context, mapView, container, scope)
         selectionPropertiesHandler = SelectionPropertiesHandler(mapView.selectionProperties)
         symbolVisibilityFilterController = SymbolVisibilityFilterController(mapView, scope)
@@ -147,8 +150,7 @@ class ArcgisMapController(
         trackTimeExtentEvents = false
         trackViewpointChangedListenerEvents = false
         methodChannel.setMethodCallHandler(null)
-        val lifecycle = lifecycleProvider()
-        lifecycle?.removeObserver(mapView)
+        lifecycle.removeObserver(mapView)
         scaleBarController.dispose()
         mapViewOnTouchListener.clearAllDelegates()
         symbolVisibilityFilterController.clear()

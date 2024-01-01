@@ -90,7 +90,7 @@ class ArcgisMapsFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler,
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
-
+        lifecycle = null
     }
 
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
