@@ -67,7 +67,7 @@ struct MapContentView: View {
                         .interactionModes(viewModel.interactionModes)
                         .contentInsets(viewModel.contentInsets)
                         .gesture(LongPressGesture(minimumDuration: 0.5)
-                                .updating($longPressState){ currentState, gestureState, transaction in
+                                .updating($longPressState) { currentState, gestureState, transaction in
                                     gestureState = currentState
                                 }
                                 .simultaneously(with: DragGesture(minimumDistance: 0).onChanged { _ in

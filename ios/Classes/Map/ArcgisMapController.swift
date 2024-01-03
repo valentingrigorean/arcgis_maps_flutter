@@ -627,6 +627,8 @@ private class MapManager {
     private let taskManager = TaskManager()
     private let layersController: LayersController
 
+    private var currentMapId = 0
+
 
     init(viewModel: MapViewModel, channel: FlutterMethodChannel, layersController: LayersController) {
         self.viewModel = viewModel
@@ -635,19 +637,16 @@ private class MapManager {
     }
 
     func changeMap(data: [String: Any]) {
-        taskManager.cancelTask(withKey: "changeMap")
-        taskManager.createTask(key: "changeMap") {
-            if let offlineInfo = data["offlineInfo"] as? [String: Any] {
-                await self.loadOfflineMap(args: offlineInfo)
-                return
-            }
-
-            let map = Map(data: data)
-            await self.changeMapInternal(map: map)
+        if let offlineInfo = data["offlineInfo"] as? [String: Any] {
+            loadOfflineMap(args: offlineInfo)
+            return
         }
+        let map = Map(data: data)
+        changeMapInternal(map: map)
     }
 
-    private func loadOfflineMap(args: [String: Any]) async {
+
+    private func loadOfflineMap(args: [String: Any]) {
         let offlinePath = args["path"] as! String
         let mapIndex = args["index"] as! Int
 
@@ -660,62 +659,59 @@ private class MapManager {
             let vectorTileLayer = ArcGISVectorTiledLayer(url: url)
             let basemap = Basemap(baseLayer: vectorTileLayer)
             let map = Map(basemap: basemap)
-            await changeMapInternal(map: map)
+            changeMapInternal(map: map)
             return
         default:
-            await loadMobileMapPackage(offlinePath: offlinePath, mapIndex: mapIndex)
-            return
+            taskManager.cancelTask(withKey: "offline_map")
+            taskManager.createTask(key: "offline_map") {
+                let mobileMapPackage = MobileMapPackage(fileURL: URL(fileURLWithPath: offlinePath))
+                do {
+                    try await mobileMapPackage.load()
+                    if Task.isCancelled {
+                        return
+                    }
+                    if mobileMapPackage.maps.isEmpty {
+                        self.channel.invokeMethod("map#loaded", arguments: "No maps in the package")
+                        return
+                    }
+                    DispatchQueue.main.async {
+                        let map = mobileMapPackage.maps[mapIndex]
+                        self.changeMapInternal(map: map)
+                    }
+                } catch {
+                    self.channel.invokeMethod("map#loaded", arguments: error.toJSONFlutter(withStackTrace: false))
+                }
+            }
         }
     }
 
-
-    private func loadMobileMapPackage(offlinePath: String, mapIndex: Int) async {
-        let mobileMapPackage = MobileMapPackage(fileURL: URL(fileURLWithPath: offlinePath))
-        do {
-            try await mobileMapPackage.load()
-            if Task.isCancelled {
-                return
-            }
-            if mobileMapPackage.maps.isEmpty {
-                channel.invokeMethod("map#loaded", arguments: "No maps in the package")
-                return
-            }
-            let map = mobileMapPackage.maps[mapIndex]
-            await changeMapInternal(map: map)
-        } catch {
-            if Task.isCancelled {
-                return
-            }
-            channel.invokeMethod("map#loaded", arguments: error.toJSONFlutter(withStackTrace: false))
-        }
-
-    }
-
-    private func changeMapInternal(map: Map) async {
-        if Task.isCancelled {
-            return
-        }
+    private func changeMapInternal(map: Map) {
+        currentMapId += 1
+        let id = currentMapId
         let viewPoint = viewModel.viewpointCenterAndScale
-        layersController.setMap(map)
-        viewModel.map = map
 
-        do {
-            try await map.load()
-            if Task.isCancelled {
+        viewModel.map = map
+        layersController.setMap(map)
+
+        taskManager.createTask {
+            do {
+                try await map.load()
+                if id != self.currentMapId {
+                    return
+                }
+                self.channel.invokeMethod("map#loaded", arguments: nil)
+            } catch {
+                if id != self.currentMapId {
+                    return
+                }
+                self.channel.invokeMethod("map#loaded", arguments: error.toJSONFlutter(withStackTrace: false))
+            }
+            if id != self.currentMapId {
                 return
             }
-            channel.invokeMethod("map#loaded", arguments: nil)
-        } catch {
-            if Task.isCancelled {
-                return
+            if let viewPoint = viewPoint {
+                await self.viewModel.mapViewProxy?.setViewpoint(viewPoint)
             }
-            channel.invokeMethod("map#loaded", arguments: error.toJSONFlutter(withStackTrace: false))
-        }
-        if Task.isCancelled {
-            return
-        }
-        if let viewPoint = viewPoint {
-            await viewModel.mapViewProxy?.setViewpoint(viewPoint)
         }
     }
 }
