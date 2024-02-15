@@ -96,6 +96,7 @@ class ArcgisMapView extends StatefulWidget {
     this.maxScale = 0,
     this.onUnknownMapObjectIdError,
     this.onIdentifyGraphics,
+    this.useAndroidViewSurface = false,
   })  : assert(onIdentifyLayer.isNotEmpty ? onIdentifyLayers == null : true,
             'You can use only onIdentifyLayer or onIdentifyLayers'),
         assert(onIdentifyLayers != null ? onIdentifyLayer.isEmpty : true,
@@ -236,6 +237,8 @@ class ArcgisMapView extends StatefulWidget {
   /// the user can zoom in indefinitely.
   final double maxScale;
 
+  final bool useAndroidViewSurface;
+
   @override
   State<ArcgisMapView> createState() => _ArcgisMapViewState();
 }
@@ -302,6 +305,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
       _mapId,
       onPlatformViewCreated,
       map: _map,
+      useAndroidViewSurface: widget.useAndroidViewSurface,
       viewpoint: widget.viewpoint,
       operationalLayers: widget.operationalLayers,
       baseLayers: widget.baseLayers,

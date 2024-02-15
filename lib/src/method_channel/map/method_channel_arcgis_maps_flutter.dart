@@ -79,6 +79,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
     int creationId,
     PlatformViewCreatedCallback onPlatformViewCreated, {
     required ArcGISMap map,
+    bool useAndroidViewSurface = false,
     Viewpoint? viewpoint,
     Set<Layer> operationalLayers = const <Layer>{},
     Set<Layer> baseLayers = const <Layer>{},
@@ -106,34 +107,6 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
 
     const viewType = 'plugins.flutter.io/arcgis_maps';
 
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      return PlatformViewLink(
-        viewType: viewType,
-        surfaceFactory:
-            (BuildContext context, PlatformViewController controller) {
-          return AndroidViewSurface(
-            controller: controller as AndroidViewController,
-            gestureRecognizers: gestureRecognizers ??
-                const <Factory<OneSequenceGestureRecognizer>>{},
-            hitTestBehavior: rendering.PlatformViewHitTestBehavior.opaque,
-          );
-        },
-        onCreatePlatformView: (PlatformViewCreationParams params) {
-          return PlatformViewsService.initSurfaceAndroidView(
-            id: params.id,
-            viewType: viewType,
-            layoutDirection: TextDirection.ltr,
-            creationParams: creationParams,
-            creationParamsCodec: const StandardMessageCodec(),
-          )
-            ..addOnPlatformViewCreatedListener((id) {
-              params.onPlatformViewCreated(id);
-              onPlatformViewCreated(id);
-            })
-            ..create();
-        },
-      );
-    }
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       return UiKitView(
         viewType: viewType,
@@ -143,6 +116,48 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
         creationParamsCodec: const StandardMessageCodec(),
       );
     }
+
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      if (useAndroidViewSurface) {
+        return PlatformViewLink(
+          viewType: viewType,
+          surfaceFactory:
+              (BuildContext context, PlatformViewController controller) {
+            return AndroidViewSurface(
+              controller: controller as AndroidViewController,
+              gestureRecognizers: gestureRecognizers ??
+                  const <Factory<OneSequenceGestureRecognizer>>{},
+              hitTestBehavior: rendering.PlatformViewHitTestBehavior.opaque,
+            );
+          },
+          onCreatePlatformView: (PlatformViewCreationParams params) {
+            return PlatformViewsService.initSurfaceAndroidView(
+              id: params.id,
+              viewType: viewType,
+              layoutDirection: TextDirection.ltr,
+              creationParams: creationParams,
+              creationParamsCodec: const StandardMessageCodec(),
+              onFocus: () {
+                params.onFocusChanged(true);
+              },
+            )
+              ..addOnPlatformViewCreatedListener((id) {
+                params.onPlatformViewCreated(id);
+                onPlatformViewCreated(id);
+              })
+              ..create();
+          },
+        );
+      }
+      return AndroidView(
+        viewType: viewType,
+        onPlatformViewCreated: onPlatformViewCreated,
+        creationParams: creationParams,
+        gestureRecognizers: gestureRecognizers,
+        creationParamsCodec: const StandardMessageCodec(),
+      );
+    }
+
     return const Text('Unsupported');
   }
 

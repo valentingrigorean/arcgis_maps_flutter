@@ -38,6 +38,7 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     int creationId,
     PlatformViewCreatedCallback onPlatformViewCreated, {
     required ArcGISMap map,
+    bool useAndroidViewSurface = false,
     Viewpoint? viewpoint,
     Set<Layer> operationalLayers = const <Layer>{},
     Set<Layer> baseLayers = const <Layer>{},
@@ -94,17 +95,13 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
   }
 
   Future<List<Feature>> queryFeatureTableFromLayer(
-      {
-        required int mapId,
-        required String layerName,
-        Geometry? geometry,
-        SpatialRelationship? spatialRelationship,
-        int? maxResults,
-        Map<String, dynamic>? queryValues
-      }
-      ) {
-    throw UnimplementedError(
-        'selectFeatureById() has not been implemented.');
+      {required int mapId,
+      required String layerName,
+      Geometry? geometry,
+      SpatialRelationship? spatialRelationship,
+      int? maxResults,
+      Map<String, dynamic>? queryValues}) {
+    throw UnimplementedError('selectFeatureById() has not been implemented.');
   }
 
   Future<List<TimeAwareLayerInfo>> getTimeAwareLayerInfos(int mapId) {
@@ -144,8 +141,10 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('setViewpoint() has not been implemented.');
   }
 
-  Future<bool> setViewpointGeometry(int mapId, Geometry geometry,double? padding) {
-    throw UnimplementedError('setViewpointGeometry() has not been implemented.');
+  Future<bool> setViewpointGeometry(
+      int mapId, Geometry geometry, double? padding) {
+    throw UnimplementedError(
+        'setViewpointGeometry() has not been implemented.');
   }
 
   Future<bool> setViewpointCenter(int mapId, Point center, double scale) {
@@ -166,8 +165,7 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
   }
 
   Future<bool> setViewpointScale(int mapId, double scale) {
-    throw UnimplementedError(
-        'setViewpointScale() has not been implemented.');
+    throw UnimplementedError('setViewpointScale() has not been implemented.');
   }
 
   Future<Offset?> locationToScreen(int mapId, Point mapPoint) {
@@ -284,7 +282,4 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
   void dispose(int mapId) {
     throw UnimplementedError('dispose() has not been implemented.');
   }
-
-
-
 }
