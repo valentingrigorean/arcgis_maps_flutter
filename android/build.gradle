@@ -2,7 +2,7 @@ group 'com.valentingrigorean.arcgis_maps_flutter'
 version '1.0'
 
 buildscript {
-    ext.kotlin_version = '1.7.10'
+    ext.kotlin_version = '1.9.20'
 
 
     repositories {
@@ -11,7 +11,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.1'
+        classpath 'com.android.tools.build:gradle:8.2.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -34,9 +34,9 @@ apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
     namespace 'com.valentingrigorean.arcgis_maps_flutter'
-    compileSdkVersion 33
 
     defaultConfig {
+        compileSdk 33
         minSdkVersion 26
     }
 
@@ -54,9 +54,9 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:+'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.0'
-    implementation 'androidx.activity:activity-ktx:1.8.0'
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
+    implementation 'androidx.activity:activity-ktx:1.8.2'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.browser:browser:1.6.0'
+    implementation 'androidx.browser:browser:1.7.0'
 }

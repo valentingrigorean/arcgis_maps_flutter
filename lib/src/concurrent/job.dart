@@ -129,12 +129,9 @@ abstract class Job extends ArcgisNativeObject {
   bool _isStarted = false;
 
   Job({
-    String? objectId,
-    bool isCreated = false,
-  }) : super(
-          objectId: objectId,
-          isCreated: isCreated,
-        );
+    super.objectId,
+    super.isCreated,
+  });
 
   @override
   void dispose() async {
