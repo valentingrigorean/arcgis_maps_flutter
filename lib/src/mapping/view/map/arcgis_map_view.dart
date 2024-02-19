@@ -96,7 +96,7 @@ class ArcgisMapView extends StatefulWidget {
     this.maxScale = 0,
     this.onUnknownMapObjectIdError,
     this.onIdentifyGraphics,
-    this.useAndroidViewSurface = false,
+    this.useAndroidViewSurface = true,
   })  : assert(onIdentifyLayer.isNotEmpty ? onIdentifyLayers == null : true,
             'You can use only onIdentifyLayer or onIdentifyLayers'),
         assert(onIdentifyLayers != null ? onIdentifyLayer.isEmpty : true,

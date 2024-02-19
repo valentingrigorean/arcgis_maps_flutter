@@ -1,7 +1,11 @@
 package com.valentingrigorean.arcgis_maps_flutter.map
 
 import android.content.Context
+import android.graphics.SurfaceTexture
+import android.util.Log
+import android.view.TextureView
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.lifecycle.Lifecycle
 import com.arcgismaps.LoadStatus
@@ -48,6 +52,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
+
 class ArcgisMapController(
     id: Int,
     private val context: Context,
@@ -55,6 +60,11 @@ class ArcgisMapController(
     binaryMessenger: BinaryMessenger,
     lifecycleProvider: () -> Lifecycle
 ) : PlatformView, MethodCallHandler, LocationDisplayControllerDelegate {
+
+    companion object {
+        private const val TAG = "ArcgisMapController"
+    }
+
     private val methodChannel: MethodChannel
     private val selectionPropertiesHandler: SelectionPropertiesHandler
     private val layersController: LayersController
@@ -135,9 +145,10 @@ class ArcgisMapController(
             initWithParams(params)
         }
 
+        installInvalidator()
     }
 
-    override fun getView(): View? {
+    override fun getView(): View {
         return container
     }
 
@@ -318,7 +329,7 @@ class ArcgisMapController(
 
             "map#screenToLocation" -> {
                 val screenLocationData = ScreenLocationData.fromJson(call.arguments as Map<*, *>)
-                var mapPoint = mapView.screenToLocation(screenLocationData.point)?.let {
+                val mapPoint = mapView.screenToLocation(screenLocationData.point)?.let {
                     if (screenLocationData.spatialReference != null && it.spatialReference?.wkid != screenLocationData.spatialReference?.wkid) {
                         GeometryEngine.projectOrNull(it, screenLocationData.spatialReference)
                     } else {
@@ -410,6 +421,53 @@ class ArcgisMapController(
 
     private fun destroyMapViewIfNecessary() {
         container.removeView(mapView)
+    }
+
+    private fun findTextureView(group: ViewGroup): TextureView? {
+        for (i in 0 until group.childCount) {
+            val child = group.getChildAt(i)
+            if (child is TextureView) {
+                return child
+            } else if (child is ViewGroup) {
+                val textureView = findTextureView(child)
+                if (textureView != null) {
+                    return textureView
+                }
+            }
+        }
+        return null
+    }
+
+    private fun installInvalidator() {
+        val textureView = findTextureView(mapView) ?: return
+        Log.i(TAG, "Installing custom TextureView driven invalidator.")
+        val internalListener = textureView.surfaceTextureListener
+        textureView.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
+            override fun onSurfaceTextureAvailable(
+                surface: SurfaceTexture,
+                width: Int,
+                height: Int
+            ) {
+                internalListener?.onSurfaceTextureAvailable(surface, width, height)
+            }
+
+            override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
+                return internalListener?.onSurfaceTextureDestroyed(surface) ?: true
+            }
+
+            override fun onSurfaceTextureSizeChanged(
+                surface: SurfaceTexture,
+                width: Int,
+                height: Int
+            ) {
+                internalListener?.onSurfaceTextureSizeChanged(surface, width, height)
+            }
+
+            override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
+                internalListener?.onSurfaceTextureUpdated(surface)
+                mapView.invalidate()
+            }
+        }
     }
 
     private fun handleQueryFeatureTableFromLayer(data: Map<*, *>, result: MethodChannel.Result) {

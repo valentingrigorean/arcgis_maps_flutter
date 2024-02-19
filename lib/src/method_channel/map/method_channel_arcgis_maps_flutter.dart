@@ -79,7 +79,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
     int creationId,
     PlatformViewCreatedCallback onPlatformViewCreated, {
     required ArcGISMap map,
-    bool useAndroidViewSurface = false,
+    bool useAndroidViewSurface = true,
     Viewpoint? viewpoint,
     Set<Layer> operationalLayers = const <Layer>{},
     Set<Layer> baseLayers = const <Layer>{},
