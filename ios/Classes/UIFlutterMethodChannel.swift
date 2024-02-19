@@ -7,7 +7,7 @@ import Flutter
 
 class UIFlutterMethodChannel: FlutterMethodChannel {
     init(name: String, binaryMessenger messenger: FlutterBinaryMessenger) {
-        super.init(name: name, binaryMessenger: messenger, codec: FlutterStandardMethodCodec.sharedInstance())
+        super.init(name: name, binaryMessenger: messenger, codec: FlutterStandardMethodCodec.sharedInstance(),taskQueue: nil)
     }
 
     override func invokeMethod(_ method: String, arguments: Any?) {
