@@ -710,7 +710,7 @@ private class MapManager {
                 return
             }
             if let viewPoint = viewPoint {
-                await self.viewModel.mapViewProxy?.setViewpoint(viewPoint)
+                await self.viewModel.mapViewProxy?.setViewpoint(viewPoint,duration: 0)
             }
         }
     }
