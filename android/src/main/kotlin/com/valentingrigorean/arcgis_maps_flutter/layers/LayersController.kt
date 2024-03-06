@@ -19,9 +19,9 @@ class LayersController(
         OPERATIONAL, BASE, REFERENCE
     }
 
-    private val operationalLayers: MutableSet<FlutterLayer> = HashSet()
-    private val baseLayers: MutableSet<FlutterLayer> = HashSet()
-    private val referenceLayers: MutableSet<FlutterLayer> = HashSet()
+    private val operationalLayers: MutableSet<FlutterLayer> = LinkedHashSet()
+    private val baseLayers: MutableSet<FlutterLayer> = LinkedHashSet()
+    private val referenceLayers: MutableSet<FlutterLayer> = LinkedHashSet()
     private val flutterOperationalLayersMap: MutableMap<String, Layer> = HashMap()
     private val flutterBaseLayersMap: MutableMap<String, Layer> = HashMap()
     private val flutterReferenceLayersMap: MutableMap<String, Layer> = HashMap()
@@ -145,7 +145,7 @@ class LayersController(
 
     private fun addLayersToMap(layers: Collection<FlutterLayer>, layerType: LayerType) {
         if (layers.isEmpty()) return
-        var map = this.map ?: return
+        val map = this.map ?: return
         val flutterMap = getFlutterMap(layerType)
         for (layer in layers) {
             val nativeLayer = flutterMap[layer.layerId] ?: layer.createLayer()
@@ -188,7 +188,7 @@ class LayersController(
             flutterLayer.remove(layer)
             nativeLayersToRemove.add(nativeLayer)
         }
-        var map = this.map ?: return
+        val map = this.map ?: return
         when (layerType) {
             LayerType.OPERATIONAL -> map.operationalLayers.removeAll(nativeLayersToRemove)
             LayerType.BASE -> map.basemap.value?.baseLayers?.removeAll(nativeLayersToRemove)
@@ -200,7 +200,7 @@ class LayersController(
         val operationalLayersNative = flutterOperationalLayersMap.values
         val baseLayersNative = flutterBaseLayersMap.values
         val referenceLayersNative = flutterReferenceLayersMap.values
-        var map = this.map ?: return
+        val map = this.map ?: return
         map.operationalLayers.removeAll(operationalLayersNative)
         map.basemap.value?.baseLayers?.removeAll(baseLayersNative)
         map.basemap.value?.referenceLayers?.removeAll(referenceLayersNative)

@@ -53,9 +53,9 @@ class LayersController {
 
     private let taskManager = TaskManager()
 
-    private var operationalLayers = SharedSet<FlutterLayer>()
-    private var baseLayers = SharedSet<FlutterLayer>()
-    private var referenceLayers = SharedSet<FlutterLayer>()
+    private var operationalLayers = [FlutterLayer]()
+    private var baseLayers = [FlutterLayer]()
+    private var referenceLayers = [FlutterLayer]()
 
     private var flutterOperationalLayersMap = SharedDictionary<String, Layer>()
     private var flutterBaseLayersMap = SharedDictionary<String, Layer>()
@@ -73,9 +73,9 @@ class LayersController {
     public func setMap(_ map: Map) {
         clearMap()
         self.map = map
-        addLayersToMap(layers: Array(operationalLayers.set), layerType: .operational)
-        addLayersToMap(layers: Array(baseLayers.set), layerType: .base)
-        addLayersToMap(layers: Array(referenceLayers.set), layerType: .reference)
+        addLayersToMap(layers: operationalLayers, layerType: .operational)
+        addLayersToMap(layers: baseLayers, layerType: .base)
+        addLayersToMap(layers: referenceLayers, layerType: .reference)
     }
 
     public func getLayerByLayerId(_ layerId: String) -> Layer? {
@@ -148,7 +148,7 @@ class LayersController {
         }
 
         let flutterMap = getFlutterMap(layerType: layerType)
-        let flutterLayers = getFlutterLayerSet(layerType: layerType)
+        let flutterLayers = getFlutterLayersArray(layerType: layerType)
 
         var layersToAdd = [FlutterLayer]()
 
@@ -161,9 +161,9 @@ class LayersController {
 
             let flutterLayer = FlutterLayer(data: layer)
             layersToAdd.append(flutterLayer)
-            flutterLayers.insert(flutterLayer)
         }
 
+        setFlutterLayersArray(layerType: layerType, layers: flutterLayers + layersToAdd)
         addLayersToMap(layers: layersToAdd, layerType: layerType)
     }
 
@@ -187,6 +187,12 @@ class LayersController {
             let flutterLayer = FlutterLayer(data: layer)
             layersToRemove.append(flutterLayer)
         }
+
+        setFlutterLayersArray(layerType: layerType, layers: getFlutterLayersArray(layerType: layerType).filter { layer in
+            !layersToRemove.contains {
+                $0.layerId == layer.layerId
+            }
+        })
 
         removeLayersFromMap(layers: layersToRemove, layerType: layerType)
     }
@@ -253,14 +259,19 @@ class LayersController {
 
         var nativeLayersToRemove = [Layer]()
         let flutterMap = getFlutterMap(layerType: layerType)
-        let flutterLayer = getFlutterLayerSet(layerType: layerType)
+        let flutterLayer = getFlutterLayersArray(layerType: layerType)
 
         for layer in layers {
             let nativeLayer = flutterMap[layer.layerId]!
             flutterMap.removeValue(forKey: layer.layerId)
-            flutterLayer.set.remove(layer)
             nativeLayersToRemove.append(nativeLayer)
         }
+
+        setFlutterLayersArray(layerType: layerType, layers: flutterLayer.filter { layer in
+            !layers.contains {
+                $0.layerId == layer.layerId
+            }
+        })
 
         if nativeLayersToRemove.isEmpty {
             return
@@ -305,7 +316,7 @@ class LayersController {
     private func removeLayersById(args: [String],
                                   layerType: LayerType) {
         var layersToRemove = [FlutterLayer]()
-        let layers = getFlutterLayerSet(layerType: layerType).set
+        let layers = getFlutterLayersArray(layerType: layerType)
         for layerId in args {
             let layer = layers.first {
                 $0.layerId == layerId
@@ -315,6 +326,12 @@ class LayersController {
                 layersToRemove.append(layer!)
             }
         }
+
+        setFlutterLayersArray(layerType: layerType, layers: layers.filter { layer in
+            !layersToRemove.contains {
+                $0.layerId == layer.layerId
+            }
+        })
 
         removeLayersFromMap(layers: layersToRemove, layerType: layerType)
     }
@@ -330,7 +347,7 @@ class LayersController {
         }
     }
 
-    private func getFlutterLayerSet(layerType: LayerType) -> SharedSet<FlutterLayer> {
+    private func getFlutterLayersArray(layerType: LayerType) -> [FlutterLayer] {
         switch layerType {
         case .operational:
             return operationalLayers
@@ -338,6 +355,17 @@ class LayersController {
             return baseLayers
         case .reference:
             return referenceLayers
+        }
+    }
+
+    private func setFlutterLayersArray(layerType: LayerType, layers: [FlutterLayer]) {
+        switch layerType {
+        case .operational:
+            operationalLayers = layers
+        case .base:
+            baseLayers = layers
+        case .reference:
+            referenceLayers = layers
         }
     }
 
