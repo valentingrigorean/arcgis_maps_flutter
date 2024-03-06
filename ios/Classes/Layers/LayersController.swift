@@ -42,15 +42,6 @@ class LayersController {
         }
     }
 
-    class SharedSet<T: Hashable> {
-        var set = Set<T>()
-
-        func insert(_ element: T) {
-            set.insert(element)
-        }
-
-    }
-
     private let taskManager = TaskManager()
 
     private var operationalLayers = [FlutterLayer]()
