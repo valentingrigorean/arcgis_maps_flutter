@@ -52,10 +52,6 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
         channel = UIFlutterMethodChannel(name: "plugins.flutter.io/arcgis_maps_\(viewId)", binaryMessenger: registrar.messenger())
 
-        hostingView.frame = frame
-        hostingView.setView(AnyView(MapContentView(viewModel: viewModel)))
-
-
         selectionPropertiesHandler = SelectionPropertiesHandler(mapViewModel: viewModel)
 
         symbolVisibilityFilterController = SymbolVisibilityFilterController(mapViewModel: viewModel)
@@ -100,6 +96,10 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 .store(in: &cancellables)
 
         initWithArgs(args: args)
+                
+        hostingView.frame = frame
+        hostingView.setView(AnyView(MapContentView(viewModel: viewModel)))
+
     }
 
     deinit {
