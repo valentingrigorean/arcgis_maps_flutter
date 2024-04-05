@@ -8,9 +8,9 @@ import ArcGIS
 class MarkerController: BaseGraphicController {
     private var marker: CompositeSymbol
     private var icon: BitmapDescriptor?
-    private var iconSymbol: ScaleSymbolHelper?
+    private var iconSymbol: Symbol?
     private var backgroundImage: BitmapDescriptor?
-    private var backgroundImageSymbol: ScaleSymbolHelper?
+    private var backgroundImageSymbol: Symbol?
     private var textSymbol: TextSymbol?
 
     private var iconOffsetX: CGFloat = 0
@@ -36,7 +36,6 @@ class MarkerController: BaseGraphicController {
         set {
             if selected != newValue {
                 selected = newValue
-                handleScaleChanged()
             }
         }
     }
@@ -50,9 +49,9 @@ class MarkerController: BaseGraphicController {
             marker.removeSymbol(marker.symbols[symbolIndex])
         }
         icon = bitmapDescription
-        iconSymbol = ScaleSymbolHelper(symbol: createSymbol(bitmapDescription: bitmapDescription))
-        offsetSymbol(symbol: iconSymbol!.symbol, offsetX: iconOffsetX, offsetY: iconOffsetY)
-        marker.insertSymbol(iconSymbol!.symbol, at: backgroundImage == nil ? 0 : 1)
+        iconSymbol = createSymbol(bitmapDescription: bitmapDescription)
+        offsetSymbol(symbol: iconSymbol!, offsetX: iconOffsetX, offsetY: iconOffsetY)
+        marker.insertSymbol(iconSymbol!, at: backgroundImage == nil ? 0 : 1)
         updateCommonProps()
     }
 
@@ -66,8 +65,8 @@ class MarkerController: BaseGraphicController {
         }
 
         backgroundImage = bitmapDescription
-        backgroundImageSymbol = ScaleSymbolHelper(symbol: createSymbol(bitmapDescription: bitmapDescription))
-        marker.insertSymbol(backgroundImageSymbol!.symbol, at: 0)
+        backgroundImageSymbol = createSymbol(bitmapDescription: bitmapDescription)
+        marker.insertSymbol(backgroundImageSymbol!, at: 0)
         updateCommonProps()
     }
 
@@ -101,32 +100,29 @@ class MarkerController: BaseGraphicController {
         setGraphicsAngle(angle: angle)
     }
 
-    func setSelectedScale(selectedScale: CGFloat) {
-        if selectedScale == selectedScale {
-            return
+
+    func setTextSymbol(data: [String: Any]?) {
+        if let textSymbolData = data {
+            if textSymbol == nil {
+                textSymbol = TextSymbol()
+                marker.addSymbol(textSymbol!)
+            }
+            textSymbol?.interpretTextSymbol(data: textSymbolData)
+        } else {
+            if textSymbol != nil {
+                marker.removeSymbol(textSymbol!)
+                textSymbol = nil
+            }
         }
-        self.selectedScale = selectedScale
-        handleScaleChanged()
     }
 
+
+
     private func updateCommonProps() {
-        handleScaleChanged()
         setGraphicsAngle(angle: angle)
         setGraphicsOpacity(opacity: opacity)
     }
 
-    private func handleScaleChanged() {
-
-        let scale = isSelected ? selectedScale : 1.0
-
-        if let iconSymbol = iconSymbol {
-            iconSymbol.setScale(scale: scale)
-        }
-
-        if let backgroundImageSymbol = backgroundImageSymbol {
-            backgroundImageSymbol.setScale(scale: scale)
-        }
-    }
 
     private func offsetSymbol(symbol: Symbol,
                               offsetX: CGFloat,

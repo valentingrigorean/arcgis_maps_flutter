@@ -95,6 +95,8 @@ class MarkersController: NSObject, SymbolsController {
         if let selectedScale = data["selectedScale"] as? Double {
             controller.setSelectedScale(selectedScale: CGFloat(selectedScale))
         }
+        let textSymbol = data["textSymbol"] as? [String: Any]
+        controller.setTextSymbol(data: textSymbol)
     }
 }
 
