@@ -77,7 +77,7 @@ extension TextSymbol {
         if let size = data["size"] as? Double {
             self.size = CGFloat(size)
         }
-        if let color = data["color"] as? Any {
+        if let color = data["color"] {
             self.color = UIColor(data: color)!
         }
         if let fontFamily = data["fontFamily"] as? String {
@@ -89,7 +89,7 @@ extension TextSymbol {
         if let fontWeight = data["fontWeight"] as? String {
             self.fontWeight = TextSymbol.FontWeight(name: fontWeight)
         }
-        if let haloColor = data["haloColor"] as? Any {
+        if let haloColor = data["haloColor"] {
             self.haloColor = UIColor(data: haloColor)!
         }
         if let haloWidth = data["haloWidth"] as? Double {
