@@ -92,9 +92,6 @@ class MarkersController: NSObject, SymbolsController {
             controller.setAngle(angle: Float(angle))
         }
 
-        if let selectedScale = data["selectedScale"] as? Double {
-            controller.setSelectedScale(selectedScale: CGFloat(selectedScale))
-        }
         let textSymbol = data["textSymbol"] as? [String: Any]
         controller.setTextSymbol(data: textSymbol)
     }
