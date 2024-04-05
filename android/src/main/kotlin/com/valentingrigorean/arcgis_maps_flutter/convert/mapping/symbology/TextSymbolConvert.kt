@@ -9,7 +9,7 @@ fun TextSymbol.interpretTextSymbol(data: Map<*, *>) {
         text = it as String
     }
     data["size"]?.let {
-        size = it as Float
+        size = (it as Double).toFloat()
     }
     data["color"]?.let {
         color = it.toArcgisColorOrNull()!!
@@ -27,7 +27,7 @@ fun TextSymbol.interpretTextSymbol(data: Map<*, *>) {
         haloColor = it.toArcgisColorOrNull()!!
     }
     data["haloWidth"]?.let {
-        haloWidth = it as Float
+        haloWidth = (it as Double).toFloat()
     }
     data["kerning"]?.let {
         kerningEnabled = it as Boolean
