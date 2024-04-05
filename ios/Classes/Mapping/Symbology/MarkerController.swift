@@ -11,6 +11,7 @@ class MarkerController: BaseGraphicController {
     private var iconSymbol: ScaleSymbolHelper?
     private var backgroundImage: BitmapDescriptor?
     private var backgroundImageSymbol: ScaleSymbolHelper?
+    private var textSymbol: TextSymbol?
 
     private var iconOffsetX: CGFloat = 0
     private var iconOffsetY: CGFloat = 0

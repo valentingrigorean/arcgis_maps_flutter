@@ -6,14 +6,17 @@ import com.arcgismaps.mapping.symbology.MarkerSymbol
 import com.arcgismaps.mapping.symbology.PictureMarkerSymbol
 import com.arcgismaps.mapping.symbology.Symbol
 import com.arcgismaps.mapping.symbology.SymbolAngleAlignment
+import com.arcgismaps.mapping.symbology.TextSymbol
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.symbology.interpretTextSymbol
 import com.valentingrigorean.arcgis_maps_flutter.map.SymbolVisibilityFilterController
 
 class MarkerController(val context: Context, markerId: String) : BaseGraphicController(),
     MarkerControllerSink {
     private val marker = CompositeSymbol()
-    private var iconScaleSymbolController: ScaleSymbolController? = null
-    private var backgroundScaleSymbolController: ScaleSymbolController? = null
+    private var iconSymbol: Symbol? = null
+    private var backgroundSymbol: Symbol? = null
+    private var textSymbol: TextSymbol? = null
 
     private var iconOffsetX = 0f
     private var iconOffsetY = 0f
@@ -30,13 +33,6 @@ class MarkerController(val context: Context, markerId: String) : BaseGraphicCont
                 return
             }
             field = value
-            handleScaleChange()
-        }
-
-    override var selectedScale: Float = 1.4f
-        set(value) {
-            field = value
-            handleScaleChange()
         }
 
     override var background: BitmapDescriptor? = null
@@ -45,13 +41,12 @@ class MarkerController(val context: Context, markerId: String) : BaseGraphicCont
                 return
             }
             field = value
-            if (backgroundScaleSymbolController != null) {
-                marker.symbols.remove(backgroundScaleSymbolController!!.symbol)
+            if (backgroundSymbol != null) {
+                marker.symbols.remove(backgroundSymbol)
             }
-            backgroundScaleSymbolController = value?.let {
-                ScaleSymbolController(createSymbol(it,0))
+            backgroundSymbol = value?.let {
+                createSymbol(it,0)
             }
-            handleScaleChange()
         }
 
     override var icon: BitmapDescriptor? = null
@@ -60,13 +55,12 @@ class MarkerController(val context: Context, markerId: String) : BaseGraphicCont
                 return
             }
             field = value
-            if (iconScaleSymbolController != null) {
-                marker.symbols.remove(iconScaleSymbolController!!.symbol)
+            if (iconSymbol != null) {
+                marker.symbols.remove(iconSymbol)
             }
-            iconScaleSymbolController = value?.let {
-                ScaleSymbolController(createSymbol(it,1))
+            iconSymbol = value?.let {
+                createSymbol(it,1)
             }
-            handleScaleChange()
         }
 
 
@@ -119,9 +113,19 @@ class MarkerController(val context: Context, markerId: String) : BaseGraphicCont
         if (angle != null) {
             this.angle = angle.toFloat()
         }
-        val selectedScale = data["selectedScale"] as Double?
-        if (selectedScale != null) {
-            this.selectedScale = selectedScale.toFloat()
+
+        val textSymbolData = data["textSymbol"] as Map<*, *>?
+        if (textSymbolData != null) {
+            if (textSymbol == null) {
+                textSymbol = TextSymbol()
+                marker.symbols.add(textSymbol!!)
+            }
+            textSymbol?.interpretTextSymbol(textSymbolData)
+        }else {
+            if (textSymbol != null) {
+                marker.symbols.remove(textSymbol!!)
+                textSymbol = null
+            }
         }
     }
 
@@ -132,8 +136,8 @@ class MarkerController(val context: Context, markerId: String) : BaseGraphicCont
         }
         iconOffsetX = offsetX
         iconOffsetY = offsetY
-        if (iconScaleSymbolController != null) {
-            offsetSymbol(iconScaleSymbolController!!.symbol, offsetX, offsetY)
+        if (iconSymbol != null) {
+            offsetSymbol(iconSymbol, offsetX, offsetY)
         }
     }
 
@@ -149,15 +153,6 @@ class MarkerController(val context: Context, markerId: String) : BaseGraphicCont
         return symbol
     }
 
-    private fun handleScaleChange() {
-//        val scale = if (isSelected) selectedScale else 1f
-//        if (backgroundScaleSymbolController != null) {
-//            backgroundScaleSymbolController!!.scale = scale
-//        }
-//        if (iconScaleSymbolController != null) {
-//            iconScaleSymbolController!!.scale = scale
-//        }
-    }
 
     private fun offsetSymbol(symbol: Symbol?, offsetX: Float, offsetY: Float) {
         if (symbol is PictureMarkerSymbol) {

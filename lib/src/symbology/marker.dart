@@ -19,8 +19,8 @@ class Marker extends Symbol {
     this.visible = true,
     this.zIndex = 0,
     this.selectedColor,
-    this.selectedScale = 1.4,
     this.visibilityFilter,
+    this.textSymbol,
   })  : assert(opacity >= 0 && opacity <= 1),
         super(symbolId: markerId);
 
@@ -57,9 +57,9 @@ class Marker extends Symbol {
 
   final Color? selectedColor;
 
-  final double selectedScale;
-
   final SymbolVisibilityFilter? visibilityFilter;
+
+  final TextSymbol? textSymbol;
 
   @override
   clone() {
@@ -77,8 +77,8 @@ class Marker extends Symbol {
       visible: visible,
       zIndex: zIndex,
       selectedColor: selectedColor,
-      selectedScale: selectedScale,
       visibilityFilter: visibilityFilter,
+      textSymbol: textSymbol,
     );
   }
 
@@ -104,13 +104,15 @@ class Marker extends Symbol {
 
     json['opacity'] = opacity;
     json['angle'] = angle;
-    json['selectedScale'] = selectedScale;
     json['zIndex'] = zIndex;
 
     if (visibilityFilter != null) {
       json['visibilityFilter'] = visibilityFilter!.toJson();
     }
 
+    if (textSymbol != null) {
+      json['textSymbol'] = textSymbol!.toJson();
+    }
     return json;
   }
 
@@ -134,6 +136,6 @@ class Marker extends Symbol {
           zIndex == other.zIndex &&
           visible == other.visible &&
           selectedColor == other.selectedColor &&
-          selectedScale == other.selectedScale &&
-          visibilityFilter == other.visibilityFilter;
+          visibilityFilter == other.visibilityFilter &&
+          textSymbol == other.textSymbol;
 }

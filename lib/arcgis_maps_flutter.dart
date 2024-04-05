@@ -141,10 +141,12 @@ part 'src/mapping/view/scene/arcgis_scene_view.dart';
 
 part 'src/symbology/bitmap_descriptor.dart';
 part 'src/symbology/marker.dart';
+part 'src/symbology/marker_symbol.dart';
 part 'src/symbology/polygon_marker.dart';
 part 'src/symbology/polyline_marker.dart';
 part 'src/symbology/symbol.dart';
 part 'src/symbology/symbol_visibility_filter.dart';
+part 'src/symbology/text_symbol.dart';
 
 part 'src/tasks/geocode/geocode_parameters.dart';
 part 'src/tasks/geocode/geocode_result.dart';

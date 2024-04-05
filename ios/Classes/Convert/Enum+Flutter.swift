@@ -44,3 +44,16 @@ extension UnitSystem {
         }
     }
 }
+
+extension SymbolAngleAlignment{
+    init(name:String){
+        switch name{
+        case "map":
+            self = .map
+        case "screen":
+            self = .screen
+        default:
+            fatalError("Invalid SymbolAngleAlignment type \(name)")
+        }
+    }
+}

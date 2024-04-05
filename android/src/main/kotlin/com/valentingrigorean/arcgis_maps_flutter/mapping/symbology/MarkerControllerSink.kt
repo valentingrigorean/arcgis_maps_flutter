@@ -2,8 +2,6 @@ package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 
 interface MarkerControllerSink : GraphicControllerSink {
 
-    var selectedScale: Float
-
     var icon: BitmapDescriptor?
 
     var background: BitmapDescriptor?
