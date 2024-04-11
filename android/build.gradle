@@ -45,7 +45,7 @@ android {
     }
 
     dependencies {
-        implementation 'com.esri:arcgis-maps-kotlin:200.3.0'
+        implementation 'com.esri:arcgis-maps-kotlin:200.4.0'
     }
 
     packagingOptions {
@@ -58,5 +58,5 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
     implementation 'androidx.activity:activity-ktx:1.8.2'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.browser:browser:1.7.0'
+    implementation 'androidx.browser:browser:1.8.0'
 }
