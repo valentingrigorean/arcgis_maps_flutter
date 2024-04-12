@@ -4,7 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class MapPageScrollingList extends StatelessWidget {
-  const MapPageScrollingList({Key? key}) : super(key: key);
+  const MapPageScrollingList({super.key});
 
   @override
   Widget build(BuildContext context) {

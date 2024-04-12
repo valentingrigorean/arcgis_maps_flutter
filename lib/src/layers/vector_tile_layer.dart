@@ -1,14 +1,12 @@
-part of arcgis_maps_flutter;
+part of '../../arcgis_maps_flutter.dart';
 
 @immutable
 class VectorTileLayer extends BaseTileLayer {
    VectorTileLayer.fromUrl(String url,{
     LayerId? layerId,
-    bool isVisible = true,
-    double opacity = 1,
+    super.isVisible,
+    super.opacity,
   }) : super.fromUrl(
-          isVisible: isVisible,
-          opacity: opacity,
           layerId: layerId ?? LayerId(url),
           url: url,
           type: 'VectorTileLayer',

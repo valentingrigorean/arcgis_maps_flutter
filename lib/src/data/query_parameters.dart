@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of '../../arcgis_maps_flutter.dart';
 
 enum SortOrder {
   ascending(0),

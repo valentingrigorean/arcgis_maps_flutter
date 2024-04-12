@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of '../../arcgis_maps_flutter.dart';
 
 
 /// A `SymbolVisibilityFilter` defines the range of zoom levels at which a symbol is visible.

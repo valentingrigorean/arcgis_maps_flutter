@@ -54,9 +54,9 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({
-    Key? key,
+    super.key,
     required this.apiVersion,
-  }) : super(key: key);
+  });
 
   final String apiVersion;
 
@@ -71,7 +71,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MainPage extends StatelessWidget {
-  const MainPage({Key? key, required this.apiVersion}) : super(key: key);
+  const MainPage({super.key, required this.apiVersion});
 
   final String apiVersion;
 

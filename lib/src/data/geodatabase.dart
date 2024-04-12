@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of '../../arcgis_maps_flutter.dart';
 
 class Geodatabase extends ArcgisNativeObject with Loadable {
   /// Initialize this object with the name of an

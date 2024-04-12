@@ -2,7 +2,7 @@ import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
 class MapPagePortal extends StatelessWidget {
-  const MapPagePortal({Key? key}) : super(key: key);
+  const MapPagePortal({super.key});
 
   @override
   Widget build(BuildContext context) {

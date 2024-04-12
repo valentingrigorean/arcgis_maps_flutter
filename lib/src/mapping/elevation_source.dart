@@ -1,8 +1,8 @@
-part of arcgis_maps_flutter;
+part of '../../arcgis_maps_flutter.dart';
 
 @immutable
 class ElevationSourceId extends MapsObjectId<ElevationSource> {
-  const ElevationSourceId(String value) : super(value);
+  const ElevationSourceId(super.value);
 }
 
 abstract class ElevationSource implements MapsObject {

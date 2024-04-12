@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of '../arcgis_maps_flutter.dart';
 
 enum UnitSystem {
   ///  Used for imperial units, e.g. miles

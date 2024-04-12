@@ -1,21 +1,5 @@
-part of arcgis_maps_flutter;
+part of '../../arcgis_maps_flutter.dart';
 
-enum SimpleMarkerSymbolStyle {
-  circle(0),
-  cross(1),
-  diamond(2),
-  square(3),
-  triangle(4),
-  x(5),
-  ;
-
-  const SimpleMarkerSymbolStyle(this.value);
-
-  factory SimpleMarkerSymbolStyle.fromValue(int value) =>
-      values.firstWhere((e) => e.value == value);
-
-  final int value;
-}
 
 @immutable
 class BitmapDescriptor {
@@ -43,19 +27,6 @@ class BitmapDescriptor {
     return BitmapDescriptor._(_ListBitmapDescriptor(descriptors));
   }
 
-  static BitmapDescriptor fromStyleMarker({
-    required SimpleMarkerSymbolStyle style,
-    required Color color,
-    required double size,
-  }) {
-    return BitmapDescriptor._(
-      _SimpleStyleMarkerBitmapDescriptor(
-        style,
-        color,
-        size,
-      ),
-    );
-  }
 
   /// Creates a BitmapDescriptorFactory using an array of bytes that must be encoded
   /// as PNG.
@@ -193,35 +164,6 @@ class _ListBitmapDescriptor implements _BitmapDescriptorBase {
   int get hashCode => Object.hashAll(descriptors);
 }
 
-@immutable
-class _SimpleStyleMarkerBitmapDescriptor implements _BitmapDescriptorBase {
-  const _SimpleStyleMarkerBitmapDescriptor(this.style, this.color, this.size);
-
-  final SimpleMarkerSymbolStyle style;
-  final Color color;
-  final double size;
-
-  @override
-  Object toJson() {
-    final json = <String, Object>{};
-    json['styleMarker'] = style.value;
-    json['color'] = color.value;
-    json['size'] = size;
-    return json;
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is _SimpleStyleMarkerBitmapDescriptor &&
-          runtimeType == other.runtimeType &&
-          style == other.style &&
-          size == other.size &&
-          color == other.color;
-
-  @override
-  int get hashCode => style.hashCode ^ color.hashCode ^ size.hashCode;
-}
 
 class _MarkerInfo extends StatefulWidget {
   const _MarkerInfo({

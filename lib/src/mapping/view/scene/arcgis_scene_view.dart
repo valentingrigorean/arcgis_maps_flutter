@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of '../../../../arcgis_maps_flutter.dart';
 
 /// Callback method for when the map is ready to be used.
 ///
@@ -13,13 +13,13 @@ typedef SceneCreatedCallback = void Function(ArcgisSceneController controller);
 int _nextSceneCreationId = 0;
 
 class ArcgisSceneView extends StatefulWidget {
-  const ArcgisSceneView(
-      {Key? key,
-      required this.scene,
-      required this.surface,
-      required this.initialCamera,
-      this.onSceneCreated})
-      : super(key: key);
+  const ArcgisSceneView({
+    super.key,
+    required this.scene,
+    required this.surface,
+    required this.initialCamera,
+    this.onSceneCreated,
+  });
 
   /// Callback method for when the map is ready to be used.
   ///

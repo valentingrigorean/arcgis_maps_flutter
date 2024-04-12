@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of '../../arcgis_maps_flutter.dart';
 
 enum SimpleLineSymbolStyle {
   dash(0),
@@ -27,16 +27,6 @@ enum SimpleLineSymbolStyle {
   final int value;
 }
 
-/// Uniquely identifies a [PolylineMarker] among [ArcgisMapView] polylines.
-///
-/// This does not have to be globally unique, only unique among the list.
-@immutable
-class PolylineId extends SymbolId<PolylineMarker> {
-  /// Creates an immutable object representing a [PolylineId] among [ArcgisMapView] polylines.
-  ///
-  /// An [AssertionError] will be thrown if [value] is null.
-  const PolylineId(super.value);
-}
 
 @immutable
 class PolylineMarker extends Symbol {
@@ -58,7 +48,7 @@ class PolylineMarker extends Symbol {
   }) : super(symbolId: polylineId);
 
   /// Uniquely identifies a [PolylineMarker].
-  final PolylineId polylineId;
+  final String polylineId;
 
   /// True if the [PolylineMarker] consumes tap events.
   ///

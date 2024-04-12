@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of '../../../arcgis_maps_flutter.dart';
 
 class OfflineMapTask extends ArcgisNativeObject with Loadable {
   /// Creates a task with the provided map to take offline.

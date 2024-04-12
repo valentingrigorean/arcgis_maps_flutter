@@ -58,3 +58,10 @@ List<Object> pointToList(
   }
   return pointJson;
 }
+
+
+void addIfPresent(String fieldName, Object? value, Map<String, Object> json) {
+  if (value != null) {
+    json[fieldName] = value;
+  }
+}

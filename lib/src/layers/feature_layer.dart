@@ -1,32 +1,26 @@
-part of arcgis_maps_flutter;
+part of '../../arcgis_maps_flutter.dart';
 
 @immutable
 class FeatureLayer extends BaseTileLayer {
   FeatureLayer.fromUrl(
     String url, {
     LayerId? layerId,
-    bool isVisible = true,
-    double opacity = 1,
+    super.isVisible,
+    super.opacity,
   })  : portalItemLayerId = -1,
         super.fromUrl(
-          isVisible: isVisible,
-          opacity: opacity,
           layerId: layerId ?? LayerId(url),
           url: url,
           type: 'FeatureLayer',
         );
 
   const FeatureLayer.fromPortalItem({
-    required LayerId layerId,
-    required PortalItem portalItem,
+    required super.layerId,
+    required super.portalItem,
     required this.portalItemLayerId,
-    bool isVisible = true,
-    double opacity = 1,
+    super.isVisible,
+    super.opacity,
   }) : super.fromPortalItem(
-          isVisible: isVisible,
-          opacity: opacity,
-          layerId: layerId,
-          portalItem: portalItem,
           type: 'FeatureLayer',
         );
 

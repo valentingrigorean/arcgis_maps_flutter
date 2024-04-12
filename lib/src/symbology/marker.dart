@@ -1,8 +1,4 @@
-part of arcgis_maps_flutter;
-
-class MarkerId extends SymbolId<Marker> {
-  const MarkerId(super.value);
-}
+part of '../../arcgis_maps_flutter.dart';
 
 class Marker extends Symbol {
   const Marker({
@@ -25,7 +21,7 @@ class Marker extends Symbol {
         super(symbolId: markerId);
 
   /// Uniquely identifies a [Marker].
-  final MarkerId markerId;
+  final String markerId;
 
   final Point position;
 

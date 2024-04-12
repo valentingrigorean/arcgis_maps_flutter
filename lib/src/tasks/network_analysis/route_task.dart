@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of '../../../arcgis_maps_flutter.dart';
 
 class RouteTask extends ArcgisNativeObject with Loadable, ApiKeyResource {
   final String _url;

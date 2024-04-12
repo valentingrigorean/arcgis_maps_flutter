@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of '../../../arcgis_maps_flutter.dart';
 
 enum AutoPanMode {
   /// The location symbol is shown at the current location but the map view

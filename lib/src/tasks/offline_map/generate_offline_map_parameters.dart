@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of '../../../arcgis_maps_flutter.dart';
 
 enum OfflineMapAttachmentSyncDirection {
   /// There is no specified attachment sync direction.

@@ -1,13 +1,12 @@
-part of arcgis_maps_flutter;
+part of '../../arcgis_maps_flutter.dart';
 
 @immutable
 class GeodatabaseLayer extends Layer {
   const GeodatabaseLayer({
-    required LayerId layerId,
+    required super.layerId,
     required this.path,
     this.featureLayersIds,
   }) : super(
-          layerId: layerId,
           isVisible: true,
           opacity: 1,
         );

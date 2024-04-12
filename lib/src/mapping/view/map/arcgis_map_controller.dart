@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of '../../../../arcgis_maps_flutter.dart';
 
 // ignore_for_file: library_private_types_in_public_api
 class ArcgisMapController {

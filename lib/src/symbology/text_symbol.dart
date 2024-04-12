@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of '../../arcgis_maps_flutter.dart';
 
 enum FontStyle {
   italic,
@@ -125,4 +125,7 @@ class TextSymbol extends MarkerSymbol {
         size,
         verticalAlignment,
       ];
+
+  @override
+  String get type => 'text';
 }

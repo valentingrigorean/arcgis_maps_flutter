@@ -1,13 +1,5 @@
-part of arcgis_maps_flutter;
+part of '../../arcgis_maps_flutter.dart';
 
-/// Uniquely identifies a [PolygonMarker] among [ArcgisMapView] polygons.
-///
-/// This does not have to be globally unique, only unique among the list.
-@immutable
-class PolygonId extends SymbolId<PolygonMarker> {
-  /// Creates an immutable identifier for a [PolygonMarker].
-  const PolygonId(super.value);
-}
 
 /// Draws a polygon through geographical locations on the map.
 @immutable
@@ -30,7 +22,7 @@ class PolygonMarker extends Symbol {
   }) : super(symbolId: polygonId);
 
   /// Uniquely identifies a [PolygonMarker].
-  final PolygonId polygonId;
+  final String polygonId;
 
   /// True if the [PolygonMarker] consumes tap events.
   ///
@@ -115,25 +107,17 @@ class PolygonMarker extends Symbol {
   @override
   Object toJson() {
     final Map<String, Object> json = <String, Object>{};
-
-    void addIfPresent(String fieldName, Object? value) {
-      if (value != null) {
-        json[fieldName] = value;
-      }
-    }
-
-    addIfPresent('polygonId', polygonId.value);
-    addIfPresent('consumeTapEvents', consumeTapEvents);
-    addIfPresent('fillColor', fillColor.value);
-    addIfPresent('strokeColor', strokeColor.value);
-    addIfPresent('strokeWidth', strokeWidth);
-    addIfPresent('strokeStyle', strokeStyle.value);
-    addIfPresent('visible', visible);
-    addIfPresent('zIndex', zIndex);
-    addIfPresent('selectedColor', selectedColor?.value);
-    addIfPresent('visibilityFilter', visibilityFilter?.toJson());
-    addIfPresent('spatialReference', spatialReference?.toJson());
-
+    json.addIfPresent('polygonId', polygonId);
+    json.addIfPresent('consumeTapEvents', consumeTapEvents);
+    json.addIfPresent('fillColor', fillColor.value);
+    json.addIfPresent('strokeColor', strokeColor.value);
+    json.addIfPresent('strokeWidth', strokeWidth);
+    json.addIfPresent('strokeStyle', strokeStyle.value);
+    json.addIfPresent('visible', visible);
+    json.addIfPresent('zIndex', zIndex);
+    json.addIfPresent('selectedColor', selectedColor?.value);
+    json.addIfPresent('visibilityFilter', visibilityFilter?.toJson());
+    json.addIfPresent('spatialReference', spatialReference?.toJson());
     json['points'] = _pointsToJson();
 
     return json;

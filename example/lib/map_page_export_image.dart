@@ -4,7 +4,7 @@ import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
 class MapPageExportImage extends StatefulWidget {
-  const MapPageExportImage({Key? key}) : super(key: key);
+  const MapPageExportImage({super.key});
 
   @override
   State<MapPageExportImage> createState() => _MapPageExportImageState();

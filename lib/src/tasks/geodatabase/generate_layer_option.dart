@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of '../../../arcgis_maps_flutter.dart';
 
 enum GenerateLayerQueryOption {
   ///  An unknown query option. Normally the result when an error occurs.

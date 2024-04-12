@@ -1,6 +1,4 @@
-part of arcgis_maps_flutter;
-
-
+part of '../../../arcgis_maps_flutter.dart';
 
 @immutable
 class LocatorAttribute {

@@ -11,23 +11,19 @@ abstract class BaseTileLayer extends Layer {
 
   const BaseTileLayer.fromUrl({
     required super.layerId,
-    required String url,
+    required String this.url,
     required this.type,
     super.isVisible = true,
     super.opacity = 1,
-  })  : portalItem = null,
-        // ignore: prefer_initializing_formals
-        url = url;
+  })  : portalItem = null;
 
   const BaseTileLayer.fromPortalItem({
     required super.layerId,
-    required PortalItem portalItem,
+    required PortalItem this.portalItem,
     required this.type,
     super.isVisible = true,
     super.opacity = 1,
-  })  : url = null,
-        // ignore: prefer_initializing_formals
-        portalItem = portalItem;
+  })  : url = null;
 
   final String? url;
 

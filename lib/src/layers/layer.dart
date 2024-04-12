@@ -1,8 +1,8 @@
-part of arcgis_maps_flutter;
+part of '../../arcgis_maps_flutter.dart';
 
 @immutable
 class LayerId extends MapsObjectId<Layer> {
-  const LayerId(String value) : super(value);
+  const LayerId(super.value);
 }
 
 abstract class Layer extends MapsObject<Layer> with EquatableMixin {

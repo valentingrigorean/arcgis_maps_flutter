@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of 'feature_collection_layer.dart';
 
 class FeatureCollectionLayer{
 

@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of '../../arcgis_maps_flutter.dart';
 
 @immutable
 class Point extends Geometry {
@@ -7,9 +7,8 @@ class Point extends Geometry {
     required this.y,
     this.z,
     this.m,
-    SpatialReference? spatialReference,
+    super.spatialReference,
   }) : super(
-          spatialReference: spatialReference,
           geometryType: GeometryType.point,
         );
 

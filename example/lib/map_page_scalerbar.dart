@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 
 class MapPageScaleBar extends StatefulWidget {
   const MapPageScaleBar({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<MapPageScaleBar> createState() => _MapPageScaleBarState();

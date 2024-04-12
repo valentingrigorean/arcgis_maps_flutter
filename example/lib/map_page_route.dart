@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class MapPageRoute extends StatefulWidget {
-  const MapPageRoute({Key? key}) : super(key: key);
+  const MapPageRoute({super.key});
 
   @override
   State<MapPageRoute> createState() => _MapPageRouteState();

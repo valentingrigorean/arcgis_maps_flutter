@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of '../../arcgis_maps_flutter.dart';
 
 enum LatitudeLongitudeFormat {
   /// The geographical coordinates are represented in decimal degrees.

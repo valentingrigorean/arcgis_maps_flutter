@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of '../../../arcgis_maps_flutter.dart';
 
 enum GeodatabaseAttachmentSyncDirection {
   /// There is no specified attachment sync direction.

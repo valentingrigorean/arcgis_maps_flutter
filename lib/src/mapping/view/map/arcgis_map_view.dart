@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of '../../../../arcgis_maps_flutter.dart';
 
 /// Callback method for when the map is ready to be used.
 ///
@@ -254,9 +254,9 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   Map<LayerId, Layer> _operationalLayers = <LayerId, Layer>{};
   Map<LayerId, Layer> _baseLayers = <LayerId, Layer>{};
   Map<LayerId, Layer> _referenceLayers = <LayerId, Layer>{};
-  Map<MarkerId, Marker> _markers = <MarkerId, Marker>{};
-  Map<PolygonId, PolygonMarker> _polygons = <PolygonId, PolygonMarker>{};
-  Map<PolylineId, PolylineMarker> _polylines = <PolylineId, PolylineMarker>{};
+  Map<String, Marker> _markers = <String, Marker>{};
+  Map<String, PolygonMarker> _polygons = <String, PolygonMarker>{};
+  Map<String, PolylineMarker> _polylines = <String, PolylineMarker>{};
   Set<LayerId> _identifyLayerAsync = <LayerId>{};
 
   late _ArcgisMapOptions _arcgisMapOptions;

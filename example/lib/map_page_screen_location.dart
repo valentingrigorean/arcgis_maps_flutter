@@ -4,7 +4,7 @@ import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
 class MapPageScreenLocation extends StatefulWidget {
-  const MapPageScreenLocation({Key? key}) : super(key: key);
+  const MapPageScreenLocation({super.key});
 
   @override
   State<MapPageScreenLocation> createState() => _MapPageScreenLocationState();

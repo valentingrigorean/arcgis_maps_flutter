@@ -1,15 +1,13 @@
-part of arcgis_maps_flutter;
+part of '../../arcgis_maps_flutter.dart';
 
 class WmsLayer extends BaseTileLayer {
   WmsLayer.fromUrl(
     String url, {
     LayerId? layerId,
     required this.layersName,
-    bool isVisible = true,
-    double opacity = 1,
+    super.isVisible,
+    super.opacity,
   }) : super.fromUrl(
-          isVisible: isVisible,
-          opacity: opacity,
           layerId: layerId ?? LayerId(url),
           url: url,
           type: 'WmsLayer',

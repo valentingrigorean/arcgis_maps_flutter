@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of '../../arcgis_maps_flutter.dart';
 
 enum GroupVisibilityMode {
   /// Each child manages its visibility independent of the parent group.
@@ -23,17 +23,13 @@ enum GroupVisibilityMode {
 @immutable
 class GroupLayer extends Layer {
   const GroupLayer({
-    required LayerId layerId,
+    required super.layerId,
     required this.layers,
     this.showChildrenInLegend = true,
     this.visibilityMode = GroupVisibilityMode.independent,
-    bool isVisible = true,
-    double opacity = 1.0,
-  }) : super(
-          layerId: layerId,
-          isVisible: isVisible,
-          opacity: opacity,
-        );
+    super.isVisible = true,
+    super.opacity = 1.0,
+  });
 
   final Set<Layer> layers;
 

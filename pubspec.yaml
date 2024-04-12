@@ -14,7 +14,6 @@ dependencies:
   plugin_platform_interface: ^2.1.8
   stream_transform: ^2.1.0
   collection:
-  fluster: ^1.2.0
   equatable: ^2.0.5
   http: ^1.2.1
   xml2json: ^6.2.3

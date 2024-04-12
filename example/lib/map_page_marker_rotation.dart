@@ -4,7 +4,7 @@ import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
 class MapPageMarkerRotation extends StatefulWidget {
-  const MapPageMarkerRotation({Key? key}) : super(key: key);
+  const MapPageMarkerRotation({super.key});
 
   @override
   State<MapPageMarkerRotation> createState() => _MapPageMarkerRotationState();

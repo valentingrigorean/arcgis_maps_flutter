@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of '../../arcgis_maps_flutter.dart';
 
 @immutable
 class Envelope extends Geometry {
@@ -7,9 +7,8 @@ class Envelope extends Geometry {
     required this.yMin,
     required this.xMax,
     required this.yMax,
-    SpatialReference? spatialReference,
+    super.spatialReference,
   }) : super(
-          spatialReference: spatialReference,
           geometryType: GeometryType.envelope,
         );
 
