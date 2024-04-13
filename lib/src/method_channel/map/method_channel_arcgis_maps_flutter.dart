@@ -2,16 +2,9 @@ import 'dart:async';
 
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:arcgis_maps_flutter/src/arcgis_method_channel.dart';
-import 'package:arcgis_maps_flutter/src/layers/layer_updates.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/arcgis_maps_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/map_event.dart';
-import 'package:arcgis_maps_flutter/src/symbology/marker_updates.dart';
-import 'package:arcgis_maps_flutter/src/symbology/polygon_updates.dart';
-import 'package:arcgis_maps_flutter/src/symbology/polyline_updates.dart';
 import 'package:arcgis_maps_flutter/src/utils/layers.dart';
-import 'package:arcgis_maps_flutter/src/utils/markers.dart';
-import 'package:arcgis_maps_flutter/src/utils/polygons.dart';
-import 'package:arcgis_maps_flutter/src/utils/polyline.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -84,9 +77,6 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
     Set<Layer> operationalLayers = const <Layer>{},
     Set<Layer> baseLayers = const <Layer>{},
     Set<Layer> referenceLayers = const <Layer>{},
-    Set<Marker> markers = const <Marker>{},
-    Set<PolygonMarker> polygons = const <PolygonMarker>{},
-    Set<PolylineMarker> polylines = const <PolylineMarker>{},
     Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers,
     Map<String, dynamic> mapOptions = const <String, dynamic>{},
   }) {
@@ -96,9 +86,6 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
       'operationalLayersToAdd': serializeLayerSet(operationalLayers),
       'baseLayersToAdd': serializeLayerSet(baseLayers),
       'referenceLayersToAdd': serializeLayerSet(referenceLayers),
-      'markersToAdd': serializeMarkerSet(markers),
-      'polygonsToAdd': serializePolygonSet(polygons),
-      'polylinesToAdd': serializePolylineSet(polylines),
     };
 
     if (viewpoint != null) {
@@ -193,7 +180,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
 
     if (results == null || results.isEmpty) {
       return LegendInfoResult(
-        layerName: layer.layerId.value,
+        layerName: layer.layerId,
         results: const [],
       );
     }
@@ -424,36 +411,12 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<void> updateLayers(int mapId, LayerUpdates layerUpdates) {
-    return channel(mapId)
-        .invokeMethod<void>('layers#update', layerUpdates.toJson());
-  }
-
-  @override
-  Future<void> updateMarkers(int mapId, MarkerUpdates markerUpdates) {
-    return channel(mapId)
-        .invokeMethod<void>('markers#update', markerUpdates.toJson());
-  }
-
-  @override
-  Future<void> updatePolygons(int mapId, PolygonUpdates polygonUpdates) {
-    return channel(mapId)
-        .invokeMethod<void>('polygons#update', polygonUpdates.toJson());
-  }
-
-  @override
-  Future<void> updatePolylines(int mapId, PolylineUpdates polylineUpdates) {
-    return channel(mapId)
-        .invokeMethod<void>('polylines#update', polylineUpdates.toJson());
-  }
-
-  @override
   Future<void> setLayerTimeOffset(
-      int mapId, LayerId layerId, TimeValue? timeValue) async {
+      int mapId, String layerId, TimeValue? timeValue) async {
     return channel(mapId).invokeMethod<void>(
       'layer#setTimeOffset',
       {
-        'layerId': layerId.value,
+        'layerId': layerId,
         'timeValue': timeValue?.toJson(),
       },
     );
@@ -472,21 +435,6 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   @override
   Stream<LayerLoadedEvent> onLayerLoad({required int mapId}) {
     return _events(mapId).whereType<LayerLoadedEvent>();
-  }
-
-  @override
-  Stream<MarkerTapEvent> onMarkerTap({required int mapId}) {
-    return _events(mapId).whereType<MarkerTapEvent>();
-  }
-
-  @override
-  Stream<PolygonTapEvent> onPolygonTap({required int mapId}) {
-    return _events(mapId).whereType<PolygonTapEvent>();
-  }
-
-  @override
-  Stream<PolylineTapEvent> onPolylineTap({required int mapId}) {
-    return _events(mapId).whereType<PolylineTapEvent>();
   }
 
   @override
@@ -547,30 +495,6 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
           ),
         );
         break;
-      case 'marker#onTap':
-        _mapEventStreamController.add(
-          MarkerTapEvent(
-            mapId,
-            MarkerId(call.arguments['markerId']),
-          ),
-        );
-        break;
-      case 'polygon#onTap':
-        _mapEventStreamController.add(
-          PolygonTapEvent(
-            mapId,
-            PolygonId(call.arguments['polygonId']),
-          ),
-        );
-        break;
-      case 'polyline#onTap':
-        _mapEventStreamController.add(
-          PolylineTapEvent(
-            mapId,
-            PolylineId(call.arguments['polylineId']),
-          ),
-        );
-        break;
       case 'map#loaded':
         _mapEventStreamController.add(
           MapLoadedEvent(
@@ -584,7 +508,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
           LayerLoadedEvent(
             mapId,
             ArcgisError.fromJson(call.arguments['error']),
-            LayerId(call.arguments['layerId']),
+            call.arguments['layerId'],
           ),
         );
         break;

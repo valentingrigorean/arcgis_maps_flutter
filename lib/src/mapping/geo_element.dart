@@ -2,18 +2,32 @@ part of '../../arcgis_maps_flutter.dart';
 
 @immutable
 abstract class GeoElement {
-  /// Attribute types supported are null, String, Date, and Numbers.
-  /// Other attribute types will be ignored.
+  const GeoElement();
+
+  String get type;
+
   Map<String, Object?> get attributes;
 
   Geometry? get geometry;
 
   factory GeoElement.fromJson(Map<dynamic, dynamic> json) {
-    final Map<String, Object?> attributes = parseAttributes(json['attributes']) ?? {};
-
+    final Map<String, Object?> attributes =
+        deserializeAttributes(json['attributes']) ?? {};
     Geometry? geometry;
 
     geometry = Geometry.fromJson(json['geometry']);
+
+    if (json.containsKey('type')) {
+      switch (json['type']) {
+        case 'Graphic':
+          return Graphic(
+            attributes: attributes,
+            geometry: geometry,
+          );
+        default:
+          break;
+      }
+    }
 
     return _GeoElementImpl(attributes, geometry);
   }
@@ -21,7 +35,12 @@ abstract class GeoElement {
   GeoElement copyWith({
     Map<String, Object?>? attributesParam,
     Geometry? geometryParam,
-  });
+  }) {
+    return _GeoElementImpl(
+      attributesParam ?? attributes,
+      geometryParam ?? geometry,
+    );
+  }
 }
 
 class _GeoElementImpl implements GeoElement {
@@ -46,4 +65,7 @@ class _GeoElementImpl implements GeoElement {
       geometryParam ?? _geometry,
     );
   }
+
+  @override
+  String get type => 'GeoElement';
 }

@@ -1,9 +1,5 @@
 part of '../../arcgis_maps_flutter.dart';
 
-@immutable
-class ElevationSourceId extends MapsObjectId<ElevationSource> {
-  const ElevationSourceId(super.value);
-}
 
 abstract class ElevationSource implements MapsObject {
   @override
@@ -12,7 +8,7 @@ abstract class ElevationSource implements MapsObject {
   }
 
   @override
-  MapsObjectId get mapsId => throw UnimplementedError();
+  String get mapsId => throw UnimplementedError();
 
   @override
   Object toJson() {

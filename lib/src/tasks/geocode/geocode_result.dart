@@ -45,7 +45,7 @@ class GeocodeResult {
   /// Creates a new [GeocodeResult] from a JSON object.
   static GeocodeResult fromJson(Map<dynamic, dynamic> json) {
     return GeocodeResult._(
-      attributes: parseAttributes(json['attributes']),
+      attributes: deserializeAttributes(json['attributes']),
       displayLocation: Point.fromJson(json['displayLocation']),
       extent: Envelope.fromJson(json['extent']),
       inputLocation: Point.fromJson(json['inputLocation']),

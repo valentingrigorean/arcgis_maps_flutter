@@ -1,4 +1,5 @@
 import 'package:arcgis_maps_flutter/src/maps_object.dart';
+import 'package:arcgis_maps_flutter/src/utils/collections.dart';
 import 'package:arcgis_maps_flutter/src/utils/maps_object.dart';
 import 'package:flutter/foundation.dart';
 
@@ -14,17 +15,17 @@ class MapsObjectUpdates<T extends MapsObject> {
     Set<T> current, {
     required this.objectName,
   }) {
-    final Map<MapsObjectId<T>, T> previousObjects = keyByMapsObjectId(previous);
-    final Map<MapsObjectId<T>, T> currentObjects = keyByMapsObjectId(current);
+    final Map<String, T> previousObjects = keyByMapsObjectId(previous);
+    final Map<String, T> currentObjects = keyByMapsObjectId(current);
 
-    final Set<MapsObjectId<T>> previousObjectIds = previousObjects.keys.toSet();
-    final Set<MapsObjectId<T>> currentObjectIds = currentObjects.keys.toSet();
+    final Set<String> previousObjectIds = previousObjects.keys.toSet();
+    final Set<String> currentObjectIds = currentObjects.keys.toSet();
 
     /// Maps an ID back to a [T] in [currentObjects].
     ///
     /// It is a programming error to call this with an ID that is not guaranteed
     /// to be in [currentObjects].
-    T idToCurrentObject(MapsObjectId<T> id) {
+    T idToCurrentObject(String id) {
       return currentObjects[id]!;
     }
 
@@ -38,7 +39,7 @@ class MapsObjectUpdates<T extends MapsObject> {
     // Returns `true` if [current] is not equals to previous one with the
     // same id.
     bool hasChanged(T current) {
-      final T? previous = previousObjects[current.mapsId as MapsObjectId<T>];
+      final T? previous = previousObjects[current.mapsId];
       return current != previous;
     }
 
@@ -60,11 +61,11 @@ class MapsObjectUpdates<T extends MapsObject> {
   late Set<T> _objectsToAdd;
 
   /// Set of objects to be removed in this update.
-  Set<MapsObjectId<T>> get objectIdsToRemove {
+  Set<String> get objectIdsToRemove {
     return _objectIdsToRemove;
   }
 
-  late Set<MapsObjectId<T>> _objectIdsToRemove;
+  late Set<String> _objectIdsToRemove;
 
   /// Set of objects to be changed in this update.
   Set<T> get objectsToChange {
@@ -82,21 +83,11 @@ class MapsObjectUpdates<T extends MapsObject> {
   /// Converts this object to JSON.
   Object toJson() {
     final Map<String, Object> updateMap = <String, Object>{};
-
-    void addIfNonNull(String fieldName, Object? value) {
-      if (value != null) {
-        updateMap[fieldName] = value;
-      }
-    }
-
-    addIfNonNull('${objectName}sToAdd', serializeMapsObjectSet(_objectsToAdd));
-    addIfNonNull(
+    updateMap.addIfNonNull(
+        '${objectName}sToAdd', serializeMapsObjectSet(_objectsToAdd));
+    updateMap.addIfNonNull(
         '${objectName}sToChange', serializeMapsObjectSet(_objectsToChange));
-    addIfNonNull(
-        '${objectName}IdsToRemove',
-        _objectIdsToRemove
-            .map<String>((MapsObjectId<T> m) => m.value)
-            .toList());
+    updateMap.addIfNonNull('${objectName}IdsToRemove', _objectIdsToRemove);
 
     return updateMap;
   }

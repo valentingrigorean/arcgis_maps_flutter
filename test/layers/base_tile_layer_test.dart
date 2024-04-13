@@ -4,12 +4,12 @@ import 'package:flutter_test/flutter_test.dart';
 
 class BaseTileLayerMock extends BaseTileLayer {
   BaseTileLayerMock.fromUrl({
-    LayerId? layerId,
+    String? layerId,
     required super.url,
     super.isVisible,
     super.opacity,
   }) : super.fromUrl(
-          layerId: layerId ?? LayerId(url),
+          layerId: layerId ?? url,
           type: 'mock',
         );
 
@@ -31,7 +31,7 @@ class BaseTileLayerMock extends BaseTileLayer {
 void main() {
   test('validate toJson with Url', () {
     var baseTileLayer = BaseTileLayerMock.fromUrl(
-      layerId: const LayerId('layerId'),
+      layerId: 'layerId',
       url: 'url',
     );
 
@@ -44,7 +44,7 @@ void main() {
 
   test('validate toJson with portalItem', () {
     var baseTileLayer = BaseTileLayerMock.fromPortalItem(
-        layerId: const LayerId('layerId'),
+        layerId: 'layerId',
         portalItem: PortalItem(
           portal: Portal.arcGISOnline(connection: PortalConnection.anonymous),
           itemId: 'itemId',

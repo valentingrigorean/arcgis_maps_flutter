@@ -2,10 +2,12 @@ part of '../../arcgis_maps_flutter.dart';
 
 @immutable
 class ArcGISTiledElevationSource implements ElevationSource {
-  const ArcGISTiledElevationSource(
-      {required this.elevationSourceId, required this.url});
+  const ArcGISTiledElevationSource({
+    required this.elevationSourceId,
+    required this.url,
+  });
 
-  final ElevationSourceId elevationSourceId;
+  final String elevationSourceId;
 
   final String url;
 
@@ -16,21 +18,15 @@ class ArcGISTiledElevationSource implements ElevationSource {
   }
 
   @override
-  MapsObjectId get mapsId => elevationSourceId;
+  String get mapsId => elevationSourceId;
 
   @override
   Object toJson() {
     final Map<String, Object> json = <String, Object>{};
 
-    void addIfPresent(String fieldName, Object? value) {
-      if (value != null) {
-        json[fieldName] = value;
-      }
-    }
-
-    addIfPresent('elevationSourceId', elevationSourceId.value);
-    addIfPresent('elevationType', 'ArcGISTiledElevationSource');
-    addIfPresent('url', url);
+    json.addIfNonNull('elevationSourceId', elevationSourceId);
+    json.addIfNonNull('elevationType', 'ArcGISTiledElevationSource');
+    json.addIfNonNull('url', url);
 
     return json;
   }

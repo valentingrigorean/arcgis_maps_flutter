@@ -38,7 +38,7 @@ abstract class BaseTileLayer extends Layer {
     if (url != null) {
       json["url"] = url!;
     }
-    json["layerId"] = layerId.value;
+    json["layerId"] = layerId;
 
     if (portalItem != null) {
       json['portalItem'] = portalItem!.toJson();

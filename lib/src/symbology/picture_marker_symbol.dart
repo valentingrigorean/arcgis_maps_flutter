@@ -68,12 +68,12 @@ class PictureMarkerSymbol extends MarkerSymbol {
   @override
   Map<String, Object?> toJson() {
     final Map<String, Object?> json = super.toJson();
-    json.addIfPresent('url', url);
-    json.addIfPresent('resource', resource);
-    json.addIfPresent('tintColor', tintColor?.value);
-    json.addIfPresent('imageData', imageData);
-    json.addIfPresent('height', height);
-    json.addIfPresent('width', width);
+    json.addIfNonNull('url', url);
+    json.addIfNonNull('resource', resource);
+    json.addIfNonNull('tintColor', tintColor?.value);
+    json.addIfNonNull('imageData', imageData);
+    json.addIfNonNull('height', height);
+    json.addIfNonNull('width', width);
     return json;
   }
 

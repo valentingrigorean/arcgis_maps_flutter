@@ -1,10 +1,6 @@
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
-import 'package:arcgis_maps_flutter/src/layers/layer_updates.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/map_event.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/method_channel_arcgis_maps_flutter.dart';
-import 'package:arcgis_maps_flutter/src/symbology/marker_updates.dart';
-import 'package:arcgis_maps_flutter/src/symbology/polygon_updates.dart';
-import 'package:arcgis_maps_flutter/src/symbology/polyline_updates.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -43,9 +39,6 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     Set<Layer> operationalLayers = const <Layer>{},
     Set<Layer> baseLayers = const <Layer>{},
     Set<Layer> referenceLayers = const <Layer>{},
-    Set<Marker> markers = const <Marker>{},
-    Set<PolygonMarker> polygons = const <PolygonMarker>{},
-    Set<PolylineMarker> polylines = const <PolylineMarker>{},
     Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers,
     Map<String, dynamic> mapOptions = const <String, dynamic>{},
   }) {
@@ -186,23 +179,7 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
         'getMapSpatialReference() has not been implemented.');
   }
 
-  Future<void> updateLayers(int mapId, LayerUpdates layerUpdates) {
-    throw UnimplementedError('updateLayers() has not been implemented.');
-  }
-
-  Future<void> updateMarkers(int mapId, MarkerUpdates markerUpdates) {
-    throw UnimplementedError('updateMarkers() has not been implemented.');
-  }
-
-  Future<void> updatePolygons(int mapId, PolygonUpdates polygonUpdates) {
-    throw UnimplementedError('updatePolygons() has not been implemented.');
-  }
-
-  Future<void> updatePolylines(int mapId, PolylineUpdates polylineUpdates) {
-    throw UnimplementedError('updatePolylines() has not been implemented.');
-  }
-
-  Future<void> updateIdentifyLayerListeners(int mapId, Set<LayerId> layers) {
+  Future<void> updateIdentifyLayerListeners(int mapId, Set<String> layers) {
     throw UnimplementedError(
         'updateIdentifyLayerListeners() has not been implemented.');
   }
@@ -212,7 +189,7 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
   /// different periods of time to be compared. Can be null if there is
   /// no time offset.
   Future<void> setLayerTimeOffset(
-      int mapId, LayerId layerId, TimeValue? timeValue) {
+      int mapId, String layerId, TimeValue? timeValue) {
     throw UnimplementedError('setLayerTimeOffset() has not been implemented.');
   }
 
@@ -222,21 +199,6 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
 
   Stream<LayerLoadedEvent> onLayerLoad({required int mapId}) {
     throw UnimplementedError('onMapLoad() has not been implemented.');
-  }
-
-  /// A [Marker] has been tapped.
-  Stream<MarkerTapEvent> onMarkerTap({required int mapId}) {
-    throw UnimplementedError('onMarkerTap() has not been implemented.');
-  }
-
-  /// A [PolygonMarker] has been tapped.
-  Stream<PolygonTapEvent> onPolygonTap({required int mapId}) {
-    throw UnimplementedError('onPolygonTap() has not been implemented.');
-  }
-
-  /// A [PolylineMarker] has been tapped.
-  Stream<PolylineTapEvent> onPolylineTap({required int mapId}) {
-    throw UnimplementedError('onPolylineTap() has not been implemented.');
   }
 
   /// A Map has been tapped at a certain [LatLng].

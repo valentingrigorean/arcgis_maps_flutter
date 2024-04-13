@@ -19,19 +19,19 @@ void main() {
     const layer = LayerMock(
       isVisible: true,
       opacity: 1,
-      layerId: LayerId('layerId'),
+      layerId: 'layerId',
     );
 
     expect(layer.opacity, 1.0);
     expect(layer.isVisible, true);
-    expect(layer.layerId, const LayerId('layerId'));
+    expect(layer.layerId, 'layerId');
   });
 
   test('toJson', () {
     const layer = LayerMock(
       isVisible: true,
       opacity: 1,
-      layerId: LayerId('layerId'),
+      layerId: 'layerId',
     );
 
      final json = layer.toJson();

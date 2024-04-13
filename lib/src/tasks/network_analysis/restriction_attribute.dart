@@ -9,7 +9,7 @@ class RestrictionAttribute {
 
   factory RestrictionAttribute.fromJson(Map<dynamic, dynamic> json) {
     return RestrictionAttribute._(
-      parameterValues: parseAttributes(json['parameterValues']),
+      parameterValues: deserializeAttributes(json['parameterValues']),
       restrictionUsageParameterName: json['restrictionUsageParameterName'],
     );
   }

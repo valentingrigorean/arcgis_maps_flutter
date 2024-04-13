@@ -1,11 +1,6 @@
 part of '../../arcgis_maps_flutter.dart';
 
 @immutable
-class SurfaceId extends MapsObjectId<Surface> {
-  const SurfaceId(super.value);
-}
-
-@immutable
 class Surface implements MapsObject {
   const Surface({
     required this.surfaceId,
@@ -15,7 +10,7 @@ class Surface implements MapsObject {
     this.elevationExaggeration,
   }) : assert((0.0 <= alpha && alpha <= 1.0));
 
-  final SurfaceId surfaceId;
+  final String surfaceId;
 
   final Set<ElevationSource>? elevationSources;
 
@@ -45,26 +40,20 @@ class Surface implements MapsObject {
   clone() => copyWith();
 
   @override
-  MapsObjectId get mapsId => surfaceId;
+  String get mapsId => surfaceId;
 
   @override
   Object toJson() {
     final Map<String, Object> json = <String, Object>{};
 
-    void addIfPresent(String fieldName, Object? value) {
-      if (value != null) {
-        json[fieldName] = value;
-      }
-    }
-
-    addIfPresent('SurfaceId', surfaceId.value);
+    json.addIfNonNull('SurfaceId', surfaceId);
     if (elevationSources != null) {
-      addIfPresent(
+      json.addIfNonNull(
           'elevationSources', serializeElevationSourceSet(elevationSources!));
     }
-    addIfPresent('isEnabled', isEnabled);
-    addIfPresent('alpha', alpha);
-    addIfPresent('elevationExaggeration', elevationExaggeration);
+    json.addIfNonNull('isEnabled', isEnabled);
+    json.addIfNonNull('alpha', alpha);
+    json.addIfNonNull('elevationExaggeration', elevationExaggeration);
     return json;
   }
 

@@ -2,14 +2,8 @@ part of '../../../arcgis_maps_flutter.dart';
 
 class IdentifyGraphicsOverlayResult {
   const IdentifyGraphicsOverlayResult({
-    required this.markers,
-    required this.polygons,
-    required this.polylines,
+    required this.ids,
   });
 
-  final List<Marker> markers;
-
-  final List<PolygonMarker> polygons;
-
-  final List<PolylineMarker> polylines;
+  final List<String> ids;
 }

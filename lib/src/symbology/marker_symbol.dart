@@ -32,8 +32,8 @@ abstract class MarkerSymbol extends Symbol {
   @override
   Map<String, Object?> toJson() {
     final Map<String, Object?> json = super.toJson();
-    json.addIfPresent('angle', angle);
-    json.addIfPresent('angleAlignment', angleAlignment?.name);
+    json.addIfNonNull('angle', angle);
+    json.addIfNonNull('angleAlignment', angleAlignment?.name);
     if (leaderOffset != null) {
       json['leaderOffset'] = <double>[leaderOffset!.dx, leaderOffset!.dy];
     }

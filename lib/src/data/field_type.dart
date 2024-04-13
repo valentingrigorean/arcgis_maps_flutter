@@ -70,7 +70,20 @@ dynamic fromNativeField(Map<dynamic, dynamic>? map) {
   }
 }
 
-Map<String, Object?>? parseAttributes(Map<dynamic, dynamic>? attributes) {
+
+
+Map<String, Object?>? serializeAttributes(Map<String, Object?>? attributes) {
+  if (attributes == null) {
+    return null;
+  }
+  final Map<String, Object?> result = <String, Object?>{};
+  attributes.forEach((key, value) {
+    result[key] = toNativeField(value);
+  });
+  return result;
+}
+
+Map<String, Object?>? deserializeAttributes(Map<String, dynamic>? attributes) {
   if (attributes == null) {
     return null;
   }

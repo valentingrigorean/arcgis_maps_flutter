@@ -16,43 +16,12 @@ class MapEvent<T> {
   const MapEvent(this.mapId, this.value);
 }
 
-/// An event fired when a [Marker] is tapped.
-class MarkerTapEvent extends MapEvent<MarkerId> {
-  /// Build a MarkerTap Event triggered from the map represented by `mapId`.
-  ///
-  /// The `value` of this event is a [MarkerId] object that represents the tapped Marker.
-  const MarkerTapEvent(
-    super.mapId,
-    super.markerId,
-  );
-}
-
-/// An event fired when a [PolygonMarker] is tapped.
-class PolygonTapEvent extends MapEvent<PolygonId> {
-  /// Build a PolygonTap Event triggered from the map represented by `mapId`.
-  ///
-  /// The `value` of this event is a [PolygonId] object that represents the tapped Polygon.
-  const PolygonTapEvent(
-    super.mapId,
-    super.polygonId,
-  );
-}
-
-class PolylineTapEvent extends MapEvent<PolylineId> {
-  /// Build a PolylineTap Event triggered from the map represented by `mapId`.
-  ///
-  /// The `value` of this event is a [PolylineId] object that represents the tapped Polygon.
-  const PolylineTapEvent(
-    super.mapId,
-    super.polylineId,
-  );
-}
 
 class UserLocationTapEvent extends MapEvent<void> {
   const UserLocationTapEvent(int mapId) : super(mapId, null);
 }
 
-class IdentifyLayerEvent extends MapEvent<LayerId> {
+class IdentifyLayerEvent extends MapEvent<String> {
   const IdentifyLayerEvent(
     super.mapId,
     super.layerId, {
@@ -97,11 +66,11 @@ class MapLoadedEvent extends MapEvent<ArcgisError?> {
   );
 }
 
-class LayerLoadedEvent extends MapEvent<LayerId> {
+class LayerLoadedEvent extends MapEvent<String> {
   const LayerLoadedEvent(
     int mapId,
     this.error,
-    LayerId value,
+    String value,
   ) : super(mapId, value);
 
   final ArcgisError? error;

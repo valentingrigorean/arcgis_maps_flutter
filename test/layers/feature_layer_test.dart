@@ -21,7 +21,7 @@ void main() {
 
   test('Clone with PortalItem', () {
     final featureLayer = FeatureLayer.fromPortalItem(
-      layerId: const LayerId('layerId'),
+      layerId: 'layerId',
       portalItemLayerId: 0,
       portalItem: PortalItem(
         portal: Portal.arcGISOnline(

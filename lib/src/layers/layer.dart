@@ -1,9 +1,5 @@
 part of '../../arcgis_maps_flutter.dart';
 
-@immutable
-class LayerId extends MapsObjectId<Layer> {
-  const LayerId(super.value);
-}
 
 abstract class Layer extends MapsObject<Layer> with EquatableMixin {
   const Layer({
@@ -13,18 +9,18 @@ abstract class Layer extends MapsObject<Layer> with EquatableMixin {
   }) : assert(opacity >= 0 && opacity <= 1.0);
 
   @override
-  LayerId get mapsId => layerId;
+  String get mapsId => layerId;
 
   final bool isVisible;
   final double opacity;
-  final LayerId layerId;
+  final String layerId;
 
   @override
   Map<String, Object> toJson() {
     return {
       'isVisible': isVisible,
       'opacity': opacity,
-      'layerId': layerId.value,
+      'layerId': layerId,
     };
   }
 
