@@ -1,14 +1,13 @@
 part of '../../arcgis_maps_flutter.dart';
 
 class WmsLayer extends BaseTileLayer {
-  WmsLayer.fromUrl(
+  const WmsLayer.fromUrl(
     String url, {
-    LayerId? layerId,
+    required super.layerId,
     required this.layersName,
     super.isVisible,
     super.opacity,
   }) : super.fromUrl(
-          layerId: layerId ?? LayerId(url),
           url: url,
           type: 'WmsLayer',
         );

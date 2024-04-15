@@ -2,13 +2,12 @@ part of '../../arcgis_maps_flutter.dart';
 
 @immutable
 class MapImageLayer extends BaseTileLayer {
-  MapImageLayer.fromUrl(
+  const MapImageLayer.fromUrl(
     String url, {
-    LayerId? layerId,
+    required super.layerId,
     super.isVisible,
     super.opacity,
   }) : super.fromUrl(
-          layerId: layerId ?? LayerId(url),
           url: url,
           type: 'MapImageLayer',
         );

@@ -3,8 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('Clone with url', () {
-    final featureLayer = FeatureLayer.fromUrl(
+    final featureLayer = const FeatureLayer.fromUrl(
       'url',
+      layerId: 'layerId',
       isVisible: false,
       opacity: 0.5,
     );

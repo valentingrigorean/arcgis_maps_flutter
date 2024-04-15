@@ -9,9 +9,7 @@ class MapPageGeodesicSector extends StatefulWidget {
 }
 
 class _MapPageGeodesicSectorState extends State<MapPageGeodesicSector> {
-  final Set<PolygonMarker> polygons = {};
-  final Set<PolylineMarker> polylines = {};
-
+  late final ArcgisMapController _mapController;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,6 +17,11 @@ class _MapPageGeodesicSectorState extends State<MapPageGeodesicSector> {
         title: const Text('Geodesic Sector'),
       ),
       body: ArcgisMapView(
+        onMapCreated: (controller){
+          _mapController = controller;
+          _mapController.createOrUpdateGraphicsOverlay(const GraphicsOverlay(id: 'default'));
+
+        },
         map: const ArcGISMap.fromBasemap(
           Basemap.fromStyle(
             basemapStyle: BasemapStyle.arcGISCommunity,
@@ -61,13 +64,7 @@ class _MapPageGeodesicSectorState extends State<MapPageGeodesicSector> {
               ),
             );
           }
-
-          if (mounted) {
-            setState(() {});
-          }
         },
-        polygons: polygons,
-        polylines: polylines,
         interactionOptions: const InteractionOptions(
           isMagnifierEnabled: false,
           allowMagnifierToPan: false,

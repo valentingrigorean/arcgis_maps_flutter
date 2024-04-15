@@ -3,26 +3,24 @@ part of '../../arcgis_maps_flutter.dart';
 class TiledLayer extends BaseTileLayer {
   final TileCache? _tileCache;
 
-  TiledLayer.fromUrl(
+  const TiledLayer.fromUrl(
     String url, {
-    LayerId? layerId,
+    required super.layerId,
     super.isVisible,
     super.opacity,
   })  : _tileCache = null,
         super.fromUrl(
-          layerId: layerId ?? LayerId(url),
           url: url,
           type: 'TiledLayer',
         );
 
-  TiledLayer.fromTileCache({
+  const TiledLayer.fromTileCache({
     required TileCache tileCache,
-    LayerId? layerId,
+    required super.layerId,
     super.isVisible,
     super.opacity,
   })  : _tileCache = tileCache,
         super(
-          layerId: layerId ?? LayerId(tileCache.path),
           type: 'TiledLayer',
         );
 

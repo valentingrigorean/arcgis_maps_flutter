@@ -3,14 +3,14 @@
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
-class MapPageASsetsMarker extends StatefulWidget {
-  const MapPageASsetsMarker({super.key});
+class MapPageAssetsMarker extends StatefulWidget {
+  const MapPageAssetsMarker({super.key});
 
   @override
-  State<MapPageASsetsMarker> createState() => _MapPageASsetsMarkerState();
+  State<MapPageAssetsMarker> createState() => _MapPageAssetsMarkerState();
 }
 
-class _MapPageASsetsMarkerState extends State<MapPageASsetsMarker> {
+class _MapPageAssetsMarkerState extends State<MapPageAssetsMarker> {
   double _offsetY = 3;
 
   @override
@@ -27,27 +27,37 @@ class _MapPageASsetsMarkerState extends State<MapPageASsetsMarker> {
                 basemapStyle: BasemapStyle.arcGISCommunity,
               ),
             ),
-            markers: {
-              Marker(
-                markerId: const MarkerId('test'),
-                position: Point.fromLatLng(
-                  latitude: 0.0,
-                  longitude: 0.0,
-                ),
-                iconOffsetY: _offsetY,
-                icon: BitmapDescriptor.fromNativeAsset(
-                  'ic_flight_hazard',
-                  width: 24,
-                  height: 24,
-                  tintColor: Colors.red,
-                ),
-                backgroundImage: BitmapDescriptor.fromNativeAsset(
-                  'ic_marker',
-                  width: 36,
-                  height: 40,
-                  tintColor: Colors.white,
-                ),
-              ),
+            onMapCreated: (controller) {
+              controller.createOrUpdateGraphicsOverlay(
+                  const GraphicsOverlay(id: 'default'));
+              controller.addGraphicsToOverlay(
+                'default',
+                [
+                  Graphic(
+                    graphicId: 'test',
+                    geometry: Point.fromLatLng(
+                      latitude: 0.0,
+                      longitude: 0.0,
+                    ),
+                    symbol: const CompositeSymbol(
+                      symbols: [
+                        PictureMarkerSymbol.fromResource(
+                          resource: 'ic_marker',
+                          width: 36,
+                          height: 40,
+                          tintColor: Colors.white,
+                        ),
+                        PictureMarkerSymbol.fromResource(
+                          resource: 'ic_marker',
+                          width: 36,
+                          height: 40,
+                          tintColor: Colors.red,
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              );
             },
           ),
           Positioned(

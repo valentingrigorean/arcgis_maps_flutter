@@ -54,8 +54,8 @@ class _MapPageTileCacheState extends State<MapPageTileCache> {
         ),
         referenceLayers: {
           if (_isAuthenticated)
-            TiledLayer.fromUrl(
-                'https://services.geodataonline.no/arcgis/rest/services/Geocache_UTM33_EUREF89/GeocacheHelning/MapServer'),
+            const TiledLayer.fromUrl(
+                'https://services.geodataonline.no/arcgis/rest/services/Geocache_UTM33_EUREF89/GeocacheHelning/MapServer',layerId: 'geocache',),
         },
         onMapCreated: (controller) {
           _mapController = controller;

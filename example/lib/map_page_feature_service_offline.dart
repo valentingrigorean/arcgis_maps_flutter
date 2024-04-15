@@ -104,7 +104,7 @@ class _MapPageFeatureServiceOfflineState
 
     if (await File(appDocPath).exists()) {
       _downloadedFeatureLayer = GeodatabaseLayer(
-        layerId: LayerId(appDocPath),
+        layerId: appDocPath,
         path: appDocPath,
       );
 
@@ -171,7 +171,7 @@ class _MapPageFeatureServiceOfflineState
           setState(() {
             _isDownloaded = true;
             _downloadedFeatureLayer = GeodatabaseLayer(
-              layerId: LayerId(appDocPath),
+              layerId: appDocPath,
               path: appDocPath.replaceAll(
                 '.geodatabase',
                 '',

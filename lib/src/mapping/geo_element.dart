@@ -21,8 +21,12 @@ abstract class GeoElement {
       switch (json['type']) {
         case 'Graphic':
           return Graphic(
+            graphicId: json['graphicId'] ?? '',
             attributes: attributes,
             geometry: geometry,
+            symbol: Symbol.fromJson(
+              json['symbol'],
+            ),
           );
         default:
           break;

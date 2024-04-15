@@ -2,14 +2,13 @@ part of '../../arcgis_maps_flutter.dart';
 
 @immutable
 class FeatureLayer extends BaseTileLayer {
-  FeatureLayer.fromUrl(
+  const FeatureLayer.fromUrl(
     String url, {
-    LayerId? layerId,
+    required super.layerId,
     super.isVisible,
     super.opacity,
   })  : portalItemLayerId = -1,
         super.fromUrl(
-          layerId: layerId ?? LayerId(url),
           url: url,
           type: 'FeatureLayer',
         );

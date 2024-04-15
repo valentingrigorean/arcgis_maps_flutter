@@ -10,8 +10,8 @@ class MapPageBuffer extends StatefulWidget {
 }
 
 class _MapPageBufferState extends State<MapPageBuffer> {
+  late final ArcgisMapController _mapController;
   int _currentBufferType = 0;
-  PolygonMarker? _polygon;
 
   @override
   Widget build(BuildContext context) {
@@ -22,15 +22,19 @@ class _MapPageBufferState extends State<MapPageBuffer> {
       body: Stack(
         children: [
           ArcgisMapView(
+            onMapCreated: (controller) {
+              _mapController = controller;
+              _mapController.createOrUpdateGraphicsOverlay(
+                  const GraphicsOverlay(id: 'default'));
+            },
             map: const ArcGISMap.fromBasemap(
               Basemap.fromStyle(
                 basemapStyle: BasemapStyle.arcGISCommunity,
               ),
             ),
-            polygons: _polygon == null ? const {} : {_polygon!},
             onTap: (screenPoint, position) async {
               Polygon? polygon;
-              if(position == null)return;
+              if (position == null) return;
               if (_currentBufferType == 0) {
                 polygon = await GeometryEngine.bufferGeometry(
                     geometry: position, distance: 1000);
@@ -43,20 +47,28 @@ class _MapPageBufferState extends State<MapPageBuffer> {
                   curveType: GeodeticCurveType.shapePreserving,
                 );
               }
+              _mapController.clearGraphicsOverlay('default');
 
               if (polygon == null) {
-                _polygon = null;
-              } else {
-                _polygon = PolygonMarker(
-                  polygonId: const PolygonId('buffer'),
-                  points: polygon.points.first,
-                  spatialReference: polygon.spatialReference,
-                  fillColor: Colors.red,
-                  strokeWidth: 2,
-                  strokeStyle: SimpleLineSymbolStyle.dash,
-                );
-                setState(() {});
+                return;
               }
+              _mapController.addGraphicsToOverlay(
+                'default',
+                [
+                  Graphic(
+                    graphicId: 'buffer',
+                    geometry: polygon,
+                    symbol: const SimpleLineSymbol(
+                      style: SimpleLineSymbolStyle.dash,
+                      color: Colors.red,
+                      width: 2,
+                      markerStyle: SimpleLineSymbolMarkerStyle.none,
+                      markerPlacement:
+                          SimpleLineSymbolMarkerPlacement.beginAndEnd,
+                    ),
+                  ),
+                ],
+              );
             },
           ),
           Positioned(

@@ -1,4 +1,5 @@
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
+import 'package:arcgis_maps_flutter/src/layers/layer_updates.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/map_event.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/method_channel_arcgis_maps_flutter.dart';
 import 'package:flutter/foundation.dart';
@@ -184,6 +185,11 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
         'updateIdentifyLayerListeners() has not been implemented.');
   }
 
+  Future<void> updateLayers(int mapId, LayerUpdates layerUpdates) {
+    throw UnimplementedError('updateLayers() has not been implemented.');
+  }
+
+
   /// Sets a time offset for this object. The time offset is subtracted from
   /// the time extent set on the owning GeoView. This allows for data from
   /// different periods of time to be compared. Can be null if there is
@@ -241,7 +247,29 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('onTimeExtentChanged() has not been implemented.');
   }
 
+  Future<void> createOrUpdateGraphicsOverlays(int mapId, List<GraphicsOverlay> graphicsOverlays) {
+    throw UnimplementedError('createOrUpdateGraphicsOverlay() has not been implemented.');
+  }
+
+  Future<void> removeGraphicsOverlays(int mapId, List<String> overlayIds) {
+    throw UnimplementedError('removeGraphicsOverlay() has not been implemented.');
+  }
+
+  Future<void> clearGraphicsOverlay(int mapId, String overlayId) {
+    throw UnimplementedError('clearGraphicsOverlay() has not been implemented.');
+  }
+
+  Future<void> addGraphicsToOverlay(int mapId, String overlayId, List<Graphic> graphics) {
+    throw UnimplementedError('addGraphicsToOverlay() has not been implemented.');
+  }
+
+  Future<void> removeGraphicsFromOverlay(int mapId, String overlayId, List<String> graphicIds) {
+    throw UnimplementedError('removeGraphicsFromOverlay() has not been implemented.');
+  }
+
   void dispose(int mapId) {
     throw UnimplementedError('dispose() has not been implemented.');
   }
+
+
 }

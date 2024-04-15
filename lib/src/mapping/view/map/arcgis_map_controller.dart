@@ -219,13 +219,48 @@ class ArcgisMapController {
   /// the time extent set on the owning GeoView. This allows for data from
   /// different periods of time to be compared. Can be null if there is
   /// no time offset.
-  Future<void> setLayerTimeOffset(LayerId layerId, TimeValue? timeValue) =>
+  Future<void> setLayerTimeOffset(String layerId, TimeValue? timeValue) =>
       ArcgisMapsFlutterPlatform.instance
           .setLayerTimeOffset(mapId, layerId, timeValue);
 
   /// Return all time aware layers from Operational layers.
   Future<List<TimeAwareLayerInfo>> getTimeAwareLayerInfos() =>
       ArcgisMapsFlutterPlatform.instance.getTimeAwareLayerInfos(mapId);
+
+  Future<void> createOrUpdateGraphicsOverlay(GraphicsOverlay graphicsOverlay) {
+    return createOrUpdateGraphicsOverlays([graphicsOverlay]);
+  }
+
+  Future<void> createOrUpdateGraphicsOverlays(
+      List<GraphicsOverlay> graphicsOverlays) {
+    return ArcgisMapsFlutterPlatform.instance
+        .createOrUpdateGraphicsOverlays(mapId, graphicsOverlays);
+  }
+
+  Future<void> removeGraphicsOverlay(String overlayId) {
+    return removeGraphicsOverlays([overlayId]);
+  }
+
+  Future<void> removeGraphicsOverlays(List<String> overlayIds) {
+    return ArcgisMapsFlutterPlatform.instance
+        .removeGraphicsOverlays(mapId, overlayIds);
+  }
+
+  Future<void> clearGraphicsOverlay(String overlayId) {
+    return ArcgisMapsFlutterPlatform.instance
+        .clearGraphicsOverlay(mapId, overlayId);
+  }
+
+  Future<void> addGraphicsToOverlay(String overlayId, List<Graphic> graphics) {
+    return ArcgisMapsFlutterPlatform.instance
+        .addGraphicsToOverlay(mapId, overlayId, graphics);
+  }
+
+  Future<void> removeGraphicsFromOverlay(
+      String overlayId, List<String> graphicIds) {
+    return ArcgisMapsFlutterPlatform.instance
+        .removeGraphicsFromOverlay(mapId, overlayId, graphicIds);
+  }
 
   Future<void> _setMap(ArcGISMap map) {
     return ArcgisMapsFlutterPlatform.instance.setMap(mapId, map);
@@ -246,22 +281,7 @@ class ArcgisMapController {
     return ArcgisMapsFlutterPlatform.instance.updateLayers(mapId, layerUpdates);
   }
 
-  Future<void> _updateMarkers(MarkerUpdates markerUpdates) {
-    return ArcgisMapsFlutterPlatform.instance
-        .updateMarkers(mapId, markerUpdates);
-  }
-
-  Future<void> _updatePolygons(PolygonUpdates polygonUpdates) {
-    return ArcgisMapsFlutterPlatform.instance
-        .updatePolygons(mapId, polygonUpdates);
-  }
-
-  Future<void> _updatePolylines(PolylineUpdates polylineUpdates) {
-    return ArcgisMapsFlutterPlatform.instance
-        .updatePolylines(mapId, polylineUpdates);
-  }
-
-  Future<void> _updateIdentifyLayerListeners(Set<LayerId> layers) {
+  Future<void> _updateIdentifyLayerListeners(Set<String> layers) {
     return ArcgisMapsFlutterPlatform.instance
         .updateIdentifyLayerListeners(mapId, layers);
   }
@@ -279,18 +299,6 @@ class ArcgisMapController {
   }
 
   void _connectStream(int mapId) {
-    ArcgisMapsFlutterPlatform.instance
-        .onMarkerTap(mapId: mapId)
-        .listen((MarkerTapEvent e) => _arcgisMapState.onMarkerTap(e.value));
-
-    ArcgisMapsFlutterPlatform.instance
-        .onPolygonTap(mapId: mapId)
-        .listen((PolygonTapEvent e) => _arcgisMapState.onPolygonTap(e.value));
-
-    ArcgisMapsFlutterPlatform.instance
-        .onPolylineTap(mapId: mapId)
-        .listen((PolylineTapEvent e) => _arcgisMapState.onPolylineTap(e.value));
-
     ArcgisMapsFlutterPlatform.instance
         .onMapLoad(mapId: mapId)
         .listen((MapLoadedEvent e) => _arcgisMapState.onMapLoaded(e.value));

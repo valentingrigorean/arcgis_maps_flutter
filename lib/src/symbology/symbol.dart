@@ -16,4 +16,8 @@ abstract class Symbol extends Equatable{
       'type': type,
     };
   }
+
+  static Symbol? fromJson(Map<String,dynamic> json) {
+    return null;
+  }
 }

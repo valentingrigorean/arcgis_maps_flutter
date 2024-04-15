@@ -17,7 +17,7 @@ class TimeAwareLayerInfo extends Equatable {
     final timeOffset = json['timeOffset'];
     final timeInterval = json['timeInterval'];
     return TimeAwareLayerInfo(
-      layerId: layerId == null ? null : LayerId(layerId),
+      layerId: layerId,
       fullTimeExtent:
           fullTimeExtent == null ? null : TimeExtent.fromJson(fullTimeExtent),
       supportsTimeFiltering: json['supportsTimeFiltering'],
@@ -28,7 +28,7 @@ class TimeAwareLayerInfo extends Equatable {
     );
   }
 
-  final LayerId? layerId;
+  final String? layerId;
 
   /// The full time extent of the layer
   final TimeExtent? fullTimeExtent;

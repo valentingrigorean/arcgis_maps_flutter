@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:arcgis_maps_flutter/src/arcgis_method_channel.dart';
+import 'package:arcgis_maps_flutter/src/layers/layer_updates.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/arcgis_maps_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/map_event.dart';
 import 'package:arcgis_maps_flutter/src/utils/layers.dart';
@@ -420,6 +421,55 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
         'timeValue': timeValue?.toJson(),
       },
     );
+  }
+
+  @override
+  Future<void> updateLayers(int mapId, LayerUpdates layerUpdates) {
+    return channel(mapId)
+        .invokeMethod<void>('layers#update', layerUpdates.toJson());
+  }
+
+  @override
+  Future<void> createOrUpdateGraphicsOverlays(
+      int mapId, List<GraphicsOverlay> graphicsOverlays) {
+    return channel(mapId).invokeMethod<void>(
+      'map#createOrUpdateGraphicsOverlays',
+      graphicsOverlays.map((e) => e.toJson()).toList(),
+    );
+  }
+
+  @override
+  Future<void> removeGraphicsOverlays(int mapId, List<String> overlayIds) {
+    return channel(mapId).invokeMethod<void>(
+      'map#removeGraphicsOverlays',
+      overlayIds,
+    );
+  }
+
+  @override
+  Future<void> clearGraphicsOverlay(int mapId, String overlayId) {
+    return channel(mapId).invokeMethod<void>(
+      'map#clearGraphicsOverlay',
+      overlayId,
+    );
+  }
+
+  @override
+  Future<void> addGraphicsToOverlay(
+      int mapId, String overlayId, List<Graphic> graphics) {
+    return channel(mapId).invokeMethod<void>(
+      'map#addGraphicsToOverlay',
+      {
+        'overlayId': overlayId,
+        'graphics': graphics.map((e) => e.toJson()).toList(),
+      },
+    );
+  }
+
+  Future<void> removeGraphicsFromOverlay(
+      int mapId, String overlayId, List<String> graphicIds) {
+    throw UnimplementedError(
+        'removeGraphicsFromOverlay() has not been implemented.');
   }
 
   @override

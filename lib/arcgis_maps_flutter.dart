@@ -104,6 +104,7 @@ part 'src/mapping/viewpoint_type.dart';
 part 'src/mapping/arcgis_map.dart';
 part 'src/mapping/view/auto_pan_mode.dart';
 part 'src/mapping/view/graphic.dart';
+part 'src/mapping/view/graphics_overlay.dart';
 part 'src/mapping/view/identify_layer_result.dart';
 part 'src/mapping/view/layers_changed_listener.dart';
 part 'src/mapping/view/location_display.dart';
@@ -135,12 +136,15 @@ part 'src/mapping/view/scene/arcgis_scene_controller.dart';
 part 'src/mapping/view/scene/arcgis_scene_view.dart';
 
 part 'src/symbology/composite_symbol.dart';
+part 'src/symbology/fill_symbol.dart';
+part 'src/symbology/line_symbol.dart';
 part 'src/symbology/marker_symbol.dart';
 part 'src/symbology/picture_marker_symbol.dart';
 part 'src/symbology/renderer.dart';
+part 'src/symbology/simple_fill_symbol.dart';
+part 'src/symbology/simple_line_symbol.dart';
 part 'src/symbology/simple_marker_symbol.dart';
 part 'src/symbology/symbol.dart';
-part 'src/symbology/symbol_visibility_filter.dart';
 part 'src/symbology/text_symbol.dart';
 part 'src/symbology/unique_value_renderer.dart';
 

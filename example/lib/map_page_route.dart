@@ -39,9 +39,6 @@ class _MapPageRouteState extends State<MapPageRoute> {
     )
   ];
 
-  final Set<Marker> _markers = {};
-
-  final Set<PolylineMarker> _routeLines = {};
   final List<DirectionManeuver> _directions = [];
 
   late final ArcgisMapController _mapController;
@@ -74,8 +71,6 @@ class _MapPageRouteState extends State<MapPageRoute> {
             onMapCreated: (controller) {
               _mapController = controller;
             },
-            markers: _markers,
-            polylines: _routeLines,
           ),
           if (_directions.isNotEmpty)
             Positioned(

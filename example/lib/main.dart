@@ -366,7 +366,7 @@ class MainPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const MapPageASsetsMarker(),
+                      builder: (context) => const MapPageAssetsMarker(),
                     ),
                   );
                 },

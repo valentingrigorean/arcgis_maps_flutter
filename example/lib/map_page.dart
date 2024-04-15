@@ -4,8 +4,6 @@ import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 // ignore_for_file: unused_field
 
-
-
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
 
@@ -46,7 +44,8 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
   Widget _buildMap() {
     var mapView = ArcgisMapView(
       map: map,
-      scalebarConfiguration: const ScalebarConfiguration(style: ScalebarStyle.dualUnitLineNauticalMile),
+      scalebarConfiguration: const ScalebarConfiguration(
+          style: ScalebarStyle.dualUnitLineNauticalMile),
       onMapCreated: onMapCreated,
       onMapLoaded: (error) {
         if (error != null) {
@@ -54,19 +53,6 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
         } else {
           print('map loaded.');
         }
-      },
-      markers: {
-        Marker(
-          markerId: const MarkerId("markerId"),
-          position: Point.fromLatLng(latitude: 0, longitude: 0),
-          onTap: () => print('On marker tap'),
-          consumeTapEvents: true,
-          icon: BitmapDescriptor.fromStyleMarker(
-            style: SimpleMarkerSymbolStyle.square,
-            color: Colors.red,
-            size: 30,
-          ),
-        )
       },
     );
 
@@ -102,7 +88,7 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
             onTap: () {
               setState(() {
                 map = ArcGISMap.fromBasemapStyle(
-                 items[index],
+                  items[index],
                 );
               });
               Navigator.pop(_scaffoldKey.currentContext!);
@@ -118,6 +104,27 @@ class _MapPageState extends State<MapPage> implements ViewpointChangedListener {
     mapController.locationDisplay.autoPanMode = AutoPanMode.navigation;
 
     _compassController = CompassController.fromMapController(mapController);
+
+    mapController
+        .createOrUpdateGraphicsOverlay(const GraphicsOverlay(id: 'default'));
+    mapController.addGraphicsToOverlay(
+      'default',
+      [
+        Graphic(
+          graphicId: '1',
+          geometry: Point.fromLatLng(
+            latitude: 34.052235,
+            longitude: -118.243683,
+          ),
+          symbol: const SimpleMarkerSymbol(
+            style: SimpleMarkerSymbolStyle.circle,
+            color: Colors.red,
+            size: 10,
+          ),
+        ),
+      ],
+    );
+
     setState(() {});
     final spatialReference = await mapController.getMapSpatialReference();
     debugPrint('spatialReference: $spatialReference');
