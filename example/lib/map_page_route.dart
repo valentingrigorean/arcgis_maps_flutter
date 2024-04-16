@@ -44,12 +44,6 @@ class _MapPageRouteState extends State<MapPageRoute> {
   late final ArcgisMapController _mapController;
 
   @override
-  void initState() {
-    super.initState();
-    _makeMarkers();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -70,6 +64,10 @@ class _MapPageRouteState extends State<MapPageRoute> {
             ),
             onMapCreated: (controller) {
               _mapController = controller;
+              _mapController.createOrUpdateGraphicsOverlay(
+                const GraphicsOverlay(id: 'route'),
+              );
+              _makeMarkers();
             },
           ),
           if (_directions.isNotEmpty)
@@ -105,43 +103,49 @@ class _MapPageRouteState extends State<MapPageRoute> {
   }
 
   void _makeMarkers() {
-    _markers.add(
-      Marker(
-        markerId: const MarkerId('origin'),
-        position: _demoStops[0].geometry!,
-        icon: BitmapDescriptor.fromStyleMarker(
+    final graphics = <Graphic>[];
+    graphics.add(
+      Graphic(
+        graphicId: 'origin',
+        geometry: _demoStops[0].geometry,
+        symbol: const SimpleMarkerSymbol(
           style: SimpleMarkerSymbolStyle.circle,
           color: Colors.green,
           size: 24,
         ),
       ),
     );
-    _markers.add(
-      Marker(
-        markerId: const MarkerId('stop'),
-        position: _demoStops[1].geometry!,
-        icon: BitmapDescriptor.fromStyleMarker(
+    graphics.add(
+      Graphic(
+        graphicId: 'stop',
+        geometry: _demoStops[1].geometry,
+        symbol: const SimpleMarkerSymbol(
           style: SimpleMarkerSymbolStyle.diamond,
           color: Colors.red,
           size: 12,
         ),
       ),
     );
-    _markers.add(
-      Marker(
-        markerId: const MarkerId('destination'),
-        position: _demoStops[2].geometry!,
-        icon: BitmapDescriptor.fromStyleMarker(
+    graphics.add(
+      Graphic(
+        graphicId: 'destination',
+        geometry: _demoStops[2].geometry,
+        symbol: const SimpleMarkerSymbol(
           style: SimpleMarkerSymbolStyle.circle,
           color: Colors.black,
           size: 24,
         ),
       ),
     );
+    _mapController.createOrUpdateGraphicsOverlay(
+      const GraphicsOverlay(id: 'stops'),
+    );
+    _mapController.addGraphicsToOverlay('stops', graphics);
   }
 
   void _testRoute() async {
     try {
+      _mapController.clearGraphicsOverlay('route');
       final parameters = await _routeTask.createDefaultParameters();
 
       final routeResults = await _routeTask.solveRoute(parameters.copyWith(
@@ -158,18 +162,18 @@ class _MapPageRouteState extends State<MapPageRoute> {
             print('didSetViewPoint: $didSetViewPoint');
           }
         }
-        _routeLines.clear();
-        _routeLines.add(
-          PolylineMarker(
-            polylineId: const PolylineId('route'),
-            points: route.routeGeometry!.points.first
-                .map((e) => e.copyWithSpatialReference(
-                      route.routeGeometry!.spatialReference,
-                    ))
-                .toList(),
-            color: Colors.green,
-            width: 5,
-          ),
+        _mapController.addGraphicsToOverlay(
+          'route',
+          [
+            Graphic(
+              graphicId: 'route',
+              geometry: route.routeGeometry,
+              symbol: const SimpleLineSymbol(
+                color: Colors.green,
+                width: 5,
+              ),
+            ),
+          ],
         );
         _directions.clear();
         _directions.addAll(route.directionManeuvers);

@@ -12,7 +12,7 @@ abstract class Geometry {
   final GeometryType geometryType;
 
   Map<String, Object> toJson() => {
-        'type': geometryType.value,
+        'type': geometryType.name,
         if (spatialReference != null)
           'spatialReference': spatialReference!.toJson(),
       };

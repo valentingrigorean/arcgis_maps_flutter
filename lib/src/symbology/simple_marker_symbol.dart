@@ -13,9 +13,9 @@ enum SimpleMarkerSymbolStyle {
 
 class SimpleMarkerSymbol extends MarkerSymbol {
   const SimpleMarkerSymbol({
-    required this.style,
-    required this.color,
-    required this.size,
+    this.style = SimpleMarkerSymbolStyle.circle,
+    this.color = const Color(0xFF000000),
+    this.size = 8,
     super.angle,
     super.angleAlignment,
     super.leaderOffset,

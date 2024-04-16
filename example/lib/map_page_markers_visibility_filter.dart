@@ -26,35 +26,36 @@ class _MapPageMarkersVisibilityFilterState
     3: Colors.pinkAccent
   };
 
-  static const Map<int, SymbolVisibilityFilter> _filterMap = {
-    0: SymbolVisibilityFilter(
-      minZoom: ZoomLevel.vilage,
-      maxZoom: ZoomLevel.city,
+  static const Map<int, GraphicsOverlay> _filterOverlay = {
+    0: GraphicsOverlay(
+      id: 'filter0',
+      minScale: ZoomLevel.vilage,
+      maxScale: ZoomLevel.city,
     ),
-    1: SymbolVisibilityFilter(
-      minZoom: ZoomLevel.largeMetropolitanArea,
-      maxZoom: ZoomLevel.smallCountry,
+    1: GraphicsOverlay(
+      id: 'filter1',
+      minScale: ZoomLevel.largeMetropolitanArea,
+      maxScale: ZoomLevel.smallCountry,
     ),
-    2: SymbolVisibilityFilter(
-      minZoom: ZoomLevel.level23,
-      maxZoom: ZoomLevel.level15,
+    2: GraphicsOverlay(
+      id: 'filter2',
+      minScale: ZoomLevel.level23,
+      maxScale: ZoomLevel.level15,
     ),
   };
 
-  final Set<Marker> _markers = List.generate(
+  final Set<Graphic> _markers = List.generate(
     100,
     (index) {
-      return Marker(
-        markerId: MarkerId(index.toString()),
-        position: Utils.getRandomLocation(
-            Point.fromLatLng(latitude: 59.91, longitude: 10.76), 200000),
-        icon: BitmapDescriptor.fromStyleMarker(
-          style: _styleMap[index % 4]!,
-          color: _colorMap[index % 4]!,
-          size: 40,
-        ),
-        visibilityFilter: index % 4 == 0 ? null : _filterMap[index % 3],
-      );
+      return Graphic(
+          graphicId: index.toString(),
+          geometry: Utils.getRandomLocation(
+              Point.fromLatLng(latitude: 59.91, longitude: 10.76), 200000),
+          symbol: SimpleMarkerSymbol(
+            style: _styleMap[index % 4]!,
+            color: _colorMap[index % 4]!,
+            size: 40,
+          ));
     },
   ).toSet();
 
@@ -65,12 +66,25 @@ class _MapPageMarkersVisibilityFilterState
         title: const Text('Visibility Filter'),
       ),
       body: ArcgisMapView(
+        onMapCreated: (controller) {
+          controller.createOrUpdateGraphicsOverlay(
+              const GraphicsOverlay(id: 'default'));
+          controller
+              .createOrUpdateGraphicsOverlays(_filterOverlay.values.toList());
+          final Map<String, List<Graphic>> map = {
+            'default': [],
+            for (int i = 0; i < 3; i++)
+              'filter$i': _markers.toList().sublist(i * 33, (i + 1) * 33)
+          };
+          for (final pair in map.entries) {
+            controller.addGraphicsToOverlay(pair.key, pair.value);
+          }
+        },
         map: const ArcGISMap.fromBasemap(
           Basemap.fromStyle(
             basemapStyle: BasemapStyle.arcGISCommunity,
           ),
         ),
-        markers: _markers,
       ),
     );
   }

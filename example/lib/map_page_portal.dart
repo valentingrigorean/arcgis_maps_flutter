@@ -18,7 +18,7 @@ class MapPagePortal extends StatelessWidget {
         ),
         operationalLayers: {
           FeatureLayer.fromPortalItem(
-            layerId: const LayerId('LayerId'),
+            layerId: 'LayerId',
             portalItem: PortalItem(
               portal: Portal.arcGISOnline(connection: PortalConnection.anonymous),
               itemId: 'af1ad38816814b7eba3fe74a3b84412d',

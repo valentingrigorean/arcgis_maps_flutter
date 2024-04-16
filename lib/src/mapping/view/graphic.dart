@@ -1,11 +1,12 @@
 part of '../../../arcgis_maps_flutter.dart';
 
-class Graphic extends GeoElement implements MapsObject<Graphic> {
+class Graphic extends GeoElement  {
   const Graphic({
     required this.graphicId,
     this.attributes = const {},
     this.geometry,
     this.symbol,
+    this.zIndex,
   });
 
   final String graphicId;
@@ -21,18 +22,11 @@ class Graphic extends GeoElement implements MapsObject<Graphic> {
   /// The symbol of the graphic.
   final Symbol? symbol;
 
+  final int? zIndex;
+
   @override
   String get type => 'Graphic';
 
-  @override
-  String get mapsId => graphicId;
-
-  @override
-  Graphic clone() {
-    return this;
-  }
-
-  @override
   Map<String, Object> toJson() {
     final Map<String, Object> json = <String, Object>{};
     json['graphicId'] = graphicId;
@@ -40,6 +34,7 @@ class Graphic extends GeoElement implements MapsObject<Graphic> {
     json.addIfNonNull('geometry', geometry?.toJson());
     json.addIfNonNull('attributes', serializeAttributes(attributes));
     json.addIfNonNull('symbol', symbol?.toJson());
+    json.addIfNonNull('zIndex', zIndex);
     return json;
   }
 }

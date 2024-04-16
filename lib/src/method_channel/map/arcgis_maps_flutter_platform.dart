@@ -189,7 +189,6 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('updateLayers() has not been implemented.');
   }
 
-
   /// Sets a time offset for this object. The time offset is subtracted from
   /// the time extent set on the owning GeoView. This allows for data from
   /// different periods of time to be compared. Can be null if there is
@@ -247,29 +246,59 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('onTimeExtentChanged() has not been implemented.');
   }
 
-  Future<void> createOrUpdateGraphicsOverlays(int mapId, List<GraphicsOverlay> graphicsOverlays) {
-    throw UnimplementedError('createOrUpdateGraphicsOverlay() has not been implemented.');
+  Future<void> createOrUpdateGraphicsOverlays({
+    required int mapId,
+    required List<GraphicsOverlay> graphicsOverlays,
+  }) {
+    throw UnimplementedError(
+        'createOrUpdateGraphicsOverlay() has not been implemented.');
   }
 
-  Future<void> removeGraphicsOverlays(int mapId, List<String> overlayIds) {
-    throw UnimplementedError('removeGraphicsOverlay() has not been implemented.');
+  Future<void> removeGraphicsOverlays({
+    required int mapId,
+    required List<String> overlayIds,
+  }) {
+    throw UnimplementedError(
+        'removeGraphicsOverlay() has not been implemented.');
   }
 
-  Future<void> clearGraphicsOverlay(int mapId, String overlayId) {
-    throw UnimplementedError('clearGraphicsOverlay() has not been implemented.');
+  Future<void> clearGraphicsOverlay({
+    required int mapId,
+    required String overlayId,
+  }) {
+    throw UnimplementedError(
+        'clearGraphicsOverlay() has not been implemented.');
   }
 
-  Future<void> addGraphicsToOverlay(int mapId, String overlayId, List<Graphic> graphics) {
-    throw UnimplementedError('addGraphicsToOverlay() has not been implemented.');
+  Future<void> addGraphicsToOverlay({
+    required int mapId,
+    required String overlayId,
+    required List<Graphic> graphics,
+  }) {
+    throw UnimplementedError(
+        'addGraphicsToOverlay() has not been implemented.');
   }
 
-  Future<void> removeGraphicsFromOverlay(int mapId, String overlayId, List<String> graphicIds) {
-    throw UnimplementedError('removeGraphicsFromOverlay() has not been implemented.');
+  Future<void> updateGraphicData({
+    required int mapId,
+    required String overlayId,
+    required String graphicId,
+    Geometry? geometry,
+    Symbol? symbol,
+  }) {
+    throw UnimplementedError('updateGraphics() has not been implemented.');
+  }
+
+  Future<void> removeGraphicsFromOverlay({
+    required int mapId,
+    required String overlayId,
+    required List<String> graphicIds,
+  }) {
+    throw UnimplementedError(
+        'removeGraphicsFromOverlay() has not been implemented.');
   }
 
   void dispose(int mapId) {
     throw UnimplementedError('dispose() has not been implemented.');
   }
-
-
 }

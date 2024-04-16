@@ -17,7 +17,6 @@ import 'package:arcgis_maps_flutter_example/map_page_gesture.dart';
 import 'package:arcgis_maps_flutter_example/map_page_group_layer.dart';
 import 'package:arcgis_maps_flutter_example/map_page_legend.dart';
 import 'package:arcgis_maps_flutter_example/map_page_locator.dart';
-import 'package:arcgis_maps_flutter_example/map_page_marker_from_widget.dart';
 import 'package:arcgis_maps_flutter_example/map_page_marker_rotation.dart';
 import 'package:arcgis_maps_flutter_example/map_page_markers.dart';
 import 'package:arcgis_maps_flutter_example/map_page_markers_visibility_filter.dart';
@@ -32,7 +31,6 @@ import 'package:arcgis_maps_flutter_example/map_page_screen_location.dart';
 import 'package:arcgis_maps_flutter_example/map_page_scrolling_list.dart';
 import 'package:arcgis_maps_flutter_example/map_page_tile_cache.dart';
 import 'package:arcgis_maps_flutter_example/map_page_view_insests.dart';
-import 'package:arcgis_maps_flutter_example/scene_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -183,17 +181,6 @@ class MainPage extends StatelessWidget {
                   );
                 },
                 child: const Text('Feature service offline & sync'),
-              ),
-              ElevatedButton(
-                child: const Text('Marker generatered from widget'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const MapPageMarkerFromWidget(),
-                    ),
-                  );
-                },
               ),
               ElevatedButton(
                 child: const Text('Map Max Extent'),
@@ -414,15 +401,6 @@ class MainPage extends StatelessWidget {
                       builder: (context) => const MapPageScreenLocation(),
                     ),
                   );
-                },
-              ),
-              ElevatedButton(
-                child: const Text('Scene 3d'),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ScenePage()));
                 },
               ),
               ElevatedButton(

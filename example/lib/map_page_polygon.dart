@@ -18,6 +18,32 @@ class _MapPagePolygonState extends State<MapPagePolygon> {
         title: const Text("Polygon"),
       ),
       body: ArcgisMapView(
+        onMapCreated: (controller) {
+          controller.createOrUpdateGraphicsOverlay(
+            const GraphicsOverlay(id: 'default'),
+          );
+
+          controller.addGraphicsToOverlay('default', [
+            Graphic(
+              graphicId: 'test',
+              geometry: Polygon(points: [
+                [
+                  Point.fromLatLng(latitude: 60.443889, longitude: 6.413889),
+                  Point.fromLatLng(latitude: 60.443889, longitude: 6.413889),
+                  Point.fromLatLng(latitude: 60.443889, longitude: 6.413889)
+                ],
+              ]),
+              symbol: const SimpleFillSymbol(
+                style: SimpleFillSymbolStyle.solid,
+                color: Colors.green,
+                outline: SimpleLineSymbol(
+                  color: Colors.red,
+                  width: 1,
+                ),
+              ),
+            ),
+          ]);
+        },
         map: const ArcGISMap.fromBasemap(
           Basemap.fromStyle(
             basemapStyle: BasemapStyle.arcGISImageryStandard,
@@ -30,37 +56,6 @@ class _MapPagePolygonState extends State<MapPagePolygon> {
           ),
           scale: ZoomLevel.city,
         ),
-        polygons: {
-          PolygonMarker(
-            polygonId: const PolygonId("test"),
-            spatialReference: SpatialReference.wgs84(),
-            points: [
-              Point.fromLatLng(
-                latitude: 60.443889,
-                longitude: 6.413889,
-              ),
-              Point.fromLatLng(
-                latitude: 60.443889,
-                longitude: 6.415278,
-              ),
-              Point.fromLatLng(
-                latitude: 60.433333,
-                longitude: 6.418611,
-              ),
-              Point.fromLatLng(
-                latitude: 60.432778,
-                longitude: 6.416667,
-              ),
-            ],
-            consumeTapEvents: true,
-            fillColor: Colors.green,
-            strokeColor: Colors.red,
-            strokeWidth: 1,
-            onTap: () {
-              print('Polygon click!');
-            },
-          ),
-        },
       ),
     );
   }

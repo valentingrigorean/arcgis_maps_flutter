@@ -430,8 +430,10 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<void> createOrUpdateGraphicsOverlays(
-      int mapId, List<GraphicsOverlay> graphicsOverlays) {
+  Future<void> createOrUpdateGraphicsOverlays({
+    required int mapId,
+    required List<GraphicsOverlay> graphicsOverlays,
+  }) {
     return channel(mapId).invokeMethod<void>(
       'map#createOrUpdateGraphicsOverlays',
       graphicsOverlays.map((e) => e.toJson()).toList(),
@@ -439,7 +441,10 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<void> removeGraphicsOverlays(int mapId, List<String> overlayIds) {
+  Future<void> removeGraphicsOverlays({
+    required int mapId,
+    required List<String> overlayIds,
+  }) {
     return channel(mapId).invokeMethod<void>(
       'map#removeGraphicsOverlays',
       overlayIds,
@@ -447,7 +452,10 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<void> clearGraphicsOverlay(int mapId, String overlayId) {
+  Future<void> clearGraphicsOverlay({
+    required int mapId,
+    required String overlayId,
+  }) {
     return channel(mapId).invokeMethod<void>(
       'map#clearGraphicsOverlay',
       overlayId,
@@ -455,8 +463,11 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<void> addGraphicsToOverlay(
-      int mapId, String overlayId, List<Graphic> graphics) {
+  Future<void> addGraphicsToOverlay({
+    required int mapId,
+    required String overlayId,
+    required List<Graphic> graphics,
+  }) {
     return channel(mapId).invokeMethod<void>(
       'map#addGraphicsToOverlay',
       {
@@ -466,10 +477,39 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
     );
   }
 
-  Future<void> removeGraphicsFromOverlay(
-      int mapId, String overlayId, List<String> graphicIds) {
-    throw UnimplementedError(
-        'removeGraphicsFromOverlay() has not been implemented.');
+  @override
+  Future<void> updateGraphicData({
+    required int mapId,
+    required String overlayId,
+    required String graphicId,
+    Geometry? geometry,
+    Symbol? symbol,
+  }) {
+    return channel(mapId).invokeMethod<void>(
+      'map#updateGraphicData',
+      {
+        'overlayId': overlayId,
+        'graphicId': graphicId,
+        'geometry': geometry?.toJson(),
+        'symbol': symbol?.toJson(),
+      },
+    );
+  }
+
+
+  @override
+  Future<void> removeGraphicsFromOverlay({
+    required int mapId,
+    required String overlayId,
+    required List<String> graphicIds,
+  }) {
+    return channel(mapId).invokeMethod<void>(
+      'map#removeGraphicsFromOverlay',
+      {
+        'overlayId': overlayId,
+        'graphicIds': graphicIds,
+      },
+    );
   }
 
   @override

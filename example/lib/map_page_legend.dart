@@ -12,42 +12,50 @@ class MapPageLegend extends StatefulWidget {
 
 class _MapPageLegendState extends State<MapPageLegend> {
   // ignore: unused_field
-  final Layer _layer = WmsLayer.fromUrl(
-      'https://wms.geonorge.no/skwms1/wms.dybdedata2?service=WMS&request=GetCapabilities',
-      layersName: [
-        'grunne',
-        'flytedokk',
-        'Dybdepunkt',
-        'Dybdelag',
-        'Dybdekontur'
-      ]);
+  final Layer _layer = const WmsLayer.fromUrl(
+    'https://wms.geonorge.no/skwms1/wms.dybdedata2?service=WMS&request=GetCapabilities',
+    layerId: 'dybdedata2',
+    layersName: [
+      'grunne',
+      'flytedokk',
+      'Dybdepunkt',
+      'Dybdelag',
+      'Dybdekontur'
+    ],
+  );
 
   static Set<Layer> getLakeLayers() => {
-    FeatureLayer.fromUrl(
-      'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/1',
-      opacity: 0.4,
-    ),
-    FeatureLayer.fromUrl(
-      'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/2',
-      opacity: 0.4,
-    ),
-    FeatureLayer.fromUrl(
-      'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/3',
-      opacity: 0.4,
-    ),
-    FeatureLayer.fromUrl(
-      'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/4',
-      opacity: 0.4,
-    ),
-    FeatureLayer.fromUrl(
-      'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/5',
-      opacity: 0.4,
-    ),
-    FeatureLayer.fromUrl(
-      'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/6',
-      opacity: 0.4,
-    ),
-  };
+        const FeatureLayer.fromUrl(
+          'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/1',
+          layerId: 'Innsjodatabase2',
+          opacity: 0.4,
+        ),
+        const FeatureLayer.fromUrl(
+          'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/2',
+          layerId: 'Innsjodatabase2_2',
+          opacity: 0.4,
+        ),
+        const FeatureLayer.fromUrl(
+          'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/3',
+          layerId: 'Innsjodatabase2_3',
+          opacity: 0.4,
+        ),
+        const FeatureLayer.fromUrl(
+          'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/4',
+          layerId: 'Innsjodatabase2_4',
+          opacity: 0.4,
+        ),
+        const FeatureLayer.fromUrl(
+          'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/5',
+          layerId: 'Innsjodatabase2_5',
+          opacity: 0.4,
+        ),
+        const FeatureLayer.fromUrl(
+          'https://nve.geodataonline.no/arcgis/rest/services/Innsjodatabase2/MapServer/6',
+          layerId: 'Innsjodatabase2_6',
+          opacity: 0.4,
+        ),
+      };
 
   ArcgisMapController? _controller;
 
@@ -73,10 +81,11 @@ class _MapPageLegendState extends State<MapPageLegend> {
         onPressed: _controller == null
             ? null
             : () async {
-                final result = await _controller!.getLegendInfosForLayers(getLakeLayers());
+                final result =
+                    await _controller!.getLegendInfosForLayers(getLakeLayers());
                 print('LegendInfo:${result.length}');
 
-                if(!context.mounted) {
+                if (!context.mounted) {
                   return;
                 }
                 showDialog(

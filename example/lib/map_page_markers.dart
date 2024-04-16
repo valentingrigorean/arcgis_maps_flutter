@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
@@ -26,7 +27,8 @@ class _MapPageMarkersState extends State<MapPageMarkers> {
     3: Colors.pinkAccent
   };
 
-  final Set<Marker> _markers = <Marker>{};
+  late final ArcgisMapController _mapController;
+  final List<Graphic> _markers = [];
 
   @override
   void initState() {
@@ -41,15 +43,25 @@ class _MapPageMarkersState extends State<MapPageMarkers> {
         title: const Text('Markers'),
       ),
       body: ArcgisMapView(
+        onMapCreated: (controller){
+          _mapController = controller;
+          controller.createOrUpdateGraphicsOverlay(
+            const GraphicsOverlay(id: 'default'),
+          );
+          controller.addGraphicsToOverlay('default', _markers);
+        },
         map: const ArcGISMap.fromBasemap(
           Basemap.fromStyle(
             basemapStyle: BasemapStyle.arcGISCommunity,
           ),
         ),
-        markers: _markers,
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _generateMarkers,
+        onPressed:(){
+          _generateMarkers();
+          _mapController.clearGraphicsOverlay('default');
+          _mapController.addGraphicsToOverlay('default', _markers);
+        },
         child: const Icon(Icons.refresh),
       ),
     );
@@ -60,13 +72,13 @@ class _MapPageMarkersState extends State<MapPageMarkers> {
     for (int i = 0; i < 5000; i++) {
       final int style = _random.nextInt(4);
       final int color = _random.nextInt(4);
-      final Marker marker = Marker(
-        markerId: MarkerId(i.toString()),
-        position: Point.fromLatLng(
+      final Graphic marker = Graphic(
+        graphicId: i.toString(),
+        geometry: Point.fromLatLng(
           latitude: _random.nextDouble() * 360 - 180,
           longitude: _random.nextDouble() * 180 - 90,
         ),
-        icon: BitmapDescriptor.fromStyleMarker(
+        symbol: SimpleMarkerSymbol(
           style: _styleMap[style]!,
           color: _colorMap[color]!,
           size: 30,
@@ -74,10 +86,5 @@ class _MapPageMarkersState extends State<MapPageMarkers> {
       );
       _markers.add(marker);
     }
-    if (mounted) {
-      setState(() {});
-    }
   }
 }
-
-

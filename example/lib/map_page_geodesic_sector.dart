@@ -10,6 +10,7 @@ class MapPageGeodesicSector extends StatefulWidget {
 
 class _MapPageGeodesicSectorState extends State<MapPageGeodesicSector> {
   late final ArcgisMapController _mapController;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,10 +18,10 @@ class _MapPageGeodesicSectorState extends State<MapPageGeodesicSector> {
         title: const Text('Geodesic Sector'),
       ),
       body: ArcgisMapView(
-        onMapCreated: (controller){
+        onMapCreated: (controller) {
           _mapController = controller;
-          _mapController.createOrUpdateGraphicsOverlay(const GraphicsOverlay(id: 'default'));
-
+          _mapController.createOrUpdateGraphicsOverlay(
+              const GraphicsOverlay(id: 'default'));
         },
         map: const ArcGISMap.fromBasemap(
           Basemap.fromStyle(
@@ -39,29 +40,44 @@ class _MapPageGeodesicSectorState extends State<MapPageGeodesicSector> {
             ),
           );
 
+          await _mapController.clearGraphicsOverlay('default');
           if (geometry is Polygon) {
-            final polygon = geometry;
-            polygons.add(
-              PolygonMarker(
-                polygonId: PolygonId(polygons.length.toString()),
-                points: polygon.points.expand((e) => e).toList(),
-                spatialReference: polygon.spatialReference,
-                strokeWidth: 2,
-                strokeColor: Colors.red,
-                fillColor: Colors.blueAccent.withOpacity(0.5),
-              ),
+            _mapController.addGraphicsToOverlay(
+              'default',
+              [
+                Graphic(
+                  graphicId: 'geodesicSector',
+                  geometry: geometry,
+                  symbol: SimpleFillSymbol(
+                    style: SimpleFillSymbolStyle.solid,
+                    color: Colors.blue.withOpacity(0.5),
+                    outline: const SimpleLineSymbol(
+                      style: SimpleLineSymbolStyle.solid,
+                      color: Colors.red,
+                      width: 2,
+                    ),
+                  ),
+                ),
+              ],
             );
           }
           if (geometry is Polyline) {
-            final polyline = geometry;
-            polylines.add(
-              PolylineMarker(
-                polylineId: PolylineId(polylines.length.toString()),
-                points: polyline.points
-                    .expand((e) => e)
-                    .toList(),
-                color: Colors.red,
-              ),
+            _mapController.addGraphicsToOverlay(
+              'default',
+              [
+                Graphic(
+                  graphicId: 'geodesicSector',
+                  geometry: geometry,
+                  symbol: const SimpleLineSymbol(
+                    style: SimpleLineSymbolStyle.dash,
+                    color: Colors.red,
+                    width: 2,
+                    markerStyle: SimpleLineSymbolMarkerStyle.arrow,
+                    markerPlacement:
+                        SimpleLineSymbolMarkerPlacement.beginAndEnd,
+                  ),
+                ),
+              ],
             );
           }
         },

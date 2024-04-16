@@ -6,7 +6,7 @@ part of '../../arcgis_maps_flutter.dart';
 /// the map's surface; that is, it will not necessarily change orientation
 /// due to map rotations, tilting, or zooming.
 @immutable
-abstract class Symbol extends Equatable{
+abstract class Symbol extends Equatable {
   const Symbol();
 
   String get type;
@@ -17,7 +17,7 @@ abstract class Symbol extends Equatable{
     };
   }
 
-  static Symbol? fromJson(Map<String,dynamic> json) {
+  static Symbol? fromJson(Map<String, dynamic> json) {
     return null;
   }
 }

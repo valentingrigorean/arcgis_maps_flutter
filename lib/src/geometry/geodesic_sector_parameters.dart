@@ -68,7 +68,7 @@ class GeodesicSectorParameters {
       'startDirection': startDirection,
       'sectorAngle': sectorAngle,
       'maxSegmentLength': maxSegmentLength,
-      'geometryType': geometryType.value,
+      'geometryType': geometryType.name,
       'maxPointCount': maxPointCount,
     };
   }

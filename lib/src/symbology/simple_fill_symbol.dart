@@ -13,8 +13,8 @@ enum SimpleFillSymbolStyle {
 
 class SimpleFillSymbol extends FillSymbol {
   const SimpleFillSymbol({
-    required this.style,
-    required super.color,
+    this.style = SimpleFillSymbolStyle.solid,
+    super.color = const Color(0xFF000000),
     super.outline,
   });
 

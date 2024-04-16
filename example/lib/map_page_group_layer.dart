@@ -11,14 +11,17 @@ class MapPageGroupLayer extends StatefulWidget {
 class _MapPageGroupLayerState extends State<MapPageGroupLayer> {
   final _operationalLayers = {
     GroupLayer(
-      layerId: const LayerId('Group'),
+      layerId: 'GroupLayer',
       layers: {
-        FeatureLayer.fromUrl(
-            'https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trailheads_Styled/FeatureServer/0'),
-        FeatureLayer.fromUrl(
-            'https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trails_Styled/FeatureServer/0'),
-        FeatureLayer.fromUrl(
-            'https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Parks_and_Open_Space_Styled/FeatureServer/0'),
+        const FeatureLayer.fromUrl(
+            'https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trailheads_Styled/FeatureServer/0',
+            layerId: 'Trailheads'),
+        const FeatureLayer.fromUrl(
+            'https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trails_Styled/FeatureServer/0',
+            layerId: 'Trails'),
+        const FeatureLayer.fromUrl(
+            'https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Parks_and_Open_Space_Styled/FeatureServer/0',
+            layerId: 'Parks'),
       },
     ),
   };

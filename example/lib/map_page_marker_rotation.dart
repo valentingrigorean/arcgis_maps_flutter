@@ -11,6 +11,7 @@ class MapPageMarkerRotation extends StatefulWidget {
 }
 
 class _MapPageMarkerRotationState extends State<MapPageMarkerRotation> {
+  late final ArcgisMapController _mapController;
   double _angle = 0.0;
 
   @override
@@ -22,34 +23,41 @@ class _MapPageMarkerRotationState extends State<MapPageMarkerRotation> {
       body: Stack(
         children: [
           ArcgisMapView(
+            onMapCreated: (controller) {
+              _mapController = controller;
+              controller.createOrUpdateGraphicsOverlay(
+                  const GraphicsOverlay(id: 'default'));
+              controller.addGraphicsToOverlay('default', [
+                Graphic(
+                  graphicId: 'test',
+                  geometry: Point.fromLatLng(
+                    latitude: 0.0,
+                    longitude: 0.0,
+                  ),
+                  symbol: const CompositeSymbol(
+                    symbols: [
+                      PictureMarkerSymbol.fromResource(
+                        resource: 'ic_flight_hazard',
+                        width: 24,
+                        height: 24,
+                        tintColor: Colors.red,
+                      ),
+                      PictureMarkerSymbol.fromResource(
+                        resource: 'ic_marker',
+                        width: 36,
+                        height: 40,
+                        tintColor: Colors.white,
+                      ),
+                    ],
+                  ),
+                ),
+              ]);
+            },
             map: const ArcGISMap.fromBasemap(
               Basemap.fromStyle(
                 basemapStyle: BasemapStyle.arcGISCommunity,
               ),
             ),
-            markers: {
-              Marker(
-                markerId: const MarkerId('test'),
-                position: Point.fromLatLng(
-                  latitude: 0.0,
-                  longitude: 0.0,
-                ),
-                iconOffsetY: 4,
-                angle: _angle,
-                icon: BitmapDescriptor.fromNativeAsset(
-                  'ic_flight_hazard',
-                  width: 24,
-                  height: 24,
-                  tintColor: Colors.red,
-                ),
-                backgroundImage: BitmapDescriptor.fromNativeAsset(
-                  'ic_marker',
-                  width: 36,
-                  height: 40,
-                  tintColor: Colors.white,
-                ),
-              ),
-            },
           ),
           Positioned(
             left: 16,
@@ -59,10 +67,30 @@ class _MapPageMarkerRotationState extends State<MapPageMarkerRotation> {
               child: Slider(
                 value: _angle / 360.0,
                 onChanged: (value) {
-                  print(_angle);
-                  setState(() {
-                    _angle = value * 360.0;
-                  });
+                  _angle = value * 360.0;
+
+                  _mapController.updateGraphicSymbol(
+                    overlayId: 'default',
+                    graphicId: 'test',
+                    symbol: CompositeSymbol(
+                      symbols: [
+                        PictureMarkerSymbol.fromResource(
+                          resource: 'ic_flight_hazard',
+                          width: 24,
+                          height: 24,
+                          tintColor: Colors.red,
+                          angle: _angle,
+                        ),
+                        PictureMarkerSymbol.fromResource(
+                          resource: 'ic_marker',
+                          width: 36,
+                          height: 40,
+                          tintColor: Colors.white,
+                          angle: _angle,
+                        ),
+                      ],
+                    ),
+                  );
                 },
               ),
             ),

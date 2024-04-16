@@ -233,8 +233,10 @@ class ArcgisMapController {
 
   Future<void> createOrUpdateGraphicsOverlays(
       List<GraphicsOverlay> graphicsOverlays) {
-    return ArcgisMapsFlutterPlatform.instance
-        .createOrUpdateGraphicsOverlays(mapId, graphicsOverlays);
+    return ArcgisMapsFlutterPlatform.instance.createOrUpdateGraphicsOverlays(
+      mapId: mapId,
+      graphicsOverlays: graphicsOverlays,
+    );
   }
 
   Future<void> removeGraphicsOverlay(String overlayId) {
@@ -242,24 +244,76 @@ class ArcgisMapController {
   }
 
   Future<void> removeGraphicsOverlays(List<String> overlayIds) {
-    return ArcgisMapsFlutterPlatform.instance
-        .removeGraphicsOverlays(mapId, overlayIds);
+    return ArcgisMapsFlutterPlatform.instance.removeGraphicsOverlays(
+      mapId: mapId,
+      overlayIds: overlayIds,
+    );
   }
 
   Future<void> clearGraphicsOverlay(String overlayId) {
-    return ArcgisMapsFlutterPlatform.instance
-        .clearGraphicsOverlay(mapId, overlayId);
+    return ArcgisMapsFlutterPlatform.instance.clearGraphicsOverlay(
+      mapId: mapId,
+      overlayId: overlayId,
+    );
   }
 
   Future<void> addGraphicsToOverlay(String overlayId, List<Graphic> graphics) {
-    return ArcgisMapsFlutterPlatform.instance
-        .addGraphicsToOverlay(mapId, overlayId, graphics);
+    return ArcgisMapsFlutterPlatform.instance.addGraphicsToOverlay(
+      mapId: mapId,
+      overlayId: overlayId,
+      graphics: graphics,
+    );
+  }
+
+  Future<void> updateGraphicSymbol({
+    required String overlayId,
+    required String graphicId,
+    required Symbol? symbol,
+  }) {
+    return ArcgisMapsFlutterPlatform.instance.updateGraphicData(
+      mapId: mapId,
+      overlayId: overlayId,
+      graphicId: graphicId,
+      symbol: symbol,
+    );
+  }
+
+  Future<void> updateGraphicGeometry({
+    required String overlayId,
+    required String graphicId,
+    required Geometry? geometry,
+  }) {
+    return ArcgisMapsFlutterPlatform.instance.updateGraphicData(
+      mapId: mapId,
+      overlayId: overlayId,
+      graphicId: graphicId,
+      geometry: geometry,
+    );
+  }
+
+  Future<void> updateGraphicData({
+    required int mapId,
+    required String overlayId,
+    required String graphicId,
+    required Geometry? geometry,
+    required Symbol? symbol,
+  }) {
+    return ArcgisMapsFlutterPlatform.instance.updateGraphicData(
+      mapId: mapId,
+      overlayId: overlayId,
+      graphicId: graphicId,
+      geometry: geometry,
+      symbol: symbol,
+    );
   }
 
   Future<void> removeGraphicsFromOverlay(
       String overlayId, List<String> graphicIds) {
-    return ArcgisMapsFlutterPlatform.instance
-        .removeGraphicsFromOverlay(mapId, overlayId, graphicIds);
+    return ArcgisMapsFlutterPlatform.instance.removeGraphicsFromOverlay(
+      mapId: mapId,
+      overlayId: overlayId,
+      graphicIds: graphicIds,
+    );
   }
 
   Future<void> _setMap(ArcGISMap map) {

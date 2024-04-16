@@ -28,11 +28,11 @@ enum SimpleLineSymbolMarkerPlacement {
 
 class SimpleLineSymbol extends LineSymbol {
   const SimpleLineSymbol({
-    required this.style,
-    required super.color,
-    required super.width,
-    required this.markerStyle,
-    required this.markerPlacement,
+    this.style = SimpleLineSymbolStyle.solid,
+    super.color = const Color(0xFF000000),
+    super.width = 1,
+    this.markerStyle = SimpleLineSymbolMarkerStyle.none,
+    this.markerPlacement = SimpleLineSymbolMarkerPlacement.end,
     super.antialias,
   });
 

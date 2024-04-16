@@ -1,8 +1,6 @@
 part of '../../arcgis_maps_flutter.dart';
 
 class PictureMarkerSymbol extends MarkerSymbol {
-
-
   const PictureMarkerSymbol.fromUrl({
     required String this.url,
     this.height,
@@ -39,7 +37,6 @@ class PictureMarkerSymbol extends MarkerSymbol {
         width = null,
         height = null;
 
-
   final String? url;
 
   final String? resource;
@@ -51,19 +48,18 @@ class PictureMarkerSymbol extends MarkerSymbol {
   final double? height;
   final double? width;
 
-
   @override
   String get type => 'picture-marker';
 
   @override
   List<Object?> get props => [
-    ...super.props,
-    url,
-    resource,
-    tintColor,
-    height,
-    width,
-  ];
+        ...super.props,
+        url,
+        resource,
+        tintColor,
+        height,
+        width,
+      ];
 
   @override
   Map<String, Object?> toJson() {
@@ -76,6 +72,4 @@ class PictureMarkerSymbol extends MarkerSymbol {
     json.addIfNonNull('width', width);
     return json;
   }
-
-
 }
