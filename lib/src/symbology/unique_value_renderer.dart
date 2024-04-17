@@ -11,7 +11,7 @@ class UniqueValue {
   final String description;
   final String label;
   final Symbol? symbol;
-  final List<String> values;
+  final List<Object> values;
 
   Map<String, Object?> toJson() {
     final Map<String, Object?> json = <String, Object?>{};

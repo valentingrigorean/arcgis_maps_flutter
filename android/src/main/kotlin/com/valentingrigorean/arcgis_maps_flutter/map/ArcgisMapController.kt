@@ -18,7 +18,6 @@ import com.arcgismaps.mapping.MobileMapPackage
 import com.arcgismaps.mapping.Viewpoint
 import com.arcgismaps.mapping.ViewpointType
 import com.arcgismaps.mapping.layers.ArcGISVectorTiledLayer
-import com.arcgismaps.mapping.view.GraphicsOverlay
 import com.arcgismaps.mapping.view.MapView
 import com.valentingrigorean.arcgis_maps_flutter.convert.arcgisservices.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toFlutterJson
@@ -34,10 +33,6 @@ import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterValue
 import com.valentingrigorean.arcgis_maps_flutter.extensions.loadAll
 import com.valentingrigorean.arcgis_maps_flutter.layers.LayersController
 import com.valentingrigorean.arcgis_maps_flutter.layers.LegendInfoController
-import com.valentingrigorean.arcgis_maps_flutter.map.LocationDisplayController.LocationDisplayControllerDelegate
-import com.valentingrigorean.arcgis_maps_flutter.mapping.symbology.MarkersController
-import com.valentingrigorean.arcgis_maps_flutter.mapping.symbology.PolygonsController
-import com.valentingrigorean.arcgis_maps_flutter.mapping.symbology.PolylinesController
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -66,18 +61,12 @@ class ArcgisMapController(
     }
 
     private val methodChannel: MethodChannel
-    private val selectionPropertiesHandler: SelectionPropertiesHandler
     private val layersController: LayersController
-    private val markersController: MarkersController
-    private val polygonsController: PolygonsController
-    private val polylinesController: PolylinesController
-    private val symbolControllers = ArrayList<SymbolsController>()
     private val mapChangeAwares = ArrayList<MapChangeAware>()
-    private val symbolVisibilityFilterController: SymbolVisibilityFilterController
+
     private val locationDisplayController: LocationDisplayController
     private val container: FrameLayout = FrameLayout(context)
     private var mapView: MapView
-    private var mapViewOnTouchListener: MapViewOnTouchListener
     private var scaleBarController: ScaleBarController
     private var viewpoint: Viewpoint? = null
     private var haveScaleBar = false
@@ -104,31 +93,14 @@ class ArcgisMapController(
         )
         lifecycle.addObserver(mapView)
         scaleBarController = ScaleBarController(context, mapView, container, scope)
-        selectionPropertiesHandler = SelectionPropertiesHandler(mapView.selectionProperties)
-        symbolVisibilityFilterController = SymbolVisibilityFilterController(mapView, scope)
         layersController = LayersController(methodChannel, scope)
         mapChangeAwares.add(layersController)
-        val graphicsOverlay = GraphicsOverlay()
-        markersController = MarkersController(context, methodChannel, graphicsOverlay)
-        symbolControllers.add(markersController)
-        polygonsController = PolygonsController(methodChannel, graphicsOverlay)
-        symbolControllers.add(polygonsController)
-        polylinesController = PolylinesController(methodChannel, graphicsOverlay)
-        symbolControllers.add(polylinesController)
         val locationDisplayChannel = MethodChannel(
             binaryMessenger, "plugins.flutter.io/arcgis_maps_" + id + "_location_display"
         )
         locationDisplayController = LocationDisplayController(
             locationDisplayChannel, mapView.locationDisplay, mapView, scope
         )
-        locationDisplayController.setLocationDisplayControllerDelegate(this)
-        initSymbolsControllers()
-        mapViewOnTouchListener = MapViewOnTouchListener(mapView, methodChannel, scope)
-        mapViewOnTouchListener.addGraphicDelegate(markersController)
-        mapViewOnTouchListener.addGraphicDelegate(polygonsController)
-        mapViewOnTouchListener.addGraphicDelegate(polylinesController)
-        mapViewOnTouchListener.addGraphicDelegate(locationDisplayController)
-        mapView.graphicsOverlays.add(graphicsOverlay)
         mapView.viewpointChanged.onEach {
             if (trackViewpointChangedListenerEvents) {
                 methodChannel.invokeMethod("map#viewpointChanged", null)
@@ -163,11 +135,7 @@ class ArcgisMapController(
         methodChannel.setMethodCallHandler(null)
         lifecycle.removeObserver(mapView)
         scaleBarController.dispose()
-        mapViewOnTouchListener.clearAllDelegates()
-        symbolVisibilityFilterController.clear()
-        clearSymbolsControllers()
         clearMapAwareControllers()
-        locationDisplayController.setLocationDisplayControllerDelegate(null)
         locationDisplayController.dispose()
         destroyMapViewIfNecessary()
     }
@@ -357,43 +325,6 @@ class ArcgisMapController(
                 result.success(null)
             }
 
-            "markers#update" -> {
-                val markersToAdd = call.argument<List<Any>>("markersToAdd")!!
-                markersController.addMarkers(markersToAdd)
-                val markersToChange = call.argument<List<Any>>("markersToChange")!!
-                markersController.changeMarkers(markersToChange)
-                val markerIdsToRemove = call.argument<List<Any>>("markerIdsToRemove")!!
-                markersController.removeMarkers(markerIdsToRemove)
-                symbolVisibilityFilterController.invalidate()
-                result.success(null)
-            }
-
-            "map#clearMarkerSelection" -> {
-                selectionPropertiesHandler.reset()
-                markersController.clearSelectedMarker()
-                result.success(null)
-            }
-
-            "polygons#update" -> {
-                val polygonsToAdd = call.argument<List<Any>>("polygonsToAdd")!!
-                polygonsController.addPolygons(polygonsToAdd)
-                val polygonsToChange = call.argument<List<Any>>("polygonsToChange")!!
-                polygonsController.changePolygons(polygonsToChange)
-                val polygonIdsToRemove = call.argument<List<Any>>("polygonIdsToRemove")!!
-                polygonsController.removePolygons(polygonIdsToRemove)
-                result.success(null)
-            }
-
-            "polylines#update" -> {
-                val polylinesToAdd = call.argument<List<Any>>("polylinesToAdd")!!
-                polylinesController.addPolylines(polylinesToAdd)
-                val polylinesToChange = call.argument<List<Any>>("polylinesToChange")!!
-                polylinesController.changePolylines(polylinesToChange)
-                val polylineIdsToRemove = call.argument<List<Any>>("polylineIdsToRemove")!!
-                polylinesController.removePolylines(polylineIdsToRemove)
-                result.success(null)
-            }
-
             "layer#setTimeOffset" -> {
                 layersController.setTimeOffset(call.arguments)
                 result.success(null)
@@ -472,104 +403,6 @@ class ArcgisMapController(
 
     private fun handleQueryFeatureTableFromLayer(data: Map<*, *>, result: MethodChannel.Result) {
         result.notImplemented()
-
-//        val params = QueryParameters()
-//        var layerName: String? = ""
-//
-//        // init query params
-//        for ((key, value) in data) {
-//            when (key) {
-//                "layerName" -> layerName = value as String?
-//                "objectId" -> params.objectIds.add(value as kotlin.String?). toLong ())
-//                "maxResults" -> params.maxFeatures = value as kotlin.String?. toInt ()
-//                "geometry" -> params.geometry =  value?.toGeometryOrNull()
-//
-//                "spatialRelationship" -> params.spatialRelationship =
-//                    (value as Int).toSpatialRelationship()
-//
-//                else -> if (params.whereClause.isEmpty()) {
-//                    params.whereClause = String.format(
-//                        "upper(%s) LIKE '%%%s%%'",
-//                        key,
-//                        value.toString().uppercase(Locale.getDefault())
-//                    )
-//                } else {
-//                    val whereClause = params.whereClause
-//                    params.whereClause = whereClause + String.format(
-//                        " AND upper(%s) LIKE '%%%s%%'",
-//                        key,
-//                        value.toString().uppercase(Locale.getDefault())
-//                    )
-//                }
-//            }
-//        }
-//
-//        // check map
-//        val map = mapView.map
-//        if (map == null || map.operationalLayers.size == 0) {
-//            result.success(null)
-//            return
-//        }
-//        val layers = map.operationalLayers
-//        val finalLayerName = layerName
-//        AGSLoadObjects.load(layers, LoadObjectsResult { loaded: Boolean ->
-//            if (!loaded) {
-//                result.success(null)
-//                return@LoadObjectsResult
-//            }
-//            for (layer in layers) {
-//                if (layer is FeatureLayer) {
-//                    val featureLayer = layer as FeatureLayer
-//                    if (featureLayer.name.equals(finalLayerName, ignoreCase = true)) {
-//                        val future =
-//                            featureLayer.featureTable.queryFeaturesAsync(params)
-//                        future.addDoneListener {
-//                            try {
-//                                val queryResult = future.get()
-//                                val results = ArrayList<Any>()
-//                                for (feature in queryResult) {
-//                                    results.add(feature.toMap())
-//                                }
-//                                result.success(results)
-//                            } catch (e: Exception) {
-//                                result.success(null)
-//                            }
-//                        }
-//                        return@LoadObjectsResult
-//                    }
-//                } else if (layer is GroupLayer) {
-//                    val gLayer = layer as GroupLayer
-//                    for (layerItem in gLayer.layers) {
-//                        if (layerItem is FeatureLayer) {
-//                            val featureLayer = layerItem
-//                            if (featureLayer.name.equals(
-//                                    finalLayerName,
-//                                    ignoreCase = true
-//                                )
-//                            ) {
-//                                val future =
-//                                    featureLayer.featureTable.queryFeaturesAsync(params)
-//                                future.addDoneListener {
-//                                    try {
-//                                        val queryResult = future.get()
-//                                        val results = ArrayList<Any>()
-//                                        for (feature in queryResult) {
-//                                            results.add(feature.toMap())
-//                                        }
-//                                        result.success(results)
-//                                    } catch (e: Exception) {
-//                                        result.success(null)
-//                                    }
-//                                }
-//                                return@LoadObjectsResult
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            result.success(null)
-//        })
-
     }
 
     private fun handleTimeAwareLayerInfos(result: MethodChannel.Result) {
@@ -590,19 +423,6 @@ class ArcgisMapController(
         }
     }
 
-    private fun initSymbolsControllers() {
-        for (controller in symbolControllers) {
-            controller.symbolVisibilityFilterController = symbolVisibilityFilterController
-            controller.selectionPropertiesHandler = selectionPropertiesHandler
-        }
-    }
-
-    private fun clearSymbolsControllers() {
-        for (controller in symbolControllers) {
-            controller.symbolVisibilityFilterController = null
-            controller.selectionPropertiesHandler = null
-        }
-    }
 
     private fun clearMapAwareControllers() {
         for (mapChangeAware in mapChangeAwares) {
@@ -717,25 +537,17 @@ class ArcgisMapController(
         if (myLocationEnabled != null) {
             mapView.locationDisplay.showLocation = myLocationEnabled
         }
-        val trackIdentifyLayers = data["trackIdentifyLayers"] as Boolean?
-        if (trackIdentifyLayers != null) {
-            mapViewOnTouchListener.trackIdentityLayers = trackIdentifyLayers
-        }
 
-        val trackIdentifyGraphics = data["trackIdentifyGraphics"] as Boolean?
-        if (trackIdentifyGraphics != null) {
-            mapViewOnTouchListener.trackIdentifyGraphics = trackIdentifyGraphics
-        }
         val haveScaleBar = data["haveScalebar"] as Boolean?
         if (haveScaleBar != null) {
             this.haveScaleBar = haveScaleBar
         }
         val isAttributionTextVisible = data["isAttributionTextVisible"] as Boolean?
-        if (isAttributionTextVisible != null && mapView != null) {
+        if (isAttributionTextVisible != null) {
             mapView.isAttributionBarVisible = isAttributionTextVisible
         }
         val contentInsets = data["contentInsets"] as List<Double>?
-        if (contentInsets != null && mapView != null) {
+        if (contentInsets != null) {
             // order is left,top,right,bottom
             mapView.setViewInsets(
                 contentInsets[0], contentInsets[1], contentInsets[2], contentInsets[3]
@@ -768,18 +580,6 @@ class ArcgisMapController(
         val options = params["options"]
         options?.let { updateMapOptions(it) }
         layersController.updateFromArgs(params)
-        val markersToAdd = params["markersToAdd"]
-        if (markersToAdd != null) {
-            markersController.addMarkers(markersToAdd as List<Any>?)
-        }
-        val polygonsToAdd = params["polygonsToAdd"]
-        if (polygonsToAdd != null) {
-            polygonsController.addPolygons(polygonsToAdd as List<Any>?)
-        }
-        val polylinesToAdd = params["polylinesToAdd"]
-        if (polylinesToAdd != null) {
-            polylinesController.addPolylines(polylinesToAdd as List<Any>)
-        }
     }
 
     private fun updateMapScale() {

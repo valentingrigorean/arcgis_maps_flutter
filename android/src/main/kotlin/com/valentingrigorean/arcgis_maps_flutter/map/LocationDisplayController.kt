@@ -23,10 +23,9 @@ class LocationDisplayController(
     private val locationDisplay: LocationDisplay,
     private val geoView: GeoView,
     private val scope: CoroutineScope
-) : MapTouchGraphicDelegate, MethodCallHandler {
+) : MethodCallHandler {
     private val locationGraphicsOverlay = GraphicsOverlay()
     private val locationGraphic: Graphic
-    private var delegate: LocationDisplayControllerDelegate? = null
     private var trackUserLocationTap = false
 
     init {
@@ -66,22 +65,6 @@ class LocationDisplayController(
                 geoView.graphicsOverlays.remove(locationGraphicsOverlay)
             }
         }
-    }
-
-    fun setLocationDisplayControllerDelegate(delegate: LocationDisplayControllerDelegate?) {
-        this.delegate = delegate
-    }
-
-    override fun canConsumeTaps(): Boolean {
-        return trackUserLocationTap
-    }
-
-    override fun didHandleGraphic(graphic: Graphic): Boolean {
-        val result = graphic.attributes.containsKey(LOCATION_ATTRIBUTE)
-        if (result && delegate != null) {
-            delegate!!.onUserLocationTap()
-        }
-        return result
     }
 
 
@@ -166,10 +149,6 @@ class LocationDisplayController(
 
             else -> result.notImplemented()
         }
-    }
-
-    interface LocationDisplayControllerDelegate {
-        fun onUserLocationTap()
     }
 
     companion object {

@@ -62,13 +62,13 @@ class CompassController extends ChangeNotifier
 
 class Compass extends StatefulWidget {
   const Compass({
-    Key? key,
+    super.key,
     required this.controller,
     this.width = 50,
     this.height = 50,
     this.autoHide = true,
     this.child,
-  }) : super(key: key);
+  });
 
   final double width;
   final double height;

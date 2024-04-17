@@ -7,9 +7,8 @@ class Polyline extends Geometry {
     required this.points,
     required this.hasZ,
     required this.hasM,
-    SpatialReference? spatialReference,
+    super.spatialReference,
   }) : super(
-    spatialReference: spatialReference,
     geometryType: GeometryType.polyline,
   );
 

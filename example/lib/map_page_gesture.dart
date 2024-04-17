@@ -9,6 +9,7 @@ class MapPageGesture extends StatefulWidget {
 }
 
 class _MapPageGestureState extends State<MapPageGesture> {
+  late final ArcgisMapController _mapController;
   String? text;
 
   @override
@@ -17,6 +18,9 @@ class _MapPageGestureState extends State<MapPageGesture> {
       body: Stack(
         children: [
           ArcgisMapView(
+            onMapCreated: (controller) {
+              _mapController = controller;
+            },
             map: const ArcGISMap.fromBasemap(
               Basemap.fromStyle(
                 basemapStyle: BasemapStyle.arcGISCommunity,
@@ -26,19 +30,22 @@ class _MapPageGestureState extends State<MapPageGesture> {
               isMagnifierEnabled: false,
               allowMagnifierToPan: false,
             ),
-            onTap: (_, point) {
+            onTap: (screenPoint) async {
+              final point = await _mapController.screenToLocation(screenPoint);
               debugPrint('Tap: $point');
               setState(() {
                 text = 'OnTap: $point';
               });
             },
-            onLongPress: (_, point) {
+            onLongPress:(screenPoint) async {
+              final point = await _mapController.screenToLocation(screenPoint);
               debugPrint('LongPress: $point');
               setState(() {
                 text = 'OnLongPress: $point';
               });
             },
-            onLongPressEnd: (_, point) {
+            onLongPressEnd: (screenPoint) async {
+              final point = await _mapController.screenToLocation(screenPoint);
               debugPrint('LongPressEnd: $point');
               setState(() {
                 text = null;

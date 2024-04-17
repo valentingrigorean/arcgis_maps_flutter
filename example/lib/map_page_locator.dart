@@ -13,6 +13,8 @@ class _MapPageLocatorState extends State<MapPageLocator> {
   final LocatorTask _locatorTask = LocatorTask(
       url:
           'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer');
+
+  late final ArcgisMapController _mapController;
   List<GeocodeResult> _results = [];
 
   bool _isLoading = false;
@@ -63,6 +65,9 @@ class _MapPageLocatorState extends State<MapPageLocator> {
           IgnorePointer(
             ignoring: _isLoading,
             child: ArcgisMapView(
+              onMapCreated: (controller) {
+                _mapController = controller;
+              },
               map: const ArcGISMap.fromBasemap(
                 Basemap.fromStyle(
                   basemapStyle: BasemapStyle.arcGISCommunity,
@@ -71,7 +76,8 @@ class _MapPageLocatorState extends State<MapPageLocator> {
               interactionOptions: const InteractionOptions(
                 isMagnifierEnabled: false,
               ),
-              onTap: (_, point) async {
+              onTap: (screenPoint) async {
+                final point = await _mapController.screenToLocation(screenPoint);
                 setState(() {
                   _isLoading = true;
                 });

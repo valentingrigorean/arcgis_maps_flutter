@@ -21,44 +21,6 @@ class UserLocationTapEvent extends MapEvent<void> {
   const UserLocationTapEvent(int mapId) : super(mapId, null);
 }
 
-class IdentifyLayerEvent extends MapEvent<String> {
-  const IdentifyLayerEvent(
-    super.mapId,
-    super.layerId, {
-    required this.result,
-    required this.screenPoint,
-    required this.position,
-  });
-
-  final Offset screenPoint;
-  final Point position;
-
-  final IdentifyLayerResult result;
-}
-
-class IdentifyLayersEvent extends MapEvent<void> {
-  const IdentifyLayersEvent(
-    int mapId, {
-    required this.results,
-    required this.screenPoint,
-    required this.position,
-  }) : super(mapId, null);
-
-  final Offset screenPoint;
-  final Point? position;
-
-  final List<IdentifyLayerResult> results;
-}
-
-class IdentifyGraphicsEvent extends _PositionedMapEvent<List<String>> {
-  const IdentifyGraphicsEvent(
-    super.mapId, {
-    required super.screenPoint,
-    required super.position,
-    required super.value,
-  });
-}
-
 class MapLoadedEvent extends MapEvent<ArcgisError?> {
   const MapLoadedEvent(
     super.mapId,
@@ -76,33 +38,6 @@ class LayerLoadedEvent extends MapEvent<String> {
   final ArcgisError? error;
 }
 
-/// An event fired when a Map is tapped.
-class MapTapEvent extends _PositionedMapEvent<void> {
-  /// Build an MapTap Event triggered from the map represented by `mapId`.
-  ///
-  /// The `position` of this event is the LatLng where the Map was tapped.
-  const MapTapEvent(
-    super.mapId, {
-    required super.screenPoint,
-    required super.position,
-  }) : super(value: null);
-}
-
-class MapLongPressEvent extends _PositionedMapEvent<void> {
-  const MapLongPressEvent(
-    super.mapId, {
-    required super.screenPoint,
-    required super.position,
-  }) : super(value: null);
-}
-
-class MapLongPressEndEvent extends _PositionedMapEvent<void> {
-  const MapLongPressEndEvent(
-    super.mapId, {
-    required super.screenPoint,
-    required super.position,
-  }) : super(value: null);
-}
 
 class ViewpointChangedEvent extends MapEvent<void> {
   const ViewpointChangedEvent(int mapId) : super(mapId, null);

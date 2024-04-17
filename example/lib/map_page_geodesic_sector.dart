@@ -28,7 +28,8 @@ class _MapPageGeodesicSectorState extends State<MapPageGeodesicSector> {
             basemapStyle: BasemapStyle.arcGISCommunity,
           ),
         ),
-        onTap: (_, point) async {
+        onTap: (screenPoint) async {
+          final point = await _mapController.screenToLocation(screenPoint);
           final geometry = await GeometryEngine.geodesicSector(
             GeodesicSectorParameters(
               center: point!,

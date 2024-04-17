@@ -496,7 +496,6 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
     );
   }
 
-
   @override
   Future<void> removeGraphicsFromOverlay({
     required int mapId,
@@ -510,6 +509,29 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
         'graphicIds': graphicIds,
       },
     );
+  }
+
+  @override
+  Future<List<IdentifyGraphicsOverlayResult>> identifyGraphicsOverlays({
+    required int mapId,
+    required Offset screenCoordinate,
+    required double tolerance,
+    required bool returnPopupsOnly,
+  }) async {
+    final result = await channel(mapId).invokeListMethod(
+      'map#identifyGraphicsOverlays',
+      {
+        'screenCoordinate': [screenCoordinate.dx, screenCoordinate.dy],
+        'tolerance': tolerance,
+        'returnPopupsOnly': returnPopupsOnly,
+      },
+    );
+
+    return result
+            ?.map<IdentifyGraphicsOverlayResult>(
+                (e) => IdentifyGraphicsOverlayResult.fromJson(e))
+            .toList() ??
+        const [];
   }
 
   @override
@@ -527,39 +549,10 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
     return _events(mapId).whereType<LayerLoadedEvent>();
   }
 
-  @override
-  Stream<MapTapEvent> onTap({required int mapId}) {
-    return _events(mapId).whereType<MapTapEvent>();
-  }
-
-  @override
-  Stream<MapLongPressEvent> onLongPress({required int mapId}) {
-    return _events(mapId).whereType<MapLongPressEvent>();
-  }
-
-  @override
-  Stream<MapLongPressEndEvent> onLongPressEnd({required int mapId}) {
-    return _events(mapId).whereType<MapLongPressEndEvent>();
-  }
 
   @override
   Stream<UserLocationTapEvent> onUserLocationTap({required int mapId}) {
     return _events(mapId).whereType<UserLocationTapEvent>();
-  }
-
-  @override
-  Stream<IdentifyLayerEvent> onIdentifyLayer({required int mapId}) {
-    return _events(mapId).whereType<IdentifyLayerEvent>();
-  }
-
-  @override
-  Stream<IdentifyLayersEvent> onIdentifyLayers({required int mapId}) {
-    return _events(mapId).whereType<IdentifyLayersEvent>();
-  }
-
-  @override
-  Stream<IdentifyGraphicsEvent> onIdentifyGraphics({required int mapId}) {
-    return _events(mapId).whereType<IdentifyGraphicsEvent>();
   }
 
   @override
@@ -602,82 +595,6 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
           ),
         );
         break;
-      case 'map#onTap':
-        final args = call.arguments;
-        final screenPoint = _fromJson(args['screenPoint']);
-        final position = Point.fromJson(args['position']);
-        _mapEventStreamController.add(
-          MapTapEvent(
-            mapId,
-            screenPoint: screenPoint,
-            position: position,
-          ),
-        );
-        break;
-      case 'map#onLongPress':
-        final args = call.arguments;
-        final screenPoint = _fromJson(args['screenPoint']);
-        final position = Point.fromJson(args['position']);
-        _mapEventStreamController.add(
-          MapLongPressEvent(
-            mapId,
-            screenPoint: screenPoint,
-            position: position,
-          ),
-        );
-        break;
-      case 'map#onLongPressEnd':
-        final args = call.arguments;
-        final screenPoint = _fromJson(args['screenPoint']);
-        final position = Point.fromJson(args['position']);
-        _mapEventStreamController.add(
-          MapLongPressEndEvent(
-            mapId,
-            screenPoint: screenPoint,
-            position: position,
-          ),
-        );
-        break;
-      case 'map#onIdentifyLayers':
-        final Map<dynamic, dynamic> args = call.arguments;
-        final screenPoint = _fromJson(args['screenPoint']);
-        final position = Point.fromJson(args['position']);
-        final List<IdentifyLayerResult> results = [];
-        for (var item in args['results']) {
-          final String layerName = item['layerName']!;
-          final List<dynamic> elementsData = item['elements']!;
-          final List<GeoElement> elements = [];
-          for (var elementData in elementsData) {
-            elements.add(GeoElement.fromJson(elementData));
-          }
-          results.add(IdentifyLayerResult(
-            layerName: layerName,
-            elements: elements,
-          ));
-        }
-        _mapEventStreamController.add(
-          IdentifyLayersEvent(
-            mapId,
-            screenPoint: screenPoint,
-            position: position,
-            results: results,
-          ),
-        );
-        break;
-      case 'map#onIdentifyGraphics':
-        final Map<dynamic, dynamic> args = call.arguments;
-        final screenPoint = _fromJson(args['screenPoint']);
-        final position = Point.fromJson(args['position']);
-        final List<String> results = args['results'].cast<String>();
-        _mapEventStreamController.add(
-          IdentifyGraphicsEvent(
-            mapId,
-            screenPoint: screenPoint,
-            position: position,
-            value: results,
-          ),
-        );
-        break;
       case 'map#timeExtentChanged':
         _mapEventStreamController.add(
           TimeExtentChangedEvent(
@@ -697,9 +614,4 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
         throw MissingPluginException();
     }
   }
-}
-
-Offset _fromJson(dynamic json) {
-  final List<dynamic> data = json;
-  return Offset(data[0]!.toDouble(), data[1]!.toDouble());
 }

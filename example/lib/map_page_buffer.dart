@@ -32,7 +32,8 @@ class _MapPageBufferState extends State<MapPageBuffer> {
                 basemapStyle: BasemapStyle.arcGISCommunity,
               ),
             ),
-            onTap: (screenPoint, position) async {
+            onTap: (screenPoint) async {
+              final position = await _mapController.screenToLocation(screenPoint);
               Polygon? polygon;
               if (position == null) return;
               if (_currentBufferType == 0) {

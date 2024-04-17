@@ -13,16 +13,7 @@ typedef MapLoadedCallback = void Function(ArcgisError? error);
 typedef LayerLoadedCallback = void Function(
     String layerId, ArcgisError? error, Layer? layer);
 
-typedef GestureCallback = void Function(Offset screenPoint, Point? position);
-
-typedef IdentifyLayerCallback = void Function(
-    Offset screenPoint, Point? position, IdentifyLayerResult result);
-
-typedef IdentifyLayersCallback = void Function(
-    Offset screenPoint, Point? position, List<IdentifyLayerResult> results);
-
-typedef IdentityGraphicsCallback = void Function(
-    Offset screenPoint, Point? position, IdentifyGraphicsOverlayResult result);
+typedef GestureCallback = void Function(Offset screenPoint);
 
 /// Callback function taking a single argument.
 typedef ArgumentCallback<T> = void Function(T argument);
@@ -65,7 +56,7 @@ class UnknownMapObjectIdError extends Error {
 }
 
 class ArcgisMapView extends StatefulWidget {
-  ArcgisMapView({
+  const ArcgisMapView({
     super.key,
     required this.map,
     this.gestureRecognizers = const <Factory<OneSequenceGestureRecognizer>>{},
@@ -86,18 +77,12 @@ class ArcgisMapView extends StatefulWidget {
     this.onTap,
     this.onLongPress,
     this.onLongPressEnd,
-    this.onIdentifyLayer = const {},
-    this.onIdentifyLayers,
     this.onUserLocationTap,
     this.minScale = 0,
     this.maxScale = 0,
     this.onUnknownMapObjectIdError,
-    this.onIdentifyGraphics,
     this.useAndroidViewSurface = true,
-  })  : assert(onIdentifyLayer.isNotEmpty ? onIdentifyLayers == null : true,
-            'You can use only onIdentifyLayer or onIdentifyLayers'),
-        assert(onIdentifyLayers != null ? onIdentifyLayer.isEmpty : true,
-            'You can use only onIdentifyLayer or onIdentifyLayers');
+  });
 
   /// Callback method for when the map is ready to be used.
   ///
@@ -135,7 +120,6 @@ class ArcgisMapView extends StatefulWidget {
   /// in the list drawn first, next layer drawn on top of the previous one,
   /// and so on.
   final Set<Layer> referenceLayers;
-
 
   final MapLoadedCallback? onMapLoaded;
 
@@ -206,12 +190,6 @@ class ArcgisMapView extends StatefulWidget {
   /// were not claimed by any other gesture recognizer.
   final Set<Factory<OneSequenceGestureRecognizer>> gestureRecognizers;
 
-  final Map<String, IdentifyLayerCallback> onIdentifyLayer;
-
-  final IdentifyLayersCallback? onIdentifyLayers;
-
-  final IdentityGraphicsCallback? onIdentifyGraphics;
-
   final VoidCallback? onUserLocationTap;
 
   final ValueChanged<UnknownMapObjectIdError>? onUnknownMapObjectIdError;
@@ -243,15 +221,14 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   Map<String, Layer> _referenceLayers = <String, Layer>{};
 
   late ArcGISMap _map = widget.map;
-  Set<String> _identifyLayerAsync = <String>{};
-
   late _ArcgisMapOptions _arcgisMapOptions;
+
+  TapDownDetails? _lastTapDownDetails;
 
   @override
   void initState() {
     super.initState();
     _arcgisMapOptions = _ArcgisMapOptions.fromWidget(widget);
-    _identifyLayerAsync = widget.onIdentifyLayer.keys.toSet();
   }
 
   @override
@@ -273,12 +250,11 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     _updateOperationalLayers();
     _updateBaseLayers();
     _updateReferenceLayers();
-    _updateIdentifyLayerListeners();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ArcgisMapsFlutterPlatform.instance.buildView(
+    Widget child = ArcgisMapsFlutterPlatform.instance.buildView(
       _mapId,
       onPlatformViewCreated,
       map: _map,
@@ -290,6 +266,23 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
       gestureRecognizers: widget.gestureRecognizers,
       mapOptions: _arcgisMapOptions.toMap(),
     );
+
+    child = GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTapDown: (details) {
+        _lastTapDownDetails = details;
+      },
+      onLongPress: widget.onLongPress == null ? null : onLongPress,
+      onLongPressEnd: widget.onLongPressEnd == null
+          ? null
+          : (details) {
+              onLongPressEnd(details.localPosition);
+            },
+      onTap: widget.onTap == null ? null : onTap,
+      child: child,
+    );
+
+    return child;
   }
 
   Future<void> onPlatformViewCreated(int id) async {
@@ -350,57 +343,33 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     }
   }
 
-  void onTap(Offset screenPoint, Point? position) {
-    final onTap = widget.onTap;
-    if (onTap != null) {
-      onTap(screenPoint, position);
-    }
-  }
-
-  void onLongPress(Offset screenPoint, Point? position) {
-    final onLongPress = widget.onLongPress;
-    if (onLongPress != null) {
-      onLongPress(screenPoint, position);
-    }
-  }
-
-  void onLongPressEnd(Offset screenPoint, Point? position) {
-    final onLongPressEnd = widget.onLongPressEnd;
-    if (onLongPressEnd != null) {
-      onLongPressEnd(screenPoint, position);
-    }
-  }
-
-  void onIdentifyLayer(String layerId, Offset screenMap, Point? position,
-      IdentifyLayerResult result) {
-    final callback = widget.onIdentifyLayer[layerId];
-    if (callback != null) {
-      callback(screenMap, position, result);
-    }
-  }
-
-  void onIdentifyLayers(
-      Offset screenMap, Point? position, List<IdentifyLayerResult> results) {
-    final callback = widget.onIdentifyLayers;
-    if (callback != null) {
-      callback(screenMap, position, results);
-    }
-  }
-
-  void onIdentityGraphics(Offset screenMap, Point? position, List<String> ids) {
-    final callback = widget.onIdentifyGraphics;
-    if (callback == null) {
+  void onTap() {
+    final position = _lastTapDownDetails?.localPosition;
+    if (position == null) {
       return;
     }
+    final callback = widget.onTap;
+    if (callback != null) {
+      callback(position);
+    }
+  }
 
+  void onLongPress() async {
+    final position = _lastTapDownDetails?.localPosition;
+    if (position == null) {
+      return;
+    }
+    final callback = widget.onLongPress;
+    if (callback != null) {
+      callback(position);
+    }
+  }
 
-    callback(
-      screenMap,
-      position,
-      IdentifyGraphicsOverlayResult(
-       ids: ids,
-      ),
-    );
+  void onLongPressEnd(Offset screenPoint) {
+    final callback = widget.onLongPressEnd;
+    if (callback != null) {
+      callback(screenPoint);
+    }
   }
 
   void _updateMap() async {
@@ -464,28 +433,13 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     controller._updateLayers(layersUpdate);
     _referenceLayers = keyByLayerId(widget.referenceLayers);
   }
-
-
-
-  void _updateIdentifyLayerListeners() async {
-    final Set<String> oldLayers = _identifyLayerAsync;
-    final Set<String> layers = widget.onIdentifyLayer.keys.toSet();
-    if (setEquals(oldLayers, layers)) {
-      return;
-    }
-    final ArcgisMapController controller = await _controller.future;
-    controller._updateIdentifyLayerListeners(layers);
-    _identifyLayerAsync = layers;
-  }
 }
 
 class _ArcgisMapOptions {
   _ArcgisMapOptions.fromWidget(ArcgisMapView map)
       : interactionOptions = map.interactionOptions,
         myLocationEnabled = map.myLocationEnabled,
-        trackIdentifyLayers = map.onIdentifyLayers != null,
         trackUserLocationTap = map.onUserLocationTap != null,
-        trackIdentifyGraphics = map.onIdentifyGraphics != null,
         insetsContentInsetFromSafeArea = map.insetsContentInsetFromSafeArea,
         isAttributionTextVisible = map.isAttributionTextVisible,
         contentInsets = map.contentInsets,
@@ -495,9 +449,7 @@ class _ArcgisMapOptions {
 
   final InteractionOptions interactionOptions;
   final bool myLocationEnabled;
-  final bool trackIdentifyLayers;
   final bool trackUserLocationTap;
-  final bool trackIdentifyGraphics;
   final bool insetsContentInsetFromSafeArea;
   final bool isAttributionTextVisible;
   final double minScale;
@@ -509,9 +461,7 @@ class _ArcgisMapOptions {
     return <String, dynamic>{
       'interactionOptions': interactionOptions.toJson(),
       'myLocationEnabled': myLocationEnabled,
-      'trackIdentifyLayers': trackIdentifyLayers,
       'trackUserLocationTap': myLocationEnabled,
-      'trackIdentifyGraphics': trackIdentifyGraphics,
       'haveScalebar': scalebarConfiguration != null,
       'insetsContentInsetFromSafeArea': insetsContentInsetFromSafeArea,
       'isAttributionTextVisible': isAttributionTextVisible,

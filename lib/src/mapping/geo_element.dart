@@ -21,7 +21,7 @@ abstract class GeoElement {
       switch (json['type']) {
         case 'Graphic':
           return Graphic(
-            graphicId: json['graphicId'] ?? '',
+            graphicId: attributes['graphicId']?.toString() ?? '',
             attributes: attributes,
             geometry: geometry,
             symbol: Symbol.fromJson(

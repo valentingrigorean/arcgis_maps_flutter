@@ -4,9 +4,8 @@ part of '../../arcgis_maps_flutter.dart';
 class Multipoint extends Geometry {
   const Multipoint._({
     required this.points,
-    SpatialReference? spatialReference,
+    super.spatialReference,
   }) : super(
-    spatialReference: spatialReference,
     geometryType: GeometryType.multipoint,
   );
 

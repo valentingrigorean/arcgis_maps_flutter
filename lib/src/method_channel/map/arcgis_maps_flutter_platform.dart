@@ -88,13 +88,14 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
         'getWanderExtentFactor() has not been implemented.');
   }
 
-  Future<List<Feature>> queryFeatureTableFromLayer(
-      {required int mapId,
-      required String layerName,
-      Geometry? geometry,
-      SpatialRelationship? spatialRelationship,
-      int? maxResults,
-      Map<String, dynamic>? queryValues}) {
+  Future<List<Feature>> queryFeatureTableFromLayer({
+    required int mapId,
+    required String layerName,
+    Geometry? geometry,
+    SpatialRelationship? spatialRelationship,
+    int? maxResults,
+    Map<String, dynamic>? queryValues,
+  }) {
     throw UnimplementedError('selectFeatureById() has not been implemented.');
   }
 
@@ -180,11 +181,6 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
         'getMapSpatialReference() has not been implemented.');
   }
 
-  Future<void> updateIdentifyLayerListeners(int mapId, Set<String> layers) {
-    throw UnimplementedError(
-        'updateIdentifyLayerListeners() has not been implemented.');
-  }
-
   Future<void> updateLayers(int mapId, LayerUpdates layerUpdates) {
     throw UnimplementedError('updateLayers() has not been implemented.');
   }
@@ -206,35 +202,8 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('onMapLoad() has not been implemented.');
   }
 
-  /// A Map has been tapped at a certain [LatLng].
-  Stream<MapTapEvent> onTap({required int mapId}) {
-    throw UnimplementedError('onTap() has not been implemented.');
-  }
-
-  /// A Map has been long tapped at a certain [LatLng].
-  Stream<MapLongPressEvent> onLongPress({required int mapId}) {
-    throw UnimplementedError('onLongPress() has not been implemented.');
-  }
-
-  /// A Map has been long tapped at a certain [LatLng] and the long tap has ended.
-  Stream<MapLongPressEndEvent> onLongPressEnd({required int mapId}) {
-    throw UnimplementedError('onLongPressEnd() has not been implemented.');
-  }
-
   Stream<UserLocationTapEvent> onUserLocationTap({required int mapId}) {
     throw UnimplementedError('onUserLocationTap() has not been implemented.');
-  }
-
-  Stream<IdentifyLayerEvent> onIdentifyLayer({required int mapId}) {
-    throw UnimplementedError('onIdentifyLayer() has not been implemented.');
-  }
-
-  Stream<IdentifyLayersEvent> onIdentifyLayers({required int mapId}) {
-    throw UnimplementedError('onIdentifyLayers() has not been implemented.');
-  }
-
-  Stream<IdentifyGraphicsEvent> onIdentifyGraphics({required int mapId}) {
-    throw UnimplementedError('onIdentifyGraphics() has not been implemented.');
   }
 
   Stream<ViewpointChangedEvent> onViewpointChanged({required int mapId}) {
@@ -296,6 +265,24 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
   }) {
     throw UnimplementedError(
         'removeGraphicsFromOverlay() has not been implemented.');
+  }
+
+  Future<List<IdentifyGraphicsOverlayResult>> identifyGraphicsOverlays(
+      {required int mapId,
+      required Offset screenCoordinate,
+      required double tolerance,
+      required bool returnPopupsOnly}) {
+    throw UnimplementedError(
+        'identifyGraphicsOverlays() has not been implemented.');
+  }
+
+  Future<List<IdentifyLayerResult>> identifyLayers({
+    required int mapId,
+    required Offset screenCoordinate,
+    required double tolerance,
+    required bool returnPopupsOnly,
+}) {
+    throw UnimplementedError('identifyLayers() has not been implemented.');
   }
 
   void dispose(int mapId) {

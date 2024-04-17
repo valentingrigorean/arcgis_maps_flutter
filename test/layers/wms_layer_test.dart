@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('toJson', () {
-    final wmsLayer = const WmsLayer.fromUrl('url',layerId: '', layersName: ['1', '2', '3']);
+    const wmsLayer = WmsLayer.fromUrl('url',layerId: '', layersName: ['1', '2', '3']);
     final json = wmsLayer.toJson();
 
     final layersName = json['layersName'];

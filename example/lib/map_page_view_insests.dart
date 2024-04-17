@@ -23,7 +23,8 @@ class _MapPageViewInsetsState extends State<MapPageViewInsets> {
             isAttributionTextVisible: false,
             insetsContentInsetFromSafeArea: false,
             contentInsets: const EdgeInsets.only(bottom: 200),
-            onTap: (_, point) {
+            onTap: (screenPoint) async {
+              final point = await _mapController.screenToLocation(screenPoint);
               if (point != null) {
                 _mapController.setViewpointCenter(point);
               }

@@ -13,6 +13,8 @@ class MapPageGeodeticDistance extends StatefulWidget {
 }
 
 class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance> {
+  late final ArcgisMapController _mapController;
+
   PermissionStatus _permissionStatus = PermissionStatus.denied;
   Point? _userLocation;
 
@@ -48,13 +50,15 @@ class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance> {
               .listen((Location? location) {
             if (location != null) _userLocation = location.position;
           });
+          _mapController = controller;
           Future.delayed(const Duration(seconds: 1)).then((value) async {
             if (mounted) {
               _userLocation = await controller.locationDisplay.mapLocation;
             }
           });
         },
-        onTap: (_, Point? point) async {
+        onTap: (screenPoint) async {
+          var point = await _mapController.screenToLocation(screenPoint);
           if (_userLocation == null) {
             return;
           }
@@ -82,7 +86,7 @@ class _MapPageGeodeticDistanceState extends State<MapPageGeodeticDistance> {
           } else {
             msg = 'Distance: ${result.distance.toStringAsFixed(2)} meters';
           }
-          if (!mounted) {
+          if (!context.mounted) {
             return;
           }
           ScaffoldMessenger.of(context).clearSnackBars();

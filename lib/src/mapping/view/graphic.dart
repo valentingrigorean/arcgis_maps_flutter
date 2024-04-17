@@ -1,12 +1,14 @@
 part of '../../../arcgis_maps_flutter.dart';
 
-class Graphic extends GeoElement  {
+class Graphic extends GeoElement {
   const Graphic({
     required this.graphicId,
     this.attributes = const {},
     this.geometry,
     this.symbol,
     this.zIndex,
+    this.isSelected,
+    this.isVisible,
   });
 
   final String graphicId;
@@ -23,6 +25,10 @@ class Graphic extends GeoElement  {
   final Symbol? symbol;
 
   final int? zIndex;
+
+  final bool? isSelected;
+
+  final bool? isVisible;
 
   @override
   String get type => 'Graphic';

@@ -9,6 +9,7 @@ class MapPageGeometryEngine extends StatefulWidget {
 }
 
 class _MapPageGeometryEngineState extends State<MapPageGeometryEngine> {
+  late final ArcgisMapController _mapController;
   String? text;
 
   @override
@@ -17,12 +18,16 @@ class _MapPageGeometryEngineState extends State<MapPageGeometryEngine> {
       body: Stack(
         children: [
           ArcgisMapView(
+            onMapCreated: (controller) {
+              _mapController = controller;
+            },
             map: const ArcGISMap.fromBasemap(
               Basemap.fromStyle(
                 basemapStyle: BasemapStyle.arcGISCommunity,
               ),
             ),
-            onTap: (_,point) async {
+            onTap: (screenPoint) async {
+              final point = await _mapController.screenToLocation(screenPoint);
               final projection = await GeometryEngine.project(
                 point!,
                 SpatialReference.wgs84(),
