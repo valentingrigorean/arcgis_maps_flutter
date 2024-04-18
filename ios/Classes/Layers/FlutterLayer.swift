@@ -84,6 +84,7 @@ extension GroupLayer.VisibilityMode{
 struct FlutterLayer: Hashable, Equatable {
 
     init(data: [String: Any]) {
+        self.data = data
         layerId = data["layerId"] as! String
         layerType = data["layerType"] as! String
         featureLayersIds = data["featureLayersIds"] as? [Int]
@@ -104,9 +105,6 @@ struct FlutterLayer: Hashable, Equatable {
             portalItem = nil
             tileCache = nil
         }
-
-        isVisible = data["isVisible"] as! Bool
-        opacity = Float(data["opacity"] as! Double)
 
         layersName = data["layersName"] as? [String]
 
@@ -145,10 +143,10 @@ struct FlutterLayer: Hashable, Equatable {
         }
     }
 
+    let data: [String: Any]
+
     let layerId: String
     let layerType: String
-    let opacity: Float
-    let isVisible: Bool
     let url: URL?
     let tileCache: TileCache?
     let layersName: [String]?
@@ -243,7 +241,5 @@ struct FlutterLayer: Hashable, Equatable {
 
     private func setupDefaultParams(layer: Layer) {
         layer.id = Layer.ID(rawValue: layerId)
-        layer.opacity = opacity
-        layer.isVisible = isVisible
     }
 }

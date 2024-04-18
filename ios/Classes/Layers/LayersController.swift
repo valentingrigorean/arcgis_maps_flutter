@@ -211,6 +211,8 @@ class LayersController {
         for layer in layers {
             let nativeLayer = flutterMap[layer.layerId] ?? layer.createNativeLayer()
 
+            updateLayer(layer: nativeLayer, data: layer.data)
+
             if flutterMap[layer.layerId] == nil {
                 flutterMap[layer.layerId] = nativeLayer
             }
@@ -295,8 +297,7 @@ class LayersController {
         }
 
         if let layersToUpdate = data["\(objectName)sToChange"] {
-            removeLayers(args: layersToUpdate, layerType: layerType)
-            addLayers(args: layersToUpdate, layerType: layerType)
+            updateLayers(args:layersToUpdate)
         }
 
         if let layersToRemove = data["\(objectName)IdsToRemove"] as? [String] {
@@ -335,6 +336,46 @@ class LayersController {
             return "baseLayer"
         case .reference:
             return "referenceLayer"
+        }
+    }
+
+    private func updateLayers(args: Any) {
+        guard let layersToUpdate = args as? [[String: Any]] else {
+            return
+        }
+
+        for layerData in layersToUpdate {
+            let layerId = layerData["layerId"] as! String
+            let layerType = layerData["layerType"] as! Int
+            let layer = getLayerByLayerId(layerId)
+            if layer == nil {
+                continue
+            }
+            updateLayer(layer: layer!, data: layerData)
+        }
+    }
+
+    private func updateLayer(layer: Layer, data: [String: Any]) {
+        if let isVisible = data["isVisible"] as? Bool {
+            layer.isVisible = isVisible
+        }
+
+        if let opacity = data["opacity"] as? Double {
+            layer.opacity = Float(opacity)
+        }
+
+        if let featureLayer = layer as? FeatureLayer{
+            if let definitionExpression = data["definitionExpression"] as? String {
+                featureLayer.definitionExpression = definitionExpression
+            }
+            if let renderer = data["renderer"] as? [String: Any] {
+                featureLayer.renderer = RendererFactory.createRenderer(data: renderer)
+            }
+
+            /// its milliseconds
+            if let refreshInterval = data["refreshInterval"] as? Int {
+                featureLayer.refreshInterval = TimeInterval(refreshInterval / 1000)
+            }
         }
     }
 

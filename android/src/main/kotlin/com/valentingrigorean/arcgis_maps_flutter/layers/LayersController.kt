@@ -1,11 +1,17 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package com.valentingrigorean.arcgis_maps_flutter.layers
 
+import android.content.Context
 import com.arcgismaps.arcgisservices.TimeAware
 import com.arcgismaps.mapping.ArcGISMap
+import com.arcgismaps.mapping.layers.FeatureLayer
 import com.arcgismaps.mapping.layers.Layer
+import com.arcgismaps.mapping.layers.Refreshable
 import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toTimeValueOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.map.MapChangeAware
+import com.valentingrigorean.arcgis_maps_flutter.mapping.symbology.RendererFactory
 import com.valentingrigorean.arcgis_maps_flutter.utils.StringUtils
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.CoroutineScope
@@ -14,6 +20,7 @@ import kotlinx.coroutines.launch
 class LayersController(
     private val methodChannel: MethodChannel,
     private val scope: CoroutineScope,
+    private val context: Context,
 ) : MapChangeAware {
     enum class LayerType {
         OPERATIONAL, BASE, REFERENCE
@@ -64,21 +71,17 @@ class LayersController(
         if (mapData == null || mapData.isEmpty()) {
             return
         }
-        for (layerType in LayerType.values()) {
+        for (layerType in LayerType.entries) {
             val objectName = getObjectName(layerType)
-            val layersToAdd = mapData[objectName + "sToAdd"]
+            val layersToAdd = (mapData[objectName + "sToAdd"])
             layersToAdd?.let { addLayers(it, layerType) }
             val layersToUpdate = mapData[objectName + "sToChange"]
-            if (layersToUpdate != null) {
-                removeLayers(layersToUpdate, layerType)
-                addLayers(layersToUpdate, layerType)
-            }
+            layersToUpdate?.let { updateLayers(it) }
             val layersToRemove = mapData[objectName + "IdsToRemove"]
-            if (layersToRemove != null) {
-                removeLayersById(layersToRemove as Collection<String>, layerType)
-            }
+            layersToRemove?.let { removeLayersById(it as Collection<String>, layerType) }
         }
     }
+
 
     fun setTimeOffset(arguments: Any) {
         val data = arguments as Map<*, *>? ?: return
@@ -110,24 +113,6 @@ class LayersController(
         addLayersToMap(layersToAdd, layerType)
     }
 
-    private fun removeLayers(args: Any, layerType: LayerType) {
-        val layersArgs = args as Collection<Map<*, *>>
-        if (layersArgs == null || layersArgs.isEmpty()) {
-            return
-        }
-        val flutterMap = getFlutterMap(layerType)
-        val layersToRemove = ArrayList<FlutterLayer>()
-        for (layer in layersArgs) {
-            val layerId = layer["layerId"] as String?
-            if (layerId == null || !flutterMap.containsKey(layerId)) {
-                continue
-            }
-            val flutterLayer = FlutterLayer(layer)
-            layersToRemove.add(flutterLayer)
-        }
-        removeLayersFromMap(layersToRemove, layerType)
-    }
-
     private fun removeLayersById(ids: Collection<String>, layerType: LayerType) {
         if (ids.isEmpty()) return
         val layersToRemove = ArrayList<FlutterLayer>()
@@ -150,6 +135,7 @@ class LayersController(
         for (layer in layers) {
             val nativeLayer = flutterMap[layer.layerId] ?: layer.createLayer()
             flutterMap[layer.layerId] = nativeLayer
+            updateLayer(nativeLayer, layer.data)
             scope.launch {
                 nativeLayer.load()
                     .onSuccess {
@@ -163,10 +149,11 @@ class LayersController(
                         if (flutterMap.containsKey(layer.layerId)) {
                             val args: MutableMap<String, Any?> = HashMap(2)
                             args["layerId"] = layer.layerId
-                            args["error"] = it.toFlutterJson(withStackTrace = false, addFlutterFlag = false)
+                            args["error"] =
+                                it.toFlutterJson(withStackTrace = false, addFlutterFlag = false)
                             methodChannel.invokeMethod("layer#loaded", args)
                         }
-                }
+                    }
             }
             when (layerType) {
                 LayerType.OPERATIONAL -> map.operationalLayers.add(nativeLayer)
@@ -192,7 +179,9 @@ class LayersController(
         when (layerType) {
             LayerType.OPERATIONAL -> map.operationalLayers.removeAll(nativeLayersToRemove)
             LayerType.BASE -> map.basemap.value?.baseLayers?.removeAll(nativeLayersToRemove)
-            LayerType.REFERENCE -> map.basemap.value?.referenceLayers?.removeAll(nativeLayersToRemove)
+            LayerType.REFERENCE -> map.basemap.value?.referenceLayers?.removeAll(
+                nativeLayersToRemove
+            )
         }
     }
 
@@ -228,6 +217,48 @@ class LayersController(
             LayerType.OPERATIONAL -> flutterOperationalLayersMap
             LayerType.BASE -> flutterBaseLayersMap
             LayerType.REFERENCE -> flutterReferenceLayersMap
+        }
+    }
+
+    private fun updateLayers(layersToUpdate: Any) {
+        val layersArgs = layersToUpdate as Collection<*>? ?: return
+        if (layersArgs.isEmpty()) {
+            return
+        }
+        for (layerData in layersArgs) {
+            layerData as Map<*, *>
+            val layerId = layerData["layerId"] as String? ?: continue
+            val layer = getLayerByLayerId(layerId) ?: continue
+            updateLayer(layer, layerData)
+        }
+    }
+
+    private fun updateLayer(layer: Layer, data: Map<*, *>) {
+        val isVisible = data["isVisible"] as Boolean?
+        if (isVisible != null) {
+            layer.isVisible = isVisible
+        }
+        val opacity = data["opacity"] as Double?
+        if (opacity != null) {
+            layer.opacity = opacity.toFloat()
+        }
+
+        if (layer is Refreshable) {
+            val refreshInterval = data["refreshInterval"] as Int?
+            if (refreshInterval != null) {
+                layer.refreshInterval = refreshInterval.toLong()
+            }
+        }
+
+        if (layer is FeatureLayer) {
+            val definitionExpression = data["definitionExpression"] as String?
+            if (definitionExpression != null) {
+                layer.definitionExpression = definitionExpression
+            }
+            val renderer = data["renderer"] as Map<*, *>?
+            if (renderer != null) {
+                layer.renderer = RendererFactory.createRenderer(context, renderer)
+            }
         }
     }
 

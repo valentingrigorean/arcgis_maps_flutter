@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
 class MapPageTileCache extends StatefulWidget {
-  const MapPageTileCache({Key? key}) : super(key: key);
+  const MapPageTileCache({super.key});
 
   @override
   State<MapPageTileCache> createState() => _MapPageTileCacheState();

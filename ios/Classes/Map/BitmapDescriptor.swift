@@ -139,7 +139,7 @@ class BitmapDescriptor: Hashable {
             return CompositeBitmapDescriptor(bitmapDescriptors: bitmaps)
         }
 
-        if let styleMarker = data["styleMarker"] as? Int {
+        if let styleMarker = data["styleMarker"] as? String {
             let color = UIColor(data: data["color"])!
             let size = CGFloat(data["size"] as! Double)
             return StyleMarkerBitmapDescriptor(style: SimpleMarkerSymbol.Style(styleMarker), color: color, size: size)

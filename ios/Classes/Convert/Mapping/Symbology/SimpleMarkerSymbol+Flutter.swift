@@ -9,28 +9,45 @@ import Foundation
 import ArcGIS
 
 extension SimpleMarkerSymbol.Style {
-    init(_ flutterValue: Int) {
+    init(_ flutterValue: String) {
         switch flutterValue {
-        case 0:
+        case "circle":
             self = .circle
             break
-        case 1:
+        case "cross":
             self = .cross
             break
-        case 2:
+        case "diamond":
             self = .diamond
             break
-        case 3:
+        case "square":
             self = .square
             break
-        case 4:
+        case "triangle":
             self = .triangle
             break
-        case 5:
+        case "x":
             self = .x
             break
         default:
             fatalError("Invalid SimpleMarkerSymbol.Style value \(flutterValue)")
+        }
+    }
+}
+
+extension SimpleMarkerSymbol {
+    func interpretSimpleMarkerSymbol(data:Dictionary<String, Any>){
+        self.interpretMarkerSymbol(data: data)
+        if let style = data["style"] as? String {
+            self.style = SimpleMarkerSymbol.Style(style)
+        }
+
+        if let color = data["color"] {
+            self.color = UIColor(data: color)!
+        }
+
+        if let size = data["size"] as? Double {
+            self.size = CGFloat(size)
         }
     }
 }

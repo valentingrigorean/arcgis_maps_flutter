@@ -20,10 +20,12 @@ import com.valentingrigorean.arcgis_maps_flutter.convert.fromFlutterColor
 import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.symbology.toSimpleMarkerSymbolStyle
 import com.valentingrigorean.arcgis_maps_flutter.convert.toArcgisColorOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.toBitmapDrawable
+import com.valentingrigorean.arcgis_maps_flutter.utils.createDrawableBitmap
+import com.valentingrigorean.arcgis_maps_flutter.utils.getResourceIdByName
 import java.util.Objects
 
 object BitmapDescriptorFactory {
-    private val resourceIdCache = HashMap<String, Int>()
+
     private var cache: LruCacheEx? = null
     fun fromRawData(context: Context, o: Any?): BitmapDescriptor? {
         val data = o as Map<*, *>? ?: return null
@@ -38,7 +40,7 @@ object BitmapDescriptorFactory {
         if (fromAsset != null) {
             return AssetBitmapDescriptor(context, BitmapDescriptorOptions(data))
         }
-        val styleMarker = (data["styleMarker"] as Int?)?.toSimpleMarkerSymbolStyle()
+        val styleMarker = (data["styleMarker"] as String?)?.toSimpleMarkerSymbolStyle()
         if (styleMarker != null) {
             val color = data["color"]?.toArcgisColorOrNull()!!
             val size = data["size"] as Double
@@ -88,13 +90,12 @@ object BitmapDescriptorFactory {
             if (cache.get(bitmapDescriptorOptions) != null) {
                 return cache.get(bitmapDescriptorOptions)!!
             }
-            val bitmap = bitmapDescriptorOptions.createBitmap(context)
-            val symbol = PictureMarkerSymbol.createWithImage(
-                BitmapDrawable(
-                    context.resources,
-                    bitmap
-                )
+            val bitmap = context.createDrawableBitmap(
+                bitmapDescriptorOptions.resourceName!!,
+                bitmapDescriptorOptions.tintColor
             )
+            val symbol =
+                bitmap?.let { PictureMarkerSymbol.createWithImage(it) } ?: PictureMarkerSymbol()
             bitmapDescriptorOptions.width?.let {
                 symbol.width = it
             }
@@ -154,8 +155,8 @@ object BitmapDescriptorFactory {
     }
 
     private class BitmapDescriptorOptions(data: Map<*, *>) {
-        private val resourceName: String?
-        private var tintColor: Int? = null
+        val resourceName: String?
+        var tintColor: Int? = null
         var width: Float? = null
         var height: Float? = null
 
@@ -164,48 +165,6 @@ object BitmapDescriptorFactory {
             tintColor = data["tintColor"]?.fromFlutterColor()
             width = (data["width"] as Double?)?.toFloat()
             height = (data["height"] as Double?)?.toFloat()
-        }
-
-        fun createBitmap(context: Context): Bitmap {
-            val drawable = createDrawable(context)
-            if (drawable is BitmapDrawable) {
-                return drawable.bitmap
-            }
-            val bitmap = Bitmap.createBitmap(
-                drawable.intrinsicWidth,
-                drawable.intrinsicHeight,
-                Bitmap.Config.ARGB_8888
-            )
-            val canvas = Canvas(bitmap)
-            drawable.setBounds(0, 0, canvas.width, canvas.height)
-            drawable.draw(canvas)
-            return bitmap
-        }
-
-        @SuppressLint("DiscouragedApi")
-        private fun createDrawable(context: Context): Drawable {
-            val drawableResourceId: Int
-            if (resourceIdCache.containsKey(resourceName)) {
-                drawableResourceId = resourceIdCache[resourceName]!!
-            } else {
-                drawableResourceId =
-                    context.resources.getIdentifier(resourceName, "drawable", context.packageName)
-                resourceIdCache[resourceName!!] = drawableResourceId
-            }
-            val drawable = ResourcesCompat.getDrawableForDensity(
-                context.resources,
-                drawableResourceId,
-                context.resources.displayMetrics.densityDpi,
-                context.theme
-            )
-            if (tintColor == null) {
-                return drawable!!
-            }
-            val wrappedDrawable = DrawableCompat.wrap(
-                drawable!!
-            )
-            DrawableCompat.setTint(wrappedDrawable, tintColor!!)
-            return wrappedDrawable
         }
 
         override fun equals(other: Any?): Boolean {

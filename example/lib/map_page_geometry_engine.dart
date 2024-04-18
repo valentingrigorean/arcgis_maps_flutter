@@ -2,7 +2,7 @@ import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
 class MapPageGeometryEngine extends StatefulWidget {
-  const MapPageGeometryEngine({Key? key}) : super(key: key);
+  const MapPageGeometryEngine({super.key});
 
   @override
   State<MapPageGeometryEngine> createState() => _MapPageGeometryEngineState();

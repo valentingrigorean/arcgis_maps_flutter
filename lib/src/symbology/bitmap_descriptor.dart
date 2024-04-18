@@ -1,22 +1,5 @@
 part of arcgis_maps_flutter;
 
-enum SimpleMarkerSymbolStyle {
-  circle(0),
-  cross(1),
-  diamond(2),
-  square(3),
-  triangle(4),
-  x(5),
-  ;
-
-  const SimpleMarkerSymbolStyle(this.value);
-
-  factory SimpleMarkerSymbolStyle.fromValue(int value) =>
-      values.firstWhere((e) => e.value == value);
-
-  final int value;
-}
-
 @immutable
 class BitmapDescriptor {
   final _BitmapDescriptorBase _bitmapDescriptorBase;
@@ -204,7 +187,7 @@ class _SimpleStyleMarkerBitmapDescriptor implements _BitmapDescriptorBase {
   @override
   Object toJson() {
     final json = <String, Object>{};
-    json['styleMarker'] = style.value;
+    json['styleMarker'] = style.name;
     json['color'] = color.value;
     json['size'] = size;
     return json;

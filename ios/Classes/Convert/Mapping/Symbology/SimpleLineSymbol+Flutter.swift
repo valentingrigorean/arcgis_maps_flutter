@@ -9,46 +9,94 @@ import Foundation
 import ArcGIS
 
 extension SimpleLineSymbol.Style {
-    init(_ flutterValue: Int) {
+    init(_ flutterValue: String) {
         switch flutterValue {
-        case 0:
+        case "dash":
             self = .dash
             break
-        case 1:
+        case "dashDot":
             self = .dashDot
             break
-        case 2:
+        case "dashDotDot":
             self = .dashDotDot
             break
-        case 3:
+        case "dot":
             self = .dot
             break
-        case 4:
+        case "longDash":
             self = .longDash
             break
-        case 5:
+        case "longDashDot":
             self = .longDashDot
             break
-        case 6:
+        case "none":
             self = .noLine
             break
-        case 7:
+        case "shortDash":
             self = .shortDash
             break
-        case 8:
+        case "shortDashDot":
             self = .shortDashDot
             break
-        case 9:
+        case "shortDashDotDot":
             self = .shortDashDotDot
             break
-        case 10:
+        case "shortDot":
             self = .shortDot
             break
-        case 11:
+        case "solid":
             self = .solid
             break
         default:
             fatalError("Invalid SimpleLineSymbol.Style value \(flutterValue)")
+        }
+    }
+}
+
+extension SimpleLineSymbol.MarkerPlacement{
+    init(_ flutterValue: String) {
+        switch flutterValue {
+        case "begin":
+            self = .begin
+            break
+        case "end":
+            self = .end
+            break
+        case "beginAndEnd":
+            self = .beginAndEnd
+            break
+        default:
+            fatalError("Invalid SimpleLineSymbol.MarkerPlacement value \(flutterValue)")
+        }
+    }
+}
+
+extension SimpleLineSymbol.MarkerStyle{
+    init(_ flutterValue: String) {
+        switch flutterValue {
+        case "none":
+            self = .noMarkers
+            break
+        case "arrow":
+            self = .arrow
+            break
+        default:
+            fatalError("Invalid SimpleLineSymbol.MarkerStyle value \(flutterValue)")
+        }
+    }
+}
+
+extension SimpleLineSymbol{
+    func interpretSimpleLineSymbol(data:Dictionary<String, Any>){
+        self.interpretLineSymbol(data:data)
+        if let style = data["style"] as? String {
+            self.style = SimpleLineSymbol.Style(style)
+        }
+        if let markerPlacement = data["markerPlacement"] as? String {
+            self.markerPlacement = SimpleLineSymbol.MarkerPlacement(markerPlacement)
+        }
+        if let markerStyle = data["markerStyle"] as? String {
+            self.markerStyle = SimpleLineSymbol.MarkerStyle(markerStyle)
         }
     }
 }

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class MapPageCurrentLocationTap extends StatefulWidget {
-  const MapPageCurrentLocationTap({Key? key}) : super(key: key);
+  const MapPageCurrentLocationTap({super.key});
 
   @override
   State<MapPageCurrentLocationTap> createState() =>

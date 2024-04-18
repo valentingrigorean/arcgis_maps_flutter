@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of '../../arcgis_maps_flutter.dart';
 
 enum FontStyle {
   italic,
@@ -66,6 +66,9 @@ class TextSymbol extends MarkerSymbol {
     super.leaderOffset,
     super.offset,
   });
+
+  @override
+  String get type => 'text';
 
   @override
   Map<String, Object?> toJson() {

@@ -54,12 +54,10 @@ private class GroupLayerOptions(data: Map<*, *>) {
     }
 }
 
-class FlutterLayer(private val data: Map<*, *>) {
+class FlutterLayer(val data: Map<*, *>) {
     val layerId = data["layerId"] as String
     private val layerType: String? = data["layerType"] as String?
     private var url: String? = null
-    private val isVisible: Boolean
-    private val opacity: Float
     private var groupLayerOptions: GroupLayerOptions? = null
     private var portalItem: PortalItem? = null
     private var tileCache: TileCache? = null
@@ -89,8 +87,6 @@ class FlutterLayer(private val data: Map<*, *>) {
             portalItem = null
             tileCache = null
         }
-        isVisible = data["isVisible"] as Boolean
-        opacity = (data["opacity"] as Double).toFloat()
         when (layerType) {
             "GroupLayer" -> {
                 groupLayerOptions = GroupLayerOptions(data)
@@ -180,8 +176,6 @@ class FlutterLayer(private val data: Map<*, *>) {
             else -> throw UnsupportedOperationException("not implemented.")
         }
         layer.id = layerId
-        layer.opacity = opacity
-        layer.isVisible = isVisible
         return layer
     }
 

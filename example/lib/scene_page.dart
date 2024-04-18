@@ -2,7 +2,7 @@ import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
 class ScenePage extends StatefulWidget {
-  const ScenePage({Key? key}) : super(key: key);
+  const ScenePage({super.key});
 
   @override
   State<ScenePage> createState() => _ScenePageState();

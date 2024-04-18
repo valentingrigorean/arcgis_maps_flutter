@@ -72,7 +72,7 @@ class PolygonsController: NSObject, SymbolsController {
             controller.setStrokeWidth(width: CGFloat(strokeWidth))
         }
 
-        if let strokeStyle = data["strokeStyle"] as? Int {
+        if let strokeStyle = data["strokeStyle"] as? String {
             controller.setStrokeStyle(style: SimpleLineSymbol.Style(strokeStyle))
         }
 

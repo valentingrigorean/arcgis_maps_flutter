@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 class MobilePageMobileMapPackage extends StatefulWidget {
-  const MobilePageMobileMapPackage({Key? key}) : super(key: key);
+  const MobilePageMobileMapPackage({super.key});
 
   @override
   State<MobilePageMobileMapPackage> createState() =>

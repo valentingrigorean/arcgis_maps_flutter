@@ -30,6 +30,7 @@ class LocationDisplayController {
         locationGraphic.zIndex = Int.max
         locationGraphic.geometry = locationDisplay.mapLocation
         locationGraphicsOverlay.addGraphic(locationGraphic)
+        mapViewModel.addGraphicOverlay(locationGraphicsOverlay)
 
         taskManager.createTask {
             for await autoPanMode in self.locationDisplay.$autoPanMode {
@@ -58,11 +59,7 @@ class LocationDisplayController {
 
     var trackUserLocationTap: Bool = false {
         didSet {
-            if (trackUserLocationTap) {
-                mapViewModel.addGraphicOverlay(locationGraphicsOverlay)
-            } else {
-                mapViewModel.removeGraphicOverlay(locationGraphicsOverlay)
-            }
+            locationGraphicsOverlay.isVisible = trackUserLocationTap
         }
     }
 

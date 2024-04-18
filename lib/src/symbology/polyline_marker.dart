@@ -1,31 +1,5 @@
 part of arcgis_maps_flutter;
 
-enum SimpleLineSymbolStyle {
-  dash(0),
-  dashDot(1),
-  dashDotDot(2),
-  dot(3),
-  longDash(4),
-  longDashDot(5),
-  none(6),
-  shortDash(7),
-  shortDashDotDot(8),
-  shortDashDot(9),
-  shortDot(10),
-  solid(11),
-  ;
-
-  const SimpleLineSymbolStyle(this.value);
-
-  factory SimpleLineSymbolStyle.fromValue(int value) {
-    return SimpleLineSymbolStyle.values.firstWhere(
-      (e) => e.value == value,
-      orElse: () => SimpleLineSymbolStyle.none,
-    );
-  }
-
-  final int value;
-}
 
 /// Uniquely identifies a [PolylineMarker] among [ArcgisMapView] polylines.
 ///
@@ -156,7 +130,7 @@ class PolylineMarker extends Symbol {
     addIfPresent('polylineId', polylineId.value);
     addIfPresent('consumeTapEvents', consumeTapEvents);
     addIfPresent('color', color.value);
-    addIfPresent('style', style.value);
+    addIfPresent('style', style.name);
     addIfPresent('spatialReference', spatialReference?.toJson());
     json['points'] = _pointsToJson();
     addIfPresent('visible', visible);

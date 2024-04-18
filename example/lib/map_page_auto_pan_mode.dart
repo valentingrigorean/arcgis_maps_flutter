@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class MapPageAutoPanMode extends StatefulWidget {
-  const MapPageAutoPanMode({Key? key}) : super(key: key);
+  const MapPageAutoPanMode({super.key});
 
   @override
   State<MapPageAutoPanMode> createState() => _MapPageAutoPanModeState();

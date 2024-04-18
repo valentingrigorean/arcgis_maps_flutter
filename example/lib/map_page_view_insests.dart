@@ -2,7 +2,7 @@ import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
 class MapPageViewInsets extends StatefulWidget {
-  const MapPageViewInsets({Key? key}) : super(key: key);
+  const MapPageViewInsets({super.key});
 
   @override
   State<MapPageViewInsets> createState() => _MapPageViewInsetsState();

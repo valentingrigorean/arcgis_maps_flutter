@@ -3,7 +3,7 @@ import 'package:arcgis_maps_flutter_example/utils.dart';
 import 'package:flutter/material.dart';
 
 class MapPageMarkersVisibilityFilter extends StatefulWidget {
-  const MapPageMarkersVisibilityFilter({Key? key}) : super(key: key);
+  const MapPageMarkersVisibilityFilter({super.key});
 
   @override
   State<MapPageMarkersVisibilityFilter> createState() =>

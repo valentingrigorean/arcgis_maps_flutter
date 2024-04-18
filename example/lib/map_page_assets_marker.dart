@@ -4,7 +4,7 @@ import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
 class MapPageASsetsMarker extends StatefulWidget {
-  const MapPageASsetsMarker({Key? key}) : super(key: key);
+  const MapPageASsetsMarker({super.key});
 
   @override
   State<MapPageASsetsMarker> createState() => _MapPageASsetsMarkerState();

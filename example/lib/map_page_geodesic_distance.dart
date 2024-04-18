@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class MapPageGeodeticDistance extends StatefulWidget {
-  const MapPageGeodeticDistance({Key? key}) : super(key: key);
+  const MapPageGeodeticDistance({super.key});
 
   @override
   State<MapPageGeodeticDistance> createState() =>

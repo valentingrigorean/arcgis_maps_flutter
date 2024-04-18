@@ -6,7 +6,10 @@ import Foundation
 import SwiftUI
 
 extension UIColor {
-    convenience init?(data: Any) {
+    convenience init?(data: Any?) {
+        guard let data = data else {
+            return nil
+        }
         guard let value = data as? CUnsignedLong else {
             return nil
         }

@@ -1,15 +1,11 @@
 # arcgis_maps_flutter
 
-A new flutter plugin project.
+## Deprecation Notice
 
-## Getting Started
+This plugin is no longer actively maintained. Esri has announced the official [ArcGIS Maps SDK for Flutter](https://www.esri.com/arcgis-blog/products/developers/announcements/announcing-arcgis-maps-sdk-for-flutter-beta/), which provides comprehensive mapping capabilities directly supported by Esri.
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+## Recommendation
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+We strongly recommend transitioning to the [ArcGIS Maps SDK for Flutter](https://www.esri.com/arcgis-blog/products/developers/announcements/announcing-arcgis-maps-sdk-for-flutter-beta/). This official SDK will ensure better support and access to the latest features and updates from Esri.
 
+Thank you for your understanding and support.

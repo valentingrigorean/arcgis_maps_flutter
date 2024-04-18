@@ -127,7 +127,7 @@ class PolygonMarker extends Symbol {
     addIfPresent('fillColor', fillColor.value);
     addIfPresent('strokeColor', strokeColor.value);
     addIfPresent('strokeWidth', strokeWidth);
-    addIfPresent('strokeStyle', strokeStyle.value);
+    addIfPresent('strokeStyle', strokeStyle.name);
     addIfPresent('visible', visible);
     addIfPresent('zIndex', zIndex);
     addIfPresent('selectedColor', selectedColor?.value);

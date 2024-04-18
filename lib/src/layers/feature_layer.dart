@@ -1,36 +1,52 @@
-part of arcgis_maps_flutter;
+part of '../../arcgis_maps_flutter.dart';
 
 @immutable
 class FeatureLayer extends BaseTileLayer {
   FeatureLayer.fromUrl(
     String url, {
     LayerId? layerId,
-    bool isVisible = true,
-    double opacity = 1,
+    super.isVisible,
+    super.opacity,
+    this.renderer,
+    this.definitionExpression,
+    this.refreshInterval,
   })  : portalItemLayerId = -1,
         super.fromUrl(
-          isVisible: isVisible,
-          opacity: opacity,
           layerId: layerId ?? LayerId(url),
           url: url,
           type: 'FeatureLayer',
         );
 
   const FeatureLayer.fromPortalItem({
-    required LayerId layerId,
-    required PortalItem portalItem,
+    required super.layerId,
+    required super.portalItem,
     required this.portalItemLayerId,
-    bool isVisible = true,
-    double opacity = 1,
+    super.isVisible,
+    super.opacity,
+    this.renderer,
+    this.definitionExpression,
+    this.refreshInterval,
   }) : super.fromPortalItem(
-          isVisible: isVisible,
-          opacity: opacity,
-          layerId: layerId,
-          portalItem: portalItem,
           type: 'FeatureLayer',
         );
 
   final int portalItemLayerId;
+
+  final Renderer? renderer;
+
+  final String? definitionExpression;
+
+  /// The objects refresh interval. The refresh interval, in milliseconds. A refresh interval of null means never refresh.
+  final int? refreshInterval;
+
+  @override
+  List<Object?> get props => super.props
+    ..addAll([
+      portalItemLayerId,
+      renderer,
+      definitionExpression,
+      refreshInterval,
+    ]);
 
   @override
   clone() {
@@ -43,12 +59,18 @@ class FeatureLayer extends BaseTileLayer {
     if (portalItem != null) {
       json['portalItemLayerId'] = portalItemLayerId;
     }
+    json.addIfNonNull('definitionExpression', definitionExpression);
+    json.addIfNonNull('refreshInterval', refreshInterval);
+    json.addIfNonNull('renderer', renderer?.toJson());
     return json;
   }
 
   FeatureLayer copyWith({
     bool? isVisibleParam,
     double? opacityParam,
+    Renderer? rendererParam,
+    String? definitionExpressionParam,
+    int? refreshIntervalParam,
   }) {
     if (url != null) {
       return FeatureLayer.fromUrl(
@@ -56,6 +78,9 @@ class FeatureLayer extends BaseTileLayer {
         layerId: layerId,
         isVisible: isVisibleParam ?? isVisible,
         opacity: opacityParam ?? opacity,
+        renderer: rendererParam ?? renderer,
+        definitionExpression: definitionExpressionParam ?? definitionExpression,
+        refreshInterval: refreshIntervalParam ?? refreshInterval,
       );
     }
 
@@ -65,6 +90,8 @@ class FeatureLayer extends BaseTileLayer {
       isVisible: isVisibleParam ?? isVisible,
       opacity: opacityParam ?? opacity,
       portalItemLayerId: portalItemLayerId,
+      renderer: rendererParam ?? renderer,
+      definitionExpression: definitionExpressionParam ?? definitionExpression,
     );
   }
 }

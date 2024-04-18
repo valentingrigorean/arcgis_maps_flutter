@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class MapPageMaxExtent extends StatefulWidget {
-  const MapPageMaxExtent({Key? key}) : super(key: key);
+  const MapPageMaxExtent({super.key});
 
   @override
   State<MapPageMaxExtent> createState() => _MapPageMaxExtentState();

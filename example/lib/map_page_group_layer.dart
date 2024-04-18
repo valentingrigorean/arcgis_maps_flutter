@@ -2,7 +2,7 @@ import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
 class MapPageGroupLayer extends StatefulWidget {
-  const MapPageGroupLayer({Key? key}) : super(key: key);
+  const MapPageGroupLayer({super.key});
 
   @override
   State<MapPageGroupLayer> createState() => _MapPageGroupLayerState();

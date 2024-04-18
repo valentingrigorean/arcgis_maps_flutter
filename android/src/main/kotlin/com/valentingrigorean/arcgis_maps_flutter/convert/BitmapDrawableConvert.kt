@@ -22,7 +22,7 @@ suspend fun BitmapDrawable.toFlutterValueAsync() : Any = withContext(Dispatchers
     return@withContext byteArrayOutputStream.toByteArray()
 }
 
-fun ByteArray.toBitmapDrawable(context: Context? = null): BitmapDrawable? {
+fun ByteArray.toBitmapDrawable(context: Context? = null): BitmapDrawable {
     val bitmap = BitmapFactory.decodeByteArray(this, 0, this.size)
     return BitmapDrawable(context?.resources, bitmap)
 }

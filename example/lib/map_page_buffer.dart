@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class MapPageBuffer extends StatefulWidget {
-  const MapPageBuffer({Key? key}) : super(key: key);
+  const MapPageBuffer({super.key});
 
   @override
   State<MapPageBuffer> createState() => _MapPageBufferState();

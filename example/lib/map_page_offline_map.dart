@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
 class MapPageOfflineMap extends StatefulWidget {
-  const MapPageOfflineMap({Key? key}) : super(key: key);
+  const MapPageOfflineMap({super.key});
 
   @override
   State<MapPageOfflineMap> createState() => _MapPageOfflineMapState();
@@ -303,9 +303,9 @@ class _MapPageOfflineMapState extends State<MapPageOfflineMap> {
 
 class MapDownloadedOfflineMap extends StatelessWidget {
   const MapDownloadedOfflineMap({
-    Key? key,
+    super.key,
     required this.map,
-  }) : super(key: key);
+  });
 
   final ArcGISMap map;
 

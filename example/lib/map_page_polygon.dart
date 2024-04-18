@@ -4,7 +4,7 @@ import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:flutter/material.dart';
 
 class MapPagePolygon extends StatefulWidget {
-  const MapPagePolygon({Key? key}) : super(key: key);
+  const MapPagePolygon({super.key});
 
   @override
   State<MapPagePolygon> createState() => _MapPagePolygonState();

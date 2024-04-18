@@ -61,7 +61,7 @@ class PolylinesController: NSObject, SymbolsController {
             controller.setColor(color: color)
         }
 
-        if let styleIndex = data["style"] as? Int {
+        if let styleIndex = data["style"] as? String {
             controller.setStyle(style:  SimpleLineSymbol.Style(styleIndex))
         }
 

@@ -1,11 +1,11 @@
-part of arcgis_maps_flutter;
+part of '../../arcgis_maps_flutter.dart';
 
 enum SymbolAngleAlignment {
   map,
   screen,
 }
 
-abstract class MarkerSymbol extends Equatable {
+abstract class MarkerSymbol extends GraphicSymbol {
   final double? angle;
 
   final SymbolAngleAlignment? angleAlignment;
@@ -21,14 +21,19 @@ abstract class MarkerSymbol extends Equatable {
     this.offset,
   });
 
+  @override
+  List<Object?> get props => [
+    angle,
+    angleAlignment,
+    leaderOffset,
+    offset,
+  ];
+
+  @override
   Map<String, Object?> toJson() {
-    final Map<String, Object?> json = <String, Object?>{};
-    if (angle != null) {
-      json['angle'] = angle;
-    }
-    if (angleAlignment != null) {
-      json['angleAlignment'] = angleAlignment!.name;
-    }
+    final Map<String, Object?> json = super.toJson();
+    json.addIfNonNull('angle', angle);
+    json.addIfNonNull('angleAlignment', angleAlignment?.name);
     if (leaderOffset != null) {
       json['leaderOffset'] = <double>[leaderOffset!.dx, leaderOffset!.dy];
     }
@@ -37,12 +42,4 @@ abstract class MarkerSymbol extends Equatable {
     }
     return json;
   }
-
-  @override
-  List<Object?> get props => [
-        angle,
-        angleAlignment,
-        leaderOffset,
-        offset,
-      ];
 }

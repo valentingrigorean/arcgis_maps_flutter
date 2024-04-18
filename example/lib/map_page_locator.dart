@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class MapPageLocator extends StatefulWidget {
-  const MapPageLocator({Key? key}) : super(key: key);
+  const MapPageLocator({super.key});
 
   @override
   State<MapPageLocator> createState() => _MapPageLocatorState();

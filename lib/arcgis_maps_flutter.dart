@@ -15,6 +15,7 @@ import 'package:arcgis_maps_flutter/src/method_channel/authentication/token_cred
 import 'package:arcgis_maps_flutter/src/symbology/marker_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polygon_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polyline_updates.dart';
+import 'package:arcgis_maps_flutter/src/utils/collections.dart';
 import 'package:arcgis_maps_flutter/src/utils/elevation_source.dart';
 import 'package:arcgis_maps_flutter/src/utils/json.dart';
 import 'package:arcgis_maps_flutter/src/utils/layers.dart';
@@ -140,13 +141,23 @@ part 'src/mapping/view/scene/arcgis_scene_controller.dart';
 part 'src/mapping/view/scene/arcgis_scene_view.dart';
 
 part 'src/symbology/bitmap_descriptor.dart';
-part 'src/symbology/marker.dart';
+part 'src/symbology/composite_symbol.dart';
+part 'src/symbology/fill_symbol.dart';
+part 'src/symbology/graphic_symbol.dart';
+part 'src/symbology/line_symbol.dart';
 part 'src/symbology/marker_symbol.dart';
+part 'src/symbology/picture_marker_symbol.dart';
+part 'src/symbology/renderer.dart';
+part 'src/symbology/simple_fill_symbol.dart';
+part 'src/symbology/simple_line_symbol.dart';
+part 'src/symbology/simple_marker_symbol.dart';
+part 'src/symbology/marker.dart';
 part 'src/symbology/polygon_marker.dart';
 part 'src/symbology/polyline_marker.dart';
 part 'src/symbology/symbol.dart';
 part 'src/symbology/symbol_visibility_filter.dart';
 part 'src/symbology/text_symbol.dart';
+part 'src/symbology/unique_value_renderer.dart';
 
 part 'src/tasks/geocode/geocode_parameters.dart';
 part 'src/tasks/geocode/geocode_result.dart';

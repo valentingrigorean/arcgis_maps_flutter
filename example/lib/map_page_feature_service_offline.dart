@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
 class MapPageFeatureServiceOffline extends StatefulWidget {
-  const MapPageFeatureServiceOffline({Key? key}) : super(key: key);
+  const MapPageFeatureServiceOffline({super.key});
 
   @override
   State<MapPageFeatureServiceOffline> createState() =>
