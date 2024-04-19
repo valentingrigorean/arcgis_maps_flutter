@@ -44,11 +44,11 @@ private fun String.toLabelingPlacement(): LabelingPlacement {
 fun Any.toLabelDefinitionOrNull(): LabelDefinition? {
     val data = this as Map<*, *>? ?: return null
     val labelExpression = data["labelExpression"] as Map<*, *>
-    val textSymbol = data["textSymbol"]?.let {
+    val textSymbol = data["symbol"]?.let {
         TextSymbol().apply { interpretTextSymbol(it as Map<*, *>) }
     }
     val labelDefinition = LabelDefinition(parseLabelExpression(labelExpression), textSymbol)
-    data["labelPlacement"]?.let {
+    data["placement"]?.let {
         labelDefinition.placement = (it as String).toLabelingPlacement()
     }
     data["minScale"]?.let {
@@ -63,8 +63,8 @@ fun Any.toLabelDefinitionOrNull(): LabelDefinition? {
 
 private fun parseLabelExpression(json: Map<*, *>): LabelExpression {
     return when (json["type"] as String) {
-        "simple" -> SimpleLabelExpression(json["value"] as String)
-        "arcade" -> ArcadeLabelExpression(json["value"] as String)
+        "simple" -> SimpleLabelExpression(json["expression"] as String)
+        "arcade" -> ArcadeLabelExpression(json["expression"] as String)
         else -> throw IllegalArgumentException("Unknown LabelExpression type ${json["type"]}")
     }
 }

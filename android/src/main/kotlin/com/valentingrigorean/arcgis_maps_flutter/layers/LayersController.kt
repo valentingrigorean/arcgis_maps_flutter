@@ -96,8 +96,8 @@ class LayersController(
     }
 
     private fun addLayers(args: Any, layerType: LayerType) {
-        val layersArgs = args as Collection<Map<*, *>>
-        if (layersArgs == null || layersArgs.isEmpty()) {
+        val layersArgs = args as Collection<Map<*, *>>?
+        if (layersArgs.isNullOrEmpty()) {
             return
         }
         val flutterMap = getFlutterMap(layerType)
@@ -266,13 +266,14 @@ class LayersController(
                 layer.definitionExpression = it as String
             }
 
-            data["labelsEnabled"]?.let {
+            data["enableLabels"]?.let {
                 layer.labelsEnabled = it as Boolean
             }
 
-            data["labelDefinition"]?.let {
-                val labelDefinition = it as List<Map<*, *>>
-                val labelDefinitions = labelDefinition.mapNotNull { toLabelDefinitionOrNull() }
+            data["labelDefinitions"]?.let {
+                val labelDefinitions = (it as List<Map<*, *>>).let { list ->
+                    list.map { label -> label.toLabelDefinitionOrNull()!! }
+                }
                 layer.labelDefinitions.clear()
                 layer.labelDefinitions.addAll(labelDefinitions)
             }

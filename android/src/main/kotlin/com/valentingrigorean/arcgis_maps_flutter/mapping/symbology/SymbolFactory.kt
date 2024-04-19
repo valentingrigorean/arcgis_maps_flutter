@@ -21,7 +21,7 @@ object SymbolFactory {
         if (data !is Map<*, *>) {
             return null
         }
-        return when (data["symbolType"] as String) {
+        return when (data["type"] as String) {
             "simple-line" -> SimpleLineSymbol().apply {
                 interpretSimpleLineSymbol(data)
             }

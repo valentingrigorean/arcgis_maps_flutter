@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 
 import android.content.Context
