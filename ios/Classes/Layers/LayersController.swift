@@ -365,10 +365,17 @@ class LayersController {
 
         if let featureLayer = layer as? FeatureLayer {
 
+            if let scaleSymbols = data["scaleSymbols"] as? Bool {
+                featureLayer.scalesSymbols = scaleSymbols
+            }
 
             /// its milliseconds
             if let refreshInterval = data["refreshInterval"] as? Int {
                 featureLayer.refreshInterval = TimeInterval(refreshInterval / 1000)
+            }
+
+            if let renderingMode = data["renderingMode"] as? String {
+                featureLayer.renderingMode = FeatureLayer.RenderingMode(renderingMode)
             }
 
             if let renderer = data["renderer"] as? [String: Any] {

@@ -1,5 +1,6 @@
 package com.valentingrigorean.arcgis_maps_flutter.convert.mapping.layers
 
+import com.arcgismaps.mapping.layers.FeatureRenderingMode
 import com.arcgismaps.mapping.layers.GroupVisibilityMode
 import com.arcgismaps.mapping.layers.TileImageFormat
 
@@ -23,5 +24,15 @@ fun Int.toTileImageFormat() : TileImageFormat {
         6 -> TileImageFormat.Lerc
         7 -> TileImageFormat.Unknown
         else -> throw IllegalArgumentException("Invalid TileImageFormat value $this")
+    }
+}
+
+
+fun String.toFeatureRenderingMode() : FeatureRenderingMode {
+    return when (this) {
+        "automatic" -> FeatureRenderingMode.Automatic
+        "dynamic" -> FeatureRenderingMode.Dynamic
+        "static" -> FeatureRenderingMode.Static
+        else -> throw IllegalArgumentException("Invalid FeatureRenderingMode value $this")
     }
 }

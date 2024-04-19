@@ -8,6 +8,7 @@ import com.arcgismaps.mapping.ArcGISMap
 import com.arcgismaps.mapping.layers.FeatureLayer
 import com.arcgismaps.mapping.layers.Layer
 import com.arcgismaps.mapping.layers.Refreshable
+import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.layers.toFeatureRenderingMode
 import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toLabelDefinitionOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toTimeValueOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
@@ -235,48 +236,46 @@ class LayersController(
     }
 
     private fun updateLayer(layer: Layer, data: Map<*, *>) {
-        val isVisible = data["isVisible"] as Boolean?
-        if (isVisible != null) {
-            layer.isVisible = isVisible
+        data["isVisible"]?.let {
+            layer.isVisible = it as Boolean
         }
-        val opacity = data["opacity"] as Double?
-        if (opacity != null) {
-            layer.opacity = opacity.toFloat()
+        data["opacity"]?.let {
+            layer.opacity = (it as Double).toFloat()
         }
-
         if (layer is Refreshable) {
-            val refreshInterval = data["refreshInterval"] as Int?
-            if (refreshInterval != null) {
-                layer.refreshInterval = refreshInterval.toLong()
+            data["refreshInterval"]?.let {
+                layer.refreshInterval = (it as Int).toLong()
             }
         }
 
         if (layer is FeatureLayer) {
-            val renderer = data["renderer"]?.let {
-                RendererFactory.createRenderer(context, it as Map<*, *>)
-            }
-            if (renderer != null) {
-                layer.renderer = renderer
-            }
-            val definitionExpression = data["definitionExpression"] as String?
-            if (definitionExpression != null) {
-                layer.definitionExpression = definitionExpression
+
+            data["scaleSymbols"] ?.let {
+                layer.scaleSymbols = it as Boolean
             }
 
-
-            val labelsEnabled = data["labelsEnabled"] as Boolean?
-            if (labelsEnabled != null) {
-                layer.labelsEnabled = labelsEnabled
+            data["renderingMode"]?.let {
+                layer.renderingMode = (it as String).toFeatureRenderingMode()
             }
 
-            val labelDefinition = data["labelDefinition"] as List<Map<*, *>>?
-            if (labelDefinition != null) {
+            data["renderer"]?.let {
+                layer.renderer = RendererFactory.createRenderer(context, it as Map<*, *>)
+            }
+
+            data["definitionExpression"]?.let {
+                layer.definitionExpression = it as String
+            }
+
+            data["labelsEnabled"]?.let {
+                layer.labelsEnabled = it as Boolean
+            }
+
+            data["labelDefinition"]?.let {
+                val labelDefinition = it as List<Map<*, *>>
                 val labelDefinitions = labelDefinition.mapNotNull { it.toLabelDefinitionOrNull() }
                 layer.labelDefinitions.clear()
                 layer.labelDefinitions.addAll(labelDefinitions)
             }
-
-
         }
     }
 

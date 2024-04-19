@@ -1,12 +1,20 @@
 part of '../../arcgis_maps_flutter.dart';
 
+enum FeatureRenderingMode{
+  automatic,
+  dynamic,
+  static,
+}
+
 @immutable
 class FeatureLayer extends BaseTileLayer {
   FeatureLayer.fromUrl(String url, {
     LayerId? layerId,
     super.isVisible,
     super.opacity,
+    this.scaleSymbols,
     this.refreshInterval,
+    this.renderingMode,
     this.renderer,
     this.definitionExpression,
     this.enableLabels,
@@ -25,7 +33,9 @@ class FeatureLayer extends BaseTileLayer {
     required this.portalItemLayerId,
     super.isVisible,
     super.opacity,
+    this.scaleSymbols,
     this.refreshInterval,
+    this.renderingMode,
     this.renderer,
     this.definitionExpression,
     this.enableLabels,
@@ -36,10 +46,12 @@ class FeatureLayer extends BaseTileLayer {
 
   final int portalItemLayerId;
 
+  final bool? scaleSymbols;
 
   /// The objects refresh interval. The refresh interval, in milliseconds. A refresh interval of null means never refresh.
   final int? refreshInterval;
 
+  final FeatureRenderingMode? renderingMode;
 
   final Renderer? renderer;
 
@@ -47,19 +59,21 @@ class FeatureLayer extends BaseTileLayer {
 
   final bool? enableLabels;
 
+
   final List<LabelDefinition>? labelDefinitions;
 
   @override
-  List<Object?> get props =>
-      super.props
-        ..addAll([
-          portalItemLayerId,
-          refreshInterval,
-          renderer,
-          definitionExpression,
-          enableLabels,
-          labelDefinitions,
-        ]);
+  List<Object?> get props => [
+    ...super.props,
+    portalItemLayerId,
+    scaleSymbols,
+    refreshInterval,
+    renderingMode,
+    renderer,
+    definitionExpression,
+    enableLabels,
+    labelDefinitions,
+  ];
 
   @override
   clone() {
@@ -72,7 +86,9 @@ class FeatureLayer extends BaseTileLayer {
     if (portalItem != null) {
       json['portalItemLayerId'] = portalItemLayerId;
     }
+    json.addIfNonNull('scalesSymbols', scaleSymbols);
     json.addIfNonNull('refreshInterval', refreshInterval);
+    json.addIfNonNull('renderingMode', renderingMode?.name);
     json.addIfNonNull('renderer', renderer?.toJson());
     json.addIfNonNull('definitionExpression', definitionExpression);
     json.addIfNonNull('enableLabels', enableLabels);
@@ -86,7 +102,9 @@ class FeatureLayer extends BaseTileLayer {
   FeatureLayer copyWith({
     bool? isVisibleParam,
     double? opacityParam,
+    bool? scaleSymbolsParam,
     int? refreshIntervalParam,
+    FeatureRenderingMode? renderingModeParam,
     Renderer? rendererParam,
     String? definitionExpressionParam,
     bool? enableLabelsParam,
@@ -98,6 +116,7 @@ class FeatureLayer extends BaseTileLayer {
         layerId: layerId,
         isVisible: isVisibleParam ?? isVisible,
         opacity: opacityParam ?? opacity,
+        scaleSymbols: scaleSymbolsParam ?? scaleSymbols,
         refreshInterval: refreshIntervalParam ?? refreshInterval,
         renderer: rendererParam ?? renderer,
         definitionExpression: definitionExpressionParam ?? definitionExpression,
@@ -111,6 +130,7 @@ class FeatureLayer extends BaseTileLayer {
       portalItem: portalItem!,
       isVisible: isVisibleParam ?? isVisible,
       opacity: opacityParam ?? opacity,
+      scaleSymbols: scaleSymbolsParam ?? scaleSymbols,
       portalItemLayerId: portalItemLayerId,
       refreshInterval: refreshIntervalParam ?? refreshInterval,
       renderer: rendererParam ?? renderer,

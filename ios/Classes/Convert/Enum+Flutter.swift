@@ -57,3 +57,18 @@ extension SymbolAngleAlignment{
         }
     }
 }
+
+extension FeatureLayer.RenderingMode{
+    init(_ flutterValue:String){
+        switch flutterValue{
+        case "automatic":
+            self = .automatic
+        case "dynamic":
+            self = .dynamic
+        case "static":
+            self = .static
+        default:
+            fatalError("Invalid FeatureLayer.RenderingMode type \(flutterValue)")
+        }
+    }
+}
