@@ -86,7 +86,7 @@ class FeatureLayer extends BaseTileLayer {
     if (portalItem != null) {
       json['portalItemLayerId'] = portalItemLayerId;
     }
-    json.addIfNonNull('scalesSymbols', scaleSymbols);
+    json.addIfNonNull('scaleSymbols', scaleSymbols);
     json.addIfNonNull('refreshInterval', refreshInterval);
     json.addIfNonNull('renderingMode', renderingMode?.name);
     json.addIfNonNull('renderer', renderer?.toJson());

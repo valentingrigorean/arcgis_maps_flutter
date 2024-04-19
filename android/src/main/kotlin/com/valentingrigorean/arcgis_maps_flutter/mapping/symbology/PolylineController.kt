@@ -57,7 +57,7 @@ class PolylineController(polylineId: String) : BaseGraphicController(), Polyline
             this.width = width.toFloat()
         }
 
-        val style = (data["style"] as Int?)?.toSimpleLineSymbolStyle()
+        val style = (data["style"] as String?)?.toSimpleLineSymbolStyle()
         if (style != null) {
             this.style = style
         }

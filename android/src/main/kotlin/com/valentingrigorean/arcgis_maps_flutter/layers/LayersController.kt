@@ -272,7 +272,7 @@ class LayersController(
 
             data["labelDefinition"]?.let {
                 val labelDefinition = it as List<Map<*, *>>
-                val labelDefinitions = labelDefinition.mapNotNull { it.toLabelDefinitionOrNull() }
+                val labelDefinitions = labelDefinition.mapNotNull { toLabelDefinitionOrNull() }
                 layer.labelDefinitions.clear()
                 layer.labelDefinitions.addAll(labelDefinitions)
             }
