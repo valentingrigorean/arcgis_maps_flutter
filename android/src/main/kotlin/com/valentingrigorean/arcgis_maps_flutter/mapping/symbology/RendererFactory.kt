@@ -1,8 +1,8 @@
 package com.valentingrigorean.arcgis_maps_flutter.mapping.symbology
 
-import android.app.Application
 import android.content.Context
 import com.arcgismaps.mapping.symbology.Renderer
+import com.arcgismaps.mapping.symbology.RotationType
 import com.arcgismaps.mapping.symbology.UniqueValue
 import com.arcgismaps.mapping.symbology.UniqueValueRenderer
 
@@ -29,6 +29,22 @@ object RendererFactory {
         val defaultLabel = data["defaultLabel"] as String
         val defaultSymbol = SymbolFactory.createSymbol(context, data["defaultSymbol"])
 
-        return UniqueValueRenderer(fieldsNames, uniqueValues, defaultLabel, defaultSymbol)
+
+        return UniqueValueRenderer(fieldsNames, uniqueValues, defaultLabel, defaultSymbol).apply {
+            data["rotationExpression"]?.let {
+                rotationExpression = it as String
+            }
+            data["rotationType"]?.let {
+                rotationType = (it as String).toRotationType()
+            }
+        }
+    }
+}
+
+private fun String.toRotationType(): RotationType {
+    return when (this) {
+        "geographic" -> RotationType.Geographic
+        "arithmetic" -> RotationType.Arithmetic
+        else -> throw IllegalArgumentException("Unknown RotationType $this")
     }
 }

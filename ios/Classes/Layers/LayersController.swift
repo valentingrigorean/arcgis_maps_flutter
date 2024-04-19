@@ -297,7 +297,7 @@ class LayersController {
         }
 
         if let layersToUpdate = data["\(objectName)sToChange"] {
-            updateLayers(args:layersToUpdate)
+            updateLayers(args: layersToUpdate)
         }
 
         if let layersToRemove = data["\(objectName)IdsToRemove"] as? [String] {
@@ -346,7 +346,6 @@ class LayersController {
 
         for layerData in layersToUpdate {
             let layerId = layerData["layerId"] as! String
-            let layerType = layerData["layerType"] as! Int
             let layer = getLayerByLayerId(layerId)
             if layer == nil {
                 continue
@@ -364,17 +363,32 @@ class LayersController {
             layer.opacity = Float(opacity)
         }
 
-        if let featureLayer = layer as? FeatureLayer{
-            if let definitionExpression = data["definitionExpression"] as? String {
-                featureLayer.definitionExpression = definitionExpression
-            }
-            if let renderer = data["renderer"] as? [String: Any] {
-                featureLayer.renderer = RendererFactory.createRenderer(data: renderer)
-            }
+        if let featureLayer = layer as? FeatureLayer {
+
 
             /// its milliseconds
             if let refreshInterval = data["refreshInterval"] as? Int {
                 featureLayer.refreshInterval = TimeInterval(refreshInterval / 1000)
+            }
+
+            if let renderer = data["renderer"] as? [String: Any] {
+                featureLayer.renderer = RendererFactory.createRenderer(data: renderer)
+            }
+
+            if let definitionExpression = data["definitionExpression"] as? String {
+                featureLayer.definitionExpression = definitionExpression
+            }
+
+            if let enableLabels = data["enableLabels"] as? Bool {
+                featureLayer.labelsAreEnabled = enableLabels
+            }
+
+            if let labelDefinitions = data["labelDefinitions"] as? [[String: Any]] {
+                // clear and read definitions
+                featureLayer.removeAllLabelDefinitions()
+                featureLayer.addLabelDefinitions(labelDefinitions.map {
+                    LabelDefinition(data: $0)
+                })
             }
         }
     }

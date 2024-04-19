@@ -8,6 +8,7 @@ import com.arcgismaps.mapping.ArcGISMap
 import com.arcgismaps.mapping.layers.FeatureLayer
 import com.arcgismaps.mapping.layers.Layer
 import com.arcgismaps.mapping.layers.Refreshable
+import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toLabelDefinitionOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.toTimeValueOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.map.MapChangeAware
@@ -251,14 +252,31 @@ class LayersController(
         }
 
         if (layer is FeatureLayer) {
+            val renderer = data["renderer"]?.let {
+                RendererFactory.createRenderer(context, it as Map<*, *>)
+            }
+            if (renderer != null) {
+                layer.renderer = renderer
+            }
             val definitionExpression = data["definitionExpression"] as String?
             if (definitionExpression != null) {
                 layer.definitionExpression = definitionExpression
             }
-            val renderer = data["renderer"] as Map<*, *>?
-            if (renderer != null) {
-                layer.renderer = RendererFactory.createRenderer(context, renderer)
+
+
+            val labelsEnabled = data["labelsEnabled"] as Boolean?
+            if (labelsEnabled != null) {
+                layer.labelsEnabled = labelsEnabled
             }
+
+            val labelDefinition = data["labelDefinition"] as List<Map<*, *>>?
+            if (labelDefinition != null) {
+                val labelDefinitions = labelDefinition.mapNotNull { it.toLabelDefinitionOrNull() }
+                layer.labelDefinitions.clear()
+                layer.labelDefinitions.addAll(labelDefinitions)
+            }
+
+
         }
     }
 

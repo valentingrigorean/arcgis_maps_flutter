@@ -28,6 +28,8 @@ class UniqueValue extends Equatable {
 
 class UniqueValueRenderer extends Renderer with EquatableMixin {
   const UniqueValueRenderer({
+    super.rotationExpression,
+    super.rotationType,
     this.defaultLabel = '',
     this.defaultSymbol,
     this.fieldsNames = const [],

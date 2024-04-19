@@ -49,7 +49,7 @@ class TextSymbol extends MarkerSymbol {
   final VerticalAlignment? verticalAlignment;
 
   const TextSymbol({
-    required this.text,
+    this.text = '',
     this.color,
     this.fontFamily,
     this.fontStyle,

@@ -5,12 +5,14 @@
 import Foundation
 import ArcGIS
 
+
+
 extension UniqueValue{
     convenience init(data:[String:Any]){
         let label = data["label"] as! String
         let description = data["description"] as! String
         let symbol =  SymbolFactory.createSymbol(data:data["symbol"])
         let values = data["values"] as! [Any]
-        self.init(description: description, label: label, symbol: symbol == nil ? nil : SymbolFactory.createSymbol(data: symbol), values: values)
+        self.init(description: description, label: label, symbol: symbol, values: values)
     }
 }
