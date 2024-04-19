@@ -106,7 +106,7 @@ class ArcgisMapController(
         scaleBarController = ScaleBarController(context, mapView, container, scope)
         selectionPropertiesHandler = SelectionPropertiesHandler(mapView.selectionProperties)
         symbolVisibilityFilterController = SymbolVisibilityFilterController(mapView, scope)
-        layersController = LayersController(methodChannel, scope)
+        layersController = LayersController(methodChannel, scope,context)
         mapChangeAwares.add(layersController)
         val graphicsOverlay = GraphicsOverlay()
         markersController = MarkersController(context, methodChannel, graphicsOverlay)

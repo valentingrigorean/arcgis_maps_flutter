@@ -68,7 +68,7 @@ class PolygonController(polygonId: String) : BaseGraphicController(), PolygonCon
         if (strokeWidth != null) {
             this.strokeWidth = strokeWidth.toFloat()
         }
-        val strokeStyle = (data["strokeStyle"] as Int?)?.toSimpleLineSymbolStyle()
+        val strokeStyle = (data["strokeStyle"] as String?)?.toSimpleLineSymbolStyle()
         if (strokeStyle != null) {
             this.strokeStyle = strokeStyle
         }
