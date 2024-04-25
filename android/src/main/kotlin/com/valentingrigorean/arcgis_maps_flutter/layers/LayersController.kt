@@ -73,7 +73,7 @@ class LayersController(
         if (mapData == null || mapData.isEmpty()) {
             return
         }
-        for (layerType in LayerType.entries) {
+        for (layerType in LayerType.values()) {
             val objectName = getObjectName(layerType)
             val layersToAdd = (mapData[objectName + "sToAdd"])
             layersToAdd?.let { addLayers(it, layerType) }

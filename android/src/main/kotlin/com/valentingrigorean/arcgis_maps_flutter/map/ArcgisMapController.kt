@@ -10,6 +10,7 @@ import android.widget.FrameLayout
 import androidx.lifecycle.Lifecycle
 import com.arcgismaps.LoadStatus
 import com.arcgismaps.arcgisservices.TimeAware
+import com.arcgismaps.data.QueryParameters
 import com.arcgismaps.geometry.Envelope
 import com.arcgismaps.geometry.GeometryEngine
 import com.arcgismaps.mapping.ArcGISMap
@@ -18,9 +19,11 @@ import com.arcgismaps.mapping.MobileMapPackage
 import com.arcgismaps.mapping.Viewpoint
 import com.arcgismaps.mapping.ViewpointType
 import com.arcgismaps.mapping.layers.ArcGISVectorTiledLayer
+import com.arcgismaps.mapping.layers.FeatureLayer
 import com.arcgismaps.mapping.view.GraphicsOverlay
 import com.arcgismaps.mapping.view.MapView
 import com.valentingrigorean.arcgis_maps_flutter.convert.arcgisservices.toFlutterJson
+import com.valentingrigorean.arcgis_maps_flutter.convert.data.toQueryParametersOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toFlutterJson
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toGeometryOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toPointOrNull
@@ -46,6 +49,8 @@ import io.flutter.plugin.platform.PlatformView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.launchIn
@@ -106,7 +111,7 @@ class ArcgisMapController(
         scaleBarController = ScaleBarController(context, mapView, container, scope)
         selectionPropertiesHandler = SelectionPropertiesHandler(mapView.selectionProperties)
         symbolVisibilityFilterController = SymbolVisibilityFilterController(mapView, scope)
-        layersController = LayersController(methodChannel, scope,context)
+        layersController = LayersController(methodChannel, scope, context)
         mapChangeAwares.add(layersController)
         val graphicsOverlay = GraphicsOverlay()
         markersController = MarkersController(context, methodChannel, graphicsOverlay)
@@ -248,6 +253,10 @@ class ArcgisMapController(
                 result.success(null)
             }
 
+            "layer#queryFeatures" -> {
+                handleQueryFeatures(call.arguments, result)
+            }
+
             "map#setViewpointChangedListenerEvents" -> {
                 trackViewpointChangedListenerEvents = call.arguments()!!
                 result.success(null)
@@ -268,10 +277,6 @@ class ArcgisMapController(
 
             "map#getWanderExtentFactor" -> {
                 result.success(mapView.locationDisplay.wanderExtentFactor)
-            }
-
-            "map#queryFeatureTableFromLayer" -> {
-                handleQueryFeatureTableFromLayer(call.arguments as Map<*, *>, result)
             }
 
             "map#getTimeAwareLayerInfos" -> handleTimeAwareLayerInfos(result)
@@ -470,108 +475,6 @@ class ArcgisMapController(
         }
     }
 
-    private fun handleQueryFeatureTableFromLayer(data: Map<*, *>, result: MethodChannel.Result) {
-        result.notImplemented()
-
-//        val params = QueryParameters()
-//        var layerName: String? = ""
-//
-//        // init query params
-//        for ((key, value) in data) {
-//            when (key) {
-//                "layerName" -> layerName = value as String?
-//                "objectId" -> params.objectIds.add(value as kotlin.String?). toLong ())
-//                "maxResults" -> params.maxFeatures = value as kotlin.String?. toInt ()
-//                "geometry" -> params.geometry =  value?.toGeometryOrNull()
-//
-//                "spatialRelationship" -> params.spatialRelationship =
-//                    (value as Int).toSpatialRelationship()
-//
-//                else -> if (params.whereClause.isEmpty()) {
-//                    params.whereClause = String.format(
-//                        "upper(%s) LIKE '%%%s%%'",
-//                        key,
-//                        value.toString().uppercase(Locale.getDefault())
-//                    )
-//                } else {
-//                    val whereClause = params.whereClause
-//                    params.whereClause = whereClause + String.format(
-//                        " AND upper(%s) LIKE '%%%s%%'",
-//                        key,
-//                        value.toString().uppercase(Locale.getDefault())
-//                    )
-//                }
-//            }
-//        }
-//
-//        // check map
-//        val map = mapView.map
-//        if (map == null || map.operationalLayers.size == 0) {
-//            result.success(null)
-//            return
-//        }
-//        val layers = map.operationalLayers
-//        val finalLayerName = layerName
-//        AGSLoadObjects.load(layers, LoadObjectsResult { loaded: Boolean ->
-//            if (!loaded) {
-//                result.success(null)
-//                return@LoadObjectsResult
-//            }
-//            for (layer in layers) {
-//                if (layer is FeatureLayer) {
-//                    val featureLayer = layer as FeatureLayer
-//                    if (featureLayer.name.equals(finalLayerName, ignoreCase = true)) {
-//                        val future =
-//                            featureLayer.featureTable.queryFeaturesAsync(params)
-//                        future.addDoneListener {
-//                            try {
-//                                val queryResult = future.get()
-//                                val results = ArrayList<Any>()
-//                                for (feature in queryResult) {
-//                                    results.add(feature.toMap())
-//                                }
-//                                result.success(results)
-//                            } catch (e: Exception) {
-//                                result.success(null)
-//                            }
-//                        }
-//                        return@LoadObjectsResult
-//                    }
-//                } else if (layer is GroupLayer) {
-//                    val gLayer = layer as GroupLayer
-//                    for (layerItem in gLayer.layers) {
-//                        if (layerItem is FeatureLayer) {
-//                            val featureLayer = layerItem
-//                            if (featureLayer.name.equals(
-//                                    finalLayerName,
-//                                    ignoreCase = true
-//                                )
-//                            ) {
-//                                val future =
-//                                    featureLayer.featureTable.queryFeaturesAsync(params)
-//                                future.addDoneListener {
-//                                    try {
-//                                        val queryResult = future.get()
-//                                        val results = ArrayList<Any>()
-//                                        for (feature in queryResult) {
-//                                            results.add(feature.toMap())
-//                                        }
-//                                        result.success(results)
-//                                    } catch (e: Exception) {
-//                                        result.success(null)
-//                                    }
-//                                }
-//                                return@LoadObjectsResult
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            result.success(null)
-//        })
-
-    }
-
     private fun handleTimeAwareLayerInfos(result: MethodChannel.Result) {
         val map = mapView.map
         if (map == null || map.operationalLayers.size == 0) {
@@ -588,6 +491,32 @@ class ArcgisMapController(
                     }
             result.success(results)
         }
+    }
+
+    private fun handleQueryFeatures(args: Any?, result: MethodChannel.Result) {
+        val data = args as Map<*, *>? ?: return
+        val layerId = data["layerId"] as String
+        val layer = layersController.getLayerByLayerId(layerId) as FeatureLayer?
+        if (layer == null) {
+            result.success(null)
+            return
+        }
+        val featureTable = layer.featureTable
+        if (featureTable == null) {
+            result.success(null)
+            return
+        }
+        val queryParams = data["parameters"]!!.toQueryParametersOrNull()!!
+        scope.launch {
+            featureTable.queryFeatures(queryParams).onSuccess { results ->
+                val items = results.toList().map { it.toFlutterJson() }
+                Log.d(TAG, "handleQueryFeatures: " + items.size + " results found.")
+                result.success(items)
+            }.onFailure {
+                result.error("queryFeatures", it.message, it.toFlutterJson())
+            }
+        }
+
     }
 
     private fun initSymbolsControllers() {

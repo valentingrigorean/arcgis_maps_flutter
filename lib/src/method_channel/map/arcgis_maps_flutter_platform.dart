@@ -207,6 +207,14 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
         'updateIdentifyLayerListeners() has not been implemented.');
   }
 
+  Future<List<GeoElement>> queryFeatures({
+    required int mapId,
+    required LayerId layerId,
+    required QueryParameters parameters,
+  }) {
+    throw UnimplementedError('queryFeatures() has not been implemented.');
+  }
+
   /// Sets a time offset for this object. The time offset is subtracted from
   /// the time extent set on the owning GeoView. This allows for data from
   /// different periods of time to be compared. Can be null if there is
@@ -282,4 +290,6 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
   void dispose(int mapId) {
     throw UnimplementedError('dispose() has not been implemented.');
   }
+
+
 }

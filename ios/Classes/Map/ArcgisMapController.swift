@@ -219,8 +219,8 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         case "map#getWanderExtentFactor":
             result(viewModel.locationDisplay.wanderExtentFactor)
             break
-        case "map#queryFeatureTableFromLayer":
-            handleQueryFeatureTableFromLayer(data: call.arguments as! [String: Any], result: result)
+        case "layer#queryFeatures":
+            handleQueryFeatures(data: call.arguments as! [String: Any], result: result)
             break
         case "map#getTimeAwareLayerInfos":
             handleTimeAwareLayerInfos(result: result)
@@ -374,154 +374,29 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         }
     }
 
-    private func handleQueryFeatureTableFromLayer(data: [String: Any], result: @escaping FlutterResult) {
-        result(FlutterMethodNotImplemented)
-//        if let data = call.arguments as? [String: Any] {
-//
-//            var queryLayerName = ""
-//            let queryParams = QueryParameters()
-//
-//            for (key, value) in data {
-//                switch (key) {
-//                case "layerName":
-//                    queryLayerName = value as! String
-//                    break
-//                case "objectId":
-//                    if let str = value as? String, let id = Int(str) {
-//                        queryParams.objectIDs.append(NSNumber(value: id))
-//                    }
-//                    break
-//                case "maxResults":
-//                    if let str = value as? String, let maxResults = Int(str) {
-//                        queryParams.maxFeatures = maxResults
-//                    }
-//                    break
-//                case "geometry":
-//                    let geometry = Geometry.fromFlutter(data: value as! [String: Any])!
-//                    queryParams.geometry = geometry
-//                    break
-//                case "spatialRelationship":
-//                    queryParams.spatialRelationship = AGSSpatialRelationship.fromFlutter(value as! Int)
-//                    break
-//                default:
-//                    if (queryParams.whereClause.isEmpty) {
-//                        queryParams.whereClause = "upper(\(key)) LIKE '%\(value as! String).uppercased())%'"
-//                    } else {
-//                        queryParams.whereClause.append(" AND upper(\(key)) LIKE '%\((value as! String).uppercased())%'")
-//                    }
-//                    break
-//                }
-//            }
-//
-//            if queryLayerName.isEmpty {
-//                result(nil)
-//                return
-//            }
-//
-//            guard let operationalLayers = mapView.map?.operationalLayers as AnyObject as? [AGSLayer],  operationalLayers.count > 0 else {
-//                result(nil)
-//                return
-//            }
-//
-//            AGSLoadObjects(operationalLayers) { [weak self] (loaded) in
-//
-//                guard loaded else {
-//                    result(nil)
-//                    return
-//                }
-//
-//                guard self != nil else {
-//                    result(nil)
-//                    return
-//                }
-//
-//                operationalLayers.forEach { (opLayer) in
-//
-//                    // check if feature layer
-//                    if let featLayer = opLayer as? FeatureLayer {
-//
-//                        if (queryLayerName.uppercased() == featLayer.name.uppercased()) {
-//                            featLayer.featureTable?.queryFeatures(with: queryParams, completion: { (qResult:AGSFeatureQueryResult?, error:Error?) -> Void in
-//                                if let _ = error {
-//                                    print("Error searching for feature")
-//                                }
-//                                else if let features = qResult?.featureEnumerator().allObjects {
-//                                    result(features.map { (feature) -> Any in
-//                                        return feature.toJSONFlutter() as! [String : Any]
-//                                    })
-//                                }
-//                            })
-//                        }
-//                    }
-//
-//                    // check group layers
-//                    guard let groupLayer = opLayer as? AGSGroupLayer else {
-//                        return
-//                    }
-//
-//                    for layer in groupLayer.layers {
-//
-//                        guard let featureLayer = layer as? FeatureLayer else {
-//                            return
-//                        }
-//
-//                        if (queryLayerName.uppercased() == featureLayer.name.uppercased()) {
-//
-//                            featureLayer.featureTable?.queryFeatures(with: queryParams, completion: { (qResult:AGSFeatureQueryResult?, error:Error?) -> Void in
-//                                if let _ = error {
-//                                    print("Error searching for feature")
-//                                }
-//                                else if let features = qResult?.featureEnumerator().allObjects {
-//                                    result(features.map { (feature) -> Any in
-//                                        return feature.toJSONFlutter() as! [String : Any]
-//                                    })
-//                                }
-//                            })
-//                        }
-//                    }
-//                }
-//            }
-//        } else {
-//            result(nil)
-//        }
-
+    private func handleQueryFeatures(data: [String: Any], result: @escaping FlutterResult) {
+        let layerId = data["layerId"] as! String
+        guard let featureLayer = layersController.getLayerByLayerId(layerId) as? FeatureLayer else {
+            result(FlutterError(code: "layer_not_found", message: "Layer with id $layerId not found", details: nil))
+            return
+        }
+        let query = QueryParameters(data: data["parameters"] as! [String: Any])
+        guard let featureTable = featureLayer.featureTable else {
+            result(FlutterError(code: "layer_not_support_query", message: "Layer with id $layerId not support query", details: nil))
+            return
+        }
+        taskManager.createTask {
+            do {
+                let res = try await featureTable.queryFeatures(using:query)
+                result(res.features().map { $0.toJSONFlutter() })
+            } catch {
+                result(FlutterError(code: "query_error", message: error.localizedDescription, details: nil))
+            }
+        }
     }
 
     private func handleTimeAwareLayerInfos(result: @escaping FlutterResult) {
         result(FlutterMethodNotImplemented)
-//        guard let layers = mapView.map?.operationalLayers as AnyObject as? [AGSLayer], layers.count > 0 else {
-//            result([])
-//            return
-//        }
-//
-//        AGSLoadObjects(layers) { [weak self] (loaded) in
-//
-//            guard loaded else {
-//                result([])
-//                return
-//            }
-//
-//            guard let self = self else {
-//                result([])
-//                return
-//            }
-//
-//            var timeAwareLayers = [TimeAware]()
-//
-//            layers.forEach { (layer) in
-//                guard let timeAwareLayer = layer as? TimeAware else {
-//                    return
-//                }
-//                timeAwareLayers.append(timeAwareLayer)
-//            }
-//            result(timeAwareLayers.map { (layer) -> Any in
-//                var layerId: String?
-//                if layer is AGSLayer {
-//                    layerId = self.layersController.getLayerIdByLayer(layer: layer as! AGSLayer)
-//                }
-//                return layer.toJSONFlutter(layerId: layerId)
-//            })
-//        }
     }
 
     private func initSymbolsControllers() {

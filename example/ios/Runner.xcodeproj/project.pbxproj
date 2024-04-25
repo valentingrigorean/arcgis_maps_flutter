@@ -15,6 +15,7 @@
 		1C10F7B11E702A0098034A64 /* LineSymbol+Flutter.swift in Resources */ = {isa = PBXBuildFile; fileRef = 1C10F62A8CCF2639F8490EB9 /* LineSymbol+Flutter.swift */; };
 		1C10F84C7494612C751962D3 /* RendererFactory.swift in Resources */ = {isa = PBXBuildFile; fileRef = 1C10FCB40102786290910E23 /* RendererFactory.swift */; };
 		1C10F935B5F2894DF18C30D0 /* SimpleFillSymbol+Flutter.swift in Resources */ = {isa = PBXBuildFile; fileRef = 1C10F5328101538BE2B5F8EF /* SimpleFillSymbol+Flutter.swift */; };
+		1C10F99A9A76255057D4168B /* QueryParameters+Flutter.swift in Resources */ = {isa = PBXBuildFile; fileRef = 1C10F65C54AE18C640E068D5 /* QueryParameters+Flutter.swift */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		6E9813462A568DEC0094DD5A /* ArcGIS in Frameworks */ = {isa = PBXBuildFile; productRef = 6E9813452A568DEC0094DD5A /* ArcGIS */; settings = {ATTRIBUTES = (Required, ); }; };
@@ -57,6 +58,7 @@
 		1C10F1338287DD90F3194744 /* PictureMarkerSymbol+Flutter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PictureMarkerSymbol+Flutter.swift"; sourceTree = "<group>"; };
 		1C10F5328101538BE2B5F8EF /* SimpleFillSymbol+Flutter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SimpleFillSymbol+Flutter.swift"; sourceTree = "<group>"; };
 		1C10F62A8CCF2639F8490EB9 /* LineSymbol+Flutter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LineSymbol+Flutter.swift"; sourceTree = "<group>"; };
+		1C10F65C54AE18C640E068D5 /* QueryParameters+Flutter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QueryParameters+Flutter.swift"; sourceTree = "<group>"; };
 		1C10FA8DF30260BD080A277C /* UniqueValue+Flutter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UniqueValue+Flutter.swift"; sourceTree = "<group>"; };
 		1C10FB5BF918024392C3E9A5 /* SymbolFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolFactory.swift; sourceTree = "<group>"; };
 		1C10FCB40102786290910E23 /* RendererFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RendererFactory.swift; sourceTree = "<group>"; };
@@ -292,6 +294,7 @@
 				1C10F442E86A77F91A98FD44 /* SymbolFactory.swift in Resources */,
 				1C10F5E28CFFC8820F407948 /* UniqueValueRenderer+Flutter.swift in Resources */,
 				1C10F4FF9989666CA7C8366C /* UniqueValue+Flutter.swift in Resources */,
+				1C10F99A9A76255057D4168B /* QueryParameters+Flutter.swift in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

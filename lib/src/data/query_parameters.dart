@@ -36,40 +36,41 @@ enum SpatialRelationship {
 }
 
 class QueryParameters {
+  const QueryParameters({
+    this.returnGeometry = true,
+    this.geometry,
+    this.resultOffset,
+    this.spatialRelationship,
+    this.whereClause = '',
+    this.maxFeatures,
+  });
+
   final SpatialRelationship? spatialRelationship;
-  final bool isReturnGeometry;
+  final bool returnGeometry;
   final Geometry? geometry;
-  final int maxFeatures;
-  final int resultOffset;
+  final int? maxFeatures;
+  final int? resultOffset;
 
   final String whereClause;
 
-  const QueryParameters({
-    this.isReturnGeometry = false,
-    this.geometry,
-    this.resultOffset = 0,
-    this.spatialRelationship,
-    this.whereClause = '',
-    this.maxFeatures = 0,
-  }) : assert(maxFeatures >= 0);
-
-  QueryParameters.fromJson(Map<dynamic, dynamic> json)
-      : this(
-          isReturnGeometry: json["isReturnGeometry"],
-          geometry: Geometry.fromJson(json["geometry"]),
-          resultOffset: json["resultOffset"],
-          maxFeatures: json["maxFeatures"],
-          spatialRelationship:
-              SpatialRelationship.fromValue(json["spatialRelationship"]),
-          whereClause: json["whereClause"],
-        );
+  factory QueryParameters.fromJson(Map<dynamic, dynamic> json) {
+    return QueryParameters(
+      returnGeometry: json["returnGeometry"] ?? true,
+      geometry: Geometry.fromJson(json["geometry"]),
+      resultOffset: json["resultOffset"],
+      maxFeatures: json["maxFeatures"],
+      spatialRelationship:
+          SpatialRelationship.fromValue(json["spatialRelationship"]),
+      whereClause: json["whereClause"],
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
-      "isReturnGeometry": isReturnGeometry,
+      "returnGeometry": returnGeometry,
       if (geometry != null) "geometry": geometry?.toJson(),
-      "resultOffset": resultOffset,
-      "maxFeatures": maxFeatures,
+      if (resultOffset != null) "resultOffset": resultOffset,
+      if (maxFeatures != null) "maxFeatures": maxFeatures,
       if (spatialRelationship != null)
         "spatialRelationship": spatialRelationship?.value,
       "whereClause": whereClause
