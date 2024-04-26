@@ -524,6 +524,9 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
 
   void _updateOperationalLayers() async {
     final ArcgisMapController controller = await _controller.future;
+    if (!mounted) {
+      return;
+    }
     final layersUpdate = LayerUpdates.from(_operationalLayers.values.toSet(),
         widget.operationalLayers, 'operationalLayer');
     if (layersUpdate.isEmpty) return;
@@ -533,6 +536,9 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
 
   void _updateBaseLayers() async {
     final ArcgisMapController controller = await _controller.future;
+    if (!mounted) {
+      return;
+    }
     final layersUpdate = LayerUpdates.from(
         _baseLayers.values.toSet(), widget.baseLayers, 'baseLayer');
     if (layersUpdate.isEmpty) return;
@@ -542,6 +548,9 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
 
   void _updateReferenceLayers() async {
     final ArcgisMapController controller = await _controller.future;
+    if (!mounted) {
+      return;
+    }
     final layersUpdate = LayerUpdates.from(_referenceLayers.values.toSet(),
         widget.referenceLayers, 'referenceLayer');
     if (layersUpdate.isEmpty) return;
@@ -551,6 +560,9 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
 
   void _updateMarkers() async {
     final ArcgisMapController controller = await _controller.future;
+    if (!mounted) {
+      return;
+    }
     final markerUpdate =
         MarkerUpdates.from(_markers.values.toSet(), widget.markers);
     if (markerUpdate.isEmpty) return;
@@ -560,6 +572,9 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
 
   void _updatePolygons() async {
     final ArcgisMapController controller = await _controller.future;
+    if (!mounted) {
+      return;
+    }
     final polygonUpdates =
         PolygonUpdates.from(_polygons.values.toSet(), widget.polygons);
     if (polygonUpdates.isEmpty) return;
@@ -569,6 +584,9 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
 
   void _updatePolylines() async {
     final ArcgisMapController controller = await _controller.future;
+    if (!mounted) {
+      return;
+    }
     final polylinesUpdate =
         PolylineUpdates.from(_polylines.values.toSet(), widget.polylines);
     if (polylinesUpdate.isEmpty) return;
@@ -583,6 +601,9 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
       return;
     }
     final ArcgisMapController controller = await _controller.future;
+    if (!mounted) {
+      return;
+    }
     controller._updateIdentifyLayerListeners(layers);
     _identifyLayerAsync = layers;
   }
