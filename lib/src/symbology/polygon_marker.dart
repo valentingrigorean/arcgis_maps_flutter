@@ -15,6 +15,7 @@ class PolygonMarker extends Symbol {
   /// Creates an immutable representation of a polygon through geographical locations on the map.
   const PolygonMarker({
     required this.polygonId,
+    this.style = SimpleFillSymbolStyle.solid,
     this.consumeTapEvents = false,
     this.fillColor = Colors.black,
     this.points = const <Point>[],
@@ -31,6 +32,8 @@ class PolygonMarker extends Symbol {
 
   /// Uniquely identifies a [PolygonMarker].
   final PolygonId polygonId;
+
+  final SimpleFillSymbolStyle style;
 
   /// True if the [PolygonMarker] consumes tap events.
   ///
@@ -77,6 +80,7 @@ class PolygonMarker extends Symbol {
   /// Creates a new [PolygonMarker] object whose values are the same as this instance,
   /// unless overwritten by the specified parameters.
   PolygonMarker copyWith({
+    SimpleFillSymbolStyle? styleParam,
     bool? consumeTapEventsParam,
     Color? fillColorParam,
     List<Point>? pointsParam,
@@ -92,6 +96,7 @@ class PolygonMarker extends Symbol {
   }) {
     return PolygonMarker(
       polygonId: polygonId,
+      style: styleParam ?? style,
       consumeTapEvents: consumeTapEventsParam ?? consumeTapEvents,
       fillColor: fillColorParam ?? fillColor,
       points: pointsParam ?? points,

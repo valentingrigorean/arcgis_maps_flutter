@@ -15,6 +15,14 @@ class SymbolFactory {
             return nil
         }
         switch type {
+        case "json":
+            do {
+                let json = data["data"] as! String
+                let symbol = try Symbol.fromJSON(json)
+                return symbol
+            } catch {
+                return nil
+            }
         case "simple-marker":
             let simpleMarker = SimpleMarkerSymbol()
             simpleMarker.interpretSimpleMarkerSymbol(data: data)
@@ -33,18 +41,35 @@ class SymbolFactory {
             let textSymbol = TextSymbol()
             textSymbol.interpretTextSymbol(data: data)
             return textSymbol
+        case "composite":
+            let compositeSymbol = CompositeSymbol()
+            let symbolsRaw = data["symbols"] as! [[String: Any]]
+            let symbols = symbolsRaw.map {
+                        createSymbol(data: $0)
+                    }
+                    .filter {
+                        $0 != nil
+                    }
+                    .map {
+                        $0!
+                    }
+            compositeSymbol.addSymbols(symbols)
+            return compositeSymbol
         default:
             return nil
         }
     }
 
-    private static func createPictureMarkerSymbol(data: Dictionary<String, Any>) -> PictureMarkerSymbol {
+    private static func createPictureMarkerSymbol(data: Dictionary<String, Any>) -> PictureMarkerSymbol? {
         var symbol: PictureMarkerSymbol
         if let url = data["url"] as? String {
             symbol = PictureMarkerSymbol(url: URL(string: url)!)
         } else if let resource = data["resource"] as? String {
             let tintColor = UIColor(data: data["tintColor"])
-            var image = UIImage(named: resource)!
+            guard var image = UIImage(named: resource) else {
+                print("Image not found in assets: \(resource)")
+                return nil
+            }
             if let color = tintColor {
                 image = image.colored(color)
             }

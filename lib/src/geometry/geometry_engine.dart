@@ -236,6 +236,12 @@ class GeometryEngine {
     );
   }
 
+  static Future<Geometry?> union({
+    required List<Geometry> geometries,
+  }) {
+    return GeometryEngineFlutterPlatform.instance.union(geometries: geometries);
+  }
+
   /// Get extent of Geometry.
   static Future<Envelope?> getExtent(Geometry geometry) {
     return GeometryEngineFlutterPlatform.instance.getExtent(geometry);

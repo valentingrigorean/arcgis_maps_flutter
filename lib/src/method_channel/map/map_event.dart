@@ -48,6 +48,13 @@ class PolylineTapEvent extends MapEvent<PolylineId> {
   );
 }
 
+class GraphicTapEvent extends MapEvent<GraphicId> {
+  const GraphicTapEvent(
+    super.mapId,
+    super.graphicId,
+  );
+}
+
 class UserLocationTapEvent extends MapEvent<void> {
   const UserLocationTapEvent(int mapId) : super(mapId, null);
 }

@@ -60,6 +60,10 @@ class PolygonsController: NSObject, SymbolsController {
 
         updateController(controller: controller, data: data)
 
+        if let style = data["style"] as? String {
+            controller.setStyle(style: SimpleFillSymbol.Style(style))
+        }
+
         if let fillColor = UIColor(data: data["fillColor"]) {
             controller.setFillColor(fillColor: fillColor)
         }

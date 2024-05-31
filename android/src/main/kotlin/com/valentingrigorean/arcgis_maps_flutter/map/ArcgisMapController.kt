@@ -38,6 +38,7 @@ import com.valentingrigorean.arcgis_maps_flutter.extensions.loadAll
 import com.valentingrigorean.arcgis_maps_flutter.layers.LayersController
 import com.valentingrigorean.arcgis_maps_flutter.layers.LegendInfoController
 import com.valentingrigorean.arcgis_maps_flutter.map.LocationDisplayController.LocationDisplayControllerDelegate
+import com.valentingrigorean.arcgis_maps_flutter.mapping.symbology.GraphicsController
 import com.valentingrigorean.arcgis_maps_flutter.mapping.symbology.MarkersController
 import com.valentingrigorean.arcgis_maps_flutter.mapping.symbology.PolygonsController
 import com.valentingrigorean.arcgis_maps_flutter.mapping.symbology.PolylinesController
@@ -76,6 +77,7 @@ class ArcgisMapController(
     private val markersController: MarkersController
     private val polygonsController: PolygonsController
     private val polylinesController: PolylinesController
+    private val graphicsController: GraphicsController
     private val symbolControllers = ArrayList<SymbolsController>()
     private val mapChangeAwares = ArrayList<MapChangeAware>()
     private val symbolVisibilityFilterController: SymbolVisibilityFilterController
@@ -120,6 +122,8 @@ class ArcgisMapController(
         symbolControllers.add(polygonsController)
         polylinesController = PolylinesController(methodChannel, graphicsOverlay)
         symbolControllers.add(polylinesController)
+        graphicsController = GraphicsController(context, methodChannel, graphicsOverlay)
+        symbolControllers.add(graphicsController)
         val locationDisplayChannel = MethodChannel(
             binaryMessenger, "plugins.flutter.io/arcgis_maps_" + id + "_location_display"
         )
@@ -132,6 +136,7 @@ class ArcgisMapController(
         mapViewOnTouchListener.addGraphicDelegate(markersController)
         mapViewOnTouchListener.addGraphicDelegate(polygonsController)
         mapViewOnTouchListener.addGraphicDelegate(polylinesController)
+        mapViewOnTouchListener.addGraphicDelegate(graphicsController)
         mapViewOnTouchListener.addGraphicDelegate(locationDisplayController)
         mapView.graphicsOverlays.add(graphicsOverlay)
         mapView.viewpointChanged.onEach {
@@ -396,6 +401,16 @@ class ArcgisMapController(
                 polylinesController.changePolylines(polylinesToChange)
                 val polylineIdsToRemove = call.argument<List<Any>>("polylineIdsToRemove")!!
                 polylinesController.removePolylines(polylineIdsToRemove)
+                result.success(null)
+            }
+
+            "graphic#update" -> {
+                val graphicsToAdd = call.argument<List<Any>>("graphicsToAdd")!!
+                graphicsController.addGraphics(graphicsToAdd)
+                val graphicsToChange = call.argument<List<Any>>("graphicsToChange")!!
+                graphicsController.changeGraphics(graphicsToChange)
+                val graphicIdsToRemove = call.argument<List<Any>>("graphicIdsToRemove")!!
+                graphicsController.removeGraphics(graphicIdsToRemove)
                 result.success(null)
             }
 

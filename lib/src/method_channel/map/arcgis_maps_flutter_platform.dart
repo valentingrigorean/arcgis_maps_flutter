@@ -2,6 +2,7 @@ import 'package:arcgis_maps_flutter/arcgis_maps_flutter.dart';
 import 'package:arcgis_maps_flutter/src/layers/layer_updates.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/map_event.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/method_channel_arcgis_maps_flutter.dart';
+import 'package:arcgis_maps_flutter/src/symbology/graphic_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/marker_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polygon_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polyline_updates.dart';
@@ -46,6 +47,7 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     Set<Marker> markers = const <Marker>{},
     Set<PolygonMarker> polygons = const <PolygonMarker>{},
     Set<PolylineMarker> polylines = const <PolylineMarker>{},
+    Set<Graphic> graphics = const <Graphic>{},
     Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers,
     Map<String, dynamic> mapOptions = const <String, dynamic>{},
   }) {
@@ -202,6 +204,10 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('updatePolylines() has not been implemented.');
   }
 
+  Future<void> updateGraphics(int mapId, GraphicUpdates graphicsUpdate) {
+    throw UnimplementedError('updateGraphics() has not been implemented.');
+  }
+
   Future<void> updateIdentifyLayerListeners(int mapId, Set<LayerId> layers) {
     throw UnimplementedError(
         'updateIdentifyLayerListeners() has not been implemented.');
@@ -247,6 +253,10 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('onPolylineTap() has not been implemented.');
   }
 
+  Stream<GraphicTapEvent> onGraphicTap({required int mapId}) {
+    throw UnimplementedError('onGraphicTap() has not been implemented.');
+  }
+
   /// A Map has been tapped at a certain [LatLng].
   Stream<MapTapEvent> onTap({required int mapId}) {
     throw UnimplementedError('onTap() has not been implemented.');
@@ -290,6 +300,4 @@ abstract class ArcgisMapsFlutterPlatform extends PlatformInterface {
   void dispose(int mapId) {
     throw UnimplementedError('dispose() has not been implemented.');
   }
-
-
 }

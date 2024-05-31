@@ -6,12 +6,10 @@ class TiledLayer extends BaseTileLayer {
   TiledLayer.fromUrl(
     String url, {
     LayerId? layerId,
-    bool isVisible = true,
-    double opacity = 1,
+    super.isVisible,
+    super.opacity,
   })  : _tileCache = null,
         super.fromUrl(
-          isVisible: isVisible,
-          opacity: opacity,
           layerId: layerId ?? LayerId(url),
           url: url,
           type: 'TiledLayer',
@@ -20,14 +18,12 @@ class TiledLayer extends BaseTileLayer {
   TiledLayer.fromTileCache({
     required TileCache tileCache,
     LayerId? layerId,
-    bool isVisible = true,
-    double opacity = 1,
+    super.isVisible,
+    super.opacity,
   })  : _tileCache = tileCache,
         super(
           layerId: layerId ?? LayerId(tileCache.path),
           type: 'TiledLayer',
-          isVisible: isVisible,
-          opacity: opacity,
         );
 
   @override

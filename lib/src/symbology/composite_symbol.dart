@@ -5,7 +5,7 @@ class CompositeSymbol extends GraphicSymbol {
     required this.symbols,
   });
 
-  final List<Symbol> symbols;
+  final List<GraphicSymbol> symbols;
 
   @override
   String get type => 'composite';
@@ -16,7 +16,7 @@ class CompositeSymbol extends GraphicSymbol {
   @override
   Map<String, Object?> toJson() {
     final Map<String, Object?> json = super.toJson();
-    json['symbols'] = symbols.map((Symbol symbol) => symbol.toJson()).toList();
+    json['symbols'] = symbols.map((GraphicSymbol symbol) => symbol.toJson()).toList();
     return json;
   }
 }

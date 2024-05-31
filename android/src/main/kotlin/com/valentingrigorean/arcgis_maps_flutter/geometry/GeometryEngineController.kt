@@ -80,6 +80,12 @@ class GeometryEngineController(messenger: BinaryMessenger) : MethodCallHandler {
                 handleAreaGeodetic(call.arguments()!!, result)
             }
 
+            "union" -> {
+                val geometries = call.arguments as List<*>
+                val geometry = GeometryEngine.unionOrNull(geometries.map { it?.toGeometryOrNull()!! })
+                result.success(geometry?.toFlutterJson())
+            }
+
             "getExtent" -> {
                 handleGetExtent(call.arguments()!!, result)
             }

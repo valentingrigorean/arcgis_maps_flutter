@@ -17,7 +17,24 @@ abstract class GraphicSymbol extends Equatable {
     };
   }
 
-  static GraphicSymbol? fromJson(Map<String, dynamic> json) {
-    return null;
+  static GraphicSymbol fromJson(Map<String, dynamic> json) => _JsonSymbol(json);
+}
+
+class _JsonSymbol extends GraphicSymbol {
+  const _JsonSymbol(this._json);
+
+  final Map<String, Object?> _json;
+
+  @override
+  String get type => 'json';
+
+  @override
+  Map<String, Object?> toJson() {
+    final Map<String, Object?> json = super.toJson();
+    json['data'] = jsonEncode(_json);
+    return json;
   }
+
+  @override
+  List<Object?> get props => [_json];
 }

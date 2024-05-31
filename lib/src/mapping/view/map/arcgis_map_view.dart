@@ -1,4 +1,4 @@
-part of arcgis_maps_flutter;
+part of '../../../../arcgis_maps_flutter.dart';
 
 /// Callback method for when the map is ready to be used.
 ///
@@ -81,6 +81,7 @@ class ArcgisMapView extends StatefulWidget {
     this.markers = const <Marker>{},
     this.polygons = const <PolygonMarker>{},
     this.polylines = const <PolylineMarker>{},
+    this.graphics = const <Graphic>{},
     this.myLocationEnabled = false,
     this.failedToStartMyLocation,
     this.insetsContentInsetFromSafeArea = true,
@@ -147,6 +148,8 @@ class ArcgisMapView extends StatefulWidget {
 
   /// Polylines to be placed on the map.
   final Set<PolylineMarker> polylines;
+
+  final Set<Graphic> graphics;
 
   final MapLoadedCallback? onMapLoaded;
 
@@ -257,6 +260,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
   Map<MarkerId, Marker> _markers = <MarkerId, Marker>{};
   Map<PolygonId, PolygonMarker> _polygons = <PolygonId, PolygonMarker>{};
   Map<PolylineId, PolylineMarker> _polylines = <PolylineId, PolylineMarker>{};
+  Map<GraphicId, Graphic> _graphics = <GraphicId, Graphic>{};
   Set<LayerId> _identifyLayerAsync = <LayerId>{};
 
   late _ArcgisMapOptions _arcgisMapOptions;
@@ -271,6 +275,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     _markers = keyByMarkerId(widget.markers);
     _polygons = keyByPolygonId(widget.polygons);
     _polylines = keyByPolylineId(widget.polylines);
+    _graphics = keyByGraphicId(widget.graphics);
     _identifyLayerAsync = widget.onIdentifyLayer.keys.toSet();
   }
 
@@ -296,6 +301,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     _updateMarkers();
     _updatePolygons();
     _updatePolylines();
+    _updateGraphics();
     _updateIdentifyLayerListeners();
   }
 
@@ -313,6 +319,7 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
       markers: widget.markers,
       polygons: widget.polygons,
       polylines: widget.polylines,
+      graphics: widget.graphics,
       gestureRecognizers: widget.gestureRecognizers,
       mapOptions: _arcgisMapOptions.toMap(),
     );
@@ -422,6 +429,23 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
       return;
     }
     final VoidCallback? onTap = polyline.onTap;
+    if (onTap != null) {
+      onTap();
+    }
+  }
+
+  void onGraphicTap(GraphicId graphicId) {
+    final Graphic? graphic = _graphics[graphicId];
+    if (graphic == null) {
+      final error = UnknownMapObjectIdError('graphic', graphicId, 'onTap');
+      final callback = widget.onUnknownMapObjectIdError;
+      if (callback == null) {
+        throw error;
+      }
+      callback(error);
+      return;
+    }
+    final VoidCallback? onTap = graphic.onTap;
     if (onTap != null) {
       onTap();
     }
@@ -592,6 +616,18 @@ class _ArcgisMapViewState extends State<ArcgisMapView> {
     if (polylinesUpdate.isEmpty) return;
     controller._updatePolylines(polylinesUpdate);
     _polylines = keyByPolylineId(widget.polylines);
+  }
+
+  void _updateGraphics() async {
+    final ArcgisMapController controller = await _controller.future;
+    if (!mounted) {
+      return;
+    }
+    final graphicUpdate =
+        GraphicUpdates.from(_graphics.values.toSet(), widget.graphics);
+    if (graphicUpdate.isEmpty) return;
+    controller._updateGraphics(graphicUpdate);
+    _graphics = keyByGraphicId(widget.graphics);
   }
 
   void _updateIdentifyLayerListeners() async {

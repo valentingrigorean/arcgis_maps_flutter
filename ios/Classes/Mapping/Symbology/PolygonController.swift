@@ -20,6 +20,10 @@ class PolygonController : BaseGraphicController {
         graphics.isVisible = visible
     }
 
+    func setStyle(style: SimpleFillSymbol.Style) {
+        polygonSymbol.style = style
+    }
+
     func setFillColor(fillColor: UIColor) {
         polygonSymbol.color = fillColor
     }

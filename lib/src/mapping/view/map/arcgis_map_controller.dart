@@ -272,6 +272,11 @@ class ArcgisMapController {
         .updatePolylines(mapId, polylineUpdates);
   }
 
+  Future<void> _updateGraphics(GraphicUpdates graphicsUpdate) {
+    return ArcgisMapsFlutterPlatform.instance
+        .updateGraphics(mapId, graphicsUpdate);
+  }
+
   Future<void> _updateIdentifyLayerListeners(Set<LayerId> layers) {
     return ArcgisMapsFlutterPlatform.instance
         .updateIdentifyLayerListeners(mapId, layers);
@@ -301,6 +306,10 @@ class ArcgisMapController {
     ArcgisMapsFlutterPlatform.instance
         .onPolylineTap(mapId: mapId)
         .listen((PolylineTapEvent e) => _arcgisMapState.onPolylineTap(e.value));
+
+    ArcgisMapsFlutterPlatform.instance
+        .onGraphicTap(mapId: mapId)
+        .listen((GraphicTapEvent e) => _arcgisMapState.onGraphicTap(e.value));
 
     ArcgisMapsFlutterPlatform.instance
         .onMapLoad(mapId: mapId)

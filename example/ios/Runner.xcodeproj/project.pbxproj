@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		1C10F333DD617AB65E00A450 /* PictureMarkerSymbol+Flutter.swift in Resources */ = {isa = PBXBuildFile; fileRef = 1C10F1338287DD90F3194744 /* PictureMarkerSymbol+Flutter.swift */; };
+		1C10F3DA676FEDF0EED0E45D /* GraphicController.swift in Resources */ = {isa = PBXBuildFile; fileRef = 1C10FB5CB56561DD7B8DE1CB /* GraphicController.swift */; };
 		1C10F442E86A77F91A98FD44 /* SymbolFactory.swift in Resources */ = {isa = PBXBuildFile; fileRef = 1C10FB5BF918024392C3E9A5 /* SymbolFactory.swift */; };
 		1C10F4FF9989666CA7C8366C /* UniqueValue+Flutter.swift in Resources */ = {isa = PBXBuildFile; fileRef = 1C10FA8DF30260BD080A277C /* UniqueValue+Flutter.swift */; };
 		1C10F5E28CFFC8820F407948 /* UniqueValueRenderer+Flutter.swift in Resources */ = {isa = PBXBuildFile; fileRef = 1C10FFB4D8853F683821F8F1 /* UniqueValueRenderer+Flutter.swift */; };
@@ -16,6 +17,7 @@
 		1C10F84C7494612C751962D3 /* RendererFactory.swift in Resources */ = {isa = PBXBuildFile; fileRef = 1C10FCB40102786290910E23 /* RendererFactory.swift */; };
 		1C10F935B5F2894DF18C30D0 /* SimpleFillSymbol+Flutter.swift in Resources */ = {isa = PBXBuildFile; fileRef = 1C10F5328101538BE2B5F8EF /* SimpleFillSymbol+Flutter.swift */; };
 		1C10F99A9A76255057D4168B /* QueryParameters+Flutter.swift in Resources */ = {isa = PBXBuildFile; fileRef = 1C10F65C54AE18C640E068D5 /* QueryParameters+Flutter.swift */; };
+		1C10FA8516A925C87C7F0A36 /* GraphicsController.swift in Resources */ = {isa = PBXBuildFile; fileRef = 1C10F9BFFCD3BD1A5AB2BD77 /* GraphicsController.swift */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		6E9813462A568DEC0094DD5A /* ArcGIS in Frameworks */ = {isa = PBXBuildFile; productRef = 6E9813452A568DEC0094DD5A /* ArcGIS */; settings = {ATTRIBUTES = (Required, ); }; };
@@ -59,8 +61,10 @@
 		1C10F5328101538BE2B5F8EF /* SimpleFillSymbol+Flutter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SimpleFillSymbol+Flutter.swift"; sourceTree = "<group>"; };
 		1C10F62A8CCF2639F8490EB9 /* LineSymbol+Flutter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LineSymbol+Flutter.swift"; sourceTree = "<group>"; };
 		1C10F65C54AE18C640E068D5 /* QueryParameters+Flutter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QueryParameters+Flutter.swift"; sourceTree = "<group>"; };
+		1C10F9BFFCD3BD1A5AB2BD77 /* GraphicsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphicsController.swift; sourceTree = "<group>"; };
 		1C10FA8DF30260BD080A277C /* UniqueValue+Flutter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UniqueValue+Flutter.swift"; sourceTree = "<group>"; };
 		1C10FB5BF918024392C3E9A5 /* SymbolFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolFactory.swift; sourceTree = "<group>"; };
+		1C10FB5CB56561DD7B8DE1CB /* GraphicController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphicController.swift; sourceTree = "<group>"; };
 		1C10FCB40102786290910E23 /* RendererFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RendererFactory.swift; sourceTree = "<group>"; };
 		1C10FFB4D8853F683821F8F1 /* UniqueValueRenderer+Flutter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UniqueValueRenderer+Flutter.swift"; sourceTree = "<group>"; };
 		300859A1DB2B75F4FFE98ACB /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -295,6 +299,8 @@
 				1C10F5E28CFFC8820F407948 /* UniqueValueRenderer+Flutter.swift in Resources */,
 				1C10F4FF9989666CA7C8366C /* UniqueValue+Flutter.swift in Resources */,
 				1C10F99A9A76255057D4168B /* QueryParameters+Flutter.swift in Resources */,
+				1C10FA8516A925C87C7F0A36 /* GraphicsController.swift in Resources */,
+				1C10F3DA676FEDF0EED0E45D /* GraphicController.swift in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

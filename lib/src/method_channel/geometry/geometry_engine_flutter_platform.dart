@@ -111,6 +111,12 @@ abstract class GeometryEngineFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('areaGeodetic() has not been implemented.');
   }
 
+  Future<Geometry?> union({
+    required List<Geometry> geometries,
+  }) {
+    throw UnimplementedError('union() has not been implemented.');
+  }
+
   Future<Envelope?> getExtent(Geometry geometry) {
     throw UnimplementedError('getExtent() has not been implemented.');
   }

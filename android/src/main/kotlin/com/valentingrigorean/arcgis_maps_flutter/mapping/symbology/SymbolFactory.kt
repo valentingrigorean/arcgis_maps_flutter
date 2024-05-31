@@ -22,6 +22,7 @@ object SymbolFactory {
             return null
         }
         return when (data["type"] as String) {
+            "json" -> Symbol.fromJsonOrNull(data["data"] as String)
             "simple-line" -> SimpleLineSymbol().apply {
                 interpretSimpleLineSymbol(data)
             }
@@ -42,12 +43,9 @@ object SymbolFactory {
             "composite" -> CompositeSymbol().apply {
                 data["symbols"]?.let {
                     val symbolsRaw = it as List<*>
-                    for (symbolRaw in symbolsRaw) {
-                        val symbol = createSymbol(context, symbolRaw)
-                        if (symbol != null) {
-                            symbols.add(symbol)
-                        }
-                    }
+                    symbols.addAll(symbolsRaw.mapNotNull { symbolRaw ->
+                        createSymbol(context, symbolRaw)
+                    })
                 }
             }
 
@@ -61,8 +59,8 @@ object SymbolFactory {
             PictureMarkerSymbol(data["url"] as String)
         } else if (data.containsKey("resource")) {
             val resourceName = data["resource"] as String
-            val tintColor = data["tintColor"] as Int?
-            val bitmap = context.createDrawableBitmap(resourceName, tintColor)
+            val tintColor = data["tintColor"] as Long?
+            val bitmap = context.createDrawableBitmap(resourceName, tintColor?.toInt())
             bitmap?.let { PictureMarkerSymbol.createWithImage(it) } ?: PictureMarkerSymbol()
         } else if (data.containsKey("fromBytes")) {
             val bytes = data["fromBytes"] as ByteArray

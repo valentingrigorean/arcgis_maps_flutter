@@ -5,9 +5,11 @@ import 'package:arcgis_maps_flutter/src/arcgis_method_channel.dart';
 import 'package:arcgis_maps_flutter/src/layers/layer_updates.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/arcgis_maps_flutter_platform.dart';
 import 'package:arcgis_maps_flutter/src/method_channel/map/map_event.dart';
+import 'package:arcgis_maps_flutter/src/symbology/graphic_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/marker_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polygon_updates.dart';
 import 'package:arcgis_maps_flutter/src/symbology/polyline_updates.dart';
+import 'package:arcgis_maps_flutter/src/utils/graphics.dart';
 import 'package:arcgis_maps_flutter/src/utils/layers.dart';
 import 'package:arcgis_maps_flutter/src/utils/markers.dart';
 import 'package:arcgis_maps_flutter/src/utils/polygons.dart';
@@ -51,7 +53,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   // It is a `broadcast` because multiple controllers will connect to
   // different stream views of this Controller.
   final StreamController<MapEvent> _mapEventStreamController =
-      StreamController<MapEvent>.broadcast();
+  StreamController<MapEvent>.broadcast();
 
   /// Accesses the MethodChannel associated to the passed mapId.
   MethodChannel channel(int mapId) {
@@ -68,28 +70,28 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
     if (channel == null) {
       channel = ArcgisMethodChannel('plugins.flutter.io/arcgis_maps_$mapId');
       channel.setMethodCallHandler(
-          (MethodCall call) => _handleMethodCall(call, mapId));
+              (MethodCall call) => _handleMethodCall(call, mapId));
       _channels[mapId] = channel;
     }
     return channel.invokeMethod<void>('map#waitForMap');
   }
 
   @override
-  Widget buildView(
-    int creationId,
-    PlatformViewCreatedCallback onPlatformViewCreated, {
-    required ArcGISMap map,
-    bool useAndroidViewSurface = true,
-    Viewpoint? viewpoint,
-    Set<Layer> operationalLayers = const <Layer>{},
-    Set<Layer> baseLayers = const <Layer>{},
-    Set<Layer> referenceLayers = const <Layer>{},
-    Set<Marker> markers = const <Marker>{},
-    Set<PolygonMarker> polygons = const <PolygonMarker>{},
-    Set<PolylineMarker> polylines = const <PolylineMarker>{},
-    Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers,
-    Map<String, dynamic> mapOptions = const <String, dynamic>{},
-  }) {
+  Widget buildView(int creationId,
+      PlatformViewCreatedCallback onPlatformViewCreated, {
+        required ArcGISMap map,
+        bool useAndroidViewSurface = true,
+        Viewpoint? viewpoint,
+        Set<Layer> operationalLayers = const <Layer>{},
+        Set<Layer> baseLayers = const <Layer>{},
+        Set<Layer> referenceLayers = const <Layer>{},
+        Set<Marker> markers = const <Marker>{},
+        Set<PolygonMarker> polygons = const <PolygonMarker>{},
+        Set<PolylineMarker> polylines = const <PolylineMarker>{},
+        Set<Graphic> graphics = const <Graphic>{},
+        Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers,
+        Map<String, dynamic> mapOptions = const <String, dynamic>{},
+      }) {
     final Map<String, dynamic> creationParams = <String, dynamic>{
       'map': map.toJson(),
       'options': mapOptions,
@@ -99,6 +101,7 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
       'markersToAdd': serializeMarkerSet(markers),
       'polygonsToAdd': serializePolygonSet(polygons),
       'polylinesToAdd': serializePolylineSet(polylines),
+      'graphicsToAdd': serializeGraphicSet(graphics),
     };
 
     if (viewpoint != null) {
@@ -235,21 +238,21 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   @override
   Future<double> getMapRotation(int mapId) async {
     final result =
-        await channel(mapId).invokeMethod<double>('map#getMapRotation');
+    await channel(mapId).invokeMethod<double>('map#getMapRotation');
     return result ?? 0;
   }
 
   @override
   Future<double> getWanderExtentFactor(int mapId) async {
     final result =
-        await channel(mapId).invokeMethod<double>('map#getWanderExtentFactor');
+    await channel(mapId).invokeMethod<double>('map#getWanderExtentFactor');
     return result ?? 0;
   }
 
   @override
   Future<List<TimeAwareLayerInfo>> getTimeAwareLayerInfos(int mapId) async {
     final result =
-        await channel(mapId).invokeListMethod('map#getTimeAwareLayerInfos');
+    await channel(mapId).invokeListMethod('map#getTimeAwareLayerInfos');
     if (result == null) {
       return const [];
     }
@@ -311,8 +314,8 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<bool> setViewpointGeometry(
-      int mapId, Geometry geometry, double? padding) async {
+  Future<bool> setViewpointGeometry(int mapId, Geometry geometry,
+      double? padding) async {
     final result = await channel(mapId).invokeMethod<bool>(
       'map#setViewpointGeometry',
       {
@@ -380,8 +383,8 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<Point?> screenToLocation(
-      int mapId, Offset screenPoint, SpatialReference spatialReference) async {
+  Future<Point?> screenToLocation(int mapId, Offset screenPoint,
+      SpatialReference spatialReference) async {
     final result = await channel(mapId).invokeMethod('map#screenToLocation', {
       'position': [screenPoint.dx, screenPoint.dy],
       'spatialReference': spatialReference.toJson(),
@@ -414,8 +417,14 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   }
 
   @override
-  Future<void> setLayerTimeOffset(
-      int mapId, LayerId layerId, TimeValue? timeValue) async {
+  Future<void> updateGraphics(int mapId, GraphicUpdates graphicsUpdate) {
+    return channel(mapId)
+        .invokeMethod<void>('graphic#update', graphicsUpdate.toJson());
+  }
+
+  @override
+  Future<void> setLayerTimeOffset(int mapId, LayerId layerId,
+      TimeValue? timeValue) async {
     return channel(mapId).invokeMethod<void>(
       'layer#setTimeOffset',
       {
@@ -472,6 +481,11 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
   @override
   Stream<PolylineTapEvent> onPolylineTap({required int mapId}) {
     return _events(mapId).whereType<PolylineTapEvent>();
+  }
+
+  @override
+  Stream<GraphicTapEvent> onGraphicTap({required int mapId}) {
+    return _events(mapId).whereType<GraphicTapEvent>();
   }
 
   @override
@@ -553,6 +567,14 @@ class MethodChannelArcgisMapsFlutter extends ArcgisMapsFlutterPlatform {
           PolylineTapEvent(
             mapId,
             PolylineId(call.arguments['polylineId']),
+          ),
+        );
+        break;
+      case 'graphic#onTap':
+        _mapEventStreamController.add(
+          GraphicTapEvent(
+            mapId,
+            GraphicId(call.arguments['graphicId']),
           ),
         );
         break;

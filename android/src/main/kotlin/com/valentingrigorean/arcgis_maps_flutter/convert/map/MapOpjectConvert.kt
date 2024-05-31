@@ -18,3 +18,8 @@ fun String.toPolygonIdValue(): Any {
     return data
 }
 
+fun String.toGraphicIdValue(): Any {
+    val data = HashMap<String, Any>(1)
+    data["graphicId"] = this
+    return data
+}

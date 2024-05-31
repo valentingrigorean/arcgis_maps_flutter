@@ -8,6 +8,7 @@ import com.arcgismaps.mapping.symbology.SimpleLineSymbol
 import com.arcgismaps.mapping.symbology.SimpleLineSymbolStyle
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toPointOrNull
 import com.valentingrigorean.arcgis_maps_flutter.convert.geometry.toSpatialReferenceOrNull
+import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.symbology.toSimpleFillSymbolStyle
 import com.valentingrigorean.arcgis_maps_flutter.convert.mapping.symbology.toSimpleLineSymbolStyle
 import com.valentingrigorean.arcgis_maps_flutter.convert.toArcgisColor
 import com.valentingrigorean.arcgis_maps_flutter.convert.toArcgisColorOrNull
@@ -29,6 +30,12 @@ class PolygonController(polygonId: String) : BaseGraphicController(), PolygonCon
         graphic.symbol = polygonSymbol
         graphic.attributes["polygonId"] = polygonId
     }
+
+    override var style: SimpleFillSymbolStyle
+        get() = polygonSymbol.style
+        set(value) {
+            polygonSymbol.style = value
+        }
 
     override var fillColor: com.arcgismaps.Color
         get() = polygonSymbol.color
@@ -56,6 +63,11 @@ class PolygonController(polygonId: String) : BaseGraphicController(), PolygonCon
         symbolVisibilityFilterController: SymbolVisibilityFilterController?
     ) {
         super.interpretGraphicController(data, symbolVisibilityFilterController)
+        val style = (data["style"] as String?)?.toSimpleFillSymbolStyle()
+        if (style != null) {
+            this.style = style
+        }
+
         val fillColor = data["fillColor"]?.toArcgisColorOrNull()
         if (fillColor != null) {
             this.fillColor = fillColor

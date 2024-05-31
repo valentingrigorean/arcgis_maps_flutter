@@ -172,6 +172,17 @@ class GeometryEngineController {
 
             result(GeometryEngine.geodeticArea(of: geometry, unit: areaUnit, curveType: curveType))
             break
+        case "union":
+            guard let geometryData = call.arguments as? [[String: Any]] else {
+                result(nil)
+                return
+            }
+            let geometries = geometryData.map {
+                Geometry.fromFlutter(data: $0)!
+            }
+            let unionGeometry = GeometryEngine.union(of: geometries)
+            result(unionGeometry?.toJSONFlutter())
+            break
         case "getExtent":
             let data = call.arguments as! [String: Any]
             let geometry = Geometry.fromFlutter(data: data["geometry"] as! [String: Any])!

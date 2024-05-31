@@ -21,6 +21,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
     private let markersController: MarkersController
     private let polygonsController: PolygonsController
     private let polylinesController: PolylinesController
+    private let graphicsController: GraphicsController
 
     private let mapManager: MapManager
 
@@ -60,8 +61,9 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         polygonsController = PolygonsController(methodChannel: channel, graphicsOverlays: graphicsOverlay)
         polylinesController = PolylinesController(methodChannel: channel, graphicsOverlays: graphicsOverlay)
         markersController = MarkersController(methodChannel: channel, graphicsOverlays: graphicsOverlay)
+        graphicsController = GraphicsController(methodChannel: channel, graphicsOverlay: graphicsOverlay)
 
-        symbolsControllers = [polygonsController, polylinesController, markersController]
+        symbolsControllers = [polygonsController, polylinesController, markersController, graphicsController]
 
         viewModel.addGraphicOverlay(graphicsOverlay)
 
@@ -73,7 +75,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
 
 
         geoViewTouchDelegate = GeoViewTouchDelegate(methodChannel: channel, viewModel: viewModel)
-        geoViewTouchDelegate.addDelegates(graphicTouchDelegates: [markersController, polygonsController, polylinesController, locationDisplayController])
+        geoViewTouchDelegate.addDelegates(graphicTouchDelegates: [markersController, polygonsController, polylinesController, locationDisplayController, graphicsController])
 
 
         legendInfoController = LegendInfoController(layersController: layersController)
@@ -96,7 +98,7 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
                 .store(in: &cancellables)
 
         initWithArgs(args: args)
-                
+
         hostingView.frame = frame
         hostingView.setView(AnyView(MapContentView(viewModel: viewModel)))
 
@@ -364,6 +366,20 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
             }
             result(nil)
             break
+        case "graphic#update":
+            if let graphicUpdates = call.arguments as? [String: Any] {
+                if let graphicsToAdd = graphicUpdates["graphicsToAdd"] as? [[String: Any]] {
+                    graphicsController.addGraphics(graphicsToAdd: graphicsToAdd)
+                }
+                if let graphicsToChange = graphicUpdates["graphicsToChange"] as? [[String: Any]] {
+                    graphicsController.changeGraphics(graphicsToChange: graphicsToChange)
+                }
+                if let graphicsIdsToRemove = graphicUpdates["graphicIdsToRemove"] as? [String] {
+                    graphicsController.removeGraphics(graphicIdsToRemove: graphicsIdsToRemove)
+                }
+            }
+            result(nil)
+            break
         case "layer#setTimeOffset":
             layersController.setTimeOffset(arguments: call.arguments)
             result(nil)
@@ -387,8 +403,10 @@ public class ArcgisMapController: NSObject, FlutterPlatformView {
         }
         taskManager.createTask {
             do {
-                let res = try await featureTable.queryFeatures(using:query)
-                result(res.features().map { $0.toJSONFlutter() })
+                let res = try await featureTable.queryFeatures(using: query)
+                result(res.features().map {
+                    $0.toJSONFlutter()
+                })
             } catch {
                 result(FlutterError(code: "query_error", message: error.localizedDescription, details: nil))
             }
@@ -585,7 +603,7 @@ private class MapManager {
                 return
             }
             if let viewPoint = viewPoint {
-                await self.viewModel.mapViewProxy?.setViewpoint(viewPoint,duration: 0)
+                await self.viewModel.mapViewProxy?.setViewpoint(viewPoint, duration: 0)
             }
         }
     }

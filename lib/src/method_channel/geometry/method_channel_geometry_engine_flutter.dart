@@ -216,6 +216,18 @@ class MethodChannelGeometryEngineFlutter extends GeometryEngineFlutterPlatform {
   }
 
   @override
+  Future<Geometry?> union({required List<Geometry> geometries}) {
+    return _channel.invokeMethod("union", {
+      "geometries": geometries.map((e) => e.toJson()).toList(),
+    }).then((result) {
+      if (result == null) {
+        return null;
+      }
+      return Geometry.fromJson(result);
+    });
+  }
+
+  @override
   Future<Envelope?> getExtent(Geometry geometry) async {
     final extent = await _channel
         .invokeMethod("getExtent", {"geometry": geometry.toJson()});
