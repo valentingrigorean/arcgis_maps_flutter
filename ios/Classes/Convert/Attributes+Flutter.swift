@@ -25,3 +25,15 @@ extension NSMutableDictionary {
         return flutterAttributes
     }
 }
+
+
+extension Dictionary where Key == String, Value == Sendable {
+    func toFlutterTypes() -> [String: Any] {
+        var flutterAttributes = [String: Any]()
+
+        for attr in self {
+            flutterAttributes[attr.key] = toFlutterFieldType(obj: attr.value)
+        }
+        return flutterAttributes
+    }
+}
